@@ -71,9 +71,19 @@ It's funny how I have ideas for **real-world projects that could make a huge imp
 
 ## 📈 GitHub Stats
 
-![Maluleke's GitHub Stats](https://github-readme-stats-eight-theta.vercel.app/api?username=KSDRILL&show_icons=true&theme=radical&count_private=true&include_all_commits=true)
+<div align="center">
 
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=radical)
+  ## 📈 My GitHub Metrics
+
+  <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=KSDRILL&show_icons=true&theme=radical&count_private=true" alt="Stats" height="180px" />
+  <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=radical&count_private=true" alt="Languages" height="180px" />
+
+  <br/>
+
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=radical" alt="Streak" />
+
+</div>
+
 
 ---
 
