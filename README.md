@@ -1,5 +1,14 @@
-# Hi, I'm Maluleke Kurhula Success 👋  
-**Full-Stack Software Developer | Problem Solver | Systems Builder**
+<h1 align="center">
+  <marquee behavior="scroll" direction="right" scrollamount="6">
+    Hi, I'm Maluleke Kurhula Success 👋
+  </marquee>
+</h1>
+
+<p align="center">
+  <marquee behavior="scroll" direction="right" scrollamount="4">
+    <strong>Full-Stack Software Developer | Problem Solver | Systems Builder</strong>
+  </marquee>
+</p>
 
 ![Profile Views](https://komarev.com/ghpvc/?username=KSDRILL&color=blue&style=flat-square)
 ![GitHub Followers](https://img.shields.io/github/followers/KSDRILL?label=Followers&style=flat-square)
