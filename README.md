@@ -1,6 +1,6 @@
 <p align="center">
   <img
-    src="https://readme-typing-svg.herokuapp.com?size=28&duration=3500&color=36BCF7&center=true&vCenter=true&width=900&lines=Hi%2C+I%27m+Maluleke+Kurhula+Success+%F0%9F%91%8B;Full-Stack+Software+Developer;Backend-Focused+Engineer;Scalable+Web+Applications+%26+APIs"
+    src="https://readme-typing-svg.herokuapp.com?size=28&duration=5500&color=36BCF7&center=true&vCenter=true&width=900&lines=Hi%2C+I%27m+Maluleke+Kurhula+Success+%F0%9F%91%8B;Full-Stack+Software+Developer;Backend-Focused+Engineer;Scalable+Web+Applications+%26+APIs"
   />
 </p>
 
