@@ -94,12 +94,6 @@ Despite resource constraints, my long-term goal is to **design and deliver syste
 
 ## 📊 GitHub Activity
 
-### 🧠 Primary Programming Languages
-
-- **Java** — Backend systems, object-oriented design, Spring Boot applications  
-- **C++** — Data structures, algorithms, and performance-critical programming  
-- **Python** — Automation, scripting, backend services, and problem-solving  
-
 <div align="center">
 
 <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=KSDRILL&show_icons=true&theme=radical&count_private=true" height="180px" />
@@ -109,6 +103,13 @@ Despite resource constraints, my long-term goal is to **design and deliver syste
 <br/>
 
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=radical" />
+
+### 🧠 Primary Programming Languages
+
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
+![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+
 
 </div>
 
