@@ -101,17 +101,15 @@ Despite resource constraints, my long-term goal is to **design and deliver syste
 <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=radical&count_private=true" height="180px" />
 
 <br/>
-
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=radical" />
+
+</div>
 
 ### 🧠 Primary Programming Languages
 
 ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-
-
-</div>
 
 ---
 
