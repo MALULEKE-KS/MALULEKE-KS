@@ -1,28 +1,29 @@
 <p align="center">
   <img
-    src="https://readme-typing-svg.herokuapp.com?size=28&duration=5500&color=36BCF7&center=true&vCenter=true&width=900&lines=Hi%2C+I%27m+Maluleke+Kurhula+Success+%F0%9F%91%8B;Full-Stack+Software+Developer;Backend-Focused+Engineer;Scalable+Web+Applications+%26+APIs"
+    src="https://readme-typing-svg.herokuapp.com?size=26&duration=5500&color=36BCF7&center=true&vCenter=true&width=900&lines=Hi%2C+I%27m+Maluleke+Kurhula+Success+%F0%9F%91%8B;Full-Stack+Software+Developer;Backend-Focused+Engineer;Scalable+Web+Applications+%26+APIs"
   />
 </p>
 
-![Profile Views](https://komarev.com/ghpvc/?username=KSDRILL&color=blue&style=flat-square)
 ![GitHub Followers](https://img.shields.io/github/followers/KSDRILL?label=Followers&style=flat-square)
 
 ---
 
 ## 👨‍💻 About Me
 
-I am a **Full-Stack Developer** focused on building **scalable, secure, and maintainable software systems** using modern technologies.
+I am a **Full-Stack Software Developer** with a strong focus on **backend engineering, system architecture, and scalable application design**.
 
-I enjoy working across the full software lifecycle — from **frontend architecture and system design** to **backend services, APIs, databases, and DevOps pipelines**.
+I work across the full software lifecycle — from **frontend structure and API design** to **backend services, databases, authentication, and DevOps pipelines**.
+
+> I prioritize clean architecture, maintainability, and scalability over quick fixes.
 
 I am actively open to:
-- **Real-world software development projects**
-- **Mentorship and engineering growth opportunities**
-- **Impact-driven initiatives in technology and STEM**
+- Real-world software development projects  
+- Mentorship and engineering growth opportunities  
+- Impact-driven initiatives in technology and STEM  
 
 ---
 
-## 🚀 Technical Skills
+## 🚀 Engineering Stack
 
 ### 🎨 Frontend Development
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
@@ -35,9 +36,9 @@ I am actively open to:
 ---
 
 ### 🛠 Backend Development
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
-![Spring](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 
 ---
 
@@ -63,35 +64,35 @@ I am actively open to:
 
 ---
 
-### 🧰 Engineering Tooling
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-![Testing](https://img.shields.io/badge/Automated_Testing-6E40C9?style=for-the-badge)
-![Linters](https://img.shields.io/badge/Code_Quality-ff69b4?style=for-the-badge)
-![Monitoring](https://img.shields.io/badge/System_Monitoring-1abc9c?style=for-the-badge)
+## 🧠 Primary Programming Languages
+
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
+![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
 ---
 
-### 🤝 Professional Strengths
-- Clear technical communication  
-- Strong debugging and analytical problem-solving  
-- System design and architectural thinking  
-- Effective collaboration in team environments  
+## 🧩 Selected Projects
+
+### 🔹 Scalable Web Application
+**Tech:** Angular, Spring Boot, PostgreSQL, Docker  
+- Designed and implemented REST APIs with authentication  
+- Built modular frontend architecture  
+- Deployed using containerized workflows  
+
+### 🔹 Backend API Service
+**Tech:** Java, Spring Boot, JWT, MySQL  
+- Implemented secure authentication and role-based access  
+- Optimized database queries for performance  
+- Applied clean architecture principles  
 
 ---
 
 ## 🌱 Current Focus
 
-- Developing **production-ready full-stack applications**
-- Strengthening **system architecture and backend scalability**
+- Building **production-ready full-stack applications**
+- Strengthening **backend scalability and system design**
 - Contributing to **real-world software solutions**
-
----
-
-## 💭 Vision
-
-I am deeply interested in building **technology-driven solutions that create real impact**, particularly in **STEM education and digital transformation**.
-
-Despite resource constraints, my long-term goal is to **design and deliver systems that improve access, efficiency, and opportunity through technology**.
 
 ---
 
@@ -108,11 +109,13 @@ Despite resource constraints, my long-term goal is to **design and deliver syste
 
 </div>
 
-### 🧠 Primary Programming Languages
+---
 
-![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
-![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+## 📌 What I’m Looking For
+
+- Entry to mid-level software engineering roles  
+- Backend or full-stack teams with strong engineering culture  
+- Opportunities to grow in system design and scalable architectures  
 
 ---
 
