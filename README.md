@@ -8,14 +8,14 @@
 
 ## 👨‍💻 About Me
 
-I am a **Full-Stack Developer** focused on building **scalable, secure, and maintainable web applications** using modern technologies.
+I am a **Full-Stack Developer** focused on building **scalable, secure, and maintainable software systems** using modern technologies.
 
-I enjoy working across the entire software lifecycle — from **system design and frontend architecture** to **backend services, APIs, databases, and DevOps pipelines**.
+I enjoy working across the full software lifecycle — from **frontend architecture and system design** to **backend services, APIs, databases, and DevOps pipelines**.
 
-I am actively seeking:
-- **Real-world project collaborations**
-- **Mentorship & engineering growth opportunities**
-- **Impact-driven projects in technology and STEM**
+I am actively open to:
+- **Real-world software development projects**
+- **Mentorship and engineering growth opportunities**
+- **Impact-driven initiatives in technology and STEM**
 
 ---
 
@@ -70,28 +70,35 @@ I am actively seeking:
 
 ### 🤝 Professional Strengths
 - Clear technical communication  
-- Strong debugging & problem-solving skills  
-- System design thinking  
-- Team collaboration & adaptability  
+- Strong debugging and analytical problem-solving  
+- System design and architectural thinking  
+- Effective collaboration in team environments  
 
 ---
 
 ## 🌱 Current Focus
 
-- Building **production-ready full-stack systems**
-- Improving **system architecture & scalability**
-- Contributing to **real-world, impact-driven projects**
+- Developing **production-ready full-stack applications**
+- Strengthening **system architecture and backend scalability**
+- Contributing to **real-world software solutions**
 
 ---
 
 ## 💭 Vision
 
-I have a strong passion for **technology-driven solutions that can positively impact STEM education and society at large**.  
-While resource limitations can slow execution, my long-term goal is to **build systems that create real value and opportunity**.
+I am deeply interested in building **technology-driven solutions that create real impact**, particularly in **STEM education and digital transformation**.
+
+Despite resource constraints, my long-term goal is to **design and deliver systems that improve access, efficiency, and opportunity through technology**.
 
 ---
 
 ## 📊 GitHub Activity
+
+### 🧠 Primary Programming Languages
+
+- **Java** — Backend systems, object-oriented design, Spring Boot applications  
+- **C++** — Data structures, algorithms, and performance-critical programming  
+- **Python** — Automation, scripting, backend services, and problem-solving  
 
 <div align="center">
 
