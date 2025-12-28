@@ -1,13 +1,7 @@
-<h1 align="center">
-  <marquee behavior="scroll" direction="right" scrollamount="6">
-    Hi, I'm Maluleke Kurhula Success 👋
-  </marquee>
-</h1>
-
 <p align="center">
-  <marquee behavior="scroll" direction="right" scrollamount="4">
-    <strong>Full-Stack Software Developer | Problem Solver | Systems Builder</strong>
-  </marquee>
+  <img
+    src="https://readme-typing-svg.herokuapp.com?size=28&duration=3500&color=36BCF7&center=true&vCenter=true&width=800&lines=Hi%2C+I%27m+Maluleke+Kurhula+Success+%F0%9F%91%8B;Full-Stack+Software+Developer+%7C+Problem+Solver+%7C+Systems+Builder"
+  />
 </p>
 
 ![Profile Views](https://komarev.com/ghpvc/?username=KSDRILL&color=blue&style=flat-square)
