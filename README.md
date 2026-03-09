@@ -1,4 +1,3 @@
-```markdown
 # 👨‍💻 Maluleke Kurhula Success
 
 <p align="center">
@@ -79,7 +78,7 @@
 
 ## 🏗️ Architecture & Engineering Philosophy
 
-```javascript
+javascript
 const engineeringPhilosophy = {
   principles: [
     "Clean Code Over Clever Code",
@@ -110,7 +109,7 @@ const engineeringPhilosophy = {
     cloud: "AWS/Azure Ready"
   }
 };
-```
+
 
 ---
 
@@ -161,7 +160,7 @@ const engineeringPhilosophy = {
 
 ## 🎓 Current Learning & Development
 
-```yaml
+yaml
 continuous_improvement:
   frontend:
     - Advanced React Patterns & Performance
@@ -182,7 +181,7 @@ continuous_improvement:
     - Technical Leadership
     - System Design Interviewing
     - Technical Writing & Documentation
-```
+
 
 ---
 
@@ -249,7 +248,7 @@ I'm actively seeking opportunities where I can:
 
 ## 📊 Quick Facts
 
-```javascript
+javascript
 const kurhula = {
   location: "South Africa",
   timezone: "GMT+2",
@@ -260,7 +259,7 @@ const kurhula = {
   coffeeRequired: true,
   problemSolving: "Always ON"
 };
-```
+
 
 ---
 
@@ -273,4 +272,4 @@ const kurhula = {
   <br/>
   <i>🚀 Building tomorrow's solutions, today 🚀</i>
 </p>
-```
+
