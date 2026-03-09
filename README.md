@@ -78,7 +78,8 @@
 
 ## 🏗️ Architecture & Engineering Philosophy
 
-javascript
+
+```javascript
 const engineeringPhilosophy = {
   principles: [
     "Clean Code Over Clever Code",
@@ -109,7 +110,6 @@ const engineeringPhilosophy = {
     cloud: "AWS/Azure Ready"
   }
 };
-
 
 ---
 
