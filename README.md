@@ -1,8 +1,8 @@
 # Maluleke Kurhula Success
-## Full-Stack AI Engineer | React • Node.js • Python
+## Full-Stack Developer + AI Engineer | React • Node.js • Python
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=600&lines=Full-Stack+AI+Engineer;React+%7C+Node.js+%7C+Python;LangChain+%7C+Vector+Databases;Building+Production+Systems" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=600&lines=Full-Stack+Developer+%2B+AI+Engineer;React+%7C+Node.js+%7C+Python;LangChain+%7C+Vector+Databases;Building+Production+Systems" alt="Typing SVG" />
 </p>
 
 <p align="center">
@@ -15,22 +15,22 @@
 
 ---
 
-## Professional Summary
+## About Me
 
-Full-Stack AI Engineer equally focused on **traditional web development** and **AI system integration**. I build complete applications with **React** and **Node.js** while incorporating **LangChain agents**, **RAG pipelines**, and **vector databases** where they add practical value. My approach balances engineering fundamentals with emerging AI capabilities—ensuring production-ready systems that are observable, testable, and scalable.
+Full-Stack Developer and AI Engineer currently strengthening my frontend skills with **React** and **Tailwind CSS** while maintaining strong backend capabilities in **Node.js** and **Python**. I build complete web applications and integrate practical AI features using **LangChain** and vector databases where they add real value.
+
+My approach combines solid engineering fundamentals with emerging AI capabilities—focusing on production-ready systems that are observable, testable, and scalable.
 
 ---
 
 ## Technical Stack
 
-### Frontend Engineering
+### Currently Learning (Frontend)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Redux](https://img.shields.io/badge/Redux-764ABC?style=for-the-badge&logo=redux&logoColor=white)
-![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
 ### Backend Engineering
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
@@ -40,7 +40,6 @@ Full-Stack AI Engineer equally focused on **traditional web development** and **
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![REST](https://img.shields.io/badge/REST-02569B?style=for-the-badge&logo=swagger&logoColor=white)
-![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)
 
 ### AI & Machine Learning
 ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
@@ -48,24 +47,17 @@ Full-Stack AI Engineer equally focused on **traditional web development** and **
 ![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)
 ![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)
 ![LlamaIndex](https://img.shields.io/badge/LlamaIndex-7047A8?style=for-the-badge)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
-
-### Vector Databases & Search
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-5A67D8?style=for-the-badge)
 ![Weaviate](https://img.shields.io/badge/Weaviate-5A67D8?style=for-the-badge)
-![Pinecone](https://img.shields.io/badge/Pinecone-F6821E?style=for-the-badge)
-![Elasticsearch](https://img.shields.io/badge/Elasticsearch-005571?style=for-the-badge&logo=elasticsearch&logoColor=white)
 
-### Databases & Data Layer
+### Databases
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 
-### DevOps & Infrastructure
+### DevOps & Tools
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
@@ -73,254 +65,172 @@ Full-Stack AI Engineer equally focused on **traditional web development** and **
 
 ---
 
-## Full-Stack Engineering
+## Current Focus
 
-### Frontend Development
-- **React & Next.js** applications with TypeScript for type safety
-- **Tailwind CSS** for utility-first, responsive styling
-- **State management** using Redux Toolkit and React Query
-- **Performance optimization** through code splitting and lazy loading
-- **Component architecture** focused on reusability and maintainability
+### Learning Path
+- **React fundamentals** including hooks, context, and component patterns
+- **Tailwind CSS** for responsive, utility-first styling
+- **TypeScript** integration with React for type safety
+- Building complete frontend applications while strengthening backend skills
 
-### Backend Development
-- **Node.js/Express** REST APIs with middleware and validation
-- **Python/FastAPI** for high-performance async endpoints
-- **Authentication & authorization** using JWT and OAuth2
-- **Database design** with PostgreSQL and MongoDB
-- **API documentation** via Swagger/OpenAPI
+### Engineering Practice
+- Building full-stack applications with Node.js backend and React frontend
+- Integrating AI features using LangChain and vector databases
+- Following clean code principles and maintainable architecture
+- Containerizing applications with Docker for consistent deployment
 
-### System Architecture
-- **Microservices** with clear separation of concerns
-- **Real-time features** using WebSockets
-- **Caching strategies** with Redis
-- **Message queues** for asynchronous processing
-- **Containerization** with Docker for consistent deployment
+---
+
+## Backend Engineering (Current Strength)
+
+### Node.js Development
+- REST API design with Express middleware and validation
+- Authentication using JWT and OAuth2 strategies
+- Database integration with PostgreSQL and MongoDB
+- Error handling and logging patterns
+- File processing and upload management
+
+### Python Development
+- FastAPI for high-performance async endpoints
+- LangChain agent orchestration and tool-use
+- RAG pipeline implementation with vector databases
+- LLM integration with OpenAI and local models
+- Data processing and ETL workflows
+
+### Database & Infrastructure
+- SQL and NoSQL database design
+- Query optimization and indexing
+- Redis caching strategies
+- Docker containerization
+- Basic AWS deployment
 
 ---
 
 ## AI Engineering
 
 ### LangChain Development
-- **Agent orchestration** with tool-use and planning capabilities
-- **Chain-of-thought reasoning** for complex multi-step tasks
-- **Conversation memory** using vector stores and buffers
-- **Multi-agent collaboration** for specialized task handling
+- Agent orchestration with tool-use capabilities
+- Chain-of-thought reasoning for multi-step tasks
+- Conversation memory using vector stores
+- Document loading and splitting strategies
 
 ### RAG Systems
-- **Document chunking strategies** (semantic, recursive, token-based)
-- **Embedding generation** with OpenAI and local models
-- **Vector database optimization** (filtering, indexing, hybrid search)
-- **Retrieval quality** monitoring and improvement
-
-### LLM Integration
-- **OpenAI API** for GPT models with function calling
-- **Local models** via Ollama for cost-effective deployment
-- **Prompt engineering** with version control and testing
-- **Structured output** parsing and validation
+- Document chunking for optimal retrieval
+- Embedding generation with various models
+- Vector database integration (ChromaDB, Weaviate)
+- Retrieval quality monitoring
 
 ### Production AI Patterns
-- **Confidence scoring** with fallback workflows
-- **Human-in-the-loop** for sensitive operations
-- **Token usage optimization** and cost tracking
-- **Streaming responses** with Server-Sent Events
-- **Observability** for latency, retrieval quality, and hallucination rates
+- Confidence scoring with fallback workflows
+- Token usage optimization
+- Streaming responses with Server-Sent Events
+- Observability for AI applications
 
 ---
 
-## Architecture Diagram
+## Projects
 
+### Backend-Focused
+**AI Research Assistant API**
+*Node.js • Python • LangChain • ChromaDB • OpenAI*
+- Built document processing pipeline for technical content
+- Implemented semantic search with vector embeddings
+- Created API endpoints for query and retrieval
+- Added citation tracking for source verification
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                         React/Next.js Frontend                       │
-│              Tailwind CSS • TypeScript • React Query                 │
-│            Component Library • State Management • Routing             │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                           API Gateway Layer                           │
-│                    REST • GraphQL • WebSockets                        │
-│                  Rate Limiting • Request Validation                    │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                    ┌───────────────┴───────────────┐
-                    ▼                               ▼
-┌─────────────────────────────────┐    ┌─────────────────────────────────┐
-│      Node.js/Express Services    │    │      Python/FastAPI Services    │
-│  ┌─────────────────────────────┐ │    │  ┌───────────────────────────┐ │
-│  │ Authentication & Users      │ │    │  │ LangChain Agents          │ │
-│  │ Business Logic & Validation │ │    │  │ RAG Pipelines             │ │
-│  │ REST API Endpoints          │ │    │  │ LLM Integration           │ │
-│  │ File Processing             │ │    │  │ Embedding Generation      │ │
-│  │ Email & Notifications       │ │    │  │ Streaming Responses       │ │
-│  └─────────────────────────────┘ │    │  └───────────────────────────┘ │
-└─────────────────────────────────┘    └─────────────────────────────────┘
-                    │                               │
-                    ▼                               ▼
-┌─────────────────────────────────┐    ┌─────────────────────────────────┐
-│       PostgreSQL/MongoDB         │    │       Vector Databases          │
-│  ┌─────────────────────────────┐ │    │  ┌───────────────────────────┐ │
-│  │ User Profiles               │ │    │  │ ChromaDB / Weaviate       │ │
-│  │ Application State           │ │    │  │ Embeddings Store          │ │
-│  │ Transactions & Relations    │ │    │  │ Semantic Search Index     │ │
-│  │ Audit Logs                  │ │    │  │ Document Chunks           │ │
-│  └─────────────────────────────┘ │    │  └───────────────────────────┘ │
-└─────────────────────────────────┘    └─────────────────────────────────┘
-                    │                               │
-                    └───────────────┬───────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                          Redis Cache Layer                            │
-│                    Session Store • Rate Limiting                       │
-│                    API Response Cache • Job Queue                      │
-└─────────────────────────────────────────────────────────────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      Docker • Kubernetes • AWS                        │
-│                    CI/CD • Monitoring • Logging                        │
-└─────────────────────────────────────────────────────────────────────┘
+**Customer Support Agent API**
+*Python • FastAPI • LangChain • Weaviate*
+- Developed autonomous agent with knowledge base retrieval
+- Implemented confidence scoring and uncertainty handling
+- Created conversation memory system
+- Built feedback collection for improvement
 
+**Document Processing Service**
+*Node.js • Python • Tesseract • PostgreSQL*
+- Built OCR pipeline for invoice processing
+- Implemented field extraction using LLMs
+- Added PII redaction layer
+- Created audit logging system
+
+### Full-Stack (In Progress)
+**Task Management Application**
+*React (learning) • Node.js • Express • PostgreSQL*
+- Building frontend with React and Tailwind CSS
+- Implementing authentication with JWT
+- Creating REST API with validation
+- Adding real-time updates with WebSockets
 
 ---
 
-## Featured Projects
+## Current Learning Progress
 
-### Full-Stack Applications
+React & Frontend
+├── Components, props, and state
+├── Hooks (useState, useEffect, useContext)
+├── Routing with React Router
+├── State management (Context API, Redux)
+├── Tailwind CSS utilities and components
+└── Building responsive layouts
 
-**TaskFlow - Project Management Platform**
-*React • Node.js • Express • PostgreSQL • JWT • WebSockets*
-- Built full-stack collaborative application with role-based access control
-- Implemented real-time updates using WebSockets for live task changes
-- Designed responsive UI with Tailwind CSS and dark mode support
-- Created RESTful API with comprehensive validation and error handling
-- Containerized with Docker for development and production consistency
+TypeScript
+├── Interfaces and types
+├── Generics and utility types
+├── React with TypeScript
+└── Type safety in full-stack apps
 
-**MediTrack - Healthcare Portal**
-*Next.js • Node.js • MongoDB • Redis • JWT*
-- Developed patient management system with secure authentication flows
-- Implemented role-based views for patients, doctors, and administrators
-- Built appointment scheduling with calendar integration and reminders
-- Created reporting dashboard with data visualization using Chart.js
-- Optimized database queries achieving 40% performance improvement
-
-**E-Commerce Backend Service**
-*Node.js • Express • PostgreSQL • Redis • JWT*
-- Designed scalable microservice architecture for product catalog and orders
-- Implemented Redis caching reducing response times by 60%
-- Built payment integration with webhook handling for transaction reliability
-- Created comprehensive test suite with 85% code coverage
-- Deployed on AWS with auto-scaling configuration
-
-### AI-Integrated Projects
-
-**AI Research Assistant Platform**
-*React • Node.js • LangChain • ChromaDB • OpenAI*
-- Built document ingestion system supporting PDF, DOCX, and TXT formats
-- Implemented semantic chunking with overlap for context preservation
-- Created hybrid search combining keyword and vector search
-- Developed citation tracking with source ranking for accuracy
-- Added streaming responses with incremental UI updates
-
-**Customer Support Agent**
-*Next.js • Python • FastAPI • LangChain • Weaviate*
-- Developed autonomous support bot with knowledge base retrieval
-- Implemented confidence scoring with uncertainty handling
-- Created ticket escalation workflow for low-confidence queries
-- Built conversation memory using vector storage for context
-- Added feedback loop for continuous model improvement
-
-**Document Intelligence Pipeline**
-*React • Node.js • Python • Tesseract • PostgreSQL*
-- Built automated invoice processing with OCR extraction
-- Implemented schema-based field extraction using LLMs
-- Created PII redaction layer before LLM processing
-- Developed human review interface with audit logging
-- Added confidence scoring with manual override options
-
-**Meeting Intelligence Platform**
-*React • Node.js • Python • WebSockets • Redis*
-- Built real-time meeting transcript analysis system
-- Implemented action item extraction with deadline detection
-- Created sentiment analysis across conversation segments
-- Developed searchable history with full-text search
-- Added real-time UI updates as processing occurs
-
----
-
-## Development Philosophy
-
-
-Traditional Engineering                    AI Engineering
-─────────────────────────────────────────────────────────────
-Clean Code                     →        Prompt Version Control
-SOLID Principles               →        Chain-of-Thought Design
-Database Normalization         →        Vector Index Optimization
-API Documentation              →        Prompt Templates
-Unit Testing                   →        Retrieval Evaluation
-Error Handling                 →        Fallback Strategies
-Caching                        →        Token Usage Optimization
-Authentication                 →        PII Redaction
-Logging                        →        LLM Observability
-
-
----
-
-## Current Development Focus
-
-
-Full-Stack Development
-├── Next.js 14 App Router and Server Components
-├── Node.js microservices with clean architecture
-├── GraphQL federation for API composition
-├── Real-time features with WebSockets
-├── Database optimization and query performance
-└── Container orchestration with Kubernetes
-
-AI Engineering
-├── LangChain agent development with tool-use
-├── Multi-agent coordination patterns
-├── RAG system improvements with hybrid search
-├── Query transformation and re-ranking
-├── Cost optimization for token usage
-└── Observability for LLM applications
-
+Full-Stack Integration
+├── Connecting React to Node.js APIs
+├── Authentication flows
+├── Real-time features
+└── Deployment strategies
 
 ---
 
 ## GitHub Analytics
 
 <div align="center">
-  <img height="180" src="https://github-readme-stats.vercel.app/api?username=KSDRILL&show_icons=true&theme=transparent&hide_border=true&include_all_commits=true&count_private=true&title_color=2563EB&icon_color=2563EB&text_color=374151" />
-  <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151" />
+  <img height="160" src="https://github-readme-stats.vercel.app/api?username=KSDRILL&show_icons=true&theme=transparent&hide_border=true&include_all_commits=true&count_private=true&title_color=2563EB&icon_color=2563EB&text_color=374151" />
+  <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151" />
   
   <br/>
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB" width="48%" />
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=KSDRILL&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" />
 </div>
 
 ---
 
 ## What I Bring
 
+### Backend Strength
+- Production experience with Node.js and Python
+- API design and database optimization
+- Authentication and security patterns
+- Docker and deployment knowledge
+- Clean, maintainable code practices
 
-Full-Stack Foundation
-├── Production experience with React and Node.js
-├── Clean, maintainable code following best practices
-├── Database design and optimization
-├── REST API design and documentation
-├── Authentication and authorization patterns
-├── Testing and debugging methodologies
-└── Deployment and DevOps practices
+### AI Capabilities
+- LangChain agent development
+- RAG system implementation
+- Vector database integration
+- LLM cost optimization
+- Production AI patterns
 
-AI Engineering
-├── LangChain agent development and orchestration
-├── RAG system design and implementation
-├── Vector database integration and optimization
-├── LLM integration with cost management
-├── Production AI patterns and fallback strategies
-├── Observability for AI applications
-└── Balancing AI capabilities with engineering fundamentals
+### Currently Building
+- React frontend skills
+- Tailwind CSS proficiency
+- Full-stack integration expertise
+- TypeScript adoption
 
+---
+
+## Development Philosophy
+
+> Write code that works, then make it better. Learn continuously, build practically.
+
+- Backend first, frontend always improving
+- AI where it adds value, not for its own sake
+- Clean code over clever code
+- Production-ready over proof-of-concept
+- Learning by building
 
 ---
 
@@ -345,7 +255,7 @@ AI Engineering
 ---
 
 <p align="center">
-  <i>Full-Stack AI Engineer • React • Node.js • Python • LangChain</i>
+  <i>Full-Stack Developer + AI Engineer • React (learning) • Node.js • Python • LangChain</i>
   <br/>
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=80&section=footer" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=60&section=footer" />
 </p>
