@@ -2,7 +2,7 @@
 ## Full-Stack AI Engineer | React • Node.js • Python
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=600&lines=Full-Stack+AI+Engineer;React+%7C+Node.js+%7C+Python;LangChain+%7C+Vector+Databases;Building+Production+AI" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=600&lines=Full-Stack+AI+Engineer;React+%7C+Node.js+%7C+Python;LangChain+%7C+Vector+Databases;Building+Production+Systems" alt="Typing SVG" />
 </p>
 
 <p align="center">
@@ -17,9 +17,7 @@
 
 ## Professional Summary
 
-Full-Stack AI Engineer building production applications with **React**, **Node.js**, and **Python**. I integrate **LangChain agents**, **RAG systems**, and **vector databases** into complete web solutions. My focus is practical AI—observable, testable, and scalable systems that solve real business problems.
-
-Current work: Agentic AI systems, document intelligence pipelines, and full-stack web applications with modern JavaScript ecosystems.
+Full-Stack AI Engineer equally focused on **traditional web development** and **AI system integration**. I build complete applications with **React** and **Node.js** while incorporating **LangChain agents**, **RAG pipelines**, and **vector databases** where they add practical value. My approach balances engineering fundamentals with emerging AI capabilities—ensuring production-ready systems that are observable, testable, and scalable.
 
 ---
 
@@ -75,141 +73,217 @@ Current work: Agentic AI systems, document intelligence pipelines, and full-stac
 
 ---
 
-## AI Engineering Capabilities
+## Full-Stack Engineering
 
-### Agentic Systems
-- **LangChain agent orchestration** with tool-use and planning
-- **Chain-of-thought reasoning** for complex tasks
-- **Conversation memory** using vector stores
-- **Multi-agent collaboration** patterns
+### Frontend Development
+- **React & Next.js** applications with TypeScript for type safety
+- **Tailwind CSS** for utility-first, responsive styling
+- **State management** using Redux Toolkit and React Query
+- **Performance optimization** through code splitting and lazy loading
+- **Component architecture** focused on reusability and maintainability
 
-### Retrieval-Augmented Generation
-- **Document chunking strategies** (semantic, recursive)
-- **Embedding generation** (OpenAI, Hugging Face, local)
-- **Vector database optimization** (filtering, hybrid search)
-- **Citation and grounding** for accuracy
+### Backend Development
+- **Node.js/Express** REST APIs with middleware and validation
+- **Python/FastAPI** for high-performance async endpoints
+- **Authentication & authorization** using JWT and OAuth2
+- **Database design** with PostgreSQL and MongoDB
+- **API documentation** via Swagger/OpenAPI
+
+### System Architecture
+- **Microservices** with clear separation of concerns
+- **Real-time features** using WebSockets
+- **Caching strategies** with Redis
+- **Message queues** for asynchronous processing
+- **Containerization** with Docker for consistent deployment
+
+---
+
+## AI Engineering
+
+### LangChain Development
+- **Agent orchestration** with tool-use and planning capabilities
+- **Chain-of-thought reasoning** for complex multi-step tasks
+- **Conversation memory** using vector stores and buffers
+- **Multi-agent collaboration** for specialized task handling
+
+### RAG Systems
+- **Document chunking strategies** (semantic, recursive, token-based)
+- **Embedding generation** with OpenAI and local models
+- **Vector database optimization** (filtering, indexing, hybrid search)
+- **Retrieval quality** monitoring and improvement
+
+### LLM Integration
+- **OpenAI API** for GPT models with function calling
+- **Local models** via Ollama for cost-effective deployment
+- **Prompt engineering** with version control and testing
+- **Structured output** parsing and validation
 
 ### Production AI Patterns
 - **Confidence scoring** with fallback workflows
 - **Human-in-the-loop** for sensitive operations
 - **Token usage optimization** and cost tracking
 - **Streaming responses** with Server-Sent Events
+- **Observability** for latency, retrieval quality, and hallucination rates
 
 ---
 
-## Architecture Approach
+## Architecture Diagram
 
-┌─────────────────────────────────────────────────────────────┐
-│                     React/Next.js Frontend                   │
-│              Tailwind CSS • TypeScript • React Query          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      API Gateway Layer                        │
-│                 REST • GraphQL • WebSockets                   │
-└─────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              ▼                               ▼
-┌─────────────────────────┐    ┌─────────────────────────┐
-│   Node.js/Express       │    │   Python/FastAPI        │
-│   • Auth & Users        │    │   • LangChain Agents    │
-│   • Business Logic      │    │   • RAG Pipelines       │
-│   • REST APIs           │    │   • LLM Integration     │
-│   • Session Management  │    │   • Vector Operations   │
-└─────────────────────────┘    └─────────────────────────┘
-              │                               │
-              ▼                               ▼
-┌─────────────────────────┐    ┌─────────────────────────┐
-│   PostgreSQL/MongoDB    │    │   Vector Databases      │
-│   • User Data           │    │   • Chroma/Weaviate     │
-│   • Application State   │    │   • Embeddings          │
-│   • Transactions        │    │   • Semantic Search     │
-└─────────────────────────┘    └─────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                         React/Next.js Frontend                       │
+│              Tailwind CSS • TypeScript • React Query                 │
+│            Component Library • State Management • Routing             │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                           API Gateway Layer                           │
+│                    REST • GraphQL • WebSockets                        │
+│                  Rate Limiting • Request Validation                    │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┴───────────────┐
+                    ▼                               ▼
+┌─────────────────────────────────┐    ┌─────────────────────────────────┐
+│      Node.js/Express Services    │    │      Python/FastAPI Services    │
+│  ┌─────────────────────────────┐ │    │  ┌───────────────────────────┐ │
+│  │ Authentication & Users      │ │    │  │ LangChain Agents          │ │
+│  │ Business Logic & Validation │ │    │  │ RAG Pipelines             │ │
+│  │ REST API Endpoints          │ │    │  │ LLM Integration           │ │
+│  │ File Processing             │ │    │  │ Embedding Generation      │ │
+│  │ Email & Notifications       │ │    │  │ Streaming Responses       │ │
+│  └─────────────────────────────┘ │    │  └───────────────────────────┘ │
+└─────────────────────────────────┘    └─────────────────────────────────┘
+                    │                               │
+                    ▼                               ▼
+┌─────────────────────────────────┐    ┌─────────────────────────────────┐
+│       PostgreSQL/MongoDB         │    │       Vector Databases          │
+│  ┌─────────────────────────────┐ │    │  ┌───────────────────────────┐ │
+│  │ User Profiles               │ │    │  │ ChromaDB / Weaviate       │ │
+│  │ Application State           │ │    │  │ Embeddings Store          │ │
+│  │ Transactions & Relations    │ │    │  │ Semantic Search Index     │ │
+│  │ Audit Logs                  │ │    │  │ Document Chunks           │ │
+│  └─────────────────────────────┘ │    │  └───────────────────────────┘ │
+└─────────────────────────────────┘    └─────────────────────────────────┘
+                    │                               │
+                    └───────────────┬───────────────┘
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                          Redis Cache Layer                            │
+│                    Session Store • Rate Limiting                       │
+│                    API Response Cache • Job Queue                      │
+└─────────────────────────────────────────────────────────────────────┘
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      Docker • Kubernetes • AWS                        │
+│                    CI/CD • Monitoring • Logging                        │
+└─────────────────────────────────────────────────────────────────────┘
+
 
 ---
 
 ## Featured Projects
 
-### AI Research Platform
-**Stack:** React • Node.js • LangChain • ChromaDB • OpenAI
+### Full-Stack Applications
 
-Enterprise RAG system for technical document analysis:
-- Multi-format document ingestion (PDF, DOCX, TXT)
-- Semantic chunking with overlap strategies
-- Hybrid search combining keyword and vector search
-- Citation tracking with source ranking
-- Streaming responses with incremental UI updates
+**TaskFlow - Project Management Platform**
+*React • Node.js • Express • PostgreSQL • JWT • WebSockets*
+- Built full-stack collaborative application with role-based access control
+- Implemented real-time updates using WebSockets for live task changes
+- Designed responsive UI with Tailwind CSS and dark mode support
+- Created RESTful API with comprehensive validation and error handling
+- Containerized with Docker for development and production consistency
 
-### Customer Support Agent
-**Stack:** Next.js • Python • FastAPI • LangChain • Weaviate
+**MediTrack - Healthcare Portal**
+*Next.js • Node.js • MongoDB • Redis • JWT*
+- Developed patient management system with secure authentication flows
+- Implemented role-based views for patients, doctors, and administrators
+- Built appointment scheduling with calendar integration and reminders
+- Created reporting dashboard with data visualization using Chart.js
+- Optimized database queries achieving 40% performance improvement
 
-Autonomous support bot with confidence-based escalation:
-- Knowledge base retrieval with grounding
-- Confidence scoring and uncertainty handling
-- Ticket creation for low-confidence queries
-- Conversation memory using vector storage
-- Feedback loop for continuous improvement
+**E-Commerce Backend Service**
+*Node.js • Express • PostgreSQL • Redis • JWT*
+- Designed scalable microservice architecture for product catalog and orders
+- Implemented Redis caching reducing response times by 60%
+- Built payment integration with webhook handling for transaction reliability
+- Created comprehensive test suite with 85% code coverage
+- Deployed on AWS with auto-scaling configuration
 
-### Document Intelligence Pipeline
-**Stack:** React • Node.js • Python • Tesseract • PostgreSQL
+### AI-Integrated Projects
 
-Automated invoice and form processing system:
-- OCR extraction with multiple fallback strategies
-- Schema-based field extraction using LLMs
-- PII redaction before processing
-- Human review interface with audit logging
-- Confidence scoring with manual override
+**AI Research Assistant Platform**
+*React • Node.js • LangChain • ChromaDB • OpenAI*
+- Built document ingestion system supporting PDF, DOCX, and TXT formats
+- Implemented semantic chunking with overlap for context preservation
+- Created hybrid search combining keyword and vector search
+- Developed citation tracking with source ranking for accuracy
+- Added streaming responses with incremental UI updates
 
-### Meeting Intelligence Platform
-**Stack:** React • Node.js • Python • WebSockets • Redis
+**Customer Support Agent**
+*Next.js • Python • FastAPI • LangChain • Weaviate*
+- Developed autonomous support bot with knowledge base retrieval
+- Implemented confidence scoring with uncertainty handling
+- Created ticket escalation workflow for low-confidence queries
+- Built conversation memory using vector storage for context
+- Added feedback loop for continuous model improvement
 
-Real-time meeting transcript analysis:
-- Live transcription processing via WebSockets
-- Action item extraction with deadline detection
-- Sentiment analysis across conversation segments
-- Searchable history with full-text search
-- Real-time UI updates as processing occurs
+**Document Intelligence Pipeline**
+*React • Node.js • Python • Tesseract • PostgreSQL*
+- Built automated invoice processing with OCR extraction
+- Implemented schema-based field extraction using LLMs
+- Created PII redaction layer before LLM processing
+- Developed human review interface with audit logging
+- Added confidence scoring with manual override options
 
-### Task Management System
-**Stack:** React • Node.js • Express • PostgreSQL • JWT
+**Meeting Intelligence Platform**
+*React • Node.js • Python • WebSockets • Redis*
+- Built real-time meeting transcript analysis system
+- Implemented action item extraction with deadline detection
+- Created sentiment analysis across conversation segments
+- Developed searchable history with full-text search
+- Added real-time UI updates as processing occurs
 
-Full-stack collaborative application:
-- Role-based access control (Admin/Manager/User)
-- Real-time updates with WebSockets
-- Responsive Tailwind UI with dark mode
-- RESTful API with comprehensive validation
-- Docker containerization for deployment
+---
+
+## Development Philosophy
+
+
+Traditional Engineering                    AI Engineering
+─────────────────────────────────────────────────────────────
+Clean Code                     →        Prompt Version Control
+SOLID Principles               →        Chain-of-Thought Design
+Database Normalization         →        Vector Index Optimization
+API Documentation              →        Prompt Templates
+Unit Testing                   →        Retrieval Evaluation
+Error Handling                 →        Fallback Strategies
+Caching                        →        Token Usage Optimization
+Authentication                 →        PII Redaction
+Logging                        →        LLM Observability
+
 
 ---
 
 ## Current Development Focus
 
-AI Engineering
-├── LangChain agent development
-│   ├── Tool-use optimization
-│   ├── Multi-agent coordination
-│   └── Memory management
-├── RAG system improvements
-│   ├── Query transformation
-│   ├── Re-ranking strategies
-│   └── Hybrid search tuning
-└── Production AI
-    ├── Cost optimization
-    ├── Observability
-    └── A/B testing frameworks
 
 Full-Stack Development
-├── Next.js 14 App Router
-├── Node.js microservices
-├── GraphQL federation
-└── Real-time features with WebSockets
+├── Next.js 14 App Router and Server Components
+├── Node.js microservices with clean architecture
+├── GraphQL federation for API composition
+├── Real-time features with WebSockets
+├── Database optimization and query performance
+└── Container orchestration with Kubernetes
 
-Infrastructure
-├── Docker orchestration
-├── Kubernetes basics
-└── CI/CD for AI services
+AI Engineering
+├── LangChain agent development with tool-use
+├── Multi-agent coordination patterns
+├── RAG system improvements with hybrid search
+├── Query transformation and re-ranking
+├── Cost optimization for token usage
+└── Observability for LLM applications
+
 
 ---
 
@@ -226,34 +300,27 @@ Infrastructure
 
 ---
 
-## Professional Approach
-
-Production-Ready AI
-├── Observable by design
-│   ├── Token usage tracking
-│   ├── Latency monitoring
-│   ├── Retrieval quality metrics
-│   └── Hallucination detection
-├── Graceful degradation
-│   ├── Fallback responses
-│   ├── Cache strategies
-│   └── Circuit breakers
-└── Security first
-    ├── PII redaction
-    ├── Rate limiting
-    ├── Input validation
-    └── Access control
-
----
-
 ## What I Bring
 
-- **Production AI experience** - deployed systems with monitoring, not just notebooks
-- **Full-stack foundation** - AI features integrated into complete web applications
-- **Clean architecture** - separation between AI and traditional services
-- **Cost consciousness** - optimized token usage and caching strategies
-- **Observable systems** - monitoring retrieval quality and latency
-- **Security mindset** - PII handling and access control for AI endpoints
+
+Full-Stack Foundation
+├── Production experience with React and Node.js
+├── Clean, maintainable code following best practices
+├── Database design and optimization
+├── REST API design and documentation
+├── Authentication and authorization patterns
+├── Testing and debugging methodologies
+└── Deployment and DevOps practices
+
+AI Engineering
+├── LangChain agent development and orchestration
+├── RAG system design and implementation
+├── Vector database integration and optimization
+├── LLM integration with cost management
+├── Production AI patterns and fallback strategies
+├── Observability for AI applications
+└── Balancing AI capabilities with engineering fundamentals
+
 
 ---
 
@@ -278,7 +345,7 @@ Production-Ready AI
 ---
 
 <p align="center">
-  <i>Building production AI systems with React, Node.js, and Python.</i>
+  <i>Full-Stack AI Engineer • React • Node.js • Python • LangChain</i>
   <br/>
   <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=80&section=footer" />
 </p>
