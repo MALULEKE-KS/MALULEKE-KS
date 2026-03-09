@@ -1,4 +1,3 @@
-```markdown
 # Maluleke Kurhula Success
 
 <p align="center">
@@ -121,7 +120,7 @@ Developing production applications with:
 
 ## Development Approach
 
-```javascript
+javascript
 const approach = {
   frontend: {
     architecture: "Component-based with state management",
@@ -144,13 +143,13 @@ const approach = {
     ci_cd: "GitHub Actions, Jenkins"
   }
 };
-```
+
 
 ---
 
 ## Current Learning Path
 
-```
+
 ├── AI & Machine Learning
 │   ├── LangChain agents and chains
 │   ├── Vector databases (Pinecone, Weaviate)
@@ -172,7 +171,7 @@ const approach = {
     ├── Docker orchestration
     ├── AWS services
     └── CI/CD pipelines
-```
+
 
 ---
 
