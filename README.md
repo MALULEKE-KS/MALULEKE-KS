@@ -110,6 +110,7 @@ const engineeringPhilosophy = {
     cloud: "AWS/Azure Ready"
   }
 };
+```
 
 ---
 
@@ -248,7 +249,7 @@ I'm actively seeking opportunities where I can:
 
 ## 📊 Quick Facts
 
-javascript
+```javascript
 const kurhula = {
   location: "South Africa",
   timezone: "GMT+2",
@@ -259,7 +260,7 @@ const kurhula = {
   coffeeRequired: true,
   problemSolving: "Always ON"
 };
-
+```
 
 ---
 
