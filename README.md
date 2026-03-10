@@ -4,7 +4,7 @@
 Building large-scale digital systems for Africa
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Full-Stack+Developer+%2B+AI+Engineer;Building+Real-World+Platforms;Designing+Systems+for+Africa" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Full-Stack+Developer+%2B+AI+Engineer;React+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Real-World+Platforms" />
 </p>
 
 <p align="center">
@@ -23,11 +23,11 @@ I am a **Full-Stack Developer and AI Engineer** building real-world digital syst
 
 My focus is creating **large-scale platforms that solve African problems** across:
 
-• <a href="#"><img src="https://img.shields.io/badge/Education-2563EB?style=flat-square&logo=google-scholar&logoColor=white" /></a> Education funding  
-• <a href="#"><img src="https://img.shields.io/badge/Finance-0A66C2?style=flat-square&logo=paypal&logoColor=white" /></a> Financial systems  
-• <a href="#"><img src="https://img.shields.io/badge/Community-25D366?style=flat-square&logo=google-maps&logoColor=white" /></a> Community infrastructure  
-• <a href="#"><img src="https://img.shields.io/badge/AI-412991?style=flat-square&logo=openai&logoColor=white" /></a> Artificial intelligence  
-• <a href="#"><img src="https://img.shields.io/badge/Marketplaces-FF6B6B?style=flat-square&logo=amazon&logoColor=white" /></a> Digital marketplaces  
+• <img src="https://img.shields.io/badge/Education-2563EB?style=flat-square&logo=google-scholar&logoColor=white" /> Education funding  
+• <img src="https://img.shields.io/badge/Finance-0A66C2?style=flat-square&logo=paypal&logoColor=white" /> Financial systems  
+• <img src="https://img.shields.io/badge/Community-25D366?style=flat-square&logo=google-maps&logoColor=white" /> Community infrastructure  
+• <img src="https://img.shields.io/badge/AI-412991?style=flat-square&logo=openai&logoColor=white" /> Artificial intelligence  
+• <img src="https://img.shields.io/badge/Marketplaces-FF6B6B?style=flat-square&logo=amazon&logoColor=white" /> Digital marketplaces  
 
 Every system I design follows a **design-first architecture approach**.
 
@@ -84,11 +84,48 @@ to help businesses achieve **measurable digital growth**.
 
 ---
 
-## Systems Currently In Development
+## Full-Stack Architecture
 
-I am currently building two flagship systems to deepen my expertise in **AI-powered web platforms**.
+┌─────────────────────────────────────────────────────────────┐
+│                     User Browser                            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              React + Tailwind CSS Frontend                  │
+│  • Components & Props • State Management (useState)         │
+│  • Effects (useEffect) • Forms • API Fetching               │
+│  • React Router • Responsive Layouts                        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Node.js / Express API                     │
+│  • API Routes • Request/Response • Middleware               │
+│  • Authentication (JWT) • Error Handling                    │
+│  • RESTful Endpoints                                        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     PostgreSQL Database                     │
+│  • Tables & Relationships • SQL Queries                     │
+│  • Indexes • CRUD Operations                                │
+│  • Prisma ORM                                               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Python AI Services                        │
+│  • Machine Learning Models • Data Analysis                   │
+│  • Predictions • FastAPI Endpoints                           │
+│  • LangChain • Vector Databases (ChromaDB/Weaviate)         │
+│  • Pandas • NumPy • Scikit-learn                            │
+└─────────────────────────────────────────────────────────────┘
 
 ---
+
+## Systems Currently In Development
 
 ### <img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=for-the-badge&logo=google-scholar&logoColor=white" />
 
@@ -113,8 +150,13 @@ A **single application platform** that matches students with:
 **Technology**
 
 <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" />
 <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
 <img src="https://img.shields.io/badge/AI_Matching-412991?style=flat-square&logo=openai&logoColor=white" />
 
 ---
@@ -132,10 +174,75 @@ An AI-powered football analytics platform that transforms betting decisions into
 
 **Technology**
 
+<img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
 <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
 <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
-<img src="https://img.shields.io/badge/Machine_Learning-FF6F00?style=flat-square&logo=scikit-learn&logoColor=white" />
+<img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" />
+<img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" />
+<img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />
+<img src="https://img.shields.io/badge/Machine_Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
+<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />
+
+---
+
+## Technical Stack
+
+### <img src="https://img.shields.io/badge/Frontend-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
 <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white" />
+<img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
+<img src="https://img.shields.io/badge/React_Query-FF4154?style=flat-square&logo=reactquery&logoColor=white" />
+
+### <img src="https://img.shields.io/badge/Backend-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" />
+<img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
+<img src="https://img.shields.io/badge/Bcrypt-003A70?style=flat-square&logo=lock&logoColor=white" />
+<img src="https://img.shields.io/badge/Multer-FF6F00?style=flat-square&logo=files&logoColor=white" />
+<img src="https://img.shields.io/badge/Helmet-0A66C2?style=flat-square&logo=helmet&logoColor=white" />
+<img src="https://img.shields.io/badge/CORS-FF6B6B?style=flat-square&logo=cors&logoColor=white" />
+
+### <img src="https://img.shields.io/badge/Python_AI-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+<img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" />
+<img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" />
+<img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" />
+<img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />
+<img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
+<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />
+<img src="https://img.shields.io/badge/Weaviate-5A67D8?style=flat-square&logo=weaviate&logoColor=white" />
+<img src="https://img.shields.io/badge/Pinecone-F6821E?style=flat-square" />
+
+### <img src="https://img.shields.io/badge/Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" />
+<img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" />
+
+### <img src="https://img.shields.io/badge/DevOps-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" />
+<img src="https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white" />
+<img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
+<img src="https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white" />
+<img src="https://img.shields.io/badge/Supabase-3FCF8E?style=flat-square&logo=supabase&logoColor=white" />
+
+### <img src="https://img.shields.io/badge/Tools-FF6F00?style=for-the-badge&logo=git&logoColor=white" />
+<img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" />
+<img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" />
+<img src="https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white" />
+<img src="https://img.shields.io/badge/Figma-FF61F6?style=flat-square&logo=figma&logoColor=white" />
+<img src="https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black" />
 
 ---
 
@@ -158,37 +265,17 @@ These platforms represent a **long-term ecosystem of technology built for Africa
 
 ---
 
-## Technical Stack
+## GitHub Analytics
 
-### <img src="https://img.shields.io/badge/Frontend-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-<img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" />
-<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
-<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<p align="center">
+  <img height="160" src="https://github-readme-stats.vercel.app/api?username=KSDRILL&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151" />
+  <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151" />
+</p>
 
-### <img src="https://img.shields.io/badge/Backend-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" />
-<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
-<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
-
-### <img src="https://img.shields.io/badge/AI_Engineering-412991?style=for-the-badge&logo=openai&logoColor=white" />
-<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
-<img src="https://img.shields.io/badge/Vector_Databases-5A67D8?style=flat-square&logo=weaviate&logoColor=white" />
-<img src="https://img.shields.io/badge/RAG_Systems-7047A8?style=flat-square&logo=llama&logoColor=white" />
-<img src="https://img.shields.io/badge/LLM_Integrations-412991?style=flat-square&logo=openai&logoColor=white" />
-<img src="https://img.shields.io/badge/ML_Pipelines-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
-
-### <img src="https://img.shields.io/badge/Databases-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
-<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
-<img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" />
-<img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" />
-
-### <img src="https://img.shields.io/badge/DevOps-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
-<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
-<img src="https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white" />
-<img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" />
-<img src="https://img.shields.io/badge/CI/CD-FF6F00?style=flat-square&logo=jenkins&logoColor=white" />
+<p align="center">
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB" width="48%" />
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=KSDRILL&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" />
+</p>
 
 ---
 
@@ -212,20 +299,6 @@ I build **operational platforms**.
 
 ---
 
-## GitHub Analytics
-
-<p align="center">
-  <img height="160" src="https://github-readme-stats.vercel.app/api?username=KSDRILL&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151" />
-  <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=KSDRILL&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=KSDRILL&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB" width="48%" />
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=KSDRILL&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" />
-</p>
-
----
-
 ## Vision
 
 My long-term goal is to build a **technology ecosystem that solves real African problems** through scalable platforms.
@@ -246,6 +319,7 @@ All powered by **systems built in Africa, for Africa**.
   <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
   <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" /></a>
   <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://github.com/KSDRILL"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
 </p>
 
 <p align="center">
