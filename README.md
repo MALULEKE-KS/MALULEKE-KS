@@ -110,7 +110,7 @@ to help businesses achieve **measurable digital growth**.
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> Database                     │
+│                     <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> Database                     
 │  • Tables & Relationships • SQL Queries                     
 │  • Indexes • CRUD Operations                                
 │  • <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" /> ORM                                               
@@ -122,7 +122,7 @@ to help businesses achieve **measurable digital growth**.
 │  • Machine Learning Models • Data Analysis                 
 │  • Predictions • <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> Endpoints                           
 │  • <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> • Vector Databases (<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />/<img src="https://img.shields.io/badge/Weaviate-5A67D8?style=flat-square&logo=weaviate&logoColor=white" />)         
-│  • <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" /> • <img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" /> • <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />                            │
+│  • <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" /> • <img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" /> • <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />                            
 └─────────────────────────────────────────────────────────────┘
 </pre>
 </p>
