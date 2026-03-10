@@ -88,42 +88,42 @@ to help businesses achieve **measurable digital growth**.
 
 <p align="center">
 <pre>
-┌─────────────────────────────────────────────────────────────────┐
-│                    <img src="https://img.shields.io/badge/User_Browser-4285F4?style=flat-square&logo=google-chrome&logoColor=white" />                          │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     <img src="https://img.shields.io/badge/User_Browser-2563EB?style=flat-square&logo=google-chrome&logoColor=white" />                        │
+└─────────────────────────────────────────────────────────────┘
                               │
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" /> + <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> Frontend                │
-│  • <img src="https://img.shields.io/badge/Components-764ABC?style=flat-square&logo=react&logoColor=white" /> • <img src="https://img.shields.io/badge/State_Management-61DAFB?style=flat-square&logo=redux&logoColor=white" /> (useState)                        │
-│  • <img src="https://img.shields.io/badge/Effects-FF6F00?style=flat-square&logo=react&logoColor=white" /> (useEffect) • <img src="https://img.shields.io/badge/Forms-EC5990?style=flat-square&logo=reacthookform&logoColor=white" /> • <img src="https://img.shields.io/badge/API_Fetching-000000?style=flat-square&logo=axios&logoColor=white" />            │
-│  • <img src="https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white" /> • <img src="https://img.shields.io/badge/Responsive_Design-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />                        │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│              <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" /> + <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> Frontend                  │
+│  • Components & Props • State Management (useState)         │
+│  • Effects (useEffect) • Forms • API Fetching               │
+│  • <img src="https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white" /> • Responsive Layouts                        │
+└─────────────────────────────────────────────────────────────┘
                               │
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> / <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" /> API                      │
-│  • <img src="https://img.shields.io/badge/API_Routes-02569B?style=flat-square&logo=swagger&logoColor=white" /> • <img src="https://img.shields.io/badge/Request-Response-9C27B0?style=flat-square&logo=postman&logoColor=white" /> • <img src="https://img.shields.io/badge/Middleware-FF6F00?style=flat-square&logo=helmet&logoColor=white" />            │
-│  • <img src="https://img.shields.io/badge/Authentication-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> (JWT) • <img src="https://img.shields.io/badge/Error_Handling-DC382D?style=flat-square&logo=sentry&logoColor=white" />                    │
-│  • <img src="https://img.shields.io/badge/RESTful_Endpoints-6DB33F?style=flat-square&logo=spring&logoColor=white" />                                        │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> / <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" /> API                     │
+│  • API Routes • Request/Response • Middleware               │
+│  • Authentication (<img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />) • Error Handling                    │
+│  • RESTful Endpoints                                        │
+└─────────────────────────────────────────────────────────────┘
                               │
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> Database                         │
-│  • <img src="https://img.shields.io/badge/Tables-FFD700?style=flat-square&logo=table&logoColor=black" /> • <img src="https://img.shields.io/badge/Relationships-FFA500?style=flat-square&logo=diagrams.net&logoColor=black" /> • <img src="https://img.shields.io/badge/SQL_Queries-4479A1?style=flat-square&logo=mysql&logoColor=white" />      │
-│  • <img src="https://img.shields.io/badge/Indexes-2D3748?style=flat-square&logo=databricks&logoColor=white" /> • <img src="https://img.shields.io/badge/CRUD_Operations-47A248?style=flat-square&logo=mongodb&logoColor=white" />                         │
+┌─────────────────────────────────────────────────────────────┐
+│                     <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> Database                     │
+│  • Tables & Relationships • SQL Queries                     │
+│  • Indexes • CRUD Operations                                │
 │  • <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" /> ORM                                               │
-└─────────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────┘
                               │
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> AI Services                            │
-│  • <img src="https://img.shields.io/badge/Machine_Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" /> • <img src="https://img.shields.io/badge/Data_Analysis-150458?style=flat-square&logo=pandas&logoColor=white" />                        │
-│  • <img src="https://img.shields.io/badge/Predictions-412991?style=flat-square&logo=openai&logoColor=white" /> • <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> Endpoints                    │
-│  • <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> • <img src="https://img.shields.io/badge/Vector_DBs-5A67D8?style=flat-square&logo=weaviate&logoColor=white" /> (ChromaDB/Weaviate)           │
-│  • <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" /> • <img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" /> • <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />    │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> AI Services                        │
+│  • Machine Learning Models • Data Analysis                 │
+│  • Predictions • <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> Endpoints                           │
+│  • <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> • Vector Databases (<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />/<img src="https://img.shields.io/badge/Weaviate-5A67D8?style=flat-square&logo=weaviate&logoColor=white" />)         │
+│  • <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" /> • <img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" /> • <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />                            │
+└─────────────────────────────────────────────────────────────┘
 </pre>
 </p>
 
@@ -188,7 +188,7 @@ An AI-powered football analytics platform that transforms betting decisions into
 <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" />
 <img src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white" />
 <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />
-<img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
+<img src="https://img.shields.io/badge/Machine_Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
 <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
 <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />
 
