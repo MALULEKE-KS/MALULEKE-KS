@@ -1,4 +1,3 @@
-```markdown
 # Maluleke Kurhula Success
 ## Founder • Fullstack Engineer • AI Systems Developer  
 Building large-scale digital systems for Africa and the world
@@ -71,7 +70,6 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 **Technology Foundation**
-```
 
 Frontend: Next.js + TypeScript + Tailwind CSS + shadcn/ui + React Hook Form + Zod
 Backend:  Next.js API Routes (Node.js) + NextAuth.js + Zod + Service Layer + BullMQ + Redis
@@ -80,7 +78,6 @@ AI Layer: Python + FastAPI + LangChain + ChromaDB + OpenAI (or custom models)
 Deployment: Vercel + GitHub Actions + Docker (AI services)
 Version Control: Git + GitHub
 
-```
 
 **Visual & Interaction Standards**
 - No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
@@ -97,13 +94,11 @@ Version Control: Git + GitHub
 <br />
 
 **Architecture**
-```
 
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
 ↓
 Python AI Service (FastAPI) – automates scholarship matching
 
-```
 **Tech Stack**  
 - **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
 - **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
@@ -116,13 +111,11 @@ Python AI Service (FastAPI) – automates scholarship matching
 <br />
 
 **Architecture**
-```
 
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
 ↓
 Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predictions
 
-```
 **Tech Stack**  
 - **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
 - **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
@@ -247,4 +240,3 @@ Building a technology ecosystem that solves **real challenges through scalable p
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=100&section=footer" alt="Footer wave" />
 </p>
-```
