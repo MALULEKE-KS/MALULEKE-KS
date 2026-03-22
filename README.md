@@ -1,5 +1,4 @@
 # Maluleke Kurhula Success
-
 ## Founder • Fullstack Engineer • AI Systems Developer  
 Building large-scale digital systems for Africa and the world
 
@@ -14,6 +13,21 @@ Building large-scale digital systems for Africa and the world
   <a href="https://github.com/KSDRILL"><img src="https://img.shields.io/github/followers/KSDRILL?style=for-the-badge&logo=github&label=Followers&color=2563EB" /></a>
   <img src="https://komarev.com/ghpvc/?username=KSDRILL&style=for-the-badge&color=2563EB" />
 </p>
+
+---
+
+## 📖 Table of Contents
+
+- [Who I Am](#who-i-am)
+- [My Companies](#my-companies)
+- [MVP Design Identity](#mvp-design-identity)
+- [Flagship Systems](#flagship-systems)
+- [Future Platform Concepts](#future-platform-concepts)
+- [Technical Stack](#technical-stack)
+- [GitHub Analytics](#github-analytics)
+- [Engineering Philosophy](#engineering-philosophy)
+- [Vision](#vision)
+- [Contact](#contact)
 
 ---
 
@@ -50,24 +64,26 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
 
 **Core Principles**
-- **Design-first, document-first** – every feature's logic is human‑defined before coding.  
-- **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.  
-- **Modular component architecture** – reusable UI, layout, and AI components.  
-- **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.  
+- **Design-first, document-first** – every feature's logic is human‑defined before coding.
+- **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
+- **Modular component architecture** – reusable UI, layout, and AI components.
+- **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 **Technology Foundation**
 
+
 Frontend: Next.js + TypeScript + Tailwind CSS + shadcn/ui + React Hook Form + Zod
-Backend: Next.js API Routes (Node.js) + NextAuth.js + Zod + Service Layer + BullMQ + Redis
+Backend:  Next.js API Routes (Node.js) + NextAuth.js + Zod + Service Layer + BullMQ + Redis
 Database: PostgreSQL + Prisma
 AI Layer: Python + FastAPI + LangChain + ChromaDB + OpenAI (or custom models)
 Deployment: Vercel + GitHub Actions + Docker (AI services)
 Version Control: Git + GitHub
 
+
 **Visual & Interaction Standards**
-- No emojis – only professional icons (Heroicons, Lucide, Font Awesome).  
-- Dynamic themes (light/dark/hybrid) with a single accent color per system.  
-- Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.  
+- No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
+- Dynamic themes (light/dark/hybrid) with a single accent color per system.
+- Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
 - PWA-ready and WCAG 2.1 AA accessible.
 
 ---
@@ -83,12 +99,11 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 ↓
 Python AI Service (FastAPI) – automates scholarship matching
 
-**Tech Stack**
-**Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
-**Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
-**AI / ML:** Python, FastAPI, LangChain, ChromaDB, OpenAI  
-
-**Status:** Active development – <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" />  
+**Tech Stack**  
+- **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
+- **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
+- **AI / ML:** Python, FastAPI, LangChain, ChromaDB, OpenAI  
+- **Status:** <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" /> (demo coming soon)
 
 ---
 
@@ -101,12 +116,11 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 ↓
 Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predictions
 
-**Tech Stack**
-**Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
-**Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
-**AI / ML:** Python, FastAPI, Scikit-learn, Pandas  
-
-**Status:** Active development – <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" />  
+**Tech Stack**  
+- **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
+- **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
+- **AI / ML:** Python, FastAPI, Scikit-learn, Pandas  
+- **Status:** <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" /> (demo coming soon)
 
 ---
 
@@ -119,17 +133,48 @@ Each is designed for **global scalability**.
 - <img src="https://img.shields.io/badge/Maphophe_Community-25D366?style=flat-square&logo=community&logoColor=white" /> **Maphophe Community System** – Digital governance for villages (transferable to local governance globally)  
 - <img src="https://img.shields.io/badge/TransLink_SA-FFA500?style=flat-square&logo=bus&logoColor=black" /> **TransLink SA** – Taxi rank coordination (urban transport models worldwide)  
 - <img src="https://img.shields.io/badge/XBridge-764ABC?style=flat-square&logo=code&logoColor=white" /> **XBridge** – Project-based developer education (scalable skill-building platform)  
-- <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" /> **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)  
+- <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" /> **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
 
 ---
 
-## Technical Stack (Grouped)
+## Technical Stack
 
-**Frontend:** Next.js, TypeScript, Tailwind CSS, shadcn/ui, React Hook Form, Zod  
-**Backend / API:** Node.js, Next.js API, NextAuth.js, Zod, Service Layer, BullMQ, Redis, Sentry  
-**Database & ORM:** PostgreSQL, Prisma  
-**AI / Python:** Python, FastAPI, LangChain, ChromaDB, OpenAI, Scikit-learn, Pandas  
-**Deployment / Tools:** Vercel, GitHub Actions, Docker, Git, Postman  
+**Frontend:**  
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+<img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
+<img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" />
+
+**Backend / API:**  
+<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" />
+<img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" />
+<img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" />
+<img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" />
+
+**Database & ORM:**  
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+
+**AI / Python:**  
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />
+<img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" />
+<img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />
+<img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" />
+
+**Deployment / Tools:**  
+<img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
+<img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" />
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" />
+<img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" />
 
 ---
 
