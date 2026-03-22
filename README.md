@@ -69,8 +69,6 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 - **Modular component architecture** – reusable UI, layout, and AI components.
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
-## Technology Foundation
-
 <details>
 <summary><strong>🔧 Click to expand — Full Stack & AI Architecture</strong></summary>
 <br />
@@ -111,7 +109,6 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 </details>
 
-
 **Visual & Interaction Standards**
 - No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
 - Dynamic themes (light/dark/hybrid) with a single accent color per system.
@@ -133,9 +130,9 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 Python AI Service (FastAPI) – automates scholarship matching
 
 **Tech Stack**  
-- **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
-- **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
-- **AI / ML:** Python, FastAPI, LangChain, ChromaDB, OpenAI  
+- **Frontend:** <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" alt="React Hook Form" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />  
+- **Backend:** <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" />  
+- **AI / ML:** <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" /> <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" />  
 - **Status:** <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
 </details>
 
@@ -150,9 +147,9 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predictions
 
 **Tech Stack**  
-- **Frontend:** Next.js, TypeScript, Tailwind, shadcn/ui, React Hook Form, Zod  
-- **Backend:** Node.js, Next.js API, NextAuth.js, Zod, Prisma, BullMQ, Redis, Sentry  
-- **AI / ML:** Python, FastAPI, Scikit-learn, Pandas  
+- **Frontend:** <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" alt="React Hook Form" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />  
+- **Backend:** <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" />  
+- **AI / ML:** <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" alt="Scikit-learn" /> <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" alt="Pandas" />  
 - **Status:** <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
 </details>
 
