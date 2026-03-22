@@ -57,9 +57,12 @@ I build all systems using a **locked, universal blueprint** (v6.2) that ensures 
 
 ### Technology Foundation
 
-Frontend: Next.js + TypeScript + Tailwind CSS
-Backend:  Node.js + Express (or NestJS) + PostgreSQL + Prisma
+Frontend: Next.js + TypeScript + Tailwind CSS + shadcn/ui
+Backend:  Next.js API Routes (Node.js) + Prisma
+Database: PostgreSQL
 AI Layer: Python + FastAPI (optional) – REST, WebSockets, or message queues
+Deployment: Vercel
+Version Control: Git + GitHub
 
 
 ### File Organisation (Adaptive Group System)
@@ -88,11 +91,11 @@ This methodology produces systems that are **predictable, scalable, and producti
 
 ### <img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=for-the-badge&logo=google-scholar&logoColor=white" />
 A national education funding platform that connects students with multiple funding sources through a single application, reducing student exclusion.  
-**Stack:** Next.js, Node.js, PostgreSQL, AI‑matching (Python)
+**Stack:** Next.js, TypeScript, Tailwind, shadcn/ui, Next.js API routes, Prisma, PostgreSQL, Python AI services
 
 ### <img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=for-the-badge&logo=analytics&logoColor=white" />
 AI‑powered football analytics platform that transforms betting decisions into data‑driven strategies using real‑time data and predictive models.  
-**Stack:** Next.js, Node.js, Python (FastAPI), Machine Learning
+**Stack:** Next.js, TypeScript, Tailwind, shadcn/ui, Next.js API routes, Prisma, PostgreSQL, Python (FastAPI), Machine Learning
 
 ---
 
@@ -115,14 +118,15 @@ AI‑powered football analytics platform that transforms betting decisions into 
 <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
 <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
 <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
 <img src="https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white" />
 <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
 
 ### Backend
+<img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" />
-<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
 <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
 <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
 
 ### AI & Python (Optional)
@@ -132,10 +136,10 @@ AI‑powered football analytics platform that transforms betting decisions into 
 <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" />
 <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" />
 
-### DevOps & Tools
+### Deployment & Tools
+<img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
 <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
 <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" />
-<img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
 <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" />
 <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" />
 
