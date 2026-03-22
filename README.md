@@ -1,6 +1,6 @@
 # Maluleke Kurhula Success
 
-## Founder • System Architect • AI Engineer  
+## Founder • Fullstack Engineer • AI Systems Developer  
 Building large-scale digital systems for Africa
 
 <p align="center">
@@ -15,7 +15,6 @@ Building large-scale digital systems for Africa
   <img src="https://komarev.com/ghpvc/?username=KSDRILL&style=for-the-badge&color=2563EB" />
 </p>
 
----
 
 ## Who I Am
 
@@ -47,68 +46,89 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining website developme
 
 ## MVP Design Identity
 
-I build all systems using a **locked, universal blueprint** (v6.2) that ensures predictability, scalability, and maintainability. Key elements:
+I build all systems using a **locked, universal blueprint** (v6.2) that ensures predictability, scalability, and maintainability.
 
-### Core Philosophy
+**Core Principles**
 - **Design-first, document-first** – every feature's logic is human‑defined before coding.
-- **Configuration‑driven** – theme, navigation, features, and AI toggle controlled via JSON.
+- **Configuration‑driven** – theme, navigation, features, and AI services controlled via JSON.
 - **Modular component architecture** – reusable UI, layout, and AI components.
-- **AI‑ready but optional** – Python AI services can be added without affecting core.
+- **AI‑ready service layer** – Python services integrated when required.
 
-### Technology Foundation
+**Technology Foundation**
 
 Frontend: Next.js + TypeScript + Tailwind CSS + shadcn/ui
 Backend:  Next.js API Routes (Node.js) + Prisma
 Database: PostgreSQL
-AI Layer: Python + FastAPI (optional) – REST, WebSockets, or message queues
+AI Layer: Python + FastAPI (modular services integrated when required)
 Deployment: Vercel
 Version Control: Git + GitHub
 
 
-### File Organisation (Adaptive Group System)
-Files are arranged in dependency‑based groups:
-- **Group 1 (Core)**: layouts, core UI, config, utilities – max 15 files.
-- **Groups 2–N**: features, integrations, AI modules – max 10 files each.
-- Each group depends only on previous groups, ensuring clean separation.
-
-### Pre‑Build Documentation
-Before coding, every system includes:
-- System overview, user stories, data models, API specs.
-- **Feature‑level design** – detailed logic, validation, edge cases, and business rules for every feature.
-- This guarantees that all behavior is intentional and traceable.
-
-### Visual & Interaction Standards
+**Visual & Interaction Standards**
 - No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
 - Dynamic themes (light/dark/hybrid) with a single accent color per system.
 - Subtle micro‑interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
 - PWA‑ready and WCAG 2.1 AA accessible.
 
-This methodology produces systems that are **predictable, scalable, and production‑ready** – from small MVPs to large platforms.
-
 ---
 
-## Systems Currently In Development
+## Flagship Systems
+
+These are the core platforms currently under active development. Their repositories are pinned for direct access.
 
 ### <img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=for-the-badge&logo=google-scholar&logoColor=white" />
-A national education funding platform that connects students with multiple funding sources through a single application, reducing student exclusion.  
-**Stack:** Next.js, TypeScript, Tailwind, shadcn/ui, Next.js API routes, Prisma, PostgreSQL, Python AI services
+National education funding platform connecting students with multiple funding sources through a single application.
 
-### <img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=for-the-badge&logo=analytics&logoColor=white" />
-AI‑powered football analytics platform that transforms betting decisions into data‑driven strategies using real‑time data and predictive models.  
-**Stack:** Next.js, TypeScript, Tailwind, shadcn/ui, Next.js API routes, Prisma, PostgreSQL, Python (FastAPI), Machine Learning
+**Architecture**
+
+Next.js Frontend → Next.js API Routes → Prisma ORM → PostgreSQL → Python AI Matching Service
+
+**Tech Stack**
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+
+**Status:** Active development – <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" /> (demo coming soon)
 
 ---
 
-## Designed Platforms (Upcoming Builds)
+### <img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=for-the-badge&logo=analytics&logoColor=white" />
+AI‑powered football analytics platform that transforms betting decisions into data‑driven strategies using real‑time data and predictive models.
 
-| System | Purpose |
-|--------|---------|
-| <img src="https://img.shields.io/badge/Ekasi_Connect-FF6B6B?style=flat-square&logo=google-maps&logoColor=white" /> Ekasi Connect | Rural service marketplace |
-| <img src="https://img.shields.io/badge/KSDRILL_Reserve_Bank-0A66C2?style=flat-square&logo=bank&logoColor=white" /> KSDRILL Reserve Bank | Discipline‑driven savings banking |
-| <img src="https://img.shields.io/badge/Maphophe_Community-25D366?style=flat-square&logo=community&logoColor=white" /> Maphophe Community System | Digital governance for villages |
-| <img src="https://img.shields.io/badge/TransLink_SA-FFA500?style=flat-square&logo=bus&logoColor=black" /> TransLink SA | Taxi rank coordination |
-| <img src="https://img.shields.io/badge/XBridge-764ABC?style=flat-square&logo=code&logoColor=white" /> XBridge | Project‑based developer education |
-| <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" /> KayS | Personal voice‑controlled AI agent |
+**Architecture**
+
+Next.js Frontend → Next.js API Routes → Prisma ORM → PostgreSQL → Python ML Service (FastAPI)
+
+**Tech Stack**
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" />
+
+**Status:** Active development – <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" /> (demo coming soon)
+
+---
+
+## Future Platform Concepts
+
+These systems have complete architecture and design documentation and will be developed sequentially after the flagship systems.
+
+- <img src="https://img.shields.io/badge/Ekasi_Connect-FF6B6B?style=flat-square&logo=google-maps&logoColor=white" /> Ekasi Connect – Rural service marketplace
+- <img src="https://img.shields.io/badge/KSDRILL_Reserve_Bank-0A66C2?style=flat-square&logo=bank&logoColor=white" /> KSDRILL Reserve Bank – Discipline‑driven savings banking
+- <img src="https://img.shields.io/badge/Maphophe_Community-25D366?style=flat-square&logo=community&logoColor=white" /> Maphophe Community System – Digital governance for villages
+- <img src="https://img.shields.io/badge/TransLink_SA-FFA500?style=flat-square&logo=bus&logoColor=black" /> TransLink SA – Taxi rank coordination
+- <img src="https://img.shields.io/badge/XBridge-764ABC?style=flat-square&logo=code&logoColor=white" /> XBridge – Project‑based developer education
+- <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" /> KayS – Personal voice‑controlled AI agent
 
 ---
 
@@ -119,17 +139,16 @@ AI‑powered football analytics platform that transforms betting decisions into 
 <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
 <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
 <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
-<img src="https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white" />
 <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
 
-### Backend
+### Backend & Database
 <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
 <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
 <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
 <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
 
-### AI & Python (Optional)
+### AI & Python
 <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
 <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
 <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
@@ -161,16 +180,14 @@ AI‑powered football analytics platform that transforms betting decisions into 
 
 ## Engineering Philosophy
 
-**Design the system first. Understand the problem deeply. Build with clarity and modular architecture.**
+My focus is building real-world systems designed for deployment and scalability.
 
-Principles I follow:
+**Principles I follow:**
 - **Design‑first architecture** – complete system design before coding.
 - **Separation of concerns** – UI, logic, and configuration stay independent.
 - **Sequential development** – one group at a time, no forward dependencies.
-- **Real‑world deployment** – I build operational platforms, not demos.
+- **Real‑world deployment** – I build operational platforms.
 - **AI as a tool** – added only where it delivers measurable value.
-
-I don't build demo projects. I build operational platforms.
 
 ---
 
