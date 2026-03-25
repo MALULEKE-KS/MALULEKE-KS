@@ -1,9 +1,9 @@
 # Maluleke Kurhula Success
-## Founder • Fullstack Engineer • AI Systems Developer  
+## Founder • Software Engineer • AI Systems Architect  
 Building large-scale digital systems for Africa and the world
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Full-Stack+Developer+%2B+AI+Engineer;Next.js+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Real-World+Platforms" alt="Typing animation" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Software+Engineer+%2B+AI+Architect;Next.js+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Real-World+Platforms" alt="Typing animation" />
 </p>
 
 <p align="center">
@@ -20,6 +20,7 @@ Building large-scale digital systems for Africa and the world
 
 - [Who I Am](#who-i-am)
 - [My Companies](#my-companies)
+- [GitHub Organization Structure](#github-organization-structure)
 - [MVP Design Identity](#mvp-design-identity)
 - [Flagship Systems](#flagship-systems)
 - [Future Platform Concepts](#future-platform-concepts)
@@ -33,9 +34,7 @@ Building large-scale digital systems for Africa and the world
 
 ## Who I Am
 
-I am a **Full-Stack Developer and AI Engineer** building real-world digital systems through my company **KSDRILL SA**.
-
-My focus is creating **large-scale platforms** that solve pressing challenges in education, finance, community infrastructure, and artificial intelligence — with a strong emphasis on African contexts, designed for **global scalability**.
+I am a **Software Engineer and AI Systems Architect** building real-world digital systems through my companies. My focus is creating **large-scale platforms** that solve pressing challenges in education, finance, community infrastructure, and artificial intelligence — with a strong emphasis on African contexts, designed for **global scalability**.
 
 Every system I design follows a **design-first architecture approach**. Before writing code I complete:
 
@@ -52,10 +51,41 @@ Development happens **sequentially**, one system at a time, ensuring stability a
 ## My Companies
 
 ### <img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=for-the-badge&logo=company&logoColor=white" alt="KSDRILL SA" />
-Technology studio building original digital systems and AI platforms. Focus areas: AI systems, fintech, community technology, education technology, automation.
+Technology studio where I design and build original digital systems and AI platforms. Focus areas: AI systems, fintech, community technology, education technology, automation.
+
+**All KSDRILL SA platforms are stored under the [KSDRILL-SA](https://github.com/KSDRILL-SA) GitHub organization.**
 
 ### <img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=for-the-badge&logo=growth&logoColor=white" alt="GrowthCore Solutions" />
 Digital growth agency (with Ngoneni Mponisi Forever) combining web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
+
+**Client projects are stored under the [GrowthCore-Solutions](https://github.com/GrowthCore-Solutions) GitHub organization.**
+
+---
+
+## GitHub Organization Structure
+
+All my commercial platforms are organized under dedicated GitHub organizations to maintain separation of concerns and professional branding.
+
+### 🏢 KSDRILL SA
+*Technology studio building original digital systems and AI platforms*
+
+**Active Repositories:**
+- [FundsLink Academy](https://github.com/KSDRILL-SA/fundslink-academy) – National education funding platform
+- [Omni Bet](https://github.com/KSDRILL-SA/omni-bet) – AI-powered football analytics
+- More platforms in active development
+
+### 📈 GrowthCore Solutions
+*Digital growth agency focused on helping businesses scale through technology and marketing*
+
+**Client Repositories:**
+- Private client work – contact for portfolio access
+
+### 🧪 Personal Projects
+Outside my companies, I explore new technologies and contribute to open source.
+
+- Portfolio site – Personal website and case studies
+- Learning labs – Experiments and explorations
+- Open source contributions
 
 ---
 
@@ -261,6 +291,10 @@ Building a technology ecosystem that solves **real challenges through scalable p
   <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>
   <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
   <a href="https://github.com/KSDRILL"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" /></a>
+</p>
+
+<p align="center">
+  *Most repositories are private during active development. For portfolio access, [contact me](mailto:kurhula04s@gmail.com) to schedule a demo.*
 </p>
 
 <p align="center">
