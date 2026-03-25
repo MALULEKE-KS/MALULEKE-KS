@@ -63,26 +63,26 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 ---
 
 <details>
-<summary><strong>🏢 GitHub Organization Structure</strong> (click to expand)</summary>
+<summary><strong><img src="https://img.shields.io/badge/GitHub_Organization_Structure-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Organization Structure" /> (click to expand)</strong></summary>
 <br />
 
 All my commercial platforms are organized under dedicated GitHub organizations to maintain separation of concerns and professional branding.
 
-### KSDRILL SA
+### <img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=flat-square&logo=company&logoColor=white" alt="KSDRILL SA" />
 *Technology studio building original digital systems and AI platforms*
 
 **Active Repositories:**
-- [FundsLink Academy](https://github.com/KSDRILL-SA/fundslink-academy) – National education funding platform
-- [Omni Bet](https://github.com/KSDRILL-SA/omni-bet) – AI-powered football analytics
+- <img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="FundsLink Academy" /> [FundsLink Academy](https://github.com/KSDRILL-SA/fundslink-academy) – National education funding platform
+- <img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=flat-square&logo=analytics&logoColor=white" alt="Omni Bet" /> [Omni Bet](https://github.com/KSDRILL-SA/omni-bet) – AI-powered football analytics
 - More platforms in active development
 
-### GrowthCore Solutions
+### <img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=flat-square&logo=growth&logoColor=white" alt="GrowthCore Solutions" />
 *Digital growth agency focused on helping businesses scale through technology and marketing*
 
 **Client Repositories:**
 - Private client work – contact for portfolio access
 
-### Personal Projects
+### <img src="https://img.shields.io/badge/Personal_Projects-181717?style=flat-square&logo=github&logoColor=white" alt="Personal Projects" />
 Outside my companies, I explore new technologies and contribute to open source.
 
 - Portfolio site – Personal website and case studies
@@ -98,13 +98,13 @@ Outside my companies, I explore new technologies and contribute to open source.
 I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
 
 **Core Principles**
-- **Design-first, document-first** – every feature's logic is human‑defined before coding.
-- **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
-- **Modular component architecture** – reusable UI, layout, and AI components.
-- **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
+- <img src="https://img.shields.io/badge/Design_First-2563EB?style=flat-square&logo=draw.io&logoColor=white" alt="Design First" /> **Design-first, document-first** – every feature's logic is human‑defined before coding.
+- <img src="https://img.shields.io/badge/Configuration_Driven-FF6F00?style=flat-square&logo=json&logoColor=white" alt="Configuration Driven" /> **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
+- <img src="https://img.shields.io/badge/Modular_Architecture-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="Modular Architecture" /> **Modular component architecture** – reusable UI, layout, and AI components.
+- <img src="https://img.shields.io/badge/AI_Core_Component-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Core Component" /> **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 <details>
-<summary><strong>🔧 Technology Foundation</strong> (click to expand — Full Stack & AI Architecture)</summary>
+<summary><strong><img src="https://img.shields.io/badge/Technology_Foundation-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Technology Foundation" /> (click to expand — Full Stack & AI Architecture)</strong></summary>
 <br />
 
 **Frontend**
@@ -144,10 +144,10 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 </details>
 
 **Visual & Interaction Standards**
-- No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
-- Dynamic themes (light/dark/hybrid) with a single accent color per system.
-- Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
-- PWA-ready and WCAG 2.1 AA accessible.
+- <img src="https://img.shields.io/badge/No_Emojis-Professional_Icons_Only-2563EB?style=flat-square&logo=heroicons&logoColor=white" alt="No Emojis" /> – only professional icons (Heroicons, Lucide, Font Awesome).
+- <img src="https://img.shields.io/badge/Dynamic_Themes-FF6F00?style=flat-square&logo=color&logoColor=white" alt="Dynamic Themes" /> – light/dark/hybrid themes with a single accent color per system.
+- <img src="https://img.shields.io/badge/Micro_Interactions-150–300ms-06B6D4?style=flat-square&logo=animation&logoColor=white" alt="Micro Interactions" /> – hover lifts, card elevation, smooth collapses.
+- <img src="https://img.shields.io/badge/PWA_Ready-5A67D8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Ready" /> and <img src="https://img.shields.io/badge/WCAG_2.1_AA-00C4B4?style=flat-square&logo=accessibility&logoColor=white" alt="WCAG 2.1 AA" /> accessible.
 
 ---
 
@@ -190,7 +190,7 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 ---
 
 <details>
-<summary><strong>🌍 Future Platform Concepts</strong> (click to expand)</summary>
+<summary><strong><img src="https://img.shields.io/badge/Future_Platform_Concepts-FF6F00?style=flat-square&logo=roadmap&logoColor=white" alt="Future Platform Concepts" /> (click to expand)</strong></summary>
 <br />
 
 Each is designed for **global scalability**.
@@ -207,7 +207,7 @@ Each is designed for **global scalability**.
 ---
 
 <details>
-<summary><strong>🔧 Technical Stack</strong> (click to expand — full details)</summary>
+<summary><strong><img src="https://img.shields.io/badge/Technical_Stack-000000?style=flat-square&logo=stackshare&logoColor=white" alt="Technical Stack" /> (click to expand — full details)</strong></summary>
 <br />
 
 **Frontend**
@@ -267,11 +267,11 @@ Each is designed for **global scalability**.
 
 ## Engineering Philosophy
 
-- **Design-first architecture** – complete system design before coding  
-- **Separation of concerns** – UI, logic, and configuration stay independent  
-- **Sequential development** – one group at a time, no forward dependencies  
-- **Real-world deployment** – operational platforms built end-to-end  
-- **AI as a core component** – integrated to deliver intelligent insights, predictive analytics, and automation  
+- <img src="https://img.shields.io/badge/Design_First_Architecture-2563EB?style=flat-square&logo=draw.io&logoColor=white" alt="Design First Architecture" /> – complete system design before coding  
+- <img src="https://img.shields.io/badge/Separation_of_Concerns-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="Separation of Concerns" /> – UI, logic, and configuration stay independent  
+- <img src="https://img.shields.io/badge/Sequential_Development-25D366?style=flat-square&logo=progress&logoColor=white" alt="Sequential Development" /> – one group at a time, no forward dependencies  
+- <img src="https://img.shields.io/badge/Real_World_Deployment-FF6B6B?style=flat-square&logo=deploy&logoColor=white" alt="Real World Deployment" /> – operational platforms built end-to-end  
+- <img src="https://img.shields.io/badge/AI_Core_Component-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Core Component" /> – integrated to deliver intelligent insights, predictive analytics, and automation  
 
 ---
 
@@ -295,7 +295,7 @@ Building a technology ecosystem that solves **real challenges through scalable p
 </p>
 
 <p align="center">
-  <i>Built in Africa • Designed for global impact</i>
+  <img src="https://img.shields.io/badge/Built_in_Africa-Designed_for_Global_Impact-2563EB?style=for-the-badge" alt="Built in Africa • Designed for Global Impact" />
 </p>
 
 <p align="center">
