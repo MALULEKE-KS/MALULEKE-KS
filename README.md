@@ -1,6 +1,7 @@
 # Maluleke Kurhula Success
-## Founder • Software Engineer • AI Systems Architect  
-Building scalable platforms across SaaS, Fintech, AI, and Enterprise
+
+## <img src="https://img.shields.io/badge/Founder-2563EB?style=flat-square&logo=company&logoColor=white" alt="Founder" /> <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" />  
+### Building scalable platforms across SaaS, Fintech, AI, and Enterprise
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Software+Engineer+%2B+AI+Architect;Next.js+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Scalable+Platforms" alt="Typing animation" />
@@ -33,7 +34,7 @@ Building scalable platforms across SaaS, Fintech, AI, and Enterprise
 
 ---
 
-## Who I Am
+## <img src="https://img.shields.io/badge/Who_I_Am-2563EB?style=flat-square&logo=aboutdotme&logoColor=white" alt="Who I Am" />
 
 I am a **Software Engineer and AI Systems Architect** building real-world digital systems through my companies. My focus is creating **large-scale platforms** that solve complex challenges across multiple industries — with strong expertise in SaaS, fintech, AI, and enterprise applications.
 
@@ -49,7 +50,7 @@ Development happens **sequentially**, one system at a time, ensuring stability a
 
 ---
 
-## What I Can Build
+## <img src="https://img.shields.io/badge/What_I_Can_Build-FF6F00?style=flat-square&logo=build&logoColor=white" alt="What I Can Build" />
 
 <details>
 <summary><strong>Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
@@ -72,21 +73,21 @@ Development happens **sequentially**, one system at a time, ensuring stability a
 
 ---
 
-## My Companies
+## <img src="https://img.shields.io/badge/My_Companies-181717?style=flat-square&logo=company&logoColor=white" alt="My Companies" />
 
-### KSDRILL SA
+### <img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=flat-square&logo=company&logoColor=white" alt="KSDRILL SA" />
 Technology studio demonstrating full-stack engineering, AI integration, and production deployment across multiple industries. Focus areas: AI systems, fintech, SaaS, enterprise automation.
 
 **All KSDRILL SA platforms are stored under the [KSDRILL-SA](https://github.com/KSDRILL-SA) GitHub organization.**
 
-### GrowthCore Solutions
+### <img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=flat-square&logo=growth&logoColor=white" alt="GrowthCore Solutions" />
 Digital growth agency (with Ngoneni Mponisi Forever) combining web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
 
 **Client projects are stored under the [GrowthCore-Solutions](https://github.com/GrowthCore-Solutions) GitHub organization.**
 
 ---
 
-## Open To
+## <img src="https://img.shields.io/badge/Open_To-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Open To" />
 
 - Software Engineering roles (full-stack, backend, AI)
 - Contract or full-time opportunities
@@ -96,7 +97,7 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 
 ---
 
-## MVP Design Identity
+## <img src="https://img.shields.io/badge/MVP_Design_Identity-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="MVP Design Identity" />
 
 I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
 
@@ -106,18 +107,23 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 - **Modular component architecture** – reusable UI, layout, and AI components.
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
-**Visual & Interaction Standards**
+<details>
+<summary><strong>Visual & Interaction Standards (click to expand)</strong></summary>
+<br />
+
 - No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
 - Dynamic themes (light/dark/hybrid) with a single accent color per system.
 - Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
 - PWA-ready and WCAG 2.1 AA accessible.
 
+</details>
+
 ---
 
-## Flagship Systems
+## <img src="https://img.shields.io/badge/Flagship_Systems-FF6F00?style=flat-square&logo=star&logoColor=white" alt="Flagship Systems" />
 
 <details>
-<summary><strong>FundsLink Academy – National education funding platform (click to expand)</strong></summary>
+<summary><strong><img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="FundsLink Academy" /> – National education funding platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -134,7 +140,7 @@ Python AI Service (FastAPI) – automates scholarship matching
 </details>
 
 <details>
-<summary><strong>Omni Bet – AI-powered football analytics platform (click to expand)</strong></summary>
+<summary><strong><img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=flat-square&logo=analytics&logoColor=white" alt="Omni Bet" /> – AI-powered football analytics platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -152,11 +158,11 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 
 ---
 
-<details>
-<summary><strong>Future Platform Concepts (click to expand)</strong></summary>
-<br />
+## <img src="https://img.shields.io/badge/Future_Platform_Concepts-FF6F00?style=flat-square&logo=roadmap&logoColor=white" alt="Future Platform Concepts" />
 
-Each is designed for **global scalability**.
+<details>
+<summary><strong>Click to expand — each designed for global scalability</strong></summary>
+<br />
 
 - **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)
 - **KSDRILL Reserve Bank** – Discipline-driven savings banking (microfinance globally)
@@ -169,8 +175,10 @@ Each is designed for **global scalability**.
 
 ---
 
+## <img src="https://img.shields.io/badge/Technical_Stack-000000?style=flat-square&logo=stackshare&logoColor=white" alt="Technical Stack" />
+
 <details>
-<summary><strong>Technical Stack (click to expand — full details)</strong></summary>
+<summary><strong>Click to expand — full details</strong></summary>
 <br />
 
 **Frontend**
@@ -214,7 +222,7 @@ Each is designed for **global scalability**.
 
 ---
 
-## GitHub Analytics
+## <img src="https://img.shields.io/badge/GitHub_Analytics-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Analytics" />
 
 <p align="center">
   <img height="160" src="https://github-readme-stats.vercel.app/api?username=KSDRILL&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151" alt="GitHub Stats" />
@@ -228,7 +236,7 @@ Each is designed for **global scalability**.
 
 ---
 
-## Engineering Philosophy
+## <img src="https://img.shields.io/badge/Engineering_Philosophy-2563EB?style=flat-square&logo=philosophy&logoColor=white" alt="Engineering Philosophy" />
 
 - **Design-first architecture** – complete system design before coding
 - **Separation of concerns** – UI, logic, and configuration stay independent
@@ -238,13 +246,13 @@ Each is designed for **global scalability**.
 
 ---
 
-## Vision
+## <img src="https://img.shields.io/badge/Vision-FF6F00?style=flat-square&logo=vision&logoColor=white" alt="Vision" />
 
 Building a technology ecosystem that solves **real challenges through scalable platforms** across SaaS, fintech, healthcare, enterprise, and AI — **built with African roots, designed for global impact**.
 
 ---
 
-## Contact
+## <img src="https://img.shields.io/badge/Contact-25D366?style=flat-square&logo=contact&logoColor=white" alt="Contact" />
 
 <p align="center">
   <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
