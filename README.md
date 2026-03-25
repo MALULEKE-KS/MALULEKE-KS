@@ -39,11 +39,11 @@ I am a **Software Engineer and AI Systems Architect** building real-world digita
 
 Every system I design follows a **design-first architecture approach**. Before writing code I complete:
 
-- <img src="https://img.shields.io/badge/Architecture-FF6F00?style=flat-square&logo=draw.io&logoColor=white" alt="Architecture" /> Full platform architecture  
-- <img src="https://img.shields.io/badge/User_Flows-0052CC?style=flat-square&logo=diagrams.net&logoColor=white" alt="User flows" /> User flows  
-- <img src="https://img.shields.io/badge/System_Modules-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="System modules" /> System modules  
-- <img src="https://img.shields.io/badge/Database-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="Database" /> Database structures  
-- <img src="https://img.shields.io/badge/Interface_Design-FF61F6?style=flat-square&logo=figma&logoColor=white" alt="Interface design" /> Interface designs  
+- Full platform architecture
+- User flows
+- System modules
+- Database structures
+- Interface designs
 
 Development happens **sequentially**, one system at a time, ensuring stability and deep technical understanding.
 
@@ -52,10 +52,8 @@ Development happens **sequentially**, one system at a time, ensuring stability a
 ## What I Can Build
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Engineering_Capabilities-2563EB?style=flat-square&logo=codefactor&logoColor=white" alt="Engineering Capabilities" /> (click to expand — skills transfer across industries)</strong></summary>
+<summary><strong>Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
 <br />
-
-**My engineering capabilities apply across sectors:**
 
 | Industry | Applications |
 |----------|--------------|
@@ -76,12 +74,12 @@ Development happens **sequentially**, one system at a time, ensuring stability a
 
 ## My Companies
 
-### <img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=for-the-badge&logo=company&logoColor=white" alt="KSDRILL SA" />
+### KSDRILL SA
 Technology studio demonstrating full-stack engineering, AI integration, and production deployment across multiple industries. Focus areas: AI systems, fintech, SaaS, enterprise automation.
 
 **All KSDRILL SA platforms are stored under the [KSDRILL-SA](https://github.com/KSDRILL-SA) GitHub organization.**
 
-### <img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=for-the-badge&logo=growth&logoColor=white" alt="GrowthCore Solutions" />
+### GrowthCore Solutions
 Digital growth agency (with Ngoneni Mponisi Forever) combining web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
 
 **Client projects are stored under the [GrowthCore-Solutions](https://github.com/GrowthCore-Solutions) GitHub organization.**
@@ -90,9 +88,9 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 
 ## Open To
 
-- <img src="https://img.shields.io/badge/Software_Engineering-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineering" /> Software Engineering roles (full-stack, backend, AI)
-- <img src="https://img.shields.io/badge/Contract_Opportunities-FF6F00?style=flat-square&logo=contract&logoColor=white" alt="Contract Opportunities" /> Contract or full-time opportunities
-- <img src="https://img.shields.io/badge/Any_Industry-25D366?style=flat-square&logo=industry&logoColor=white" alt="Any Industry" /> Building scalable platforms across **any industry** — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
+- Software Engineering roles (full-stack, backend, AI)
+- Contract or full-time opportunities
+- Building scalable platforms across **any industry** — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
 
 *My architecture and engineering skills transfer across domains. I solve problems, not just build features.*
 
@@ -103,23 +101,23 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
 
 **Core Principles**
-- <img src="https://img.shields.io/badge/Design_First-2563EB?style=flat-square&logo=draw.io&logoColor=white" alt="Design First" /> **Design-first, document-first** – every feature's logic is human‑defined before coding.
-- <img src="https://img.shields.io/badge/Configuration_Driven-FF6F00?style=flat-square&logo=json&logoColor=white" alt="Configuration Driven" /> **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
-- <img src="https://img.shields.io/badge/Modular_Architecture-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="Modular Architecture" /> **Modular component architecture** – reusable UI, layout, and AI components.
-- <img src="https://img.shields.io/badge/AI_Core_Component-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Core Component" /> **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
+- **Design-first, document-first** – every feature's logic is human‑defined before coding.
+- **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
+- **Modular component architecture** – reusable UI, layout, and AI components.
+- **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 **Visual & Interaction Standards**
-- <img src="https://img.shields.io/badge/No_Emojis-Professional_Icons_Only-2563EB?style=flat-square&logo=heroicons&logoColor=white" alt="No Emojis" /> – only professional icons (Heroicons, Lucide, Font Awesome).
-- <img src="https://img.shields.io/badge/Dynamic_Themes-FF6F00?style=flat-square&logo=color&logoColor=white" alt="Dynamic Themes" /> – light/dark/hybrid themes with a single accent color per system.
-- <img src="https://img.shields.io/badge/Micro_Interactions-150–300ms-06B6D4?style=flat-square&logo=animation&logoColor=white" alt="Micro Interactions" /> – hover lifts, card elevation, smooth collapses.
-- <img src="https://img.shields.io/badge/PWA_Ready-5A67D8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Ready" /> and <img src="https://img.shields.io/badge/WCAG_2.1_AA-00C4B4?style=flat-square&logo=accessibility&logoColor=white" alt="WCAG 2.1 AA" /> accessible.
+- No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
+- Dynamic themes (light/dark/hybrid) with a single accent color per system.
+- Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
+- PWA-ready and WCAG 2.1 AA accessible.
 
 ---
 
 ## Flagship Systems
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="FundsLink Academy" /> – National education funding platform (click to expand)</strong></summary>
+<summary><strong>FundsLink Academy – National education funding platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -128,15 +126,15 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 ↓
 Python AI Service (FastAPI) – automates scholarship matching
 
-**Tech Stack**  
-- **Frontend:** <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" alt="React Hook Form" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />  
-- **Backend:** <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" />  
-- **AI / ML:** <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" /> <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" />  
-- **Status:** <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+
+**Problem it solves:** 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources. A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
+
+**Status:** <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=flat-square&logo=analytics&logoColor=white" alt="Omni Bet" /> – AI-powered football analytics platform (click to expand)</strong></summary>
+<summary><strong>Omni Bet – AI-powered football analytics platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -145,34 +143,34 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 ↓
 Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predictions
 
-**Tech Stack**  
-- **Frontend:** <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" alt="React Hook Form" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />  
-- **Backend:** <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" />  
-- **AI / ML:** <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" alt="Scikit-learn" /> <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" alt="Pandas" />  
-- **Status:** <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+
+**Core capabilities:** Machine learning predictions, real-time data scraping, betting value detection, bankroll management algorithms.
+
+**Status:** <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+
 </details>
 
 ---
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Future_Platform_Concepts-FF6F00?style=flat-square&logo=roadmap&logoColor=white" alt="Future Platform Concepts" /> (click to expand)</strong></summary>
+<summary><strong>Future Platform Concepts (click to expand)</strong></summary>
 <br />
 
 Each is designed for **global scalability**.
 
-- <img src="https://img.shields.io/badge/Ekasi_Connect-FF6B6B?style=flat-square&logo=google-maps&logoColor=white" alt="Ekasi Connect" /> **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)  
-- <img src="https://img.shields.io/badge/KSDRILL_Reserve_Bank-0A66C2?style=flat-square&logo=bank&logoColor=white" alt="KSDRILL Reserve Bank" /> **KSDRILL Reserve Bank** – Discipline-driven savings banking (microfinance globally)  
-- <img src="https://img.shields.io/badge/Maphophe_Community-25D366?style=flat-square&logo=community&logoColor=white" alt="Maphophe Community System" /> **Maphophe Community System** – Digital governance for villages (transferable to local governance globally)  
-- <img src="https://img.shields.io/badge/TransLink_SA-FFA500?style=flat-square&logo=bus&logoColor=black" alt="TransLink SA" /> **TransLink SA** – Taxi rank coordination (urban transport models worldwide)  
-- <img src="https://img.shields.io/badge/XBridge-764ABC?style=flat-square&logo=code&logoColor=white" alt="XBridge" /> **XBridge** – Project-based developer education (scalable skill-building platform)  
-- <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" alt="KayS" /> **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
+- **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)
+- **KSDRILL Reserve Bank** – Discipline-driven savings banking (microfinance globally)
+- **Maphophe Community System** – Digital governance for villages (transferable to local governance globally)
+- **TransLink SA** – Taxi rank coordination (urban transport models worldwide)
+- **XBridge** – Project-based developer education (scalable skill-building platform)
+- **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
 
 </details>
 
 ---
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Technical_Stack-000000?style=flat-square&logo=stackshare&logoColor=white" alt="Technical Stack" /> (click to expand — full details)</strong></summary>
+<summary><strong>Technical Stack (click to expand — full details)</strong></summary>
 <br />
 
 **Frontend**
@@ -232,11 +230,11 @@ Each is designed for **global scalability**.
 
 ## Engineering Philosophy
 
-- <img src="https://img.shields.io/badge/Design_First_Architecture-2563EB?style=flat-square&logo=draw.io&logoColor=white" alt="Design First Architecture" /> – complete system design before coding  
-- <img src="https://img.shields.io/badge/Separation_of_Concerns-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="Separation of Concerns" /> – UI, logic, and configuration stay independent  
-- <img src="https://img.shields.io/badge/Sequential_Development-25D366?style=flat-square&logo=progress&logoColor=white" alt="Sequential Development" /> – one group at a time, no forward dependencies  
-- <img src="https://img.shields.io/badge/Real_World_Deployment-FF6B6B?style=flat-square&logo=deploy&logoColor=white" alt="Real World Deployment" /> – operational platforms built end-to-end  
-- <img src="https://img.shields.io/badge/AI_Core_Component-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Core Component" /> – integrated to deliver intelligent insights, predictive analytics, and automation  
+- **Design-first architecture** – complete system design before coding
+- **Separation of concerns** – UI, logic, and configuration stay independent
+- **Sequential development** – one group at a time, no forward dependencies
+- **Real-world deployment** – operational platforms built end-to-end
+- **AI as a core component** – integrated to deliver intelligent insights, predictive analytics, and automation
 
 ---
 
@@ -260,7 +258,7 @@ Building a technology ecosystem that solves **real challenges through scalable p
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built_with_African_Roots-Designed_for_Global_Impact-2563EB?style=for-the-badge" alt="Built with African Roots • Designed for Global Impact" />
+  <i>Built with African roots • Designed for global impact</i>
 </p>
 
 <p align="center">
