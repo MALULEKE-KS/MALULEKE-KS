@@ -62,11 +62,13 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 
 ---
 
-## GitHub Organization Structure
+<details>
+<summary><strong>🏢 GitHub Organization Structure</strong> (click to expand)</summary>
+<br />
 
 All my commercial platforms are organized under dedicated GitHub organizations to maintain separation of concerns and professional branding.
 
-### 🏢 KSDRILL SA
+### KSDRILL SA
 *Technology studio building original digital systems and AI platforms*
 
 **Active Repositories:**
@@ -74,18 +76,20 @@ All my commercial platforms are organized under dedicated GitHub organizations t
 - [Omni Bet](https://github.com/KSDRILL-SA/omni-bet) – AI-powered football analytics
 - More platforms in active development
 
-### 📈 GrowthCore Solutions
+### GrowthCore Solutions
 *Digital growth agency focused on helping businesses scale through technology and marketing*
 
 **Client Repositories:**
 - Private client work – contact for portfolio access
 
-### 🧪 Personal Projects
+### Personal Projects
 Outside my companies, I explore new technologies and contribute to open source.
 
 - Portfolio site – Personal website and case studies
 - Learning labs – Experiments and explorations
 - Open source contributions
+
+</details>
 
 ---
 
@@ -100,7 +104,7 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 <details>
-<summary><strong>🔧 Click to expand — Full Stack & AI Architecture</strong></summary>
+<summary><strong>🔧 Technology Foundation</strong> (click to expand — Full Stack & AI Architecture)</summary>
 <br />
 
 **Frontend**
@@ -150,7 +154,7 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 ## Flagship Systems
 
 <details>
-<summary><strong>📌 FundsLink Academy</strong> – National education funding platform (click to expand)</summary>
+<summary><strong><img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="FundsLink Academy" /> – National education funding platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -167,7 +171,7 @@ Python AI Service (FastAPI) – automates scholarship matching
 </details>
 
 <details>
-<summary><strong>⚽ Omni Bet</strong> – AI-powered football analytics platform (click to expand)</summary>
+<summary><strong><img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=flat-square&logo=analytics&logoColor=white" alt="Omni Bet" /> – AI-powered football analytics platform (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -185,7 +189,9 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 
 ---
 
-## Future Platform Concepts
+<details>
+<summary><strong>🌍 Future Platform Concepts</strong> (click to expand)</summary>
+<br />
 
 Each is designed for **global scalability**.
 
@@ -196,24 +202,23 @@ Each is designed for **global scalability**.
 - <img src="https://img.shields.io/badge/XBridge-764ABC?style=flat-square&logo=code&logoColor=white" alt="XBridge" /> **XBridge** – Project-based developer education (scalable skill-building platform)  
 - <img src="https://img.shields.io/badge/KayS-412991?style=flat-square&logo=voice&logoColor=white" alt="KayS" /> **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
 
+</details>
+
 ---
 
-## Technical Stack
-
 <details>
-<summary><strong>🔧 Frontend</strong> (click to expand)</summary>
+<summary><strong>🔧 Technical Stack</strong> (click to expand — full details)</summary>
 <br />
+
+**Frontend**
 <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
 <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
 <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
 <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
 <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" alt="React Hook Form" />
 <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />
-</details>
 
-<details>
-<summary><strong>⚙️ Backend & API</strong> (click to expand)</summary>
-<br />
+**Backend & API**
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" />
 <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" />
 <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" />
@@ -221,18 +226,12 @@ Each is designed for **global scalability**.
 <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" />
 <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" />
 <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" />
-</details>
 
-<details>
-<summary><strong>🗄️ Database & ORM</strong> (click to expand)</summary>
-<br />
+**Database & ORM**
 <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
 <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" />
-</details>
 
-<details>
-<summary><strong>🤖 AI / Python</strong> (click to expand)</summary>
-<br />
+**AI / Python**
 <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
 <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
 <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" />
@@ -240,16 +239,14 @@ Each is designed for **global scalability**.
 <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" />
 <img src="https://img.shields.io/badge/Scikit_Learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" alt="Scikit-learn" />
 <img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" alt="Pandas" />
-</details>
 
-<details>
-<summary><strong>🚀 Deployment & Tools</strong> (click to expand)</summary>
-<br />
+**Deployment & Tools**
 <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" />
 <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
 <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
 <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
 <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" alt="Postman" />
+
 </details>
 
 ---
