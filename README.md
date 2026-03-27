@@ -160,6 +160,8 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 
 ## <img src="https://img.shields.io/badge/Future_Platform_Concepts-FF6F00?style=flat-square&logo=roadmap&logoColor=white" alt="Future Platform Concepts" />
 
+*Designed, architected, and ready for development — launching after current flagships.*
+
 <details>
 <summary><strong>Click to expand — each designed for global scalability</strong></summary>
 <br />
