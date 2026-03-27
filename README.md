@@ -122,6 +122,8 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 ## <img src="https://img.shields.io/badge/Flagship_Systems-FF6F00?style=flat-square&logo=star&logoColor=white" alt="Flagship Systems" />
 
+*Currently in active development — sequenced for delivery*
+
 <details>
 <summary><strong><img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="FundsLink Academy" /> – National education funding platform (click to expand)</strong></summary>
 <br />
@@ -135,7 +137,7 @@ Python AI Service (FastAPI) – automates scholarship matching
 
 **Problem it solves:** 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources. A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
 
-**Status:** <img src="https://img.shields.io/badge/Alpha-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+**Status:** <img src="https://img.shields.io/badge/Active_Development-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
 
 </details>
 
@@ -152,7 +154,22 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 
 **Core capabilities:** Machine learning predictions, real-time data scraping, betting value detection, bankroll management algorithms.
 
-**Status:** <img src="https://img.shields.io/badge/Alpha-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Alpha" /> (demo coming soon)
+**Status:** <img src="https://img.shields.io/badge/Active_Development-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 2)
+
+</details>
+
+<details>
+<summary><strong><img src="https://img.shields.io/badge/Ekasi_Connect-FF6B6B?style=flat-square&logo=google-maps&logoColor=white" alt="Ekasi Connect" /> – Rural service marketplace (click to expand)</strong></summary>
+<br />
+
+**Architecture**
+
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+
+
+**Problem it solves:** Rural communities lack access to digital marketplaces for goods, services, and local opportunities. Ekasi Connect creates a trusted platform connecting buyers, sellers, and service providers in underserved areas.
+
+**Status:** <img src="https://img.shields.io/badge/Design_Complete-FF6B6B?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
 
 </details>
 
@@ -166,7 +183,6 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 <summary><strong>Click to expand — each designed for global scalability</strong></summary>
 <br />
 
-- **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)
 - **KSDRILL Reserve Bank** – Discipline-driven savings banking (microfinance globally)
 - **Maphophe Community System** – Digital governance for villages (transferable to local governance globally)
 - **TransLink SA** – Taxi rank coordination (urban transport models worldwide)
