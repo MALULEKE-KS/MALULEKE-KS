@@ -1,6 +1,6 @@
 # Maluleke Kurhula Success
 
-## <img src="https://img.shields.io/badge/Founder-2563EB?style=flat-square&logo=company&logoColor=white" alt="Founder" /> <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" />  
+## <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" />  
 ### Building scalable platforms across SaaS, Fintech, AI, and Enterprise
 
 <p align="center">
@@ -102,7 +102,7 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
 
 **Core Principles**
-- **Design-first, document-first** – every feature's logic is human‑defined before coding.
+- **Design-first, document-first** – every feature's logic is human-defined before coding.
 - **Configuration-driven** – theme, navigation, features, and AI services controlled via JSON.
 - **Modular component architecture** – reusable UI, layout, and AI components.
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
