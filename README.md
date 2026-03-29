@@ -108,13 +108,13 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 - **AI as a core component** – enabling intelligent insights, predictive analytics, and automated decision-making.
 
 <details>
-<summary><strong>Visual & Interaction Standards (click to expand)</strong></summary>
+<summary><strong>Design Standards (click to expand)</strong></summary>
 <br />
 
-- No emojis – only professional icons (Heroicons, Lucide, Font Awesome).
-- Dynamic themes (light/dark/hybrid) with a single accent color per system.
-- Subtle micro-interactions (150–300ms) – hover lifts, card elevation, smooth collapses.
-- PWA-ready and WCAG 2.1 AA accessible.
+- Clean, modern, and accessible interfaces
+- Consistent theming and design systems
+- Performance-focused interactions
+- Production-ready UI/UX standards
 
 </details>
 
