@@ -142,24 +142,22 @@ Python AI Service (FastAPI) – automates scholarship matching
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Omni_Bet-FF6F00?style=flat-square&logo=analytics&logoColor=white" alt="Omni Bet" /> – AI-powered football analytics platform (click to expand)</strong></summary>
+<summary><strong><img src="https://img.shields.io/badge/Maphophe_Community_System-25D366?style=flat-square&logo=community&logoColor=white" alt="Maphophe Community System" /> – Digital governance for villages (click to expand)</strong></summary>
 <br />
 
 **Architecture**
 
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-↓
-Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predictions
 
 
-**Core capabilities:** Machine learning predictions, real-time data scraping, betting value detection, bankroll management algorithms.
+**Problem it solves:** Rural villages lack digital infrastructure for governance, communication, and service delivery. A village-level platform for announcements, service requests, and community voting.
 
-**Status:** <img src="https://img.shields.io/badge/Active_Development-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 2)
+**Status:** <img src="https://img.shields.io/badge/Design_Complete-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
 
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Ekasi_Connect-FF6B6B?style=flat-square&logo=google-maps&logoColor=white" alt="Ekasi Connect" /> – Rural service marketplace (click to expand)</strong></summary>
+<summary><strong><img src="https://img.shields.io/badge/KSDRILL_Reserve_Bank-0A66C2?style=flat-square&logo=bank&logoColor=white" alt="KSDRILL Reserve Bank" /> – Discipline-driven savings banking (click to expand)</strong></summary>
 <br />
 
 **Architecture**
@@ -167,9 +165,24 @@ Python ML Service (FastAPI + Scikit-learn + Pandas) – real-time betting predic
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
 
 
-**Problem it solves:** Rural communities lack access to digital marketplaces for goods, services, and local opportunities. Ekasi Connect creates a trusted platform connecting buyers, sellers, and service providers in underserved areas.
+**Problem it solves:** Many people struggle with consistent savings habits and lack accessible microfinance tools. A digital savings platform with goal-setting, automated deposits, and interest tracking.
 
-**Status:** <img src="https://img.shields.io/badge/Design_Complete-FF6B6B?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
+**Status:** <img src="https://img.shields.io/badge/Design_Complete-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
+
+</details>
+
+<details>
+<summary><strong><img src="https://img.shields.io/badge/SyncUp-FF6F00?style=flat-square&logo=star&logoColor=white" alt="SyncUp" /> – Creator collaboration platform (click to expand)</strong></summary>
+<br />
+
+**Architecture**
+
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+
+
+**Problem it solves:** Creators struggle to find collaborators; existing platforms lack structured negotiation. A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
+
+**Status:** <img src="https://img.shields.io/badge/Design_Complete-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
 
 </details>
 
@@ -183,8 +196,8 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <summary><strong>Click to expand — each designed for global scalability</strong></summary>
 <br />
 
-- **KSDRILL Reserve Bank** – Discipline-driven savings banking (microfinance globally)
-- **Maphophe Community System** – Digital governance for villages (transferable to local governance globally)
+- **Omni Bet** – AI-powered football analytics platform
+- **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)
 - **TransLink SA** – Taxi rank coordination (urban transport models worldwide)
 - **XBridge** – Project-based developer education (scalable skill-building platform)
 - **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
