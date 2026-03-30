@@ -25,7 +25,7 @@
 - [Open To](#open-to)
 - [MVP Design Identity](#mvp-design-identity)
 - [Flagship Systems](#flagship-systems)
-- [Future Platform Concepts](#future-platform-concepts)
+- [Future Platforms](#future-platforms)
 - [Technical Stack](#technical-stack)
 - [GitHub Analytics](#github-analytics)
 - [Engineering Philosophy](#engineering-philosophy)
@@ -188,21 +188,11 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 ---
 
-## <img src="https://img.shields.io/badge/Future_Platform_Concepts-FF6F00?style=flat-square&logo=roadmap&logoColor=white" alt="Future Platform Concepts" />
+## <img src="https://img.shields.io/badge/Future_Platforms-FF6F00?style=flat-square&logo=shield&logoColor=white" alt="Future Platforms" />
 
-*Designed, architected, and ready for development — launching after current flagships.*
+*Additional platforms are in development — details protected under company confidentiality.*
 
-<details>
-<summary><strong>Click to expand — each designed for global scalability</strong></summary>
-<br />
-
-- **Omni Bet** – AI-powered football analytics platform
-- **Ekasi Connect** – Rural service marketplace (adaptable to underserved regions worldwide)
-- **TransLink SA** – Taxi rank coordination (urban transport models worldwide)
-- **XBridge** – Project-based developer education (scalable skill-building platform)
-- **KayS** – Personal voice-controlled AI agent (universal personal assistant concept)
-
-</details>
+*For partnership inquiries, [contact me](mailto:kurhula04s@gmail.com) to discuss upcoming releases.*
 
 ---
 
