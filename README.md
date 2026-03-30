@@ -36,9 +36,9 @@
 
 ## <img src="https://img.shields.io/badge/Who_I_Am-2563EB?style=flat-square&logo=aboutdotme&logoColor=white" alt="Who I Am" />
 
-I am a **Software Engineer and AI Systems Architect** building real-world digital systems through my companies. My focus is creating **large-scale platforms** that solve complex challenges across multiple industries — with strong expertise in SaaS, fintech, AI, and enterprise applications.
+I am a **Software Engineer and AI Systems Architect** building real-world digital systems through my companies. My focus is creating **large-scale platforms** that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
 
-Every system I design follows a **design-first architecture approach**. Before writing code I complete:
+Before writing code I complete:
 
 - Full platform architecture
 - User flows
@@ -92,8 +92,6 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 - Software Engineering roles (full-stack, backend, AI)
 - Contract or full-time opportunities
 - Building scalable platforms across **any industry** — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
-
-*My architecture and engineering skills transfer across domains. I solve problems, not just build features.*
 
 ---
 
@@ -263,7 +261,7 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 - **Separation of concerns** – UI, logic, and configuration stay independent
 - **Sequential development** – one group at a time, no forward dependencies
 - **Real-world deployment** – operational platforms built end-to-end
-- **AI as a core component** – integrated to deliver intelligent insights, predictive analytics, and automation
+- **AI integration** – delivering intelligent insights, predictive analytics, and automation
 
 ---
 
