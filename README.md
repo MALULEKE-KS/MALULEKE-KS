@@ -89,8 +89,8 @@ Digital growth agency (with Ngoneni Mponisi Forever) combining web development, 
 
 ## <img src="https://img.shields.io/badge/Open_To-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Open To" />
 
-- Software Engineering roles (full-stack, backend, AI)
-- Contract or full-time opportunities
+- Full-time, part-time, contract, or remote opportunities
+- Software Engineering roles — full-stack, backend, AI/ML, systems architecture
 - Building scalable platforms across **any industry** — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
 
 ---
