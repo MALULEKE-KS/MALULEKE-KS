@@ -281,7 +281,7 @@ Building a technology ecosystem that solves **real challenges through scalable p
 </p>
 
 <p align="center">
-  *Most repositories are private during active development. For portfolio access, [contact me](mailto:kurhula04s@gmail.com) to schedule a demo.*
+  Most repositories are private during active development. For portfolio access, [contact me](mailto:kurhula04s@gmail.com) to schedule a demo.
 </p>
 
 <p align="center">
