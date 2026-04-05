@@ -224,7 +224,7 @@ Python AI Service (FastAPI) – automates scholarship matching
 <br/>
 
 <details>
-<summary><strong><a href="https://github.com/KSDRILL-SA/maphophe-community"><img src="https://img.shields.io/badge/Maphophe_Community_System-25D366?style=flat-square&logo=community&logoColor=white" alt="Maphophe Community System" /></a> – Digital governance for villages (click to expand)</strong></summary>
+<summary><strong><a href="https://github.com/KSDRILL-SA/maphophe-community-system"><img src="https://img.shields.io/badge/Maphophe_Community_System-25D366?style=flat-square&logo=community&logoColor=white" alt="Maphophe Community System" /></a> – Digital governance for villages (click to expand)</strong></summary>
 
 <br/>
 
