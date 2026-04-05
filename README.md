@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,12,20&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect%20%7C%20Founder%20of%20KSDRILL%20SA&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
 </p>
 
 ## <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" /> <img src="https://img.shields.io/badge/Founder-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Founder" />
@@ -36,6 +36,8 @@
 - [Future Platforms](#future-platforms)
 - [Technical Stack](#technical-stack)
 - [GitHub Analytics](#github-analytics)
+- [GitHub Trophies](#github-trophies)
+- [Contribution Snake](#contribution-snake)
 - [Engineering Philosophy](#engineering-philosophy)
 - [Vision](#vision)
 - [Contact](#contact)
@@ -278,6 +280,22 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <p align="center">
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB" width="48%" alt="GitHub Streak" />
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=MALULEKE-KS&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" alt="Contribution Graph" />
+</p>
+
+---
+
+## <img src="https://img.shields.io/badge/GitHub_Trophies-2563EB?style=flat-square&logo=github&logoColor=white" alt="Trophies" />
+
+<p align="center">
+  <img src="https://github-profile-trophy.vercel.app/?username=MALULEKE-KS&theme=flat&no-frame=true&no-bg=true&column=7&margin-w=4" alt="GitHub Trophies" />
+</p>
+
+---
+
+## <img src="https://img.shields.io/badge/Contribution_Snake-2563EB?style=flat-square&logo=github&logoColor=white" alt="Snake" />
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MALULEKE-KS/MALULEKE-KS/output/github-contribution-grid-snake.svg" alt="Snake animation" />
 </p>
 
 ---
