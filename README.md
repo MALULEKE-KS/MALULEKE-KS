@@ -1,9 +1,9 @@
 <p align="center">
 <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
 
-</p>  <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" />
+</p>  <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" /> <img src="https://img.shields.io/badge/Founder-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Founder" />
 
-Designing and building practical digital systems that solve real-world challenges
+Building scalable platforms across SaaS, Fintech, AI, and Enterprise
 
 <p align="center">  
   <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=500&size=28&duration=2800&pause=500&color=2563EB&center=true&vCenter=true&width=650&lines=Founder+of+KSDRILL+SA;Software+Engineer+%2B+AI+Architect;Next.js+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Scalable+Platforms;African+Roots+%7C+Global+Impact" alt="Typing animation" />  
@@ -57,7 +57,7 @@ Contact
 
 <img src="https://img.shields.io/badge/Who_I_Am-2563EB?style=flat-square&logo=aboutdotme&logoColor=white" alt="Who I Am" />
 
-I am a Software Engineer and AI Systems Architect building practical digital systems through my companies. My focus is creating reliable platforms that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
+I am a Software Engineer and AI Systems Architect building real-world digital systems through my companies. My focus is creating large-scale platforms that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
 
 Before writing code I complete:
 
