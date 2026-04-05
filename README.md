@@ -284,22 +284,6 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 ---
 
-## <img src="https://img.shields.io/badge/GitHub_Trophies-2563EB?style=flat-square&logo=github&logoColor=white" alt="Trophies" />
-
-<p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=MALULEKE-KS&theme=flat&no-frame=true&no-bg=true&column=7&margin-w=4" alt="GitHub Trophies" />
-</p>
-
----
-
-## <img src="https://img.shields.io/badge/Contribution_Snake-2563EB?style=flat-square&logo=github&logoColor=white" alt="Snake" />
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/MALULEKE-KS/MALULEKE-KS/output/github-contribution-grid-snake.svg" alt="Snake animation" />
-</p>
-
----
-
 ## <img src="https://img.shields.io/badge/Engineering_Philosophy-2563EB?style=flat-square&logo=philosophy&logoColor=white" alt="Engineering Philosophy" />
 
 - **Design-first architecture** – complete system design before coding
