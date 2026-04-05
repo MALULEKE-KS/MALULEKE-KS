@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=120&section=header&text=Maluleke%20Kurhula%20Success&fontSize=36&fontColor=white&fontAlignY=40&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect%20%7C%20Founder&descAlignY=62&descSize=16" alt="Header" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,12,20&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect%20%7C%20Founder%20of%20KSDRILL%20SA&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
 </p>
 
 ## <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=flat-square&logo=code&logoColor=white" alt="Software Engineer" /> <img src="https://img.shields.io/badge/AI_Systems_Architect-412991?style=flat-square&logo=openai&logoColor=white" alt="AI Systems Architect" /> <img src="https://img.shields.io/badge/Founder-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Founder" />
