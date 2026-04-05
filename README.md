@@ -146,7 +146,7 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 *Currently in active development — sequenced for delivery*
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/Bursary_Match-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="Bursary Match" /> – National education funding platform (click to expand)</strong></summary>
+<summary><strong><a href="https://github.com/KSDRILL-SA/bursary-match"><img src="https://img.shields.io/badge/Bursary_Match-2563EB?style=flat-square&logo=google-scholar&logoColor=white" alt="Bursary Match" /></a> – National education funding platform (click to expand)</strong></summary>
 
 **Problem it solves:** 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources. A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
 
@@ -156,10 +156,12 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 **Status:** <img src="https://img.shields.io/badge/Phase_1-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Phase 1" />
 
+**Repository:** <a href="https://github.com/KSDRILL-SA/bursary-match"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Repo" /></a>
+
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/VillageGov-25D366?style=flat-square&logo=community&logoColor=white" alt="VillageGov" /> – Digital governance for villages (click to expand)</strong></summary>
+<summary><strong><a href="https://github.com/KSDRILL-SA/villagegov"><img src="https://img.shields.io/badge/VillageGov-25D366?style=flat-square&logo=community&logoColor=white" alt="VillageGov" /></a> – Digital governance for villages (click to expand)</strong></summary>
 
 **Problem it solves:** Rural villages lack digital infrastructure for governance, communication, and service delivery. A village-level platform for announcements, service requests, and community voting.
 
@@ -169,10 +171,12 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 **Status:** <img src="https://img.shields.io/badge/Phase_2-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Phase 2" />
 
+**Repository:** <a href="https://github.com/KSDRILL-SA/villagegov"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Repo" /></a>
+
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/SavingsFirst-0A66C2?style=flat-square&logo=bank&logoColor=white" alt="SavingsFirst" /> – Discipline-driven savings banking (click to expand)</strong></summary>
+<summary><strong><a href="https://github.com/KSDRILL-SA/savingsfirst"><img src="https://img.shields.io/badge/SavingsFirst-0A66C2?style=flat-square&logo=bank&logoColor=white" alt="SavingsFirst" /></a> – Discipline-driven savings banking (click to expand)</strong></summary>
 
 **Problem it solves:** Many people struggle with consistent savings habits and lack accessible microfinance tools. A digital savings platform with goal-setting, automated deposits, and interest tracking.
 
@@ -182,10 +186,12 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 **Status:** <img src="https://img.shields.io/badge/Phase_3-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Phase 3" />
 
+**Repository:** <a href="https://github.com/KSDRILL-SA/savingsfirst"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Repo" /></a>
+
 </details>
 
 <details>
-<summary><strong><img src="https://img.shields.io/badge/CreatorCollab-FF6F00?style=flat-square&logo=star&logoColor=white" alt="CreatorCollab" /> – Creator collaboration platform (click to expand)</strong></summary>
+<summary><strong><a href="https://github.com/KSDRILL-SA/creatorcollab"><img src="https://img.shields.io/badge/CreatorCollab-FF6F00?style=flat-square&logo=star&logoColor=white" alt="CreatorCollab" /></a> – Creator collaboration platform (click to expand)</strong></summary>
 
 **Problem it solves:** Creators struggle to find collaborators; existing platforms lack structured negotiation. A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
 
@@ -194,6 +200,8 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 `Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL`
 
 **Status:** <img src="https://img.shields.io/badge/Phase_4-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Phase 4" />
+
+**Repository:** <a href="https://github.com/KSDRILL-SA/creatorcollab"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Repo" /></a>
 
 </details>
 
