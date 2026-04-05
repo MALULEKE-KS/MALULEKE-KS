@@ -314,5 +314,6 @@ Building a technology ecosystem that solves real challenges through scalable pla
 </p>
 
 <p align="center">  
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=100&section=footer" alt="Footer wave" />  
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=100&section=footer" alt="Footer wave" /> 
+ 
 </p>
