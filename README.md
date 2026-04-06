@@ -336,10 +336,6 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />  
 </p>
 
-## Contribution Snake
-
-![Snake animation](https://github.com/MALULEKE-KS/MALULEKE-KS/blob/output/github-contribution-grid-snake.svg)
----
 
 <br/>
 
