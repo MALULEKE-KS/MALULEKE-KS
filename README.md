@@ -220,9 +220,11 @@ Currently in active development — sequenced for delivery
 🏗️ Architecture:
 
 ```
+
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
 ↓
 Python AI Service (FastAPI) – automates scholarship matching
+
 ```
 
 📊 Status: <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
@@ -243,7 +245,9 @@ Python AI Service (FastAPI) – automates scholarship matching
 🏗️ Architecture:
 
 ```
+
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+
 ```
 
 📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
@@ -264,7 +268,9 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 🏗️ Architecture:
 
 ```
+
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+
 ```
 
 📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
@@ -285,7 +291,9 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 🏗️ Architecture:
 
 ```
+
 Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+
 ```
 
 📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
@@ -338,8 +346,6 @@ Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-squar
 <p align="center">  
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />  
 </p>
-
----
 
 <br/>
 
