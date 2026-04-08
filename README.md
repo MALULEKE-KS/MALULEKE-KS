@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <h1 align="center">Designing and building practical digital systems that solve real-world challenges</h1>
+  <h1 align="center">Building practical digital systems with locked constitutions — frontend v16.0 · backend v2.2</h1>
 </p>
 
 <p align="center">  
@@ -55,11 +55,9 @@
 
 <br/>
 
-> *"Building practical digital systems that solve real-world challenges"*
-
 I am a **Software Engineer** and **AI Systems Architect** building practical digital systems through my companies. My focus is creating **reliable platforms** that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
 
-### 📋 Development Process
+### Development Process
 
 | Phase | Focus |
 |-------|-------|
@@ -94,7 +92,7 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 <br/>
 
 <details>
-<summary><strong>📊 Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
+<summary><strong>Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
 
 <br/>
 
@@ -113,7 +111,7 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 
 <br/>
 
-> 🎯 **The common thread:** Scalable full-stack architecture, AI integration, production deployment.
+> **The common thread:** Scalable full-stack architecture, AI integration, production deployment.
 
 ---
 
@@ -129,9 +127,9 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 
 Full-stack engineering, AI integration, and production deployment across multiple industries.
 
-> 🎯 **Focus areas:** AI systems, fintech, SaaS, enterprise automation.
+> **Focus areas:** AI systems, fintech, SaaS, enterprise automation.
 >
-> 📦 All platforms stored under the [`KSDRILL-SA`](https://github.com/KSDRILL-SA) GitHub organization.
+> All platforms stored under the [`KSDRILL-SA`](https://github.com/KSDRILL-SA) GitHub organization.
 
 ---
 
@@ -141,7 +139,7 @@ Full-stack engineering, AI integration, and production deployment across multipl
 
 Web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
 
-> 📦 Client projects stored under the [`GrowthCore-Solutions`](https://github.com/GrowthCore-Solutions) GitHub organization.
+> Client projects stored under the [`GrowthCore-Solutions`](https://github.com/GrowthCore-Solutions) GitHub organization.
 
 ---
 
@@ -151,9 +149,9 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 <br/>
 
-- ✅ Full-time, part-time, contract, or remote opportunities
-- ✅ Software Engineering roles — full-stack, backend, AI/ML, systems architecture
-- ✅ Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
+- Full-time, part-time, contract, or remote opportunities
+- Software Engineering roles — full-stack, backend, AI/ML, systems architecture
+- Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
 
 ---
 
@@ -163,28 +161,28 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 <br/>
 
-I build all systems using a **locked, universal blueprint (v6.2)** that ensures predictability, scalability, and maintainability.
+I build all systems using **locked constitutions** (Frontend v16.0 · Backend v2.2) that ensure predictability, scalability, and maintainability.
 
 ### Core Principles
 
 | Principle | Description |
 |:----------|:------------|
-| **Design-first, document-first** | Every feature's logic is human-defined before coding |
-| **Configuration-driven** | Theme, navigation, features, and AI services controlled via JSON |
-| **Modular component architecture** | Reusable UI, layout, and AI components |
-| **AI as a core component** | Enabling intelligent insights, predictive analytics, and automated decision-making |
+| **One adaptive system** | Never separate mobile/desktop apps — single responsive codebase |
+| **Mobile-first** | Design for 320px first, enhance with breakpoints |
+| **Configuration-driven** | Theme, navigation, features controlled via JSON |
+| **Sequential development** | Groups 1+2 only in v1; Groups 3+ are placeholders |
+| **AI as optional layer** | Python FastAPI services only when needed |
 
-<details>
-<summary><strong>🎨 Design Standards (click to expand)</strong></summary>
+### Architecture Boundaries
 
-<br/>
+| Service | Responsibility |
+|:--------|:---------------|
+| **Next.js API Routes** | Auth, CRUD, payments, orchestration |
+| **FastAPI (Python)** | AI, predictions, RAG, agents (internal-only) |
+| **PostgreSQL** | All relational data |
+| **ChromaDB** | Vector embeddings |
 
-- Clean, modern, and accessible interfaces
-- Consistent theming and design systems
-- Performance-focused interactions
-- Production-ready UI/UX standards
-
-</details>
+> FastAPI never writes to PostgreSQL. Frontend never calls FastAPI directly (except WebSocket).
 
 ---
 
@@ -203,21 +201,13 @@ I build all systems using a **locked, universal blueprint (v6.2)** that ensures 
 
 <br/>
 
-**🎯 Problem it solves:** 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
+**Problem:** 342,000+ students excluded yearly due to fragmented bursary applications.
 
-**💡 Solution:** A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
+**Solution:** Single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships.
 
-**🏗️ Architecture:**
+**Architecture:** Next.js → API Routes → Prisma → PostgreSQL + FastAPI for AI matching.
 
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-↓
-Python AI Service (FastAPI) – automates scholarship matching
-
-```
-
-**📊 Status:** <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
+**Status:** <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
 
 </details>
 
@@ -228,19 +218,13 @@ Python AI Service (FastAPI) – automates scholarship matching
 
 <br/>
 
-**🎯 Problem it solves:** Rural villages lack digital infrastructure for governance, communication, and service delivery.
+**Problem:** Rural villages lack digital infrastructure for governance and service delivery.
 
-**💡 Solution:** A village-level platform for announcements, service requests, and community voting.
+**Solution:** Village-level platform for announcements, service requests, and community voting.
 
-**🏗️ Architecture:**
+**Architecture:** Next.js → API Routes → Prisma → PostgreSQL (no AI in v1).
 
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-**📊 Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
+**Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
 
 </details>
 
@@ -251,19 +235,13 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 <br/>
 
-**🎯 Problem it solves:** Many people struggle with consistent savings habits and lack accessible microfinance tools.
+**Problem:** People struggle with consistent savings habits and lack microfinance tools.
 
-**💡 Solution:** A digital savings platform with goal-setting, automated deposits, and interest tracking.
+**Solution:** Digital savings platform with goal-setting, automated deposits, interest tracking.
 
-**🏗️ Architecture:**
+**Architecture:** Next.js → API Routes → Prisma → PostgreSQL.
 
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-**📊 Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
+**Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
 
 </details>
 
@@ -274,27 +252,21 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 <br/>
 
-**🎯 Problem it solves:** Creators struggle to find collaborators; existing platforms lack structured negotiation.
+**Problem:** Creators struggle to find collaborators; existing platforms lack structured negotiation.
 
-**💡 Solution:** A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
+**Solution:** Template-based negotiation, 10-message limit, privacy protection, drop subscriptions.
 
-**🏗️ Architecture:**
+**Architecture:** Next.js → API Routes → Prisma → PostgreSQL.
 
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-**📊 Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
+**Status:** <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
 
 </details>
 
 <br/>
 
-> 📌 **Additional platforms** are in development — details protected under company confidentiality.
+> **Additional platforms** are in development — details protected under company confidentiality.
 >
-> 🤝 *For partnership inquiries, contact me to discuss upcoming releases.*
+> *For partnership inquiries, contact me to discuss upcoming releases.*
 
 ---
 
@@ -305,17 +277,17 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <br/>
 
 <details>
-<summary><strong>🔧 Click to expand — full technology stack</strong></summary>
+<summary><strong>Click to expand — full technology stack</strong></summary>
 
 <br/>
 
 | Layer | Technologies |
 |:------|:-------------|
-| **Frontend** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white" alt="Framer Motion" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> |
-| **Backend & API** | <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" alt="Express" /> <img src="https://img.shields.io/badge/GraphQL-E10098?style=flat-square&logo=graphql&logoColor=white" alt="GraphQL" /> |
-| **Database & ORM** | <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> |
-| **AI / Python** | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" /> <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch" /> <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" alt="TensorFlow" /> |
-| **Deployment & Tools** | <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" /> <img src="https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white" alt="AWS" /> <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" /> |
+| **Frontend** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> |
+| **Backend (Core)** | <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> |
+| **Database & ORM** | <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> |
+| **AI Layer (Python)** | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" /> <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" /> |
+| **Deployment** | <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" /> <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" /> |
 
 </details>
 
@@ -328,14 +300,15 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <br/>
 
 <p align="center">  
-  <img height="180" src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" alt="GitHub Stats" />  
-  <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" alt="Top Languages" />  
+  <img height="160" src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" alt="GitHub Stats" />  
+  <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" alt="Top Languages" />  
 </p>
 
 <p align="center">  
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />  
 </p>
 
+---
 
 <br/>
 
@@ -345,11 +318,11 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 | Principle | Description |
 |:----------|:------------|
-| 🏛️ **Design-first architecture** | Complete system design before coding |
-| 🔧 **Separation of concerns** | UI, logic, and configuration stay independent |
-| 📦 **Sequential development** | One system at a time, no forward dependencies |
-| 🚀 **Real-world deployment** | Operational platforms built end-to-end |
-| 🤖 **AI integration** | Delivering intelligent insights, predictive analytics, and automation |
+| **Design-first architecture** | Complete system design before coding |
+| **Separation of concerns** | UI, logic, and configuration stay independent |
+| **Sequential development** | One system at a time, no forward dependencies |
+| **Real-world deployment** | Operational platforms built end-to-end |
+| **AI as optional service** | Python FastAPI layer added only when needed |
 
 ---
 
@@ -362,7 +335,7 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 > *Building a technology ecosystem that solves real challenges through scalable platforms across SaaS, fintech, healthcare, enterprise, and AI*
 
 <p align="center">
-  <strong>🌍 Built with African roots • Designed for global impact</strong>
+  <strong>Built with African roots • Designed for global impact</strong>
 </p>
 
 ---
