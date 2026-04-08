@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 <br/>
 
 <p align="center">  
-  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white&logoSize=auto" alt="Portfolio" /></a>
+  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
   <a href="https://github.com/MALULEKE-KS/my-portfolio"><img src="https://img.shields.io/badge/Portfolio_Source-181717?style=for-the-badge&logo=github&logoColor=white" alt="Portfolio Source" /></a>
   <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
   <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
@@ -31,21 +31,22 @@
 
 <br/>
 
-## <picture><source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/Table_of_Contents-ffffff?style=for-the-badge&logo=readthedocs&logoColor=2563EB&color=2563EB"><img src="https://img.shields.io/badge/Table_of_Contents-2563EB?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Table of Contents"></picture>
+## **Table of Contents**
 
-<br/>
-
-<p align="center">
-  <a href="#who-i-am"><img src="https://img.shields.io/badge/WHO_I_AM-2563EB?style=flat-square&logo=aboutdotme&logoColor=white" alt="Who I Am" /></a>&nbsp;
-  <a href="#what-i-can-build"><img src="https://img.shields.io/badge/WHAT_I_CAN_BUILD-FF6F00?style=flat-square&logo=build&logoColor=white" alt="What I Can Build" /></a>&nbsp;
-  <a href="#live-work"><img src="https://img.shields.io/badge/LIVE_WORK-2563EB?style=flat-square&logo=vercel&logoColor=white" alt="Live Work" /></a>&nbsp;
-  <a href="#my-companies"><img src="https://img.shields.io/badge/MY_COMPANIES-181717?style=flat-square&logo=company&logoColor=white" alt="My Companies" /></a>&nbsp;
-  <a href="#open-to"><img src="https://img.shields.io/badge/OPEN_TO-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Open To" /></a>&nbsp;
-  <a href="#how-i-build"><img src="https://img.shields.io/badge/HOW_I_BUILD-764ABC?style=flat-square&logo=codefactor&logoColor=white" alt="How I Build" /></a>&nbsp;
-  <a href="#flagship-systems"><img src="https://img.shields.io/badge/FLAGSHIP_SYSTEMS-FF6F00?style=flat-square&logo=star&logoColor=white" alt="Flagship Systems" /></a>&nbsp;
-  <a href="#technical-stack"><img src="https://img.shields.io/badge/TECH_STACK-000000?style=flat-square&logo=stackshare&logoColor=white" alt="Tech Stack" /></a>&nbsp;
-  <a href="#github-analytics"><img src="https://img.shields.io/badge/GITHUB_ANALYTICS-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Analytics" /></a>
-</p>
+| Section | Link |
+| :--- | :--- |
+| **Who I Am** | [goto →](#who-i-am) |
+| **What I Can Build** | [goto →](#what-i-can-build) |
+| **Live Work** | [goto →](#live-work) |
+| **My Companies** | [goto →](#my-companies) |
+| **Open To** | [goto →](#open-to) |
+| **How I Build** | [goto →](#how-i-build) |
+| **Flagship Systems** | [goto →](#flagship-systems) |
+| **Technical Stack** | [goto →](#technical-stack) |
+| **GitHub Analytics** | [goto →](#github-analytics) |
+| **Engineering Philosophy** | [goto →](#engineering-philosophy) |
+| **Vision** | [goto →](#vision) |
+| **Contact** | [goto →](#contact) |
 
 ---
 
@@ -59,10 +60,10 @@
 
 I am a **Software Engineer** and **AI Systems Architect** building practical digital systems through my companies. My focus is creating **reliable platforms** that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
 
-### 📋 Development Process
+### Development Process
 
 | Phase | Focus |
-|-------|-------|
+| :--- | :--- |
 | **1. Architecture** | Full platform architecture & user flows |
 | **2. Design** | System modules & database structures |
 | **3. Interface** | Complete interface designs |
@@ -79,7 +80,7 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 <br/>
 
 | Project | Platform | Description |
-|---------|----------|-------------|
+| :--- | :--- | :--- |
 | **Portfolio** | [ksdrill-portfolio.vercel.app](https://ksdrill-portfolio.vercel.app) | Live portfolio — projects, stack, and background |
 | **Portfolio Source** | [MALULEKE-KS/my-portfolio](https://github.com/MALULEKE-KS/my-portfolio) | Portfolio source code on GitHub |
 | **Company** | [KSDRILL-SA](https://github.com/KSDRILL-SA) | Company GitHub — all platform repositories |
@@ -94,12 +95,12 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 <br/>
 
 <details>
-<summary><strong>📊 Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
+<summary><strong> Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
 
 <br/>
 
 | Industry | Applications |
-|:---------|:-------------|
+| :--- | :--- |
 | **SaaS** | Multi-tenant platforms, subscription management, analytics dashboards |
 | **Fintech** | Payment processing, banking systems, fraud detection, microfinance |
 | **AI & ML** | Prediction engines, recommendation systems, intelligent agents, RAG pipelines |
@@ -113,7 +114,7 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 
 <br/>
 
-> 🎯 **The common thread:** Scalable full-stack architecture, AI integration, production deployment.
+> **The common thread:** Scalable full-stack architecture, AI integration, production deployment.
 
 ---
 
@@ -129,9 +130,9 @@ I am a **Software Engineer** and **AI Systems Architect** building practical dig
 
 Full-stack engineering, AI integration, and production deployment across multiple industries.
 
-> 🎯 **Focus areas:** AI systems, fintech, SaaS, enterprise automation.
+> **Focus areas:** AI systems, fintech, SaaS, enterprise automation.
 >
-> 📦 All platforms stored under the [`KSDRILL-SA`](https://github.com/KSDRILL-SA) GitHub organization.
+> All platforms stored under the [`KSDRILL-SA`](https://github.com/KSDRILL-SA) GitHub organization.
 
 ---
 
@@ -141,7 +142,7 @@ Full-stack engineering, AI integration, and production deployment across multipl
 
 Web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
 
-> 📦 Client projects stored under the [`GrowthCore-Solutions`](https://github.com/GrowthCore-Solutions) GitHub organization.
+> Client projects stored under the [`GrowthCore-Solutions`](https://github.com/GrowthCore-Solutions) GitHub organization.
 
 ---
 
@@ -151,9 +152,9 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 <br/>
 
-- ✅ Full-time, part-time, contract, or remote opportunities
-- ✅ Software Engineering roles — full-stack, backend, AI/ML, systems architecture
-- ✅ Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
+- Full-time, part-time, contract, or remote opportunities
+- Software Engineering roles — full-stack, backend, AI/ML, systems architecture
+- Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
 
 ---
 
@@ -213,21 +214,11 @@ Currently in active development — sequenced for delivery
 
 <br/>
 
-🎯 Problem it solves: 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
-
-💡 Solution: A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
-
-🏗️ Architecture:
-
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-↓
-Python AI Service (FastAPI) – automates scholarship matching
-
-```
-
-📊 Status: <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
+Aspect Description
+Problem 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
+Solution A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
+Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL → Python AI Service (FastAPI) for scholarship matching
+Status <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
 
 </details>
 
@@ -238,19 +229,11 @@ Python AI Service (FastAPI) – automates scholarship matching
 
 <br/>
 
-🎯 Problem it solves: Rural villages lack digital infrastructure for governance, communication, and service delivery.
-
-💡 Solution: A village-level platform for announcements, service requests, and community voting.
-
-🏗️ Architecture:
-
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
+Aspect Description
+Problem Rural villages lack digital infrastructure for governance, communication, and service delivery.
+Solution A village-level platform for announcements, service requests, and community voting.
+Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
 
 </details>
 
@@ -261,19 +244,11 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 <br/>
 
-🎯 Problem it solves: Many people struggle with consistent savings habits and lack accessible microfinance tools.
-
-💡 Solution: A digital savings platform with goal-setting, automated deposits, and interest tracking.
-
-🏗️ Architecture:
-
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
+Aspect Description
+Problem Many people struggle with consistent savings habits and lack accessible microfinance tools.
+Solution A digital savings platform with goal-setting, automated deposits, and interest tracking.
+Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
 
 </details>
 
@@ -284,27 +259,19 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 <br/>
 
-🎯 Problem it solves: Creators struggle to find collaborators; existing platforms lack structured negotiation.
-
-💡 Solution: A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
-
-🏗️ Architecture:
-
-```
-
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-
-```
-
-📊 Status: <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
+Aspect Description
+Problem Creators struggle to find collaborators; existing platforms lack structured negotiation.
+Solution A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
+Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
 
 </details>
 
 <br/>
 
-📌 Additional platforms are in development — details protected under company confidentiality.
+Additional platforms are in development — details protected under company confidentiality.
 
-🤝 For partnership inquiries, contact me to discuss upcoming releases.
+For partnership inquiries, contact me to discuss upcoming releases.
 
 ---
 
@@ -315,18 +282,18 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <br/>
 
 <details>
-<summary><strong>🔧 Click to expand — locked technology stack</strong></summary>
+<summary><strong> Click to expand — locked technology stack</strong></summary>
 
 <br/>
 
-Layer Technologies
-Frontend <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
-Backend (Core) <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" />
-AI Layer (Python) <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" />
-Database & ORM <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" />
-Testing <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" alt="Vitest" /> <img src="https://img.shields.io/badge/Playwright-45BA4B?style=flat-square&logo=playwright&logoColor=white" alt="Playwright" />
-Infrastructure <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
-Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" /> <img src="https://img.shields.io/badge/Better_Stack-131C2E?style=flat-square&logo=betterstack&logoColor=white" alt="Better Stack" /> <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" alt="Prometheus" />
+Layer Technologies Role
+Frontend <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> Tailwind + Custom CSS — Tailwind handles layout, spacing, colors, typography, responsive breakpoints. Custom CSS handles complex animations, gradients, glassmorphism, and unique effects.
+Backend (Core) <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> Authentication, API routes, background jobs, caching, and business logic orchestration.
+AI Layer (Python) <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" /> AI matching, RAG pipelines, predictive analytics, and intelligent agents.
+Database & ORM <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> Relational data storage, migrations, type-safe queries.
+Testing <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" alt="Vitest" /> <img src="https://img.shields.io/badge/Playwright-45BA4B?style=flat-square&logo=playwright&logoColor=white" alt="Playwright" /> Unit, integration, and end-to-end testing.
+Infrastructure <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" /> Deployment, containerization, and CI/CD pipelines.
+Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" /> <img src="https://img.shields.io/badge/Better_Stack-131C2E?style=flat-square&logo=betterstack&logoColor=white" alt="Better Stack" /> <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" alt="Prometheus" /> Error tracking, uptime monitoring, and metrics collection.
 
 </details>
 
@@ -338,14 +305,17 @@ Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-squar
 
 <br/>
 
-<p align="center">  
-  <img height="180" src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" alt="GitHub Stats" />  
-  <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" alt="Top Languages" />  
+<p align="center">
+  <img height="180" src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" alt="GitHub Stats" />
+  <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" alt="Top Languages" />
 </p>
 
-<p align="center">  
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />  
+<p align="center">
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=MALULEKE-KS&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" alt="Contribution Graph" />
 </p>
+
+---
 
 <br/>
 
@@ -354,11 +324,11 @@ Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-squar
 <br/>
 
 Principle Description
-🏛️ Design-first architecture Complete system design before coding
-🔧 Separation of concerns UI, logic, and configuration stay independent
-📦 Sequential development One system at a time, no forward dependencies
-🚀 Real-world deployment Operational platforms built end-to-end
-🤖 AI integration Delivering intelligent insights, predictive analytics, and automation
+Design-first architecture Complete system design before coding
+Separation of concerns UI, logic, and configuration stay independent
+Sequential development One system at a time, no forward dependencies
+Real-world deployment Operational platforms built end-to-end
+AI integration Delivering intelligent insights, predictive analytics, and automation
 
 ---
 
@@ -371,7 +341,7 @@ Principle Description
 Building a technology ecosystem that solves real challenges through scalable platforms across SaaS, fintech, healthcare, enterprise, and AI
 
 <p align="center">
-  <strong>🌍 Built with African roots • Designed for global impact</strong>
+  <strong>Built with African roots • Designed for global impact</strong>
 </p>
 
 ---
@@ -382,20 +352,26 @@ Building a technology ecosystem that solves real challenges through scalable pla
 
 <br/>
 
-<p align="center">  
-  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>  
-  <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>  
-  <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>  
-  <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>  
-  <a href="https://github.com/MALULEKE-KS"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" /></a>  
+<p align="center">
+  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
+  <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+  <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>
+  <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+  <a href="https://github.com/MALULEKE-KS"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" /></a>
 </p>
 
-<p align="center">  
-  <em>Most repositories are private during active development.</em>  
+<p align="center">
+  <em>Most repositories are private during active development.</em>
+</p>
+
+---
+
+<p align="center">
+  <strong>The sky is not the limit. It's just the beginning.</strong>
 </p>
 
 <br/>
 
-<p align="center">  
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=100&section=footer" alt="Footer wave" />  
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563EB&height=100&section=footer" alt="Footer wave" />
 </p>
