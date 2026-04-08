@@ -31,7 +31,7 @@
 
 <br/>
 
-## **Table of Contents**
+## Table of Contents
 
 | Section | Link |
 | :--- | :--- |
@@ -214,11 +214,31 @@ Currently in active development — sequenced for delivery
 
 <br/>
 
-Aspect Description
-Problem 342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
-Solution A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
-Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL → Python AI Service (FastAPI) for scholarship matching
-Status <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
+Problem
+
+342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
+
+<br/>
+
+Solution
+
+A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
+
+<br/>
+
+Architecture
+
+```
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+↓
+Python AI Service (FastAPI) – automates scholarship matching
+```
+
+<br/>
+
+Status
+
+<img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> (Phase 1)
 
 </details>
 
@@ -229,11 +249,29 @@ Status <img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=fl
 
 <br/>
 
-Aspect Description
-Problem Rural villages lack digital infrastructure for governance, communication, and service delivery.
-Solution A village-level platform for announcements, service requests, and community voting.
-Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
+Problem
+
+Rural villages lack digital infrastructure for governance, communication, and service delivery.
+
+<br/>
+
+Solution
+
+A village-level platform for announcements, service requests, and community voting.
+
+<br/>
+
+Architecture
+
+```
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+```
+
+<br/>
+
+Status
+
+<img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 2)
 
 </details>
 
@@ -244,11 +282,29 @@ Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-
 
 <br/>
 
-Aspect Description
-Problem Many people struggle with consistent savings habits and lack accessible microfinance tools.
-Solution A digital savings platform with goal-setting, automated deposits, and interest tracking.
-Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
+Problem
+
+Many people struggle with consistent savings habits and lack accessible microfinance tools.
+
+<br/>
+
+Solution
+
+A digital savings platform with goal-setting, automated deposits, and interest tracking.
+
+<br/>
+
+Architecture
+
+```
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+```
+
+<br/>
+
+Status
+
+<img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 3)
 
 </details>
 
@@ -259,11 +315,29 @@ Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-
 
 <br/>
 
-Aspect Description
-Problem Creators struggle to find collaborators; existing platforms lack structured negotiation.
-Solution A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
-Architecture Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-Status <img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
+Problem
+
+Creators struggle to find collaborators; existing platforms lack structured negotiation.
+
+<br/>
+
+Solution
+
+A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
+
+<br/>
+
+Architecture
+
+```
+Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+```
+
+<br/>
+
+Status
+
+<img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> (Phase 4)
 
 </details>
 
@@ -305,14 +379,28 @@ Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-squar
 
 <br/>
 
+GitHub Stats
+
 <p align="center">
   <img height="180" src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" alt="GitHub Stats" />
+</p>
+
+Top Languages
+
+<p align="center">
   <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" alt="Top Languages" />
 </p>
 
+Contribution Streak
+
 <p align="center">
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="48%" alt="GitHub Streak" />
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=MALULEKE-KS&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="48%" alt="Contribution Graph" />
+</p>
+
+Activity Graph
+
+<p align="center">
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=MALULEKE-KS&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="95%" alt="Contribution Graph" />
 </p>
 
 ---
@@ -323,12 +411,19 @@ Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-squar
 
 <br/>
 
+<details>
+<summary><strong> Design-first architecture — complete system design before coding (click to expand)</strong></summary>
+
+<br/>
+
 Principle Description
 Design-first architecture Complete system design before coding
 Separation of concerns UI, logic, and configuration stay independent
 Sequential development One system at a time, no forward dependencies
 Real-world deployment Operational platforms built end-to-end
 AI integration Delivering intelligent insights, predictive analytics, and automation
+
+</details>
 
 ---
 
@@ -367,7 +462,7 @@ Building a technology ecosystem that solves real challenges through scalable pla
 ---
 
 <p align="center">
-  <strong>The sky is not the limit. It's just the beginning.</strong>
+  <strong>The sky is the limit</strong>
 </p>
 
 <br/>
