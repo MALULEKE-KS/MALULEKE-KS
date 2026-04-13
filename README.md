@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">  
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=28&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%2B+AI+Architect;Next.js+%7C+Node.js+%7C+Python+%7C+PostgreSQL;Building+Reliable+Scalable+Platforms;African+Roots+%7C+Global+Impact" alt="Typing animation" />  
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=28&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%2B+AI+Architect;Next.js+%7C+Angular+%7C+Node.js+%7C+Python;Building+Reliable+Scalable+Platforms;African+Roots+%7C+Global+Impact" alt="Typing animation" />  
 </p>
 
 <br/>
@@ -361,8 +361,10 @@ For partnership inquiries, contact me to discuss upcoming releases.
 <br/>
 
 Layer Technologies Role
-Frontend <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> Tailwind + Custom CSS — Tailwind handles layout, spacing, colors, typography, responsive breakpoints. Custom CSS handles complex animations, gradients, glassmorphism, and unique effects.
-Backend (Core) <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> Authentication, API routes, background jobs, caching, and business logic orchestration.
+Frontend (Dual Framework) <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" alt="Angular" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui" /> Next.js + Angular — Dual framework capability. Next.js for full-stack portfolio (API routes + auth built-in). Angular for standalone frontend projects. Both share TypeScript + Tailwind + shadcn/ui.
+Backend (Next.js Portfolio) <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js API" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth.js" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> Authentication + API routes — all in one Next.js project. Clean, conventional, already deployed.
+Backend (Angular Portfolio) <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" alt="JWT" /> Python + FastAPI — connects directly to AI journey. Separate backend for Angular projects.
+Shared Backend Services <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" alt="BullMQ" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" /> Background jobs, caching, and message queues (shared across both backends when needed).
 AI Layer (Python) <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" alt="LangChain" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" alt="ChromaDB" /> AI matching, RAG pipelines, predictive analytics, and intelligent agents.
 Database & ORM <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" /> Relational data storage, migrations, type-safe queries.
 Testing <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" alt="Vitest" /> <img src="https://img.shields.io/badge/Playwright-45BA4B?style=flat-square&logo=playwright&logoColor=white" alt="Playwright" /> Unit, integration, and end-to-end testing.
@@ -370,6 +372,30 @@ Infrastructure <img src="https://img.shields.io/badge/Vercel-000000?style=flat-s
 Monitoring <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" alt="Sentry" /> <img src="https://img.shields.io/badge/Better_Stack-131C2E?style=flat-square&logo=betterstack&logoColor=white" alt="Better Stack" /> <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" alt="Prometheus" /> Error tracking, uptime monitoring, and metrics collection.
 
 </details>
+
+---
+
+Architecture Flow for Both Portfolios
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         NEXT.JS PORTFOLIO                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  Next.js Frontend → Next.js API Routes → NextAuth → PostgreSQL     │
+│                                                                     │
+│  One project. Everything built-in. Already deployed. ✅             │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                         ANGULAR PORTFOLIO                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  Angular Frontend → FastAPI (Python) → JWT → PostgreSQL            │
+│                              ↓                                      │
+│                         AI Services (Future)                        │
+│                                                                     │
+│  Python backend connects directly to your AI journey.              │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
