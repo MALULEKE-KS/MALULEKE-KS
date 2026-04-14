@@ -513,54 +513,110 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 
 **Architecture Flow — Framework Assignment**
 
-<p align="center">
+<br/>
+
+<table align="center" width="100%">
+<tr>
+<td align="center" colspan="2">
+<img src="https://img.shields.io/badge/NEXT.JS_SYSTEMS-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Maphophe_Community-25D366?style=for-the-badge&logoColor=white" />
+<img src="https://img.shields.io/badge/SyncUp-FF6F00?style=for-the-badge&logoColor=white" />
+<br/><sub>Content-driven &nbsp;·&nbsp; SEO-critical &nbsp;·&nbsp; Full-stack unified codebase</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
 
 ```
-╔══════════════════════════════════════════════════════════════════════════╗
-║              NEXT.JS  —  Maphophe Community · SyncUp                   ║
-║                   Content-driven · SEO-critical · Full-stack            ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║                                                                          ║
-║   Browser  ──►  Next.js Frontend  (React · Tailwind · Custom CSS · shadcn/ui) ║
-║                 SSR Pages · Dynamic Routes · PWA (Maphophe)             ║
-║                         │                                               ║
-║                         ▼                                               ║
-║               Next.js API Routes  ◄──  NextAuth.js  (Session Layer)     ║
-║                         │                                               ║
-║                         ▼                                               ║
-║                   Service Layer                                          ║
-║                         │                                               ║
-║                         ▼                                               ║
-║               Prisma ORM  ──►  PostgreSQL                                ║
-║                         │                                               ║
-║               BullMQ + Redis  (SyncUp — timers · Maphophe — jobs)       ║
-║                                                                          ║
-║        One unified codebase · Frontend + Backend + Auth                 ║
-╚══════════════════════════════════════════════════════════════════════════╝
-
-╔══════════════════════════════════════════════════════════════════════════╗
-║         ANGULAR + FASTAPI  —  FundsLink Academy · Reserve Bank          ║
-║              Enterprise-grade · AI-powered · Precision-critical         ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║                                                                          ║
-║   Browser  ──►  Angular Frontend  (TypeScript · Tailwind · Custom CSS · shadcn/ui) ║
-║                 Reactive Forms · Role Guards · Strict Type Safety        ║
-║                         │                                               ║
-║                         │  HTTP REST                                    ║
-║                         ▼                                               ║
-║               FastAPI Backend  (Python)  ◄──  JWT Auth Layer            ║
-║                         │                                               ║
-║              ┌──────────┴──────────┐                                    ║
-║              ▼                     ▼                                    ║
-║  Prisma ORM → PostgreSQL       AI Services  (FundsLink only)            ║
-║  Structured financial &        LangChain · ChromaDB                     ║
-║  application data              Scholarship matching + RAG               ║
-║                                                                          ║
-║        Dedicated backend · Python powers both API and AI layer          ║
-╚══════════════════════════════════════════════════════════════════════════╝
+Browser
+   │
+   ▼
+Next.js Frontend
+React · Tailwind · Custom CSS
+shadcn/ui · SSR · PWA
+   │
+   ▼
+Next.js API Routes
+◄── NextAuth.js
+   │
+   ▼
+Service Layer
+   │
+   ▼
+Prisma ORM ──► PostgreSQL
+   │
+BullMQ + Redis
+(timers · scheduled jobs)
 ```
 
-</p>
+</td>
+<td align="center" width="50%">
+
+| Layer | Detail |
+| :--- | :--- |
+| <img src="https://img.shields.io/badge/Frontend-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> | React · Tailwind · Custom CSS · shadcn/ui |
+| <img src="https://img.shields.io/badge/Auth-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> | NextAuth.js — session management |
+| <img src="https://img.shields.io/badge/API-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | Built-in API Routes — no separate server |
+| <img src="https://img.shields.io/badge/Database-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> | PostgreSQL via Prisma ORM |
+| <img src="https://img.shields.io/badge/Jobs-DC382D?style=flat-square&logo=redis&logoColor=white" /> | BullMQ + Redis |
+| <img src="https://img.shields.io/badge/Deploy-000000?style=flat-square&logo=vercel&logoColor=white" /> | Vercel — one-click deployment |
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+<table align="center" width="100%">
+<tr>
+<td align="center" colspan="2">
+<img src="https://img.shields.io/badge/ANGULAR_+_FASTAPI_SYSTEMS-DD0031?style=for-the-badge&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/FundsLink_Academy-2563EB?style=for-the-badge&logoColor=white" />
+<img src="https://img.shields.io/badge/Reserve_Bank-0A66C2?style=for-the-badge&logoColor=white" />
+<br/><sub>Enterprise-grade &nbsp;·&nbsp; AI-powered &nbsp;·&nbsp; Precision-critical &nbsp;·&nbsp; Dedicated backend</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+
+```
+Browser
+   │
+   ▼
+Angular Frontend
+TypeScript · Tailwind · Custom CSS
+shadcn/ui · Reactive Forms
+   │
+   │  HTTP REST
+   ▼
+FastAPI Backend (Python)
+◄── JWT Auth Layer
+   │
+   ├──────────────┐
+   ▼              ▼
+Prisma ORM    AI Engine
+PostgreSQL    LangChain
+              ChromaDB
+              (FundsLink)
+```
+
+</td>
+<td align="center" width="50%">
+
+| Layer | Detail |
+| :--- | :--- |
+| <img src="https://img.shields.io/badge/Frontend-DD0031?style=flat-square&logo=angular&logoColor=white" /> | TypeScript · Tailwind · Custom CSS · shadcn/ui |
+| <img src="https://img.shields.io/badge/Auth-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | JWT — stateless token auth |
+| <img src="https://img.shields.io/badge/API-009688?style=flat-square&logo=fastapi&logoColor=white" /> | FastAPI (Python) — dedicated backend |
+| <img src="https://img.shields.io/badge/Database-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> | PostgreSQL via Prisma ORM |
+| <img src="https://img.shields.io/badge/Documents-47A248?style=flat-square&logo=mongodb&logoColor=white" /> | MongoDB + Mongoose |
+| <img src="https://img.shields.io/badge/AI-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> | LangChain · ChromaDB — FundsLink only |
+| <img src="https://img.shields.io/badge/Jobs-DC382D?style=flat-square&logo=redis&logoColor=white" /> | BullMQ + Redis — Reserve Bank |
+| <img src="https://img.shields.io/badge/Deploy-000000?style=flat-square&logo=vercel&logoColor=white" /> | Vercel (Angular) · Railway (FastAPI) |
+
+</td>
+</tr>
+</table>
 
 ---
 
