@@ -281,7 +281,7 @@ Angular chosen for its enterprise-grade structure — multi-role dashboards (stu
 <img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center" colspan="3">⬇️ &nbsp; HTTP REST</td></tr>
+<tr><td align="center" colspan="3"><img src="https://img.shields.io/badge/▼_HTTP_REST-2563EB?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center" colspan="3">
 <img src="https://img.shields.io/badge/FASTAPI_BACKEND_(PYTHON)-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
@@ -296,7 +296,7 @@ Angular chosen for its enterprise-grade structure — multi-role dashboards (stu
 <img src="https://img.shields.io/badge/AI_Matching_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center" colspan="3">⬇️ &nbsp; splits into two layers</td></tr>
+<tr><td align="center" colspan="3"><img src="https://img.shields.io/badge/▼_splits_into_two_layers-2563EB?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center" width="50%">
 <img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
@@ -371,7 +371,7 @@ Next.js chosen because this is a content-driven civic platform — public-facing
 <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️ &nbsp; built-in · no separate server</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼_built--in_·_no_separate_server-000000?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/NEXT.JS_API_ROUTES-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
@@ -386,13 +386,13 @@ Next.js chosen because this is a content-driven civic platform — public-facing
 <img src="https://img.shields.io/badge/Auth_Module-374151?style=flat-square&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/SERVICE_LAYER-374151?style=for-the-badge&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
@@ -458,7 +458,7 @@ Angular chosen because financial dashboards demand strict typed forms, reactive 
 <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️ &nbsp; HTTP REST</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼_HTTP_REST-2563EB?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/FASTAPI_BACKEND_(PYTHON)-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
@@ -475,7 +475,7 @@ Angular chosen because financial dashboards demand strict typed forms, reactive 
 <img src="https://img.shields.io/badge/Lock_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
@@ -483,7 +483,7 @@ Angular chosen because financial dashboards demand strict typed forms, reactive 
 <br/><sub>accounts · transactions · goals · interest logs</sub>
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/BULLMQ_+_REDIS-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
@@ -547,7 +547,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 <img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️ &nbsp; built-in · no separate server</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼_built--in_·_no_separate_server-000000?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/NEXT.JS_API_ROUTES-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
@@ -564,7 +564,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 <img src="https://img.shields.io/badge/Negotiation_Engine_(10--msg_limit_·_auto--close)-FF6F00?style=flat-square&logoColor=white" />
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
@@ -572,7 +572,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 <br/><sub>creators · pitches · negotiations · subscriptions · drops</sub>
 </td>
 </tr>
-<tr><td align="center">⬇️</td></tr>
+<tr><td align="center"><img src="https://img.shields.io/badge/▼-374151?style=flat-square&logoColor=white" /></td></tr>
 <tr>
 <td align="center">
 <img src="https://img.shields.io/badge/BULLMQ_+_REDIS-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
