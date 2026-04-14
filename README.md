@@ -629,7 +629,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 
 > Building a technology ecosystem that solves real challenges through scalable platforms across SaaS, fintech, healthcare, enterprise, and AI.
 
-The systems being built under KSDRILL-SA are not side projects — they are infrastructure. Infrastructure for students who cannot navigate a broken funding system. Infrastructure for villages that have never had a digital voice. Infrastructure for creators who deserve structured tools, not chaotic DMs. Infrastructure for people trying to build financial discipline with no support. Each platform exists because the gap is real, the people affected are real, and the right solution has not been built with the care it deserves. That is the standard this work is held to.
+*Every platform exists because the gap is real and the people behind it are real. The best systems are not built for recognition — they are built because the absence of them costs real people real things. KSDRILL-SA exists to build what should already exist, with the precision, care, and permanence it deserves.*
 
 <p align="center">
   <strong>Built with African roots • Designed for global impact</strong>
