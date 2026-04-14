@@ -262,33 +262,60 @@ Angular chosen for its enterprise-grade structure — multi-role dashboards (stu
 
 **Architecture**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  FUNDSLINK ACADEMY                                              │
-│                                                                 │
-│  Angular Frontend  (Student Portal · Funder Portal · Admin)    │
-│  ├── Reactive Forms    (multi-step funding applications)        │
-│  ├── Role Guards       (student / funder / admin routing)       │
-│  └── HTTP Client       (communicates with FastAPI via REST)     │
-│           │                                                     │
-│           │  HTTP REST                                          │
-│           ▼                                                     │
-│  FastAPI Backend  (Python)  ◄──  JWT Auth Layer                 │
-│  ├── Auth Module         (KYC-gated registration + JWT)        │
-│  ├── Application Module  (multi-step funding applications)     │
-│  ├── Notification Module (email + SMS alerts on status)        │
-│  └── AI Matching Module  (routes to internal AI engine)        │
-│           │                                                     │
-│           ├──────────────────────────┐                          │
-│           ▼                          ▼                          │
-│  Prisma ORM → PostgreSQL        AI Matching Engine              │
-│  (students, funders,            LangChain + ChromaDB            │
-│   applications, statuses)       Eligibility scoring +           │
-│                                 Scholarship RAG pipeline        │
-└─────────────────────────────────────────────────────────────────┘
-```
+<div align="center">
 
+<table>
+<tr>
+<td align="center" colspan="3" style="background:#DD0031;padding:8px">
+<img src="https://img.shields.io/badge/ANGULAR_FRONTEND-DD0031?style=for-the-badge&logo=angular&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center" colspan="3">
+<img src="https://img.shields.io/badge/Student_Portal-DD0031?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Funder_Portal-DD0031?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Admin_Dashboard-DD0031?style=flat-square&logoColor=white" />
 <br/>
+<img src="https://img.shields.io/badge/Reactive_Forms-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/Role_Guards-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center" colspan="3">⬇️ &nbsp; HTTP REST</td></tr>
+<tr>
+<td align="center" colspan="3">
+<img src="https://img.shields.io/badge/FASTAPI_BACKEND_(PYTHON)-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/JWT_Auth_Layer-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center" colspan="3">
+<img src="https://img.shields.io/badge/Auth_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Application_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Notification_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/AI_Matching_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center" colspan="3">⬇️ &nbsp; splits into two layers</td></tr>
+<tr>
+<td align="center" width="50%">
+<img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Prisma_ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<br/><sub>students · funders · applications · statuses</sub>
+</td>
+<td align="center" width="5%">│</td>
+<td align="center" width="50%">
+<img src="https://img.shields.io/badge/AI_ENGINE-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+<img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square&logoColor=white" />
+<br/><sub>eligibility scoring · scholarship RAG pipeline</sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 **Status**
 
@@ -323,29 +350,59 @@ Next.js chosen because this is a content-driven civic platform — public-facing
 
 **Architecture**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  MAPHOPHE COMMUNITY SYSTEM                                      │
-│                                                                 │
-│  Next.js Frontend  (Resident Portal · Ward Admin Panel)        │
-│  ├── SSR Pages         (public announcements — SEO optimised)  │
-│  ├── Role Guards       (resident / ward admin / super admin)    │
-│  └── PWA Support       (offline-ready for low connectivity)    │
-│           │                                                     │
-│           ▼                                                     │
-│  Next.js API Routes                                             │
-│  ├── Auth Module         (NextAuth — resident & admin roles)   │
-│  ├── Announcements       (publish + push notify residents)     │
-│  ├── Service Requests    (submit → assign → resolve pipeline)  │
-│  └── Voting Module       (community decisions + audit trail)   │
-│           │                                                     │
-│           ▼                                                     │
-│  Service Layer → Prisma ORM → PostgreSQL                        │
-│        (residents, wards, requests, votes, announcements)       │
-└─────────────────────────────────────────────────────────────────┘
-```
+<div align="center">
 
+<table>
+<tr>
+<td align="center" colspan="1">
+<img src="https://img.shields.io/badge/NEXT.JS_FRONTEND-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Resident_Portal-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Ward_Admin_Panel-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
 <br/>
+<img src="https://img.shields.io/badge/SSR_Pages-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/PWA_Offline_Ready-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Role_Guards-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️ &nbsp; built-in · no separate server</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/NEXT.JS_API_ROUTES-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Announcements_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Service_Requests_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Voting_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Auth_Module-374151?style=flat-square&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/SERVICE_LAYER-374151?style=for-the-badge&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma_ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<br/><sub>residents · wards · requests · votes · announcements</sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 **Status**
 
@@ -380,34 +437,62 @@ Angular chosen because financial dashboards demand strict typed forms, reactive 
 
 **Architecture**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  KSDRILL RESERVE BANK                                           │
-│                                                                 │
-│  Angular Frontend  (Customer Dashboard · Admin Panel)          │
-│  ├── Reactive Forms    (KYC registration + goal setup)         │
-│  ├── Live Balance View (real-time account + interest display)   │
-│  └── HTTP Client       (communicates with FastAPI via REST)     │
-│           │                                                     │
-│           │  HTTP REST                                          │
-│           ▼                                                     │
-│  FastAPI Backend  (Python)  ◄──  JWT Auth Layer                 │
-│  ├── Auth Module         (KYC-gated registration + JWT)        │
-│  ├── Accounts Module     (savings accounts, balances, history) │
-│  ├── Goals Module        (create goals, track milestones)      │
-│  ├── Deposits Module     (manual + scheduled auto-deposits)    │
-│  ├── Interest Engine     (daily compounding — Python Decimal)  │
-│  └── Lock Module         (enforced lock periods + penalties)   │
-│           │                                                     │
-│           ▼                                                     │
-│  Prisma ORM → PostgreSQL                                        │
-│  (accounts, transactions, goals, interest logs)                 │
-│           │                                                     │
-│  BullMQ + Redis  (scheduled deposits · interest cron jobs)     │
-└─────────────────────────────────────────────────────────────────┘
-```
+<div align="center">
 
+<table>
+<tr>
+<td align="center" colspan="1">
+<img src="https://img.shields.io/badge/ANGULAR_FRONTEND-DD0031?style=for-the-badge&logo=angular&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Customer_Dashboard-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/Admin_Panel-DD0031?style=flat-square&logo=angular&logoColor=white" />
 <br/>
+<img src="https://img.shields.io/badge/Reactive_Forms-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/Live_Balance_View-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<img src="https://img.shields.io/badge/Role_Guards-DD0031?style=flat-square&logo=angular&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️ &nbsp; HTTP REST</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/FASTAPI_BACKEND_(PYTHON)-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/JWT_Auth_Layer-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Accounts_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Goals_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Deposits_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Interest_Engine_(Python_Decimal)-3776AB?style=flat-square&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/Lock_Module-009688?style=flat-square&logo=fastapi&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma_ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<br/><sub>accounts · transactions · goals · interest logs</sub>
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/BULLMQ_+_REDIS-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+<br/><sub>scheduled deposits · interest cron jobs · lock enforcement</sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 **Status**
 
@@ -442,33 +527,61 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 
 **Architecture**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  SYNCUP                                                         │
-│                                                                 │
-│  Next.js Frontend  (Creator Profiles · Collaboration Hub)      │
-│  ├── SSR Pages         (creator profiles — SEO indexed)        │
-│  ├── Dynamic Routes    (/creators/[id] · /pitches/[id])        │
-│  └── Real-time UI      (live negotiation message thread)       │
-│           │                                                     │
-│           ▼                                                     │
-│  Next.js API Routes                                             │
-│  ├── Auth Module         (NextAuth — creator accounts)         │
-│  ├── Discovery Module    (search + filter creators by niche)   │
-│  ├── Pitch Module        (template-based collaboration pitches)│
-│  ├── Negotiation Engine  (10-message limit · auto-close logic) │
-│  ├── Privacy Module      (idea protection · NDA-style controls)│
-│  └── Drops Module        (subscriptions · exclusive content)   │
-│           │                                                     │
-│           ▼                                                     │
-│  Service Layer → Prisma ORM → PostgreSQL                        │
-│  (creators, pitches, negotiations, subscriptions, drops)        │
-│           │                                                     │
-│  BullMQ + Redis  (negotiation timers · drop scheduling)        │
-└─────────────────────────────────────────────────────────────────┘
-```
+<div align="center">
 
+<table>
+<tr>
+<td align="center" colspan="1">
+<img src="https://img.shields.io/badge/NEXT.JS_FRONTEND-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Creator_Profiles-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Collaboration_Hub-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
 <br/>
+<img src="https://img.shields.io/badge/SSR_Pages_(SEO_indexed)-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Dynamic_Routes-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Real--time_Negotiation_UI-FF6F00?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Tailwind_%2B_Custom_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️ &nbsp; built-in · no separate server</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/NEXT.JS_API_ROUTES-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Discovery_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Pitch_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Privacy_Module-374151?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Drops_Module-374151?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/Negotiation_Engine_(10--msg_limit_·_auto--close)-FF6F00?style=flat-square&logoColor=white" />
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma_ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+<br/><sub>creators · pitches · negotiations · subscriptions · drops</sub>
+</td>
+</tr>
+<tr><td align="center">⬇️</td></tr>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/BULLMQ_+_REDIS-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+<br/><sub>negotiation timers · drop scheduling · auto-close logic</sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 **Status**
 
