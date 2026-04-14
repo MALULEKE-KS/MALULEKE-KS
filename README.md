@@ -254,28 +254,37 @@ A unified application platform that aggregates all funding sources — bursaries
 
 <br/>
 
+**Stack Decision**
+
+<img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+
+Angular chosen for its enterprise-grade structure — multi-role dashboards (student, funder, admin) demand strict component architecture, reactive forms for complex multi-step applications, and type-safe service injection at scale. FastAPI as the dedicated Python backend enables native AI integration without bridging languages — the scholarship matching engine, eligibility scoring, and RAG pipeline all live in the same Python ecosystem.
+
 **Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  FUNDSLINK ACADEMY                                              │
 │                                                                 │
-│  Next.js Frontend (Student Portal + Admin Dashboard)           │
+│  Angular Frontend  (Student Portal · Funder Portal · Admin)    │
+│  ├── Reactive Forms    (multi-step funding applications)        │
+│  ├── Role Guards       (student / funder / admin routing)       │
+│  └── HTTP Client       (communicates with FastAPI via REST)     │
 │           │                                                     │
+│           │  HTTP REST                                          │
 │           ▼                                                     │
-│  Next.js API Routes                                             │
-│  ├── Auth Module         (NextAuth — student & admin sessions) │
+│  FastAPI Backend  (Python)  ◄──  JWT Auth Layer                 │
+│  ├── Auth Module         (KYC-gated registration + JWT)        │
 │  ├── Application Module  (multi-step funding applications)     │
-│  ├── Matching Module     (routes to Python AI service)         │
-│  └── Notification Module (email + SMS alerts on status)        │
+│  ├── Notification Module (email + SMS alerts on status)        │
+│  └── AI Matching Module  (routes to internal AI engine)        │
 │           │                                                     │
-│           ▼                                                     │
-│  Service Layer → Prisma ORM → PostgreSQL                        │
-│        (students, funders, applications, statuses)              │
-│           │                                                     │
-│           ▼                                                     │
-│  FastAPI AI Service (Python)                                    │
-│  └── Scholarship Matching Engine (LangChain + ChromaDB)        │
+│           ├──────────────────────────┐                          │
+│           ▼                          ▼                          │
+│  Prisma ORM → PostgreSQL        AI Matching Engine              │
+│  (students, funders,            LangChain + ChromaDB            │
+│   applications, statuses)       Eligibility scoring +           │
+│                                 Scholarship RAG pipeline        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -306,19 +315,28 @@ A village-level governance platform enabling structured announcements, trackable
 
 <br/>
 
+**Stack Decision**
+
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+
+Next.js chosen because this is a content-driven civic platform — public-facing announcement pages benefit from server-side rendering and SEO, resident portals need fast page loads on low-bandwidth rural connections, and the data flows (announcements, requests, votes) are straightforward enough that built-in API routes handle everything cleanly without a separate backend.
+
 **Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  MAPHOPHE COMMUNITY SYSTEM                                      │
 │                                                                 │
-│  Next.js Frontend (Resident Portal + Ward Admin Panel)         │
+│  Next.js Frontend  (Resident Portal · Ward Admin Panel)        │
+│  ├── SSR Pages         (public announcements — SEO optimised)  │
+│  ├── Role Guards       (resident / ward admin / super admin)    │
+│  └── PWA Support       (offline-ready for low connectivity)    │
 │           │                                                     │
 │           ▼                                                     │
 │  Next.js API Routes                                             │
 │  ├── Auth Module         (NextAuth — resident & admin roles)   │
-│  ├── Announcements       (publish + notify residents)          │
-│  ├── Service Requests    (submit, track, resolve pipeline)     │
+│  ├── Announcements       (publish + push notify residents)     │
+│  ├── Service Requests    (submit → assign → resolve pipeline)  │
 │  └── Voting Module       (community decisions + audit trail)   │
 │           │                                                     │
 │           ▼                                                     │
@@ -354,28 +372,38 @@ A structured digital savings platform with enforced deposit schedules, savings g
 
 <br/>
 
+**Stack Decision**
+
+<img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" />
+
+Angular chosen because financial dashboards demand strict typed forms, reactive state management for live balance updates, and zero tolerance for runtime errors — Angular's compile-time checks and dependency injection enforce the discipline that financial software requires. FastAPI handles the backend because Python's numerical precision and scheduling libraries (APScheduler, Celery) are the right tools for interest compounding logic, automated deposit jobs, and lock period enforcement — precision that a JavaScript backend cannot match natively.
+
 **Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  KSDRILL RESERVE BANK                                           │
 │                                                                 │
-│  Next.js Frontend (Customer Dashboard + Admin Panel)           │
+│  Angular Frontend  (Customer Dashboard · Admin Panel)          │
+│  ├── Reactive Forms    (KYC registration + goal setup)         │
+│  ├── Live Balance View (real-time account + interest display)   │
+│  └── HTTP Client       (communicates with FastAPI via REST)     │
 │           │                                                     │
+│           │  HTTP REST                                          │
 │           ▼                                                     │
-│  Next.js API Routes                                             │
-│  ├── Auth Module         (NextAuth — KYC-gated registration)   │
+│  FastAPI Backend  (Python)  ◄──  JWT Auth Layer                 │
+│  ├── Auth Module         (KYC-gated registration + JWT)        │
 │  ├── Accounts Module     (savings accounts, balances, history) │
 │  ├── Goals Module        (create goals, track milestones)      │
 │  ├── Deposits Module     (manual + scheduled auto-deposits)    │
-│  ├── Interest Engine     (daily compounding calculation)       │
+│  ├── Interest Engine     (daily compounding — Python Decimal)  │
 │  └── Lock Module         (enforced lock periods + penalties)   │
 │           │                                                     │
 │           ▼                                                     │
-│  Service Layer → Prisma ORM → PostgreSQL                        │
-│        (accounts, transactions, goals, interest logs)           │
+│  Prisma ORM → PostgreSQL                                        │
+│  (accounts, transactions, goals, interest logs)                 │
 │           │                                                     │
-│  BullMQ + Redis  (scheduled deposits, interest cron jobs)      │
+│  BullMQ + Redis  (scheduled deposits · interest cron jobs)     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -406,28 +434,37 @@ A structured collaboration platform with template-based pitch flows, a 10-messag
 
 <br/>
 
+**Stack Decision**
+
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" />
+
+Next.js chosen because creator discovery is content-driven and SEO-critical — creator profiles need to be indexed and found. The dynamic routing model maps naturally to creator pages, pitch threads, and drop pages. API routes handle the negotiation engine cleanly without a separate backend, and Redis-backed BullMQ manages negotiation timers and drop scheduling as lightweight background jobs alongside the main Next.js process.
+
 **Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  SYNCUP                                                         │
 │                                                                 │
-│  Next.js Frontend (Creator Profiles + Collaboration Hub)       │
+│  Next.js Frontend  (Creator Profiles · Collaboration Hub)      │
+│  ├── SSR Pages         (creator profiles — SEO indexed)        │
+│  ├── Dynamic Routes    (/creators/[id] · /pitches/[id])        │
+│  └── Real-time UI      (live negotiation message thread)       │
 │           │                                                     │
 │           ▼                                                     │
 │  Next.js API Routes                                             │
 │  ├── Auth Module         (NextAuth — creator accounts)         │
 │  ├── Discovery Module    (search + filter creators by niche)   │
 │  ├── Pitch Module        (template-based collaboration pitches)│
-│  ├── Negotiation Engine  (10-message limit, auto-close logic)  │
-│  ├── Privacy Module      (idea protection, NDA-style controls) │
-│  └── Drops Module        (subscriptions, exclusive content)    │
+│  ├── Negotiation Engine  (10-message limit · auto-close logic) │
+│  ├── Privacy Module      (idea protection · NDA-style controls)│
+│  └── Drops Module        (subscriptions · exclusive content)   │
 │           │                                                     │
 │           ▼                                                     │
 │  Service Layer → Prisma ORM → PostgreSQL                        │
-│        (creators, pitches, negotiations, subscriptions)         │
+│  (creators, pitches, negotiations, subscriptions, drops)        │
 │           │                                                     │
-│  BullMQ + Redis  (negotiation timers, drop scheduling)         │
+│  BullMQ + Redis  (negotiation timers · drop scheduling)        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -460,8 +497,8 @@ A structured collaboration platform with template-based pitch flows, a 10-messag
 | Layer | Technologies | Role |
 | :--- | :--- | :--- |
 | **Frontend (Dual Framework)** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" /> | **Next.js** powers all flagship platforms — full-stack with API routes and auth built-in. **Angular** is used for structured standalone frontends with dedicated backends. Both share TypeScript + Tailwind. |
-| **Backend (Next.js Projects)** | <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | All flagship systems (FundsLink, Maphophe, Reserve Bank, SyncUp) use Next.js API routes + NextAuth. One unified codebase per platform — no separate backend server needed. |
-| **Backend (Angular Projects)** | <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | Angular projects use FastAPI as a dedicated Python backend — separating frontend from backend concerns and enabling direct AI service integration in the same language. |
+| **Backend (Next.js Systems)** | <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | Used by **Maphophe** and **SyncUp** — content-driven, SEO-critical platforms where built-in API routes, SSR, and NextAuth cover all needs without a separate backend. One unified codebase per platform. |
+| **Backend (Angular Systems)** | <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | Used by **FundsLink Academy** and **KSDRILL Reserve Bank** — enterprise-grade platforms with complex logic (AI matching, financial precision) that demand Angular's strict structure on the frontend and Python's capabilities on the backend. |
 | **Shared Backend Services** | <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" /> | Background job queues and caching shared across systems — handles scheduled deposits (Reserve Bank), negotiation timers (SyncUp), and drop releases. |
 | **AI Layer** | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" /> | Deployed as a Python microservice. Powers scholarship matching (FundsLink), RAG pipelines, predictive analytics, and intelligent agents — integrated into Next.js platforms via internal API calls. |
 | **Database — Relational** | <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" /> | Primary database for all flagship systems. Pairs with **Next.js via Prisma ORM** — type-safe queries, migrations, and relational integrity. Chosen for structured, transactional data where consistency is critical (accounts, applications, votes). |
@@ -474,16 +511,18 @@ A structured collaboration platform with template-based pitch flows, a 10-messag
 
 <br/>
 
-**Architecture Flow — Both Portfolios**
+**Architecture Flow — Framework Assignment**
 
 <p align="center">
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════╗
-║                         NEXT.JS  PORTFOLIO                              ║
+║              NEXT.JS  —  Maphophe Community · SyncUp                   ║
+║                   Content-driven · SEO-critical · Full-stack            ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
 ║   Browser  ──►  Next.js Frontend  (React · Tailwind · shadcn/ui)        ║
+║                 SSR Pages · Dynamic Routes · PWA (Maphophe)             ║
 ║                         │                                               ║
 ║                         ▼                                               ║
 ║               Next.js API Routes  ◄──  NextAuth.js  (Session Layer)     ║
@@ -493,15 +532,19 @@ A structured collaboration platform with template-based pitch flows, a 10-messag
 ║                         │                                               ║
 ║                         ▼                                               ║
 ║               Prisma ORM  ──►  PostgreSQL                                ║
+║                         │                                               ║
+║               BullMQ + Redis  (SyncUp — timers · Maphophe — jobs)       ║
 ║                                                                          ║
 ║        One unified codebase · Frontend + Backend + Auth                 ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
 ╔══════════════════════════════════════════════════════════════════════════╗
-║                         ANGULAR  PORTFOLIO                              ║
+║         ANGULAR + FASTAPI  —  FundsLink Academy · Reserve Bank          ║
+║              Enterprise-grade · AI-powered · Precision-critical         ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
 ║   Browser  ──►  Angular Frontend  (TypeScript · Tailwind · shadcn/ui)   ║
+║                 Reactive Forms · Role Guards · Strict Type Safety        ║
 ║                         │                                               ║
 ║                         │  HTTP REST                                    ║
 ║                         ▼                                               ║
@@ -509,8 +552,9 @@ A structured collaboration platform with template-based pitch flows, a 10-messag
 ║                         │                                               ║
 ║              ┌──────────┴──────────┐                                    ║
 ║              ▼                     ▼                                    ║
-║           MongoDB             AI Services                                ║
-║    Mongoose · dynamic data   LangChain · ChromaDB                        ║
+║  Prisma ORM → PostgreSQL       AI Services  (FundsLink only)            ║
+║  Structured financial &        LangChain · ChromaDB                     ║
+║  application data              Scholarship matching + RAG               ║
 ║                                                                          ║
 ║        Dedicated backend · Python powers both API and AI layer          ║
 ╚══════════════════════════════════════════════════════════════════════════╝
