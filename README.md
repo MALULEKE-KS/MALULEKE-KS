@@ -19,8 +19,8 @@
 <br/>
 
 <p align="center">
-  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
-  <a href="https://github.com/MALULEKE-KS/my-portfolio"><img src="https://img.shields.io/badge/Portfolio_Source-181717?style=for-the-badge&logo=github&logoColor=white" alt="Portfolio Source" /></a>
+  <a href="https://my-nextjs-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Next.js_Portfolio-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js Portfolio" /></a>
+  <a href="https://my-angular-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Angular_Portfolio-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular Portfolio" /></a>
   <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
   <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
   <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>
@@ -62,7 +62,7 @@
 
 I am a **Software Engineer** and **AI Systems Architect** and a **final year BSc Computer Science & Mathematics** student building practical digital systems through my companies. My focus is creating **reliable platforms** that solve complex challenges in education, finance, community infrastructure, and artificial intelligence.
 
-My Mathematics background gives me an edge most developers don't have — I understand the theory behind the systems I build, not just the code.
+Where most engineers write code, I reason through systems — Computer Science shapes how I architect, Mathematics shapes how I think. That combination produces software that is not just functional, but structurally sound from the ground up.
 
 ### Development Process
 
@@ -85,13 +85,13 @@ My Mathematics background gives me an edge most developers don't have — I unde
 
 | | |
 | :--- | :--- |
-| 🔭 **Building** | Angular Portfolio + FastAPI backend |
-| 🤖 **Exploring** | AI integration, LangChain, RAG pipelines |
-| 🎓 **Studying** | BSc Computer Science & Mathematics — Final Year |
-| 🌍 **Based in** | South Africa 🇿🇦 |
-| 💡 **Interested in** | Web Dev + AI, Fintech, EdTech, GovTech |
-| 📬 **Reach me** | [kurhula04s@gmail.com](mailto:kurhula04s@gmail.com) |
-| ⚡ **Fun fact** | I build with a 10-constitution, 355-rule governance system |
+| <img src="https://img.shields.io/badge/Building-2563EB?style=flat-square&logo=hammer&logoColor=white" /> | Angular Portfolio + FastAPI backend |
+| <img src="https://img.shields.io/badge/Exploring-412991?style=flat-square&logo=openai&logoColor=white" /> | AI integration, LangChain, RAG pipelines |
+| <img src="https://img.shields.io/badge/Studying-FF6F00?style=flat-square&logo=academia&logoColor=white" /> | BSc Computer Science & Mathematics — Final Year |
+| <img src="https://img.shields.io/badge/Based_in-25D366?style=flat-square&logo=googlemaps&logoColor=white" /> | South Africa |
+| <img src="https://img.shields.io/badge/Interested_in-0A66C2?style=flat-square&logo=target&logoColor=white" /> | Web Dev + AI, Fintech, EdTech, GovTech |
+| <img src="https://img.shields.io/badge/Reach_me-EA4335?style=flat-square&logo=gmail&logoColor=white" /> | [kurhula04s@gmail.com](mailto:kurhula04s@gmail.com) |
+| <img src="https://img.shields.io/badge/Fun_fact-181717?style=flat-square&logo=gitbook&logoColor=white" /> | I build with a 10-constitution, 355-rule governance system |
 
 ---
 
@@ -103,9 +103,10 @@ My Mathematics background gives me an edge most developers don't have — I unde
 
 | Project | Platform | Description |
 | :--- | :--- | :--- |
-| **Next.js Portfolio** | [ksdrill-portfolio.vercel.app](https://ksdrill-portfolio.vercel.app) | Live portfolio — projects, stack, and background |
-| **Portfolio Source** | [MALULEKE-KS/my-portfolio](https://github.com/MALULEKE-KS/my-portfolio) | Next.js portfolio source code on GitHub |
-| **Angular Portfolio** | [my-angular-portfolio](https://github.com/MALULEKE-KS/my-angular-portfolio) | Angular portfolio — deployed on Vercel |
+| **Next.js Portfolio** | [my-nextjs-portfolio.vercel.app](https://my-nextjs-portfolio.vercel.app) | Full-stack portfolio — Next.js, NextAuth, API routes |
+| **Angular Portfolio** | [my-angular-portfolio.vercel.app](https://my-angular-portfolio.vercel.app) | Angular portfolio — deployed on Vercel |
+| **Next.js Source** | [MALULEKE-KS/my-nextjs-portfolio](https://github.com/MALULEKE-KS/my-nextjs-portfolio) | Next.js portfolio source code |
+| **Angular Source** | [MALULEKE-KS/my-angular-portfolio](https://github.com/MALULEKE-KS/my-angular-portfolio) | Angular portfolio source code |
 | **Company** | [KSDRILL-SA](https://github.com/KSDRILL-SA) | Company GitHub — all platform repositories |
 | **Agency** | [GrowthCore-Solutions](https://github.com/GrowthCore-Solutions) | Client project repositories |
 
@@ -118,7 +119,7 @@ My Mathematics background gives me an edge most developers don't have — I unde
 <br/>
 
 <details>
-<summary><strong>⚙️ Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
+<summary><strong>Engineering Capabilities — skills transfer across industries (click to expand)</strong></summary>
 
 <br/>
 
@@ -175,10 +176,16 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 <br/>
 
-- 💼 Full-time, part-time, contract, or remote opportunities
-- 🛠️ Software Engineering roles — full-stack, backend, AI/ML, systems architecture
-- 🌍 Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
-- 🤝 Open source collaboration and meaningful partnerships
+<p>
+  <img src="https://img.shields.io/badge/Full--time-2563EB?style=flat-square&logoColor=white" />
+  <img src="https://img.shields.io/badge/Part--time-2563EB?style=flat-square&logoColor=white" />
+  <img src="https://img.shields.io/badge/Contract-2563EB?style=flat-square&logoColor=white" />
+  <img src="https://img.shields.io/badge/Remote-2563EB?style=flat-square&logoColor=white" />
+</p>
+
+- Software Engineering roles — full-stack, backend, AI/ML, systems architecture
+- Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
+- Open source collaboration and meaningful partnerships
 
 ---
 
@@ -191,7 +198,7 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 I build all systems using a **locked constitutional framework** — 10 constitutions, 355 rules, covering everything from team process to production deployment.
 
 **The complete governance system is documented here:**
-👉 [github.com/MALULEKE-KS/system-design-template](https://github.com/MALULEKE-KS/system-design-template)
+[github.com/MALULEKE-KS/system-design-template](https://github.com/MALULEKE-KS/system-design-template)
 
 ### Constitutional Build Order
 
@@ -223,7 +230,10 @@ git clone https://github.com/MALULEKE-KS/system-design-template.git .system-desi
 
 <br/>
 
-Currently in active development — sequenced for delivery
+<p align="center">
+  <img src="https://img.shields.io/badge/ALL_SYSTEMS-UNDER_ACTIVE_DEVELOPMENT-FF6F00?style=for-the-badge&logo=rocket&logoColor=white" alt="Under Active Development" />
+  <img src="https://img.shields.io/badge/Updates_will_follow_as_each_system_ships-181717?style=for-the-badge&logo=github&logoColor=white" alt="Updates Follow" />
+</p>
 
 <br/>
 
@@ -234,29 +244,46 @@ Currently in active development — sequenced for delivery
 
 **Problem**
 
-342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources.
+342,000+ students excluded yearly due to fragmented bursary applications and unused funding sources across NSFAS, SETA, and private bursaries that never get claimed.
 
 <br/>
 
 **Solution**
 
-A single application platform connecting students with bursaries, NSFAS, SETA funds, scholarships, and emergency support.
+A unified application platform that aggregates all funding sources — bursaries, NSFAS, SETA funds, scholarships, and emergency support — into a single intelligent application flow with AI-powered eligibility matching.
 
 <br/>
 
 **Architecture**
 
 ```
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
-                              ↓
-              Python AI Service (FastAPI) – automates scholarship matching
+┌─────────────────────────────────────────────────────────────────┐
+│  FUNDSLINK ACADEMY                                              │
+│                                                                 │
+│  Next.js Frontend (Student Portal + Admin Dashboard)           │
+│           │                                                     │
+│           ▼                                                     │
+│  Next.js API Routes                                             │
+│  ├── Auth Module         (NextAuth — student & admin sessions) │
+│  ├── Application Module  (multi-step funding applications)     │
+│  ├── Matching Module     (routes to Python AI service)         │
+│  └── Notification Module (email + SMS alerts on status)        │
+│           │                                                     │
+│           ▼                                                     │
+│  Service Layer → Prisma ORM → PostgreSQL                        │
+│        (students, funders, applications, statuses)              │
+│           │                                                     │
+│           ▼                                                     │
+│  FastAPI AI Service (Python)                                    │
+│  └── Scholarship Matching Engine (LangChain + ChromaDB)        │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 <br/>
 
 **Status**
 
-<img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" alt="Active Development" /> Phase 1
+<img src="https://img.shields.io/badge/ACTIVE_DEVELOPMENT-2563EB?style=flat-square&logo=rocket&logoColor=white" /> Phase 1 — updates will follow
 
 </details>
 
@@ -269,27 +296,42 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 **Problem**
 
-Rural villages lack digital infrastructure for governance, communication, and service delivery.
+Rural villages have no digital infrastructure — community announcements are made verbally, service requests get lost, and governance decisions are undocumented and untraceable.
 
 <br/>
 
 **Solution**
 
-A village-level platform for announcements, service requests, and community voting.
+A village-level governance platform enabling structured announcements, trackable service requests, community voting, and ward-level reporting — bringing accountability to local governance.
 
 <br/>
 
 **Architecture**
 
 ```
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+┌─────────────────────────────────────────────────────────────────┐
+│  MAPHOPHE COMMUNITY SYSTEM                                      │
+│                                                                 │
+│  Next.js Frontend (Resident Portal + Ward Admin Panel)         │
+│           │                                                     │
+│           ▼                                                     │
+│  Next.js API Routes                                             │
+│  ├── Auth Module         (NextAuth — resident & admin roles)   │
+│  ├── Announcements       (publish + notify residents)          │
+│  ├── Service Requests    (submit, track, resolve pipeline)     │
+│  └── Voting Module       (community decisions + audit trail)   │
+│           │                                                     │
+│           ▼                                                     │
+│  Service Layer → Prisma ORM → PostgreSQL                        │
+│        (residents, wards, requests, votes, announcements)       │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 <br/>
 
 **Status**
 
-<img src="https://img.shields.io/badge/DESIGN_COMPLETE-25D366?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> Phase 2
+<img src="https://img.shields.io/badge/UNDER_DEVELOPMENT-25D366?style=flat-square&logo=rocket&logoColor=white" /> Phase 2 — updates will follow
 
 </details>
 
@@ -302,27 +344,46 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 **Problem**
 
-Many people struggle with consistent savings habits and lack accessible microfinance tools.
+Most people save inconsistently because the tools are passive. There is no enforced discipline, no goal visibility, and no consequence for breaking savings habits.
 
 <br/>
 
 **Solution**
 
-A digital savings platform with goal-setting, automated deposits, and interest tracking.
+A structured digital savings platform with enforced deposit schedules, savings goals with real-time progress, interest tracking, and lock periods — built to build financial discipline, not just store money.
 
 <br/>
 
 **Architecture**
 
 ```
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+┌─────────────────────────────────────────────────────────────────┐
+│  KSDRILL RESERVE BANK                                           │
+│                                                                 │
+│  Next.js Frontend (Customer Dashboard + Admin Panel)           │
+│           │                                                     │
+│           ▼                                                     │
+│  Next.js API Routes                                             │
+│  ├── Auth Module         (NextAuth — KYC-gated registration)   │
+│  ├── Accounts Module     (savings accounts, balances, history) │
+│  ├── Goals Module        (create goals, track milestones)      │
+│  ├── Deposits Module     (manual + scheduled auto-deposits)    │
+│  ├── Interest Engine     (daily compounding calculation)       │
+│  └── Lock Module         (enforced lock periods + penalties)   │
+│           │                                                     │
+│           ▼                                                     │
+│  Service Layer → Prisma ORM → PostgreSQL                        │
+│        (accounts, transactions, goals, interest logs)           │
+│           │                                                     │
+│  BullMQ + Redis  (scheduled deposits, interest cron jobs)      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 <br/>
 
 **Status**
 
-<img src="https://img.shields.io/badge/DESIGN_COMPLETE-0A66C2?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> Phase 3
+<img src="https://img.shields.io/badge/UNDER_DEVELOPMENT-0A66C2?style=flat-square&logo=rocket&logoColor=white" /> Phase 3 — updates will follow
 
 </details>
 
@@ -335,27 +396,46 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 **Problem**
 
-Creators struggle to find collaborators; existing platforms lack structured negotiation.
+Creators waste time in unstructured DM negotiations that go nowhere. There is no standard process for pitching collaborations, protecting ideas, or formalising agreements between creators.
 
 <br/>
 
 **Solution**
 
-A platform with template-based negotiation, 10-message limit, privacy protection, and drop subscriptions.
+A structured collaboration platform with template-based pitch flows, a 10-message negotiation limit to force decisions, privacy controls, and drop-based subscription management — making creator partnerships fast, clean, and professional.
 
 <br/>
 
 **Architecture**
 
 ```
-Next.js Frontend → Next.js API Routes → Service Layer → Prisma → PostgreSQL
+┌─────────────────────────────────────────────────────────────────┐
+│  SYNCUP                                                         │
+│                                                                 │
+│  Next.js Frontend (Creator Profiles + Collaboration Hub)       │
+│           │                                                     │
+│           ▼                                                     │
+│  Next.js API Routes                                             │
+│  ├── Auth Module         (NextAuth — creator accounts)         │
+│  ├── Discovery Module    (search + filter creators by niche)   │
+│  ├── Pitch Module        (template-based collaboration pitches)│
+│  ├── Negotiation Engine  (10-message limit, auto-close logic)  │
+│  ├── Privacy Module      (idea protection, NDA-style controls) │
+│  └── Drops Module        (subscriptions, exclusive content)    │
+│           │                                                     │
+│           ▼                                                     │
+│  Service Layer → Prisma ORM → PostgreSQL                        │
+│        (creators, pitches, negotiations, subscriptions)         │
+│           │                                                     │
+│  BullMQ + Redis  (negotiation timers, drop scheduling)         │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 <br/>
 
 **Status**
 
-<img src="https://img.shields.io/badge/DESIGN_COMPLETE-FF6F00?style=flat-square&logo=rocket&logoColor=white" alt="Design Complete" /> Phase 4
+<img src="https://img.shields.io/badge/UNDER_DEVELOPMENT-FF6F00?style=flat-square&logo=rocket&logoColor=white" /> Phase 4 — updates will follow
 
 </details>
 
@@ -373,19 +453,20 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <br/>
 
 <details>
-<summary><strong>🔧 Click to expand — locked technology stack</strong></summary>
+<summary><strong>Click to expand — locked technology stack</strong></summary>
 
 <br/>
 
 | Layer | Technologies | Role |
 | :--- | :--- | :--- |
-| **Frontend (Dual Framework)** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" /> | Next.js for full-stack portfolio. Angular for standalone frontend projects. Both share TypeScript + Tailwind. |
-| **Backend (Next.js Portfolio)** | <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | Authentication + API routes — all in one Next.js project. |
-| **Backend (Angular Portfolio)** | <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | Python + FastAPI — connects directly to AI journey. |
-| **Shared Backend Services** | <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" /> | Background jobs, caching, and message queues. |
-| **AI Layer (Python)** | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" /> | AI matching, RAG pipelines, predictive analytics, intelligent agents. |
-| **Database & ORM** | <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" /> | Relational data storage, migrations, type-safe queries. |
-| **Testing** | <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" /> <img src="https://img.shields.io/badge/Playwright-45BA4B?style=flat-square&logo=playwright&logoColor=white" /> | Unit, integration, and end-to-end testing. |
+| **Frontend (Dual Framework)** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" /> | **Next.js** powers all flagship platforms — full-stack with API routes and auth built-in. **Angular** is used for structured standalone frontends with dedicated backends. Both share TypeScript + Tailwind. |
+| **Backend (Next.js Projects)** | <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | All flagship systems (FundsLink, Maphophe, Reserve Bank, SyncUp) use Next.js API routes + NextAuth. One unified codebase per platform — no separate backend server needed. |
+| **Backend (Angular Projects)** | <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | Angular projects use FastAPI as a dedicated Python backend — separating frontend from backend concerns and enabling direct AI service integration in the same language. |
+| **Shared Backend Services** | <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" /> | Background job queues and caching shared across systems — handles scheduled deposits (Reserve Bank), negotiation timers (SyncUp), and drop releases. |
+| **AI Layer** | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" /> <img src="https://img.shields.io/badge/ChromaDB-5A67D8?style=flat-square" /> | Deployed as a Python microservice. Powers scholarship matching (FundsLink), RAG pipelines, predictive analytics, and intelligent agents — integrated into Next.js platforms via internal API calls. |
+| **Database — Relational** | <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" /> | Primary database for all flagship systems. Pairs with **Next.js via Prisma ORM** — type-safe queries, migrations, and relational integrity. Chosen for structured, transactional data where consistency is critical (accounts, applications, votes). |
+| **Database — Document** | <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" /> <img src="https://img.shields.io/badge/Mongoose-880000?style=flat-square&logo=mongoose&logoColor=white" /> | Pairs with **Angular + FastAPI** projects. Used for flexible, schema-less data — dynamic content, AI-generated outputs, logs, and feature-rich data models that evolve without migration overhead. |
+| **Testing** | <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" /> <img src="https://img.shields.io/badge/Playwright-45BA4B?style=flat-square&logo=playwright&logoColor=white" /> | Unit, integration, and end-to-end testing across all platforms. |
 | **Infrastructure** | <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" /> | Deployment, containerization, and CI/CD pipelines. |
 | **Monitoring** | <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" /> <img src="https://img.shields.io/badge/Better_Stack-131C2E?style=flat-square&logo=betterstack&logoColor=white" /> <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" /> | Error tracking, uptime monitoring, and metrics collection. |
 
@@ -393,27 +474,49 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 <br/>
 
-**Architecture Flow for Both Portfolios**
+**Architecture Flow — Both Portfolios**
+
+<p align="center">
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         NEXT.JS PORTFOLIO                           │
-├─────────────────────────────────────────────────────────────────────┤
-│  Next.js Frontend → Next.js API Routes → NextAuth → PostgreSQL     │
-│                                                                     │
-│  One project. Everything built-in. Already deployed. ✅             │
-└─────────────────────────────────────────────────────────────────────┘
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         NEXT.JS  PORTFOLIO                              ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║   Browser  ──►  Next.js Frontend  (React · Tailwind · shadcn/ui)        ║
+║                         │                                               ║
+║                         ▼                                               ║
+║               Next.js API Routes  ◄──  NextAuth.js  (Session Layer)     ║
+║                         │                                               ║
+║                         ▼                                               ║
+║                   Service Layer                                          ║
+║                         │                                               ║
+║                         ▼                                               ║
+║               Prisma ORM  ──►  PostgreSQL                                ║
+║                                                                          ║
+║        One unified codebase · Frontend + Backend + Auth                 ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                         ANGULAR PORTFOLIO                           │
-├─────────────────────────────────────────────────────────────────────┤
-│  Angular Frontend → FastAPI (Python) → JWT → PostgreSQL            │
-│                              ↓                                      │
-│                      AI Services (Future) 🤖                        │
-│                                                                     │
-│  Python backend connects directly to AI journey.                   │
-└─────────────────────────────────────────────────────────────────────┘
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         ANGULAR  PORTFOLIO                              ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║   Browser  ──►  Angular Frontend  (TypeScript · Tailwind · shadcn/ui)   ║
+║                         │                                               ║
+║                         │  HTTP REST                                    ║
+║                         ▼                                               ║
+║               FastAPI Backend  (Python)  ◄──  JWT Auth Layer            ║
+║                         │                                               ║
+║              ┌──────────┴──────────┐                                    ║
+║              ▼                     ▼                                    ║
+║           MongoDB             AI Services                                ║
+║    Mongoose · dynamic data   LangChain · ChromaDB                        ║
+║                                                                          ║
+║        Dedicated backend · Python powers both API and AI layer          ║
+╚══════════════════════════════════════════════════════════════════════════╝
 ```
+
+</p>
 
 ---
 
@@ -439,7 +542,7 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 **Trophies**
 
 <p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=MALULEKE-KS&theme=flat&no-frame=true&column=7&margin-w=10&title_color=2563EB" alt="GitHub Trophies" />
+  <img src="https://github-profile-trophy.vercel.app/?username=MALULEKE-KS&theme=flat&no-frame=true&column=7&margin-w=10" alt="GitHub Trophies" />
 </p>
 
 **Activity Graph**
@@ -457,7 +560,7 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 <br/>
 
 <details>
-<summary><strong>🧠 Design-first architecture — complete system design before coding (click to expand)</strong></summary>
+<summary><strong>Design-first architecture — complete system design before coding (click to expand)</strong></summary>
 
 <br/>
 
@@ -482,10 +585,10 @@ Next.js Frontend → Next.js API Routes → Service Layer → Prisma → Postgre
 
 > Building a technology ecosystem that solves real challenges through scalable platforms across SaaS, fintech, healthcare, enterprise, and AI.
 
-In 5 years — I want to be the engineer who built the platforms that changed how African students access funding, how rural communities govern themselves, and how creators collaborate. Not just code. **Systems that matter.**
+The systems being built under KSDRILL-SA are not side projects — they are infrastructure. Infrastructure for students who cannot navigate a broken funding system. Infrastructure for villages that have never had a digital voice. Infrastructure for creators who deserve structured tools, not chaotic DMs. Infrastructure for people trying to build financial discipline with no support. Each platform exists because the gap is real, the people affected are real, and the right solution has not been built with the care it deserves. That is the standard this work is held to.
 
 <p align="center">
-  <strong>🌍 Built with African roots • Designed for global impact</strong>
+  <strong>Built with African roots • Designed for global impact</strong>
 </p>
 
 ---
@@ -497,7 +600,8 @@ In 5 years — I want to be the engineer who built the platforms that changed ho
 <br/>
 
 <p align="center">
-  <a href="https://ksdrill-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
+  <a href="https://my-nextjs-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Next.js_Portfolio-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js Portfolio" /></a>
+  <a href="https://my-angular-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Angular_Portfolio-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular Portfolio" /></a>
   <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
   <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>
   <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
@@ -517,7 +621,7 @@ In 5 years — I want to be the engineer who built the platforms that changed ho
 <br/>
 
 <p align="center">
-  <strong>🚀 From South Africa to the world — one system at a time</strong>
+  <img src="https://img.shields.io/badge/The_sky_is_the_limit_—_KSDRILL--SA-2563EB?style=for-the-badge&logo=github&logoColor=white" alt="The sky is the limit — KSDRILL-SA" />
 </p>
 
 <br/>
