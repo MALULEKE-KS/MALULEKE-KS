@@ -496,7 +496,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 
 | Layer | Technologies | Role |
 | :--- | :--- | :--- |
-| **Frontend (Dual Framework)** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" /> | **Next.js** powers all flagship platforms — full-stack with API routes and auth built-in. **Angular** is used for structured standalone frontends with dedicated backends. Both share TypeScript + Tailwind. |
+| **Frontend (Dual Framework)** | <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/Custom_CSS-1572B6?style=flat-square&logo=css3&logoColor=white" /> <img src="https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=shadcnui&logoColor=white" /> | **Next.js** powers all flagship platforms — full-stack with API routes and auth built-in. **Angular** is used for structured standalone frontends with dedicated backends. Both share TypeScript + Tailwind for utility-first styling, paired with Custom CSS for heavy visual work — animations, complex layouts, gradients, and design details that go beyond what Tailwind handles out of the box. |
 | **Backend (Next.js Systems)** | <img src="https://img.shields.io/badge/Next.js_API-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" /> | Used by **Maphophe** and **SyncUp** — content-driven, SEO-critical platforms where built-in API routes, SSR, and NextAuth cover all needs without a separate backend. One unified codebase per platform. |
 | **Backend (Angular Systems)** | <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" /> <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" /> | Used by **FundsLink Academy** and **KSDRILL Reserve Bank** — enterprise-grade platforms with complex logic (AI matching, financial precision) that demand Angular's strict structure on the frontend and Python's capabilities on the backend. |
 | **Shared Backend Services** | <img src="https://img.shields.io/badge/BullMQ-FF6F00?style=flat-square&logo=bull&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" /> | Background job queues and caching shared across systems — handles scheduled deposits (Reserve Bank), negotiation timers (SyncUp), and drop releases. |
@@ -521,7 +521,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 ║                   Content-driven · SEO-critical · Full-stack            ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
-║   Browser  ──►  Next.js Frontend  (React · Tailwind · shadcn/ui)        ║
+║   Browser  ──►  Next.js Frontend  (React · Tailwind · Custom CSS · shadcn/ui) ║
 ║                 SSR Pages · Dynamic Routes · PWA (Maphophe)             ║
 ║                         │                                               ║
 ║                         ▼                                               ║
@@ -543,7 +543,7 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 ║              Enterprise-grade · AI-powered · Precision-critical         ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
-║   Browser  ──►  Angular Frontend  (TypeScript · Tailwind · shadcn/ui)   ║
+║   Browser  ──►  Angular Frontend  (TypeScript · Tailwind · Custom CSS · shadcn/ui) ║
 ║                 Reactive Forms · Role Guards · Strict Type Safety        ║
 ║                         │                                               ║
 ║                         │  HTTP REST                                    ║
