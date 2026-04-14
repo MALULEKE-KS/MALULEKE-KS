@@ -32,23 +32,25 @@
 
 <br/>
 
-## Table of Contents
+## <img src="https://img.shields.io/badge/TABLE_OF_CONTENTS-181717?style=for-the-badge&logo=bookstack&logoColor=white" />
 
-| Section | Link |
-| :--- | :--- |
-| **Who I Am** | [goto →](#who-i-am) |
-| **Currently** | [goto →](#currently) |
-| **What I Can Build** | [goto →](#what-i-can-build) |
-| **Live Work** | [goto →](#live-work) |
-| **My Companies** | [goto →](#my-companies) |
-| **Open To** | [goto →](#open-to) |
-| **How I Build** | [goto →](#how-i-build) |
-| **Flagship Systems** | [goto →](#flagship-systems) |
-| **Technical Stack** | [goto →](#technical-stack) |
-| **GitHub Analytics** | [goto →](#github-analytics) |
-| **Engineering Philosophy** | [goto →](#engineering-philosophy) |
-| **Vision** | [goto →](#vision) |
-| **Contact** | [goto →](#contact) |
+<br/>
+
+<p align="center">
+  <a href="#who-i-am"><img src="https://img.shields.io/badge/Who_I_Am-2563EB?style=flat-square&logoColor=white" /></a>
+  <a href="#currently"><img src="https://img.shields.io/badge/Currently-412991?style=flat-square&logoColor=white" /></a>
+  <a href="#what-i-can-build"><img src="https://img.shields.io/badge/What_I_Can_Build-FF6F00?style=flat-square&logoColor=white" /></a>
+  <a href="#live-work"><img src="https://img.shields.io/badge/Live_Work-2563EB?style=flat-square&logo=vercel&logoColor=white" /></a>
+  <a href="#my-companies"><img src="https://img.shields.io/badge/My_Companies-181717?style=flat-square&logo=github&logoColor=white" /></a>
+  <a href="#open-to"><img src="https://img.shields.io/badge/Open_To-25D366?style=flat-square&logoColor=white" /></a>
+  <a href="#how-i-build"><img src="https://img.shields.io/badge/How_I_Build-764ABC?style=flat-square&logoColor=white" /></a>
+  <a href="#flagship-systems"><img src="https://img.shields.io/badge/Flagship_Systems-FF6F00?style=flat-square&logo=star&logoColor=white" /></a>
+  <a href="#technical-stack"><img src="https://img.shields.io/badge/Technical_Stack-000000?style=flat-square&logo=stackshare&logoColor=white" /></a>
+  <a href="#github-analytics"><img src="https://img.shields.io/badge/GitHub_Analytics-181717?style=flat-square&logo=github&logoColor=white" /></a>
+  <a href="#engineering-philosophy"><img src="https://img.shields.io/badge/Engineering_Philosophy-2563EB?style=flat-square&logoColor=white" /></a>
+  <a href="#vision"><img src="https://img.shields.io/badge/Vision-FF6F00?style=flat-square&logoColor=white" /></a>
+  <a href="#contact"><img src="https://img.shields.io/badge/Contact-25D366?style=flat-square&logoColor=white" /></a>
+</p>
 
 ---
 
@@ -148,25 +150,41 @@ Where most engineers write code, I reason through systems — Computer Science s
 
 <br/>
 
-### <a href="https://github.com/KSDRILL-SA"><img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=for-the-badge&logo=github&logoColor=white" alt="KSDRILL SA" /></a>
+<table align="center" width="100%">
+<tr>
+<td align="center" width="50%">
 
-**Technology Studio**
+<a href="https://github.com/KSDRILL-SA"><img src="https://img.shields.io/badge/KSDRILL_SA-2563EB?style=for-the-badge&logo=github&logoColor=white" alt="KSDRILL SA" /></a>
+
+<img src="https://img.shields.io/badge/Technology_Studio-2563EB?style=flat-square&logoColor=white" />
 
 Full-stack engineering, AI integration, and production deployment across multiple industries.
 
-> **Focus areas:** AI systems, fintech, SaaS, enterprise automation.
->
-> All platforms stored under the [`KSDRILL-SA`](https://github.com/KSDRILL-SA) GitHub organization.
+<img src="https://img.shields.io/badge/AI_Systems-2563EB?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Fintech-2563EB?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/SaaS-2563EB?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Enterprise_Automation-2563EB?style=flat-square&logoColor=white" />
 
----
+<br/><sub>All platforms stored under the <a href="https://github.com/KSDRILL-SA">KSDRILL-SA</a> GitHub organization</sub>
 
-### <a href="https://github.com/GrowthCore-Solutions"><img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=for-the-badge&logo=github&logoColor=white" alt="GrowthCore Solutions" /></a>
+</td>
+<td align="center" width="50%">
 
-**Digital Growth Agency** (with Ngoneni Mponisi Forever)
+<a href="https://github.com/GrowthCore-Solutions"><img src="https://img.shields.io/badge/GrowthCore_Solutions-FF6B6B?style=for-the-badge&logo=github&logoColor=white" alt="GrowthCore Solutions" /></a>
+
+<img src="https://img.shields.io/badge/Digital_Growth_Agency-FF6B6B?style=flat-square&logoColor=white" />
 
 Web development, marketing campaigns, customer acquisition, and analytics to drive measurable growth.
 
-> Client projects stored under the [`GrowthCore-Solutions`](https://github.com/GrowthCore-Solutions) GitHub organization.
+<img src="https://img.shields.io/badge/Web_Development-FF6B6B?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Marketing-FF6B6B?style=flat-square&logoColor=white" />
+<img src="https://img.shields.io/badge/Analytics-FF6B6B?style=flat-square&logoColor=white" />
+
+<br/><sub>With Ngoneni Mponisi Forever · <a href="https://github.com/GrowthCore-Solutions">GrowthCore-Solutions</a> GitHub organization</sub>
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -176,16 +194,31 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 <br/>
 
-<p>
-  <img src="https://img.shields.io/badge/Full--time-2563EB?style=flat-square&logoColor=white" />
-  <img src="https://img.shields.io/badge/Part--time-2563EB?style=flat-square&logoColor=white" />
-  <img src="https://img.shields.io/badge/Contract-2563EB?style=flat-square&logoColor=white" />
-  <img src="https://img.shields.io/badge/Remote-2563EB?style=flat-square&logoColor=white" />
+<p align="center">
+  <img src="https://img.shields.io/badge/Full--time-2563EB?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/Part--time-2563EB?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/Contract-2563EB?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/Remote-2563EB?style=for-the-badge&logoColor=white" />
 </p>
 
-- Software Engineering roles — full-stack, backend, AI/ML, systems architecture
-- Building scalable platforms across any industry — fintech, healthcare, enterprise, e-commerce, AI, SaaS, or social impact
-- Open source collaboration and meaningful partnerships
+<br/>
+
+<table align="center" width="100%">
+<tr>
+<td align="center" width="33%">
+<img src="https://img.shields.io/badge/Engineering_Roles-2563EB?style=flat-square&logo=code&logoColor=white" />
+<br/><sub>Full-stack · Backend · AI/ML · Systems Architecture</sub>
+</td>
+<td align="center" width="33%">
+<img src="https://img.shields.io/badge/Industries-FF6F00?style=flat-square&logo=globe&logoColor=white" />
+<br/><sub>Fintech · Healthcare · EdTech · SaaS · GovTech · AI</sub>
+</td>
+<td align="center" width="33%">
+<img src="https://img.shields.io/badge/Collaboration-25D366?style=flat-square&logo=handshake&logoColor=white" />
+<br/><sub>Open source · Partnerships · Social impact</sub>
+</td>
+</tr>
+</table>
 
 ---
 
@@ -197,24 +230,58 @@ Web development, marketing campaigns, customer acquisition, and analytics to dri
 
 I build all systems using a **locked constitutional framework** — 10 constitutions, 355 rules, covering everything from team process to production deployment.
 
-**The complete governance system is documented here:**
-[github.com/MALULEKE-KS/system-design-template](https://github.com/MALULEKE-KS/system-design-template)
+<br/>
+
+<p align="center">
+  <a href="https://github.com/MALULEKE-KS/system-design-template">
+    <img src="https://img.shields.io/badge/Full_Governance_System-MALULEKE--KS/system--design--template-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>
+
+<br/>
 
 ### Constitutional Build Order
 
-```
-PHASE 0: FOUNDATION
-  1. Team & Process → 2. Code Quality & Review
-
-PHASE 1: CORE ARCHITECTURE
-  3. Backend → 4. Auth Domain → 5. Frontend → 6. Database
-
-PHASE 2: QUALITY & RELIABILITY
-  7. Testing → 8. Infrastructure → 9. Incident Response
-
-PHASE 3: PRODUCT
-  10. Product & Feature
-```
+<table align="center" width="100%">
+<tr>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/PHASE_0-181717?style=for-the-badge&logoColor=white" />
+<br/><img src="https://img.shields.io/badge/FOUNDATION-374151?style=flat-square&logoColor=white" />
+<br/><br/>
+<img src="https://img.shields.io/badge/1._Team_%26_Process-2563EB?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/2._Code_Quality_%26_Review-2563EB?style=flat-square&logoColor=white" />
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/PHASE_1-181717?style=for-the-badge&logoColor=white" />
+<br/><img src="https://img.shields.io/badge/CORE_ARCHITECTURE-374151?style=flat-square&logoColor=white" />
+<br/><br/>
+<img src="https://img.shields.io/badge/3._Backend-412991?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/4._Auth_Domain-412991?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/5._Frontend-412991?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/6._Database-412991?style=flat-square&logoColor=white" />
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/PHASE_2-181717?style=for-the-badge&logoColor=white" />
+<br/><img src="https://img.shields.io/badge/QUALITY_%26_RELIABILITY-374151?style=flat-square&logoColor=white" />
+<br/><br/>
+<img src="https://img.shields.io/badge/7._Testing-FF6F00?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/8._Infrastructure-FF6F00?style=flat-square&logoColor=white" />
+<br/>
+<img src="https://img.shields.io/badge/9._Incident_Response-FF6F00?style=flat-square&logoColor=white" />
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/PHASE_3-181717?style=for-the-badge&logoColor=white" />
+<br/><img src="https://img.shields.io/badge/PRODUCT-374151?style=flat-square&logoColor=white" />
+<br/><br/>
+<img src="https://img.shields.io/badge/10._Product_%26_Feature-25D366?style=flat-square&logoColor=white" />
+</td>
+</tr>
+</table>
 
 ### Quick Clone
 
@@ -624,7 +691,9 @@ Next.js chosen because creator discovery is content-driven and SEO-critical — 
 
 <br/>
 
-**Architecture Flow — Framework Assignment**
+<p align="center">
+  <img src="https://img.shields.io/badge/ARCHITECTURE_FLOW_—_FRAMEWORK_ASSIGNMENT-000000?style=for-the-badge&logo=stackshare&logoColor=white" />
+</p>
 
 <br/>
 
@@ -739,26 +808,34 @@ PostgreSQL    LangChain
 
 <br/>
 
-**Stats & Languages**
+<p align="center">
+  <img src="https://img.shields.io/badge/STATS_%26_LANGUAGES-181717?style=flat-square&logo=github&logoColor=white" />
+</p>
 
 <p align="center">
   <img src="https://github-readme-stats.vercel.app/api?username=MALULEKE-KS&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=374151&bg_color=ffffff" width="48%" alt="GitHub Stats" />
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=MALULEKE-KS&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=374151&bg_color=ffffff" width="40%" alt="Top Languages" />
 </p>
 
-**Contribution Streak**
+<p align="center">
+  <img src="https://img.shields.io/badge/CONTRIBUTION_STREAK-181717?style=flat-square&logo=github&logoColor=white" />
+</p>
 
 <p align="center">
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=MALULEKE-KS&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&background=ffffff" width="55%" alt="GitHub Streak" />
 </p>
 
-**Trophies**
+<p align="center">
+  <img src="https://img.shields.io/badge/TROPHIES-181717?style=flat-square&logo=github&logoColor=white" />
+</p>
 
 <p align="center">
   <img src="https://github-profile-trophy.vercel.app/?username=MALULEKE-KS&theme=flat&no-frame=true&column=7&margin-w=10" alt="GitHub Trophies" />
 </p>
 
-**Activity Graph**
+<p align="center">
+  <img src="https://img.shields.io/badge/ACTIVITY_GRAPH-181717?style=flat-square&logo=github&logoColor=white" />
+</p>
 
 <p align="center">
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=MALULEKE-KS&custom_title=Contribution%20Graph&bg_color=ffffff&color=374151&line=2563EB&point=2563EB&area=true&hide_border=true" width="95%" alt="Contribution Graph" />
@@ -796,12 +873,22 @@ PostgreSQL    LangChain
 
 <br/>
 
-> Building a technology ecosystem that solves real challenges through scalable platforms across SaaS, fintech, healthcare, enterprise, and AI.
+<p align="center">
+  <img src="https://img.shields.io/badge/Building_a_technology_ecosystem_that_solves_real_challenges-FF6F00?style=flat-square&logoColor=white" />
+  <img src="https://img.shields.io/badge/SaaS_·_Fintech_·_Healthcare_·_Enterprise_·_AI-374151?style=flat-square&logoColor=white" />
+</p>
 
-*Every platform exists because the gap is real and the people behind it are real. The best systems are not built for recognition — they are built because the absence of them costs real people real things. KSDRILL-SA exists to build what should already exist, with the precision, care, and permanence it deserves.*
+<br/>
 
 <p align="center">
-  <strong>Built with African roots • Designed for global impact</strong>
+<em>Every platform exists because the gap is real and the people behind it are real. The best systems are not built for recognition — they are built because the absence of them costs real people real things. KSDRILL-SA exists to build what should already exist, with the precision, care, and permanence it deserves.</em>
+</p>
+
+<br/>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Built_with_African_roots-181717?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/Designed_for_global_impact-2563EB?style=for-the-badge&logoColor=white" />
 </p>
 
 ---
