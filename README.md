@@ -32,7 +32,7 @@
 
 ## About
 
-Final year BSc Computer Science & Mathematics student building production-grade systems through my companies. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
+Final year BSc Computer Science & Mathematics student building production-grade systems through my Organizations. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
 
 I build through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and co-run **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**. All active systems live in those organizations.
 
