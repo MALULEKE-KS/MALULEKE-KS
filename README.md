@@ -66,8 +66,8 @@ All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-S
 
 | | Organization | Role | Focus |
 | :---: | :--- | :--- | :--- |
-| <img src="https://img.shields.io/badge/-181717?style=flat-square&logo=github&logoColor=white" width="28"/> | **[KSDRILL-SA](https://github.com/KSDRILL-SA)** | Founder & Principal Engineer | AI Systems · Fintech · SaaS · EdTech · GovTech · Enterprise Automation |
-| <img src="https://img.shields.io/badge/-2563EB?style=flat-square&logo=github&logoColor=white" width="28"/> | **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)** | Co-Founder | Web Development · Digital Marketing · Customer Acquisition · Analytics |
+| ![GitHub](https://img.shields.io/badge/-181717?style=flat-square&logo=github&logoColor=white) | **[KSDRILL-SA](https://github.com/KSDRILL-SA)** | Founder & Principal Engineer | AI Systems · Fintech · SaaS · EdTech · GovTech · Enterprise Automation |
+| ![GitHub](https://img.shields.io/badge/-2563EB?style=flat-square&logo=github&logoColor=white) | **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)** | Co-Founder | Web Development · Digital Marketing · Customer Acquisition · Analytics |
 
 </div>
 
@@ -75,158 +75,32 @@ All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-S
 
 ## Technical Stack
 
-### Languages
-
-<div align="center">
-  <img src="https://skillicons.dev/icons?i=ts,py,js&theme=dark" />
-</div>
-
-<br/>
-
-### Frontend
+> Stack is assigned by problem type before build begins — not by preference. Each column below represents a locked architecture decision.
 
 <div align="center">
 
-**Next.js Stack**
+| Layer | ![](https://img.shields.io/badge/Next.js%20Stack-000000?style=flat-square&logo=nextdotjs&logoColor=white) Next.js Stack | ![](https://img.shields.io/badge/Angular%20+%20FastAPI%20Stack-DD0031?style=flat-square&logo=angular&logoColor=white) Angular + FastAPI Stack |
+| :--- | :--- | :--- |
+| **Use When** | Content-driven · SEO-critical · Full-stack unified codebase | Enterprise dashboards · Financial precision · AI/ML pipelines |
+| **Languages** | ![TS](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | ![TS](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![PY](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) |
+| **Frontend** | ![Next.js](https://img.shields.io/badge/Next.js%20App%20Router-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) ![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![shadcn](https://img.shields.io/badge/shadcn%2Fui-000000?style=flat-square&logo=shadcnui&logoColor=white) | ![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white) ![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![Signals](https://img.shields.io/badge/Signals-DD0031?style=flat-square&logo=angular&logoColor=white) ![RxJS](https://img.shields.io/badge/RxJS-B7178C?style=flat-square&logo=reactivex&logoColor=white) |
+| **Backend** | ![API Routes](https://img.shields.io/badge/API%20Routes-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white) | ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) ![Pydantic](https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white) |
+| **Auth** | ![NextAuth](https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white) Database sessions · HttpOnly cookie | ![JWT](https://img.shields.io/badge/JWT%20RS256-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) HttpOnly refresh · Memory access token |
+| **Relational DB** | ![PG](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma%20ORM-2D3748?style=flat-square&logo=prisma&logoColor=white) ![SQL](https://img.shields.io/badge/Raw%20SQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) | ![PG](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma%20ORM-2D3748?style=flat-square&logo=prisma&logoColor=white) ![SQL](https://img.shields.io/badge/Raw%20SQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) |
+| **Document DB** | — | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white) ![Beanie](https://img.shields.io/badge/Beanie%20ODM-47A248?style=flat-square&logo=mongodb&logoColor=white) |
+| **Vector DB** | — | ![ChromaDB](https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white) |
+| **AI / ML** | — | ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white) ![ChromaDB](https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white) RAG Pipelines |
+| **State** | ![TanStack](https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat-square&logo=reactquery&logoColor=white) ![Zustand](https://img.shields.io/badge/Zustand-433E38?style=flat-square&logo=react&logoColor=white) | ![Signals](https://img.shields.io/badge/Angular%20Signals-DD0031?style=flat-square&logo=angular&logoColor=white) ![RxJS](https://img.shields.io/badge/RxJS-B7178C?style=flat-square&logo=reactivex&logoColor=white) |
+| **Forms & Validation** | ![RHF](https://img.shields.io/badge/React%20Hook%20Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white) ![Zod](https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white) | ![RF](https://img.shields.io/badge/Reactive%20Forms-DD0031?style=flat-square&logo=angular&logoColor=white) |
+| **Jobs & Queues** | ![BullMQ](https://img.shields.io/badge/BullMQ-FF0000?style=flat-square&logo=redis&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-FF4438?style=flat-square&logo=redis&logoColor=white) | ![BullMQ](https://img.shields.io/badge/BullMQ-FF0000?style=flat-square&logo=redis&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-FF4438?style=flat-square&logo=redis&logoColor=white) |
+| **Security** | ![bcrypt](https://img.shields.io/badge/bcrypt%20cost%2012-FF6F00?style=flat-square&logo=letsencrypt&logoColor=white) HttpOnly cookies · Progressive delay | ![bcrypt](https://img.shields.io/badge/bcrypt%20cost%2012-FF6F00?style=flat-square&logo=letsencrypt&logoColor=white) RS256 · Token rotation |
+| **Testing** | ![Jest](https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white) ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white) ![RTL](https://img.shields.io/badge/RTL-E33332?style=flat-square&logo=testinglibrary&logoColor=white) ![PW](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white) | ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white) Angular utilities · ![PW](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white) |
+| **Coverage** | ![Unit](https://img.shields.io/badge/Unit%2070%25-2563EB?style=flat-square) ![Int](https://img.shields.io/badge/Integration%2020%25-FF6F00?style=flat-square) ![E2E](https://img.shields.io/badge/E2E%2010%25-007A4D?style=flat-square) | ![Unit](https://img.shields.io/badge/Unit%2070%25-2563EB?style=flat-square) ![Int](https://img.shields.io/badge/Integration%2020%25-FF6F00?style=flat-square) ![E2E](https://img.shields.io/badge/E2E%2010%25-007A4D?style=flat-square) |
+| **Frontend Deploy** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) |
+| **Backend Deploy** | ![Vercel](https://img.shields.io/badge/Vercel%20(built--in)-000000?style=flat-square&logo=vercel&logoColor=white) | ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white) |
+| **CI/CD** | ![GHA](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | ![GHA](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) |
+| **Observability** | ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white) ![BS](https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white) ![Prom](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) | ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white) ![BS](https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white) ![Prom](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) |
 
-<img src="https://skillicons.dev/icons?i=nextjs,react,tailwind&theme=dark" />
-&nbsp;&nbsp;
-<img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/App%20Router-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-
-<br/><br/>
-
-**Angular Stack**
-
-<img src="https://skillicons.dev/icons?i=angular&theme=dark" />
-&nbsp;&nbsp;
-<img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/Reactive%20Forms-DD0031?style=flat-square&logo=angular&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/Angular%20Signals-DD0031?style=flat-square&logo=angular&logoColor=white" />
-
-</div>
-
-<br/>
-
-### Backend
-
-<div align="center">
-
-**Next.js Stack**
-
-<img src="https://skillicons.dev/icons?i=nodejs&theme=dark" />
-&nbsp;&nbsp;
-<img src="https://img.shields.io/badge/Next.js%20API%20Routes-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-
-<br/><br/>
-
-**Angular Stack**
-
-<img src="https://skillicons.dev/icons?i=fastapi,python&theme=dark" />
-&nbsp;&nbsp;
-<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/JWT%20RS256-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
-&nbsp;
-<img src="https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white" />
-
-</div>
-
-<br/>
-
-### Databases
-
-<div align="center">
-  <img src="https://skillicons.dev/icons?i=postgres,mongodb,redis&theme=dark" />
-  <br/><br/>
-  <img src="https://img.shields.io/badge/Prisma%20ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Raw%20SQL-336791?style=flat-square&logo=postgresql&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Beanie%20ODM-43B02A?style=flat-square&logo=mongodb&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white" />
-</div>
-
-<br/>
-
-### AI & ML
-
-<div align="center">
-  <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white" />
-  &nbsp;
-  <img src="https://skillicons.dev/icons?i=fastapi&theme=dark" height="28"/>
-  &nbsp;
-  <img src="https://img.shields.io/badge/RAG%20Pipelines-2563EB?style=flat-square&logo=python&logoColor=white" />
-</div>
-
-<br/>
-
-### State, Forms & Queues
-
-<div align="center">
-  <img src="https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat-square&logo=reactquery&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Zustand-433E38?style=flat-square&logo=react&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/RxJS-B7178C?style=flat-square&logo=reactivex&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/React%20Hook%20Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/BullMQ-FF0000?style=flat-square&logo=redis&logoColor=white" />
-</div>
-
-<br/>
-
-### Auth & Security
-
-<div align="center">
-  <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/JWT%20HttpOnly%20Cookies-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/bcrypt%20cost%2012-FF6F00?style=flat-square&logo=letsencrypt&logoColor=white" />
-</div>
-
-<br/>
-
-### Testing
-
-<div align="center">
-  <img src="https://skillicons.dev/icons?i=jest,playwright&theme=dark" />
-  &nbsp;&nbsp;
-  <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/70%25%20Unit-2563EB?style=flat-square" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/20%25%20Integration-FF6F00?style=flat-square" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/10%25%20E2E-007A4D?style=flat-square" />
-</div>
-
-<br/>
-
-### Infrastructure & Observability
-
-<div align="center">
-  <img src="https://skillicons.dev/icons?i=vercel,docker,github,githubactions&theme=dark" />
-  <br/><br/>
-  <img src="https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" />
 </div>
 
 ---
