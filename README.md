@@ -100,7 +100,12 @@ All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-S
 | **Backend Deploy** | ![Vercel](https://img.shields.io/badge/Vercel%20(built--in)-000000?style=flat-square&logo=vercel&logoColor=white) | ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white) |
 | **CI/CD** | ![GHA](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | ![GHA](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) |
 | **Observability** | ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white) ![BS](https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white) ![Prom](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) | ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white) ![BS](https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white) ![Prom](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) |
-| **Additional** | ![Oracle](https://img.shields.io/badge/Oracle%20SQL-F80000?style=flat-square&logo=oracle&logoColor=white) Proficient — used outside current project stack | ![Oracle](https://img.shields.io/badge/Oracle%20SQL-F80000?style=flat-square&logo=oracle&logoColor=white) Proficient — used outside current project stack |
+
+</div>
+
+<div align="center">
+
+![Oracle](https://img.shields.io/badge/Oracle%20SQL-F80000?style=flat-square&logo=oracle&logoColor=white) &nbsp; **Additional proficiency — used outside current project stack**
 
 </div>
 
