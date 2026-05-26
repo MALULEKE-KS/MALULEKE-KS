@@ -1,83 +1,229 @@
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,2,5,30&height=300&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
-</p>
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,2,5,30&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
+</div>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Software_Engineer-2563EB?style=for-the-badge&logo=code&logoColor=white" />
-  <img src="https://img.shields.io/badge/BSc_CS_%26_Mathematics-FF6F00?style=for-the-badge&logo=academia&logoColor=white" />
-  <img src="https://img.shields.io/badge/South_Africa-007A4D?style=for-the-badge&logo=googlemaps&logoColor=white" />
-</p>
+<br/>
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=24&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=800&lines=Software+Engineer+%7C+AI+Systems+Architect;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
-</p>
+<div align="center">
+  <img src="https://img.shields.io/badge/Software%20Engineer-2563EB?style=for-the-badge&logo=code&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/BSc%20CS%20%26%20Mathematics-FF6F00?style=for-the-badge&logo=academia&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/South%20Africa-007A4D?style=for-the-badge&logo=googlemaps&logoColor=white" />
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=22&duration=3000&pause=600&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%7C+AI+Systems+Architect;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
+</div>
+
+<br/>
 
 ---
 
-<p align="center">
-  <a href="https://my-nextjs-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Next.js_Portfolio-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" /></a>
-  <a href="https://my-angular-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Angular_Portfolio-DD0031?style=for-the-badge&logo=angular&logoColor=white" /></a>
-  <a href="https://github.com/KSDRILL-SA"><img src="https://img.shields.io/badge/KSDRILL--SA-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
-  <a href="https://github.com/GrowthCore-Solutions"><img src="https://img.shields.io/badge/GrowthCore--Solutions-2563EB?style=for-the-badge&logo=github&logoColor=white" /></a>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://za.linkedin.com/in/kurhula-success-maluleke-32153231a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
-  <a href="mailto:kurhula04s@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
-  <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" /></a>
-  <img src="https://komarev.com/ghpvc/?username=MALULEKE-KS&style=for-the-badge&color=2563EB" />
-</p>
+### Profiles & Organizations
+
+<br/>
+
+[![Next.js Portfolio](https://img.shields.io/badge/Next.js%20Portfolio-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://my-nextjs-portfolio.vercel.app/)
+&nbsp;
+[![Angular Portfolio](https://img.shields.io/badge/Angular%20Portfolio-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://my-angular-portfolio.vercel.app/)
+&nbsp;
+[![KSDRILL-SA](https://img.shields.io/badge/KSDRILL--SA-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KSDRILL-SA)
+&nbsp;
+[![GrowthCore](https://img.shields.io/badge/GrowthCore--Solutions-2563EB?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GrowthCore-Solutions)
+
+<br/>
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://za.linkedin.com/in/kurhula-success-maluleke-32153231a)
+&nbsp;
+[![Gmail](https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:kurhula04s@gmail.com)
+&nbsp;
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/27640708649)
+&nbsp;
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MALULEKE-KS)
+&nbsp;
+![Profile Views](https://komarev.com/ghpvc/?username=MALULEKE-KS&style=for-the-badge&color=2563EB)
+
+</div>
 
 ---
 
 ## About
 
-Final year BSc Computer Science & Mathematics student building production-grade systems through my Organizations. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
+Final year BSc Computer Science & Mathematics student building production-grade systems through my companies. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
 
-I build through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and co-run **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**. All active systems live in those organizations.
+All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**.
 
 ---
 
 ## Organizations
 
-| Organization | Role | Focus |
-| :--- | :--- | :--- |
-| **[KSDRILL-SA](https://github.com/KSDRILL-SA)** | Founder & Principal Engineer | AI Systems · Fintech · SaaS · EdTech · GovTech · Enterprise Automation |
-| **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)** | Co-Founder | Web Development · Digital Marketing · Customer Acquisition · Analytics |
+<div align="center">
+
+| | Organization | Role | Focus |
+| :---: | :--- | :--- | :--- |
+| <img src="https://img.shields.io/badge/-181717?style=flat-square&logo=github&logoColor=white" width="28"/> | **[KSDRILL-SA](https://github.com/KSDRILL-SA)** | Founder & Principal Engineer | AI Systems · Fintech · SaaS · EdTech · GovTech · Enterprise Automation |
+| <img src="https://img.shields.io/badge/-2563EB?style=flat-square&logo=github&logoColor=white" width="28"/> | **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)** | Co-Founder | Web Development · Digital Marketing · Customer Acquisition · Analytics |
+
+</div>
 
 ---
 
 ## Technical Stack
 
-### Dual-Stack — Assigned by Problem Type
+### Languages
 
-| Stack | When |
-| :--- | :--- |
-| **Next.js + NextAuth** | Content-driven · SEO-critical · Full-stack unified codebase |
-| **Angular + FastAPI** | Enterprise dashboards · Financial precision · AI/ML pipelines |
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=ts,py,js&theme=dark" />
+</div>
 
-Stack is assigned by architecture decision before build begins — not by preference.
+<br/>
 
-### Technology Layers
+### Frontend
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Languages** | TypeScript (strict) · Python · JavaScript |
-| **Frontend — Next.js** | Next.js App Router · React · Tailwind CSS · shadcn/ui · Custom CSS |
-| **Frontend — Angular** | Angular · TypeScript · Tailwind CSS · Reactive Forms · Angular Signals |
-| **Backend — Next.js** | Next.js API Routes · NextAuth.js · Node.js |
-| **Backend — Angular** | FastAPI (Python) · JWT (RS256) · Pydantic |
-| **Database — Relational** | PostgreSQL · Prisma ORM |
-| **Database — Document** | MongoDB · Beanie ODM |
-| **Database — Vector** | ChromaDB |
-| **AI / ML** | LangChain · ChromaDB · FastAPI Python microservice · RAG pipelines |
-| **State Management** | TanStack Query (server) · Zustand · Angular Signals · RxJS |
-| **Forms & Validation** | React Hook Form + Zod · Angular Reactive Forms |
-| **Jobs & Queues** | BullMQ · Redis |
-| **Authentication** | NextAuth.js (Next.js) · RS256 JWT in HttpOnly cookies (Angular) · bcrypt cost 12 |
-| **Testing** | Jest · Vitest · Playwright · RTL — 70% unit / 20% integration / 10% E2E |
-| **Infrastructure** | Vercel · Railway · Docker · GitHub Actions |
-| **Observability** | Sentry · Better Stack · Prometheus |
+<div align="center">
+
+**Next.js Stack**
+
+<img src="https://skillicons.dev/icons?i=nextjs,react,tailwind&theme=dark" />
+&nbsp;&nbsp;
+<img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=flat-square&logo=shadcnui&logoColor=white" />
+&nbsp;
+<img src="https://img.shields.io/badge/App%20Router-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+
+<br/><br/>
+
+**Angular Stack**
+
+<img src="https://skillicons.dev/icons?i=angular&theme=dark" />
+&nbsp;&nbsp;
+<img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+&nbsp;
+<img src="https://img.shields.io/badge/Reactive%20Forms-DD0031?style=flat-square&logo=angular&logoColor=white" />
+&nbsp;
+<img src="https://img.shields.io/badge/Angular%20Signals-DD0031?style=flat-square&logo=angular&logoColor=white" />
+
+</div>
+
+<br/>
+
+### Backend
+
+<div align="center">
+
+**Next.js Stack**
+
+<img src="https://skillicons.dev/icons?i=nodejs&theme=dark" />
+&nbsp;&nbsp;
+<img src="https://img.shields.io/badge/Next.js%20API%20Routes-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+&nbsp;
+<img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+
+<br/><br/>
+
+**Angular Stack**
+
+<img src="https://skillicons.dev/icons?i=fastapi&theme=dark" />
+&nbsp;&nbsp;
+<img src="https://img.shields.io/badge/JWT%20RS256-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
+&nbsp;
+<img src="https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white" />
+
+</div>
+
+<br/>
+
+### Databases
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=postgres,mongodb,redis&theme=dark" />
+  <br/><br/>
+  <img src="https://img.shields.io/badge/Prisma%20ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Beanie%20ODM-43B02A?style=flat-square&logo=mongodb&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white" />
+</div>
+
+<br/>
+
+### AI & ML
+
+<div align="center">
+  <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=databricks&logoColor=white" />
+  &nbsp;
+  <img src="https://skillicons.dev/icons?i=fastapi&theme=dark" height="28"/>
+  &nbsp;
+  <img src="https://img.shields.io/badge/RAG%20Pipelines-2563EB?style=flat-square&logo=python&logoColor=white" />
+</div>
+
+<br/>
+
+### State, Forms & Queues
+
+<div align="center">
+  <img src="https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat-square&logo=reactquery&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Zustand-433E38?style=flat-square&logo=react&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/RxJS-B7178C?style=flat-square&logo=reactivex&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/React%20Hook%20Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/BullMQ-FF0000?style=flat-square&logo=redis&logoColor=white" />
+</div>
+
+<br/>
+
+### Auth & Security
+
+<div align="center">
+  <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/JWT%20HttpOnly%20Cookies-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/bcrypt%20cost%2012-FF6F00?style=flat-square&logo=letsencrypt&logoColor=white" />
+</div>
+
+<br/>
+
+### Testing
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=jest,playwright&theme=dark" />
+  &nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/70%25%20Unit-2563EB?style=flat-square" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/20%25%20Integration-FF6F00?style=flat-square" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/10%25%20E2E-007A4D?style=flat-square" />
+</div>
+
+<br/>
+
+### Infrastructure & Observability
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=vercel,docker,github,githubactions&theme=dark" />
+  <br/><br/>
+  <img src="https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Sentry-362D59?style=flat-square&logo=sentry&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Better%20Stack-000000?style=flat-square&logo=betterstack&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" />
+</div>
 
 ---
 
@@ -95,46 +241,71 @@ Stack is assigned by architecture decision before build begins — not by prefer
 
 ## Domains
 
+<div align="center">
+
 | Industry | Capability |
-| :--- | :--- |
-| **Fintech** | Payment processing · Savings enforcement · Banking systems · Fraud detection · Microfinance |
-| **EdTech** | Learning platforms · Student management · National funding aggregation |
-| **GovTech** | Digital governance · Citizen services · Community reporting infrastructure |
-| **SaaS** | Multi-tenant platforms · Subscription management · Analytics dashboards |
-| **AI / ML** | RAG pipelines · LangChain agents · Prediction engines · Recommendation systems |
-| **Enterprise** | Workflow automation · Internal tooling · Data visualization · Compliance systems |
+| :---: | :--- |
+| ![Fintech](https://img.shields.io/badge/Fintech-FF6F00?style=flat-square&logo=stripe&logoColor=white) | Payment processing · Savings enforcement · Banking systems · Fraud detection · Microfinance |
+| ![EdTech](https://img.shields.io/badge/EdTech-2563EB?style=flat-square&logo=googleclassroom&logoColor=white) | Learning platforms · Student management · National funding aggregation |
+| ![GovTech](https://img.shields.io/badge/GovTech-007A4D?style=flat-square&logo=googlemaps&logoColor=white) | Digital governance · Citizen services · Community reporting infrastructure |
+| ![SaaS](https://img.shields.io/badge/SaaS-6E40C9?style=flat-square&logo=salesforce&logoColor=white) | Multi-tenant platforms · Subscription management · Analytics dashboards |
+| ![AI/ML](https://img.shields.io/badge/AI%20%2F%20ML-1C3C3C?style=flat-square&logo=openai&logoColor=white) | RAG pipelines · LangChain agents · Prediction engines · Recommendation systems |
+| ![Enterprise](https://img.shields.io/badge/Enterprise-181717?style=flat-square&logo=microsoft&logoColor=white) | Workflow automation · Internal tooling · Data visualization · Compliance systems |
+
+</div>
 
 ---
 
 ## Open To
 
-**Full-time · Part-time · Contract · Remote**
+<div align="center">
 
-Roles: Full-stack · Backend · AI/ML · Systems Architecture
+![Full-time](https://img.shields.io/badge/Full--time-2563EB?style=for-the-badge)
+&nbsp;
+![Part-time](https://img.shields.io/badge/Part--time-FF6F00?style=for-the-badge)
+&nbsp;
+![Contract](https://img.shields.io/badge/Contract-007A4D?style=for-the-badge)
+&nbsp;
+![Remote](https://img.shields.io/badge/Remote-6E40C9?style=for-the-badge)
 
-Industries: Fintech · Healthcare · EdTech · SaaS · GovTech · AI
+<br/>
 
-Collaboration: Open source · Partnerships · Social impact projects
+**Roles:** Full-stack &nbsp;·&nbsp; Backend &nbsp;·&nbsp; AI/ML &nbsp;·&nbsp; Systems Architecture
+
+**Industries:** Fintech &nbsp;·&nbsp; Healthcare &nbsp;·&nbsp; EdTech &nbsp;·&nbsp; SaaS &nbsp;·&nbsp; GovTech &nbsp;·&nbsp; AI
+
+**Collaboration:** Open source &nbsp;·&nbsp; Partnerships &nbsp;·&nbsp; Social impact projects
+
+</div>
 
 ---
 
 ## Contact
 
-| | |
-| :--- | :--- |
-| **Next.js Portfolio** | [my-nextjs-portfolio.vercel.app](https://my-nextjs-portfolio.vercel.app) |
-| **Angular Portfolio** | [my-angular-portfolio.vercel.app](https://my-angular-portfolio.vercel.app) |
-| **Email** | [kurhula04s@gmail.com](mailto:kurhula04s@gmail.com) |
-| **WhatsApp** | [wa.me/27640708649](https://wa.me/27640708649) |
-| **LinkedIn** | [linkedin.com/in/kurhula-success-maluleke](https://za.linkedin.com/in/kurhula-success-maluleke-32153231a) |
-| **GitHub** | [github.com/MALULEKE-KS](https://github.com/MALULEKE-KS) |
+<div align="center">
+
+[![Next.js Portfolio](https://img.shields.io/badge/Next.js%20Portfolio-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://my-nextjs-portfolio.vercel.app/)
+&nbsp;
+[![Angular Portfolio](https://img.shields.io/badge/Angular%20Portfolio-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://my-angular-portfolio.vercel.app/)
+
+<br/>
+
+[![Email](https://img.shields.io/badge/kurhula04s%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:kurhula04s@gmail.com)
+&nbsp;
+[![WhatsApp](https://img.shields.io/badge/%2B27%2064%20070%208649-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/27640708649)
+&nbsp;
+[![LinkedIn](https://img.shields.io/badge/kurhula--success--maluleke-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://za.linkedin.com/in/kurhula-success-maluleke-32153231a)
+
+</div>
 
 ---
 
-<p align="center">
+<div align="center">
   <em>The sky is the limit — KSDRILL SA</em>
-</p>
+</div>
 
-<p align="center">
+<br/>
+
+<div align="center">
   <img src="https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,2,5,30&height=120&section=footer" alt="Footer" />
-</p>
+</div>
