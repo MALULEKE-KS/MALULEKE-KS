@@ -127,8 +127,10 @@ All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-S
 
 **Angular Stack**
 
-<img src="https://skillicons.dev/icons?i=fastapi&theme=dark" />
+<img src="https://skillicons.dev/icons?i=fastapi,python&theme=dark" />
 &nbsp;&nbsp;
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+&nbsp;
 <img src="https://img.shields.io/badge/JWT%20RS256-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" />
 &nbsp;
 <img src="https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white" />
@@ -143,6 +145,8 @@ All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-S
   <img src="https://skillicons.dev/icons?i=postgres,mongodb,redis&theme=dark" />
   <br/><br/>
   <img src="https://img.shields.io/badge/Prisma%20ORM-2D3748?style=flat-square&logo=prisma&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Raw%20SQL-336791?style=flat-square&logo=postgresql&logoColor=white" />
   &nbsp;
   <img src="https://img.shields.io/badge/Beanie%20ODM-43B02A?style=flat-square&logo=mongodb&logoColor=white" />
   &nbsp;
