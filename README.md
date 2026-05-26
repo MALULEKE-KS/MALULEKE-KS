@@ -5,9 +5,9 @@
 <br/>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Software%20Engineer%20%2B%20AI-2563EB?style=for-the-badge&logo=code&logoColor=white" />
-  &nbsp;
   <img src="https://img.shields.io/badge/BSc%20CS%20%26%20Mathematics-FF6F00?style=for-the-badge&logo=academia&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Final%20Year-2563EB?style=for-the-badge&logo=mortarboard&logoColor=white" />
   &nbsp;
   <img src="https://img.shields.io/badge/South%20Africa-007A4D?style=for-the-badge&logo=googlemaps&logoColor=white" />
 </div>
@@ -15,7 +15,7 @@
 <br/>
 
 <div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=22&duration=3000&pause=600&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%2B+AI;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=700&size=20&duration=2800&pause=800&color=2563EB&center=true&vCenter=true&width=780&height=60&lines=Architecture+before+code.+Always.;Next.js+for+content.+Angular+%2B+FastAPI+for+precision.;PostgreSQL+%C2%B7+MongoDB+%C2%B7+ChromaDB+%C2%B7+Redis;LangChain+%C2%B7+RAG+Pipelines+%C2%B7+AI+Integration;One+system+at+a+time.+No+shortcuts.;African+Engineer.+Global+Standards." alt="Typing" />
 </div>
 
 <br/>
@@ -54,9 +54,7 @@
 
 ## About
 
-Final year BSc Computer Science & Mathematics student building production-grade systems through my companies. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
-
-All active systems are built through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**.
+Final year BSc Computer Science & Mathematics student building production-grade systems through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
 
 ---
 
