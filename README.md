@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=24&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=800&lines=Software+Engineer+%7C+AI+Systems+Architect;Constitutional+Governance+for+AI-Assisted+Development;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably." alt="Typing" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=24&duration=3000&pause=500&color=2563EB&center=true&vCenter=true&width=800&lines=Software+Engineer+%7C+AI+Systems+Architect;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
 </p>
 
 ---
@@ -32,39 +32,13 @@
 
 ## About
 
-I am a **Software Engineer and AI Systems Architect** — final year BSc Computer Science & Mathematics student designing and building production-grade platforms through my companies.
+Final year BSc Computer Science & Mathematics student building production-grade systems through my companies. I work across full-stack web, AI integration, and enterprise automation — dual-framework depending on the problem type, design-complete before any code is written, one system at a time.
 
-Where most engineers write code, I reason through systems first. Computer Science shapes how I architect. Mathematics shapes how I think. Every platform I build is fully designed, constitutionally governed, and deployed sequentially — one system at a time.
-
-My build methodology is grounded in **Governova** — a constitutional governance framework I authored that defines exactly what every AI tool is permitted to build, how it must build it, what it must never do, and which decisions require human approval. Every system I ship operates under 11 locked constitutions across 4 phases, with an immutable audit trail on every AI action.
-
----
-
-## Governova — Constitutional Governance Framework
-
-[![Status](https://img.shields.io/badge/Status-LOCKED-red?style=flat-square)](https://github.com/MALULEKE-KS/system-design-template)
-[![Version](https://img.shields.io/badge/Version-v2.0-blue?style=flat-square)](https://github.com/MALULEKE-KS/system-design-template)
-[![Constitutions](https://img.shields.io/badge/Constitutions-11-purple?style=flat-square)](https://github.com/MALULEKE-KS/system-design-template)
-[![Phases](https://img.shields.io/badge/Build_Phases-4-teal?style=flat-square)](https://github.com/MALULEKE-KS/system-design-template)
-
-> *"AI can build anything. It is us who must tell it exactly what to build, how to build it, what not to build, and who approves every decision."*
-
-Governova is the constitutional layer between AI capability and enterprise trust. It is not a linter or a code reviewer — it is the infrastructure that governs how AI reasons before it writes a single line of code, and documents everything it did after.
-
-| Layer | Scope |
-| :--- | :--- |
-| **Framework** | Universal primitives: format, phases, severity, permissions, amendment protocol |
-| **Constitution Core** | 11 constitutions across 4 phases — universal standards as principles |
-| **Implementation Bindings** | Stack-specific bindings: FastAPI · Next.js · NextAuth · Prisma · Angular |
-| **Domain Extensions** | Industry overlays: Fintech · EdTech · GovTech · HealthTech · SaaS · AI/ML |
-
-**→ [github.com/MALULEKE-KS/system-design-template](https://github.com/MALULEKE-KS/system-design-template)**
+I build through **[KSDRILL-SA](https://github.com/KSDRILL-SA)** and co-run **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**. All active systems live in those organizations.
 
 ---
 
 ## Organizations
-
-All production systems are built under dedicated organizations. No system details are published on this profile — visit the organizations directly.
 
 | Organization | Role | Focus |
 | :--- | :--- | :--- |
@@ -75,14 +49,14 @@ All production systems are built under dedicated organizations. No system detail
 
 ## Technical Stack
 
-### Dual-Stack Architecture — Assigned by Problem Type
+### Dual-Stack — Assigned by Problem Type
 
-| Stack | When Assigned | Key Differentiators |
-| :--- | :--- | :--- |
-| **Next.js + NextAuth** | Content-driven · SEO-critical · Unified codebase | SSR/SSG · App Router · API Routes built-in · Vercel deploy |
-| **Angular + FastAPI** | Enterprise dashboards · Financial precision · AI pipelines | Reactive Forms · Python Decimal · LangChain/RAG · Railway deploy |
+| Stack | When |
+| :--- | :--- |
+| **Next.js + NextAuth** | Content-driven · SEO-critical · Full-stack unified codebase |
+| **Angular + FastAPI** | Enterprise dashboards · Financial precision · AI/ML pipelines |
 
-Stack assignment is governed by `C6 S6.1–S6.7` and documented in an ADR before any build begins. Framework and stack are never debated — they are assigned by architecture decision, then locked.
+Stack is assigned by architecture decision before build begins — not by preference.
 
 ### Technology Layers
 
@@ -107,16 +81,15 @@ Stack assignment is governed by `C6 S6.1–S6.7` and documented in an ADR before
 
 ---
 
-## Engineering Philosophy
+## How I Build
 
-| Principle | Implementation |
+| Principle | Detail |
 | :--- | :--- |
-| **Design-first, always** | Full architecture, user flows, database schema, and interface designs are complete before a single line of code is written. No exceptions. |
-| **Constitutional governance** | Every decision references a standard ID (`S{C}.{N}`). No guesses, no conventions invented on the fly — everything is governed or flagged for amendment. |
-| **Controlled imperfection** | Systems fail. The goal is predictable, traceable, and debuggable failures — not perfection. Every incident feeds a runbook. Every runbook prevents recurrence. |
-| **Sequential build discipline** | One system at a time. No forward dependencies. No parallel builds. Phase 0 → Phase 1 → Phase 2 → Phase 3, in order. |
-| **Human authority is non-negotiable** | L4 decisions — production approvals, security overrides, constitutional amendments — are permanently human-only. AI proposes and implements. It never approves. |
-| **Audit trail or it didn't happen** | Every AI action, standard applied, violation caught, and human approval is recorded. If it is not in the audit trail, it is not governed. |
+| **Design before code** | Architecture, user flows, database schema, and interface designs are finalized before any code is written. |
+| **Sequential development** | One system at a time. No forward dependencies. Phase 0 → Phase 1 → Phase 2 → Phase 3, in order. |
+| **Controlled failure** | Systems fail. The goal is failures that are predictable, traceable, and debuggable — not perfect systems that no one understands. |
+| **Stack by problem type** | Framework is assigned by problem type and locked via an architecture decision record. Not debated per project. |
+| **Observability from day one** | Sentry, Better Stack, and Prometheus are wired in at Phase 0, not added later when something breaks. |
 
 ---
 
@@ -126,7 +99,7 @@ Stack assignment is governed by `C6 S6.1–S6.7` and documented in an ADR before
 | :--- | :--- |
 | **Fintech** | Payment processing · Savings enforcement · Banking systems · Fraud detection · Microfinance |
 | **EdTech** | Learning platforms · Student management · National funding aggregation |
-| **GovTech** | Digital village governance · Citizen services · Structured community reporting |
+| **GovTech** | Digital governance · Citizen services · Community reporting infrastructure |
 | **SaaS** | Multi-tenant platforms · Subscription management · Analytics dashboards |
 | **AI / ML** | RAG pipelines · LangChain agents · Prediction engines · Recommendation systems |
 | **Enterprise** | Workflow automation · Internal tooling · Data visualization · Compliance systems |
@@ -137,7 +110,7 @@ Stack assignment is governed by `C6 S6.1–S6.7` and documented in an ADR before
 
 **Full-time · Part-time · Contract · Remote**
 
-Engineering Roles: Full-stack · Backend · AI/ML · Systems Architecture
+Roles: Full-stack · Backend · AI/ML · Systems Architecture
 
 Industries: Fintech · Healthcare · EdTech · SaaS · GovTech · AI
 
