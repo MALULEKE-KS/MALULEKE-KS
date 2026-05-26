@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,2,5,30&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%7C%20AI%20Systems%20Architect&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
+  <img src="https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,2,5,30&height=280&section=header&text=Maluleke%20Kurhula%20Success&fontSize=52&fontColor=white&fontAlignY=42&fontAlign=50&desc=Software%20Engineer%20%2B%20AI&descAlignY=60&descAlign=50&descSize=20&animation=fadeIn" alt="Header" />
 </div>
 
 <br/>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Software%20Engineer-2563EB?style=for-the-badge&logo=code&logoColor=white" />
+  <img src="https://img.shields.io/badge/Software%20Engineer%20%2B%20AI-2563EB?style=for-the-badge&logo=code&logoColor=white" />
   &nbsp;
   <img src="https://img.shields.io/badge/BSc%20CS%20%26%20Mathematics-FF6F00?style=for-the-badge&logo=academia&logoColor=white" />
   &nbsp;
@@ -15,7 +15,7 @@
 <br/>
 
 <div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=22&duration=3000&pause=600&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%7C+AI+Systems+Architect;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=22&duration=3000&pause=600&color=2563EB&center=true&vCenter=true&width=750&lines=Software+Engineer+%2B+AI;Next.js+%7C+Angular+%7C+FastAPI+%7C+Python;Design-first.+Build-sequentially.+Ship-reliably.;BSc+Computer+Science+%2B+Mathematics;African+Roots+%7C+Global+Impact" alt="Typing" />
 </div>
 
 <br/>
