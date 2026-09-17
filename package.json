@@ -23,7 +23,8 @@
     "prisma:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "prisma:studio": "dotenv -e .env.local -- prisma studio",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
-    "sync:github": "dotenv -e .env.local -- tsx scripts/github-sync.ts"
+    "sync:github": "dotenv -e .env.local -- tsx scripts/github-sync.ts",
+    "create-admin": "dotenv -e .env.local -- tsx scripts/create-admin.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
