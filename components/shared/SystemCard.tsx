@@ -25,7 +25,7 @@ export function SystemCard({ slug, name, description, status, isFlagship }: Syst
   return (
     <Link
       href={`/systems/${slug}`}
-      className="group relative block border border-slate/20 px-6 py-5 outline-none"
+      className="group relative block border border-slate/25 bg-white px-6 py-5 outline-none transition-colors hover:border-slate/40"
     >
       {/* Four corner brackets — the CAD/drafting selection indicator,
           replacing the rounded-card-plus-shadow treatment this design
@@ -36,7 +36,7 @@ export function SystemCard({ slug, name, description, status, isFlagship }: Syst
       <span className={`${CORNER_BASE} bottom-0 right-0 border-b-2 border-r-2`} />
 
       <div className="flex items-start justify-between gap-4">
-        <h3 className="font-sans text-lg text-ink">{name}</h3>
+        <h3 className="font-sans font-semibold text-lg text-ink">{name}</h3>
         <StatusBadge label={status.label} colorToken={status.colorToken} />
       </div>
 
