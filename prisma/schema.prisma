@@ -158,7 +158,13 @@ model System {
   isFlagship       Boolean           @default(false)
   sortOrder        Int               @default(0)
   clientVisibility ClientVisibility  @default(PUBLIC) // BR-1.2 default is applied in app logic on create
-  clientApproved   Boolean           @default(false)
+  clientApproved   Boolean           @default(false) // authorizes publishing (BR-1.1) — NOT the same authorization as revealing the real org name
+  // Separate from clientApproved on purpose (BR-1.4): a client can approve
+  // publishing an ANONYMIZED_ONLY case study without approving disclosure of
+  // their real name in it. Reusing clientApproved for both would make name
+  // masking unreachable for any published system, since BR-1.1 already
+  // requires clientApproved=true to publish anything non-PUBLIC.
+  nameDisclosureApproved Boolean      @default(false)
   contentStatus    ContentStatus     @default(DRAFT)  // BR-1.6: sync-created rows always start here
   needsCuration    Boolean           @default(false)  // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
   // No delete endpoint exists for System anywhere in the contract — retirement

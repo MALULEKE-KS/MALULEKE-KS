@@ -10,8 +10,14 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { config as loadEnv } from "dotenv";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Integration tests need DATABASE_URL. Loads .env.local for local dev;
+// dotenv never overrides a var already set in process.env, so this is a
+// no-op in CI, where the job's `env:` block already sets DATABASE_URL.
+loadEnv({ path: path.resolve(dirname, ".env.local") });
 
 export default defineConfig({
   plugins: [react()],

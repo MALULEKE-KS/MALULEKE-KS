@@ -121,6 +121,9 @@ export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
   contentStatus: ContentStatusEnum,
   clientVisibility: ClientVisibilityEnum,
   clientApproved: z.boolean(),
+  // Separate from clientApproved (BR-1.4) — approves real-name disclosure
+  // for ANONYMIZED_ONLY systems specifically, not publication itself.
+  nameDisclosureApproved: z.boolean(),
   needsCuration: z.boolean(),
   sortOrder: z.number().int(),
 });
@@ -148,6 +151,7 @@ export const SystemUpdateInputSchema = z
   .object({
     contentStatus: ContentStatusEnum.optional(),
     clientApproved: z.boolean().optional(),
+    nameDisclosureApproved: z.boolean().optional(),
     isFlagship: z.boolean().optional(),
     sortOrder: z.number().int().optional(),
     caseStudyBody: z.string().optional(),

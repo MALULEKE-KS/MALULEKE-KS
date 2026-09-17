@@ -896,7 +896,8 @@ components:
           properties:
             contentStatus: { type: string, enum: [draft, published, archived] }
             clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
-            clientApproved: { type: boolean }
+            clientApproved: { type: boolean, description: "Authorizes publishing (BR-1.1) — see nameDisclosureApproved for real-name authorization" }
+            nameDisclosureApproved: { type: boolean, description: "Separate from clientApproved (BR-1.4) — authorizes revealing the real org name for an ANONYMIZED_ONLY system" }
             needsCuration: { type: boolean }
             sortOrder: { type: integer }
 
@@ -920,6 +921,7 @@ components:
       properties:
         contentStatus: { type: string, enum: [draft, published, archived] }
         clientApproved: { type: boolean }
+        nameDisclosureApproved: { type: boolean }
         isFlagship: { type: boolean }
         sortOrder: { type: integer }
         caseStudyBody: { type: string }
