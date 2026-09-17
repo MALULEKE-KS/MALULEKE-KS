@@ -1,0 +1,1073 @@
+openapi: 3.0.3
+info:
+  title: MALULEKE-KS Platform API
+  version: "1.0.0"
+  description: >
+    Contract-first specification for the MALULEKE-KS platform.
+    Derives from PLATFORM-CONSTITUTION-v1.md and BUSINESS-RULES-v1.md.
+    Zod schemas are generated from this contract, never hand-written independently of it.
+servers:
+  - url: https://malulekeks.dev/api/v1
+    description: Production
+  - url: http://localhost:3000/api/v1
+    description: Local development
+
+tags:
+  - name: Systems (Public)
+  - name: Systems (Admin)
+  - name: Inquiries
+  - name: Lookups
+  - name: Auth
+  - name: Timeline
+  - name: CV
+  - name: CV (Admin)
+  - name: Settings (Admin)
+  - name: Activity Log (Admin)
+
+security:
+  - {}
+
+paths:
+  # ============================================================
+  # PUBLIC — SYSTEMS
+  # ============================================================
+  /systems:
+    get:
+      tags: [Systems (Public)]
+      summary: List published systems
+      description: >
+        Returns only System rows where contentStatus = published.
+        Per BR-1.1, NDA_RESTRICTED and unapproved REQUIRES_APPROVAL systems
+        never appear here regardless of query parameters.
+      parameters:
+        - name: organization
+          in: query
+          schema: { type: string }
+          description: Filter by organization slug
+        - name: domain
+          in: query
+          schema: { type: string }
+          description: Filter by domain key
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by status key (finished / in_progress / planned)
+        - name: flagship
+          in: query
+          schema: { type: boolean }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+      responses:
+        "200":
+          description: Paginated list of public systems
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/SystemPublic" }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /systems/{slug}:
+    get:
+      tags: [Systems (Public)]
+      summary: Get a single published system by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: A single public system, including case study body
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SystemPublicDetailed" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ============================================================
+  # ADMIN — SYSTEMS
+  # ============================================================
+  /admin/systems:
+    get:
+      tags: [Systems (Admin)]
+      summary: List all systems, any content status
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: contentStatus
+          in: query
+          schema: { type: string, enum: [draft, published, archived] }
+        - name: needsCuration
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Full system list including drafts and NDA-restricted entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/SystemAdmin" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Systems (Admin)]
+      summary: Register a new system manually
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SystemCreateInput" }
+      responses:
+        "201":
+          description: System created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SystemAdmin" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/systems/{id}:
+    patch:
+      tags: [Systems (Admin)]
+      summary: Update a system, including publishing state transitions
+      description: >
+        BR-1.1 is enforced here: a request that sets contentStatus=published
+        while clientVisibility != PUBLIC and clientApproved=false returns 409.
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SystemUpdateInput" }
+      responses:
+        "200":
+          description: Updated system
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SystemAdmin" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: Publishing blocked — client approval required (BR-1.1)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ============================================================
+  # INQUIRIES
+  # ============================================================
+  /inquiries:
+    post:
+      tags: [Inquiries]
+      summary: Submit a visitor inquiry
+      description: >
+        The single visitor write path. Used identically by the human contact
+        form and the agent's submit_inquiry tool (BR-4.2). Rate-limited per
+        BR-2.4 — 5 submissions per IP per 24 hours. If the request includes a
+        honeypot field with a non-empty value, the endpoint returns the same
+        201 confirmation shape without creating a row (BR-2.7) — bot filling
+        gets no distinguishable signal. Resubmission with a previously-used
+        idempotencyKey within 10 minutes returns the original confirmation
+        rather than creating a duplicate (BR-2.6).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InquiryCreateInput" }
+      responses:
+        "201":
+          description: Inquiry received
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InquiryConfirmation" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429":
+          description: Rate limit exceeded (BR-2.4)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/inquiries:
+    get:
+      tags: [Inquiries]
+      summary: List inquiries for triage
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [new, reviewed, responded, closed] }
+        - name: inquiryType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Inquiry inbox
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/InquiryAdmin" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/inquiries/{id}:
+    patch:
+      tags: [Inquiries]
+      summary: Update inquiry status
+      description: >
+        Enforces sequential status transitions per BR-2.1. new -> reviewed is
+        always required first. From reviewed, either responded or closed is
+        valid (closed covers spam/irrelevant inquiries without requiring a
+        fake responded step). new -> responded and new -> closed both return
+        409, as does any other non-adjacent jump.
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [reviewed, responded, closed] }
+      responses:
+        "200":
+          description: Inquiry updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InquiryAdmin" }
+        "409":
+          description: Invalid status transition (BR-2.1)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ============================================================
+  # LOOKUPS — one generic endpoint for every EXT-1 lookup table
+  # ============================================================
+  /lookups/{type}:
+    get:
+      tags: [Lookups]
+      summary: Read lookup values for a given type
+      description: >
+        One contract for every open dimension in the system — Status, Domain,
+        InquiryType, MilestoneType, SkillCategory. A new lookup type added
+        under EXT-1 needs no new endpoint, only a new value of {type}.
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [status, domain, inquiry-type, milestone-type, skill-category]
+        - name: includeInactive
+          in: query
+          schema: { type: boolean, default: false }
+          description: Admin-only param; ignored for unauthenticated requests (BR-8.2)
+      responses:
+        "200":
+          description: List of lookup values for the given type
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LookupValue" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Lookups]
+      summary: Add a new lookup value (BR-8.1)
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key, label]
+              properties:
+                key: { type: string }
+                label: { type: string }
+      responses:
+        "201":
+          description: Lookup value created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LookupValue" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /lookups/{type}/{id}/deprecate:
+    post:
+      tags: [Lookups]
+      summary: Soft-deprecate a lookup value in use (BR-8.2)
+      description: Marks a value inactive without deleting it. Hard delete is a separate, unexposed operation reserved for never-used values.
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string }
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Value marked inactive
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ============================================================
+  # AUTH
+  # ============================================================
+  /admin/auth/login:
+    post:
+      tags: [Auth]
+      summary: Admin login step 1 — credentials
+      description: On success, returns a challenge requiring 2FA (BR-3.1). Never issues a session on this call alone.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        "200":
+          description: Credentials accepted, 2FA challenge issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challengeToken: { type: string }
+        "401":
+          description: Invalid credentials, or account locked (BR-3.2)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/auth/verify-2fa:
+    post:
+      tags: [Auth]
+      summary: Admin login step 2 — TOTP verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challengeToken, code]
+              properties:
+                challengeToken: { type: string }
+                code: { type: string, minLength: 6, maxLength: 6 }
+      responses:
+        "200":
+          description: Session established
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionExpiresAt: { type: string, format: date-time }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  # ============================================================
+  # TIMELINE & CV
+  # ============================================================
+  /timeline:
+    get:
+      tags: [Timeline]
+      summary: List public timeline entries
+      parameters:
+        - name: milestoneType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Timeline entries, chronological
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimelineEntry" }
+
+  /cv/generate:
+    post:
+      tags: [CV]
+      summary: Generate a CV document from current data (BR-7.1)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetRole: { type: string, nullable: true }
+      responses:
+        "201":
+          description: Generated document reference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileUrl: { type: string, format: uri }
+                  generatedAt: { type: string, format: date-time }
+
+  # ============================================================
+  # ADMIN — TIMELINE
+  # ============================================================
+  /admin/timeline:
+    get:
+      tags: [Timeline]
+      summary: List all timeline entries for management
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Full timeline entry list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TimelineEntry" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Timeline]
+      summary: Create a timeline entry
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimelineCreateInput" }
+      responses:
+        "201":
+          description: Timeline entry created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimelineEntry" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/timeline/{id}:
+    patch:
+      tags: [Timeline]
+      summary: Update a timeline entry
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimelineCreateInput" }
+      responses:
+        "200":
+          description: Timeline entry updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimelineEntry" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Timeline]
+      summary: Delete a timeline entry
+      description: Timeline entries, unlike Systems, may be hard-deleted directly — they carry no publishing-state history worth preserving.
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ============================================================
+  # ADMIN — CV (Experience / Education / Skill)
+  # ============================================================
+  /admin/cv/experience:
+    get:
+      tags: [CV (Admin)]
+      summary: List experience entries
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Experience list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/ExperienceEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [CV (Admin)]
+      summary: Create an experience entry
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExperienceInput" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/ExperienceEntry" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/cv/experience/{id}:
+    patch:
+      tags: [CV (Admin)]
+      summary: Update an experience entry
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExperienceInput" }
+      responses:
+        "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/ExperienceEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [CV (Admin)]
+      summary: Delete an experience entry
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/cv/education:
+    get:
+      tags: [CV (Admin)]
+      summary: List education entries
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Education list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/EducationEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [CV (Admin)]
+      summary: Create an education entry
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EducationInput" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/EducationEntry" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/cv/education/{id}:
+    patch:
+      tags: [CV (Admin)]
+      summary: Update an education entry
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EducationInput" }
+      responses:
+        "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/EducationEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [CV (Admin)]
+      summary: Delete an education entry
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/cv/skills:
+    get:
+      tags: [CV (Admin)]
+      summary: List skills
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Skill list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/SkillEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [CV (Admin)]
+      summary: Create a skill
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SkillInput" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/SkillEntry" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/cv/skills/{id}:
+    patch:
+      tags: [CV (Admin)]
+      summary: Update a skill
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SkillInput" }
+      responses:
+        "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/SkillEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [CV (Admin)]
+      summary: Delete a skill
+      description: Blocked with 409 if the skill is still referenced by any System or Experience (onDelete Restrict, mirrors BR-8.2 discipline).
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { description: Skill is still in use, content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  # ============================================================
+  # ADMIN — SETTINGS (Flags, Visitor Lenses)
+  # ============================================================
+  /admin/settings/flags:
+    get:
+      tags: [Settings (Admin)]
+      summary: List all feature flags
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Flag list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/FlagEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/settings/flags/{key}:
+    patch:
+      tags: [Settings (Admin)]
+      summary: Toggle a single feature flag (BR-4.4 — one at a time, no bulk-enable)
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [enabled], properties: { enabled: { type: boolean } } }
+      responses:
+        "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/FlagEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/settings/lenses:
+    get:
+      tags: [Settings (Admin)]
+      summary: List visitor lenses
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Lens list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/VisitorLensEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Settings (Admin)]
+      summary: Create a visitor lens
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VisitorLensInput" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/VisitorLensEntry" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/settings/lenses/{id}:
+    patch:
+      tags: [Settings (Admin)]
+      summary: Update a visitor lens's priority content or AI framing prompt
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VisitorLensInput" }
+      responses:
+        "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/VisitorLensEntry" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ============================================================
+  # ADMIN — ACTIVITY LOG (read-only, BR-3.4)
+  # ============================================================
+  /admin/activity-log:
+    get:
+      tags: [Activity Log (Admin)]
+      summary: List activity log entries
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: entityType
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 50, maximum: 100 }
+      responses:
+        "200":
+          description: Activity log, most recent first
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ActivityLogEntry" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+components:
+  securitySchemes:
+    adminSession:
+      type: apiKey
+      in: cookie
+      name: admin_session
+      description: HTTP-only session cookie, issued only after 2FA verification (BR-3.1)
+
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: Missing or invalid admin session
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - NOT_FOUND
+                - CLIENT_APPROVAL_REQUIRED
+                - INVALID_STATUS_TRANSITION
+                - RATE_LIMITED
+                - ACCOUNT_LOCKED
+                - CHALLENGE_EXPIRED
+                - CHALLENGE_INVALID
+                - LOOKUP_KEY_DEPRECATED
+                - INTERNAL_ERROR
+              description: Closed set, kept in lockstep with lib/schemas.ts ErrorCodeEnum — never a freeform string.
+            message: { type: string }
+            details: { type: object, nullable: true }
+
+    PageMeta:
+      type: object
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer }
+
+    LookupValue:
+      type: object
+      properties:
+        id: { type: string }
+        key: { type: string }
+        label: { type: string }
+        active: { type: boolean }
+
+    SystemPublic:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        organization: { type: string }
+        status: { type: string }
+        domain: { type: string, nullable: true }
+        description: { type: string }
+        repoUrl: { type: string, nullable: true, description: "Null when clientVisibility = NDA_RESTRICTED (BR-1.3)" }
+        liveUrl: { type: string, nullable: true }
+        techStack: { type: array, items: { type: string } }
+        isFlagship: { type: boolean }
+
+    SystemPublicDetailed:
+      allOf:
+        - $ref: "#/components/schemas/SystemPublic"
+        - type: object
+          properties:
+            caseStudyBody: { type: string }
+            impacts:
+              type: array
+              items:
+                type: object
+                properties:
+                  label: { type: string }
+                  value: { type: string }
+            testimonials:
+              type: array
+              items: { $ref: "#/components/schemas/TestimonialPublic" }
+
+    TestimonialPublic:
+      type: object
+      description: Only ever returned where hasPermission=true (BR-6.1)
+      properties:
+        authorName: { type: string }
+        authorRole: { type: string, nullable: true }
+        organization: { type: string, nullable: true }
+        quote: { type: string }
+
+    SystemAdmin:
+      allOf:
+        - $ref: "#/components/schemas/SystemPublicDetailed"
+        - type: object
+          properties:
+            contentStatus: { type: string, enum: [draft, published, archived] }
+            clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
+            clientApproved: { type: boolean }
+            needsCuration: { type: boolean }
+            sortOrder: { type: integer }
+
+    SystemCreateInput:
+      type: object
+      required: [name, slug, organizationId, statusId, description]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        organizationId: { type: string }
+        statusId: { type: string }
+        domainId: { type: string, nullable: true }
+        description: { type: string }
+        repoUrl: { type: string, nullable: true }
+        liveUrl: { type: string, nullable: true }
+        techStack: { type: array, items: { type: string } }
+        clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
+
+    SystemUpdateInput:
+      type: object
+      properties:
+        contentStatus: { type: string, enum: [draft, published, archived] }
+        clientApproved: { type: boolean }
+        isFlagship: { type: boolean }
+        sortOrder: { type: integer }
+        caseStudyBody: { type: string }
+
+    InquiryCreateInput:
+      type: object
+      required: [name, email, message, inquiryType]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string, format: email }
+        message: { type: string, minLength: 20, maxLength: 5000, description: "BR-2.3" }
+        inquiryType:
+          type: string
+          enum: [hire, partnership, service, contribution, recruitment, collaboration]
+        source: { type: string, nullable: true, description: "Captured automatically, not client-supplied (BR-2.5); \"direct\" when no Referer header is present" }
+        idempotencyKey: { type: string, format: uuid, nullable: true, description: "Optional; dedupes a resubmission within 10 minutes (BR-2.6)" }
+
+    InquiryConfirmation:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, example: "new" }
+        submittedAt: { type: string, format: date-time }
+
+    InquiryAdmin:
+      allOf:
+        - $ref: "#/components/schemas/InquiryConfirmation"
+        - type: object
+          properties:
+            name: { type: string }
+            email: { type: string }
+            message: { type: string }
+            inquiryType: { type: string }
+            source: { type: string, nullable: true }
+
+    TimelineEntry:
+      type: object
+      properties:
+        id: { type: string }
+        milestoneType: { type: string }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        date: { type: string, format: date }
+        tags: { type: array, items: { type: string } }
+
+    TimelineCreateInput:
+      type: object
+      required: [milestoneTypeId, title, date]
+      properties:
+        milestoneTypeId: { type: string }
+        title: { type: string, minLength: 1 }
+        description: { type: string, nullable: true }
+        date: { type: string, format: date }
+        media: { type: string, nullable: true }
+        tags: { type: array, items: { type: string }, default: [] }
+
+    ExperienceEntry:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        organization: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        description: { type: string }
+        skills: { type: array, items: { type: string } }
+
+    ExperienceInput:
+      type: object
+      required: [title, organization, startDate, description]
+      properties:
+        title: { type: string, minLength: 1 }
+        organization: { type: string, minLength: 1 }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        description: { type: string, minLength: 1 }
+        skillIds: { type: array, items: { type: string }, default: [] }
+
+    EducationEntry:
+      type: object
+      properties:
+        id: { type: string }
+        institution: { type: string }
+        qualification: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        honors: { type: string, nullable: true }
+
+    EducationInput:
+      type: object
+      required: [institution, qualification, startDate]
+      properties:
+        institution: { type: string, minLength: 1 }
+        qualification: { type: string, minLength: 1 }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        honors: { type: string, nullable: true }
+
+    SkillEntry:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        yearsExperience: { type: number, nullable: true }
+
+    SkillInput:
+      type: object
+      required: [name, categoryId]
+      properties:
+        name: { type: string, minLength: 1 }
+        categoryId: { type: string }
+        yearsExperience: { type: number, nullable: true }
+
+    FlagEntry:
+      type: object
+      properties:
+        id: { type: string }
+        key: { type: string }
+        enabled: { type: boolean }
+        notes: { type: string, nullable: true }
+
+    VisitorLensEntry:
+      type: object
+      properties:
+        id: { type: string }
+        key: { type: string }
+        label: { type: string }
+        priorityContent: { type: object }
+        aiFramingPrompt: { type: string }
+
+    VisitorLensInput:
+      type: object
+      required: [key, label, priorityContent, aiFramingPrompt]
+      properties:
+        key: { type: string, minLength: 1 }
+        label: { type: string, minLength: 1 }
+        priorityContent: { type: object }
+        aiFramingPrompt: { type: string, minLength: 1 }
+
+    ActivityLogEntry:
+      type: object
+      properties:
+        id: { type: string }
+        adminUserEmail: { type: string }
+        action: { type: string }
+        entityType: { type: string, nullable: true }
+        entityId: { type: string, nullable: true }
+        before: { type: object, nullable: true }
+        after: { type: object, nullable: true }
+        createdAt: { type: string, format: date-time }
