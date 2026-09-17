@@ -401,7 +401,11 @@ paths:
   /admin/auth/verify-2fa:
     post:
       tags: [Auth]
-      summary: Admin login step 2 — TOTP verification
+      summary: Admin login step 2 — TOTP or recovery code verification
+      description: >
+        `code` is either a 6-digit TOTP code or a recovery code (Design
+        System §5). 5 failed attempts against the same challengeToken
+        invalidates it (BR-3.6) rather than allowing continued guessing.
       requestBody:
         required: true
         content:
@@ -411,7 +415,7 @@ paths:
               required: [challengeToken, code]
               properties:
                 challengeToken: { type: string }
-                code: { type: string, minLength: 6, maxLength: 6 }
+                code: { type: string, minLength: 6, maxLength: 32 }
       responses:
         "200":
           description: Session established

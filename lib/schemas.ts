@@ -241,7 +241,11 @@ export const AdminLoginChallengeSchema = z.object({
 
 export const Verify2FAInputSchema = z.object({
   challengeToken: z.string(),
-  code: z.string().length(6).regex(/^\d{6}$/, "code must be 6 digits"),
+  // Either a 6-digit TOTP code or a recovery code (Design System §5 — "Use
+  // a recovery code instead" swaps to a single text field). The route
+  // handler distinguishes them by shape: exactly 6 digits is treated as a
+  // TOTP code, anything else is checked against the hashed recovery codes.
+  code: z.string().min(6).max(32),
 });
 
 export const SessionResultSchema = z.object({
