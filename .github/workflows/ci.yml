@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      # Generated Prisma Client types are needed for anything importing
+      # @prisma/client to typecheck/lint cleanly — no live DB connection
+      # required for `prisma generate` itself.
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: malulekeks_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npx playwright install --with-deps chromium
+      # 70/20/10 unit/integration/E2E per Constitution §2 — a single script
+      # composing all three so CI has one gate, not three separately maintained ones.
+      - run: npm run test
+
+  migration-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: malulekeks_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Verify migrations are additive-only (BR-8.1 / Constitution EXT-1)
+        run: npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url $DATABASE_URL --exit-code
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
+      - run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
+
+  ai-eval:
+    runs-on: ubuntu-latest
+    # Gates any change touching the concierge system prompt or grounding data.
+    # Constitution §6 — a failing eval blocks merge exactly like a failing unit test.
+    # `changed_files` is not a real Actions context field — path detection
+    # needs an actual diff, hence the paths-filter step below gating the job.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: ai-paths
+        with:
+          filters: |
+            ai:
+              - 'lib/ai/**'
+              - 'lib/prompts/**'
+      - uses: actions/setup-node@v4
+        if: steps.ai-paths.outputs.ai == 'true'
+        with:
+          node-version: "20"
+          cache: "npm"
+      - if: steps.ai-paths.outputs.ai == 'true'
+        run: npm ci
+      # Placeholder until the EvalCase fixture set and runner exist (V1.1,
+      # Constitution §6) — wired here now so the gate is in place from day one
+      # rather than bolted on after the concierge ships.
+      - if: steps.ai-paths.outputs.ai == 'true'
+        run: npm run test:ai-evals
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  build:
+    needs: [lint, test, migration-check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build

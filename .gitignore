@@ -1,0 +1,26 @@
+# Dependencies
+/node_modules
+
+# Next.js
+/.next/
+/out/
+
+# Env — real secrets never committed (.env.example is the template)
+.env
+.env.local
+.env.*.local
+
+# Prisma
+/prisma/dev.db
+
+# Testing
+/coverage
+/playwright-report
+/test-results
+
+# Misc
+.DS_Store
+*.pem
+npm-debug.log*
+.vercel
+*.tsbuildinfo

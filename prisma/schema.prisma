@@ -1,0 +1,365 @@
+// MALULEKE-KS Platform — Prisma Schema
+// Derives from PLATFORM-CONSTITUTION-v1.md §3
+// Enforces BR-1.x through BR-8.x at the database-constraint level where possible;
+// remaining business rules are enforced at the API layer (see openapi-contract.yaml).
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector, pgcrypto]
+}
+
+// ============================================================
+// AUTH & ACCESS
+// ============================================================
+
+model AdminUser {
+  id               String    @id @default(cuid())
+  email            String    @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
+  passwordHash     String
+  role             String    @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
+  twoFactorSecret  String? // encrypted at rest with TWO_FACTOR_ENCRYPTION_KEY, not plaintext
+  twoFactorEnabled Boolean   @default(false)
+  recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime? // BR-3.2
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  activityLogs     ActivityLog[]
+  loginChallenges  LoginChallenge[]
+
+  @@index([email])
+}
+
+model LoginChallenge {
+  // Bridges step-1 (credentials) and step-2 (TOTP) of admin login.
+  // Short-lived and single-use by design (BR-3.5, BR-3.6) — this table is
+  // pruned continuously and is never part of the 24-month retention policy.
+  id            String    @id @default(cuid())
+  tokenHash     String    @unique // the challengeToken is never stored raw
+  adminUserId   String
+  adminUser     AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  attempts      Int       @default(0) // BR-3.6 — invalidated at 5
+  consumedAt    DateTime? // set on first verify attempt, success or failure (BR-3.5)
+  expiresAt     DateTime  // issuedAt + 5 minutes (BR-3.5)
+  createdAt     DateTime  @default(now())
+
+  @@index([expiresAt])
+}
+
+model RateLimitEntry {
+  // Generic short-window rate-limit ledger (BR-2.4 inquiries, BR-3.2/3.6 auth).
+  // Deliberately its own table with its own short retention, separate from
+  // Inquiry/Event's 24-month policy — an IP address here is kept only as
+  // long as the relevant window requires (BR-2.4).
+  id         String   @id @default(cuid())
+  bucketKey  String   // e.g. "inquiry:ip:203.0.113.4" or "login2fa:challenge:<id>"
+  windowEnd  DateTime // entry is inert/prunable once now() > windowEnd
+  count      Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@unique([bucketKey, windowEnd])
+  @@index([windowEnd])
+}
+
+model ActivityLog {
+  id          String    @id @default(cuid())
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id])
+  action      String    // "system.update" | "auth.login" | "auth.login_failed" | ... (BR-3.4)
+  entityType  String?
+  entityId    String?
+  before      Json?
+  after       Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([adminUserId, createdAt])
+  @@index([entityType, entityId])
+}
+
+// ============================================================
+// ORGANIZATIONS & SYSTEMS
+// ============================================================
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  role      String?  // "Founder" | "Co-founder"
+  isClient  Boolean  @default(false) // drives BR-1.2 default at System creation time only — never retroactive
+  // Optional override for GitHub org/user login names that don't slugify to
+  // this Organization's slug (e.g. GitHub login "MALULEKE-KS" -> this row's
+  // slug "personal"). github-sync.ts checks this before falling back to
+  // slugify(githubLogin) == slug.
+  githubLogins String[] @default([])
+  systems   System[]
+  createdAt DateTime @default(now())
+}
+
+model Status {
+  id         String   @id @default(cuid())
+  key        String   @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
+  label      String
+  colorToken String   // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
+                       // New Status values carry their own color as data (this field), so
+                       // a new admin-added status never needs a component code change (EXT-1).
+  active     Boolean  @default(true) // BR-8.2 soft-deprecation
+  systems    System[]
+}
+
+model Domain {
+  id      String   @id @default(cuid())
+  key     String   @unique
+  label   String
+  active  Boolean  @default(true)
+  systems System[]
+}
+
+enum ClientVisibility {
+  PUBLIC
+  REQUIRES_APPROVAL
+  NDA_RESTRICTED
+  ANONYMIZED_ONLY
+  // Deliberately an enum, not a lookup table — a fixed compliance state
+  // machine, not a growing content dimension (Constitution §1, EXT-1 exception).
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  // Same exception as ClientVisibility — see BR-1.5.
+}
+
+model System {
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  // Stable GitHub identity, independent of name/slug — used to match an
+  // existing System across a repo rename instead of matching by slugify(name),
+  // which would otherwise create a duplicate row on every rename.
+  githubRepoId     Int?              @unique
+  organizationId   String
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  statusId         String
+  status           Status            @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  domainId         String?
+  domain           Domain?           @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  description      String
+  repoUrl          String?
+  liveUrl          String?
+  techStack        String[]
+  isFlagship       Boolean           @default(false)
+  sortOrder        Int               @default(0)
+  clientVisibility ClientVisibility  @default(PUBLIC) // BR-1.2 default is applied in app logic on create
+  clientApproved   Boolean           @default(false)
+  contentStatus    ContentStatus     @default(DRAFT)  // BR-1.6: sync-created rows always start here
+  needsCuration    Boolean           @default(false)  // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
+  // No delete endpoint exists for System anywhere in the contract — retirement
+  // is always contentStatus = ARCHIVED (BR-1.9). Rows are never hard-deleted.
+  caseStudyBody    String?           // MDX
+  impacts          Impact[]
+  testimonials     Testimonial[]
+  skills           SkillOnSystem[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([contentStatus])
+  @@index([organizationId])
+  @@index([domainId])
+}
+
+model Impact {
+  id        String @id @default(cuid())
+  systemId  String
+  system    System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  label     String // "Audit findings closed"
+  value     String // "58"
+  sortOrder Int    @default(0)
+}
+
+model Testimonial {
+  id            String   @id @default(cuid())
+  systemId      String?
+  system        System?  @relation(fields: [systemId], references: [id], onDelete: SetNull) // a testimonial outlives the (archived, never deleted) System it praised
+  authorName    String
+  authorRole    String?
+  organization  String?
+  quote         String
+  hasPermission Boolean  @default(false) // BR-6.1 — absolute gate, checked at read time
+  createdAt     DateTime @default(now())
+}
+
+// ============================================================
+// CAREER & ACADEMIC RECORD
+// ============================================================
+
+model MilestoneType {
+  id              String     @id @default(cuid())
+  key             String     @unique // "education" | "job" | "launch" | "achievement" | "personal"
+  label           String
+  active          Boolean    @default(true)
+  timelineEntries Timeline[]
+}
+
+model Timeline {
+  id              String        @id @default(cuid())
+  milestoneTypeId String
+  milestoneType   MilestoneType @relation(fields: [milestoneTypeId], references: [id])
+  title           String
+  description     String?
+  date            DateTime
+  media           String?
+  tags            String[]
+  createdAt       DateTime      @default(now())
+
+  @@index([date])
+}
+
+model Experience {
+  id           String              @id @default(cuid())
+  title        String
+  organization String
+  startDate    DateTime
+  endDate      DateTime?
+  description  String
+  skills       SkillOnExperience[]
+}
+
+model Education {
+  id            String    @id @default(cuid())
+  institution   String
+  qualification String
+  startDate     DateTime
+  endDate       DateTime?
+  honors        String?
+}
+
+model SkillCategory {
+  id     String  @id @default(cuid())
+  key    String  @unique
+  label  String
+  active Boolean @default(true)
+  skills Skill[]
+}
+
+model Skill {
+  id              String              @id @default(cuid())
+  name            String              @unique
+  categoryId      String
+  category        SkillCategory       @relation(fields: [categoryId], references: [id])
+  yearsExperience Float?
+  systems         SkillOnSystem[]
+  experiences     SkillOnExperience[]
+}
+
+model SkillOnSystem {
+  skillId  String
+  systemId String
+  skill    Skill  @relation(fields: [skillId], references: [id], onDelete: Restrict) // an in-use Skill can't be deleted, same discipline as BR-8.2
+  system   System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, systemId])
+}
+
+model SkillOnExperience {
+  skillId      String
+  experienceId String
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, experienceId])
+}
+
+model DocumentGen {
+  id          String   @id @default(cuid())
+  type        String   // "cv" | "resume-tailored"
+  targetRole  String?
+  generatedAt DateTime @default(now()) // BR-7.1 — always reflects live data at this timestamp
+  fileUrl     String
+  supersededByFileUrl String? // BR-7.2 — prior versions kept, not deleted
+}
+
+// ============================================================
+// VISITOR INTAKE
+// ============================================================
+
+model InquiryType {
+  id        String    @id @default(cuid())
+  key       String    @unique // hire | partnership | service | contribution | recruitment | collaboration
+  label     String
+  active    Boolean   @default(true)
+  inquiries Inquiry[]
+}
+
+enum InquiryStatus {
+  NEW
+  REVIEWED
+  RESPONDED
+  CLOSED
+  // Fixed workflow state machine — sequential transitions enforced in app logic (BR-2.1)
+}
+
+model Inquiry {
+  id             String        @id @default(cuid())
+  inquiryTypeId  String
+  inquiryType    InquiryType   @relation(fields: [inquiryTypeId], references: [id])
+  name           String
+  email          String
+  message        String        // BR-2.3: 20-5000 chars, enforced in lib/schemas.ts
+  source         String?       // captured server-side only; "direct" when no Referer (BR-2.5)
+  status         InquiryStatus @default(NEW)
+  idempotencyKey String?       @unique // BR-2.6 — dedupes a resubmit within the client-held window
+  createdAt      DateTime      @default(now())
+
+  @@index([status, createdAt])
+}
+
+// ============================================================
+// VISITOR SEGMENTATION, AI, ANALYTICS
+// ============================================================
+
+model VisitorLens {
+  id              String @id @default(cuid())
+  key             String @unique // "recruiter" | "client-fintech" | "academic" | ...
+  label           String
+  priorityContent Json
+  aiFramingPrompt String
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  eventType  String   // "page_view" | "system_viewed" | "concierge_message" | "resume_downloaded"
+  entityType String?
+  entityId   String?
+  sessionId  String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([eventType, createdAt])
+  @@index([sessionId])
+}
+
+model ContentChunk {
+  id         String                    @id @default(cuid())
+  entityType String                    // "system" | "timeline" | "skill" | "document"
+  entityId   String
+  content    String
+  embedding  Unsupported("vector(1536)")
+  createdAt  DateTime                  @default(now())
+
+  @@index([entityType, entityId])
+}
+
+model Flag {
+  id      String  @id @default(cuid())
+  key     String  @unique
+  enabled Boolean @default(false) // BR-4.4 — new tools/lenses ship disabled by default
+  notes   String?
+}

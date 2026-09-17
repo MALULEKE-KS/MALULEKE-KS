@@ -1,0 +1,183 @@
+/* app/globals.css */
+/* Custom CSS handles exactly what Tailwind utilities can't: timed animation,
+   print output, and small signature details. Everything else — layout,
+   spacing, responsive states, the corner-bracket hover — stays in Tailwind
+   utility classes in the components themselves. See DESIGN-SYSTEM.md §7. */
+
+/* Tailwind v4 — single import replaces the old @tailwind base/components/utilities
+   trio. @config bridges to the existing tailwind.config.ts (JS/TS config
+   compatibility mode) so the already-reviewed color/font/radius tokens and
+   the tailwindcss-animate plugin keep working unchanged rather than being
+   rewritten into v4's CSS-first @theme syntax. */
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* ---- Design tokens as CSS custom properties ----
+   Mirrors tailwind.config.ts. Exists so components can bind a token to real
+   data at runtime (e.g. a status color set from the actual Status value)
+   without reaching for arbitrary Tailwind values scattered through JSX. */
+:root {
+  --color-ink: #0f1729;
+  --color-paper: #f5f7fa;
+  --color-slate: #3d4a5c;
+  --color-accent: #906722; /* corrected from #c08a2e — see DESIGN-SYSTEM.md §1 */
+  --color-signal-finished: #1f6f5c;
+  --color-signal-progress: #906722;
+  --color-signal-planned: #5a6470; /* corrected from #6b7684 */
+  --color-critical: #9b3a2e;
+
+  /* ---- shadcn/ui semantic tokens (HSL triplets, no hsl() wrapper — that's
+     applied in tailwind.config.ts) ----
+     Mapped to the palette above, not shadcn's own default gray/blue, so any
+     component installed later via the CLI inherits this design system
+     instead of looking generic. Values are the HSL equivalents of the hex
+     tokens above (ink/paper/slate/accent/critical). */
+  --background: 210 33% 97%; /* paper */
+  --foreground: 222 46% 11%; /* ink */
+  --border: 215 20% 30%; /* slate */
+  --input: 215 20% 30%; /* slate */
+  --ring: 38 62% 35%; /* accent */
+  --primary: 222 46% 11%; /* ink */
+  --primary-foreground: 210 33% 97%; /* paper */
+  --secondary: 215 20% 30%; /* slate */
+  --secondary-foreground: 210 33% 97%; /* paper */
+  --muted: 215 20% 90%;
+  --muted-foreground: 215 20% 30%; /* slate */
+  --destructive: 7 54% 39%; /* critical */
+  --destructive-foreground: 210 33% 97%; /* paper */
+  --radius: 2px; /* Design System §3 — sharp corners, never the rounded-card treatment */
+}
+
+/* ---- Ledger hero: blinking caret ----
+   The typewriter sequencing itself lives in React (useTypewriterLines) so it
+   can respect real data and prefers-reduced-motion reliably. The caret is a
+   pure visual detail — CSS owns it. */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.ledger-caret {
+  display: inline-block;
+  width: 0.55ch;
+  margin-left: 2px;
+  background-color: var(--color-accent);
+  animation: caret-blink 0.85s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ledger-caret {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ---- Scale figure: self-drawing line art ----
+   The architectural "scale figure" convention, rendered as ink-only stroke
+   art that draws itself in once, synced to LedgerHero's typewriter duration
+   via the --draw-duration custom property set in ScaleFigure.tsx (Design
+   System §7). stroke-dasharray/-dashoffset is a pure-CSS technique — no
+   JS-driven per-frame animation needed once the duration is known, which is
+   exactly the kind of timed, sequenced effect this file (not Tailwind) owns
+   per the split established in Design System §7's introduction. */
+.scale-figure-stroke {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.scale-figure-draw {
+  stroke-dasharray: var(--path-length, 200);
+  stroke-dashoffset: var(--path-length, 200);
+  animation: scale-figure-draw-in var(--draw-duration, 1800ms) ease-out forwards;
+  animation-delay: var(--draw-delay, 0ms);
+}
+
+@keyframes scale-figure-draw-in {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scale-figure-draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- Signature small details ---- */
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-paper);
+}
+
+/* A thin, functional scrollbar rather than the browser default — restrained,
+   not decorative, consistent with the drafting-table layout language. */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate);
+  border: 2px solid var(--color-paper);
+}
+
+/* Rule citations (BR-1.1, EXT-1) get a functional underline distinct from a
+   normal hyperlink — a dashed baseline, evoking an engineering-drawing
+   annotation line rather than a web link. */
+.rule-citation {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--color-slate);
+}
+.rule-citation:hover,
+.rule-citation:focus-visible {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ---- Print: /cv only ----
+   Constitution §9 — the CV needs a working print/PDF output independent of
+   the rest of the site's visual language. Ink-only, dense, no brass accent,
+   no navigation, no hero. This is a print-cascade concern Tailwind's
+   utility model has no equivalent for. */
+@media print {
+  nav,
+  .ledger-hero,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 11pt;
+  }
+
+  .cv-page {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  * {
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+}
