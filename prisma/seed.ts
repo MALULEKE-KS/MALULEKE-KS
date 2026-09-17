@@ -164,6 +164,23 @@ async function main() {
     },
   });
 
+  // --- Experience ---
+  // Drives the homepage LedgerHero's "years building" figure (real data,
+  // never hardcoded — Design System §7). No natural unique key on
+  // Experience, so this is a find-then-create rather than an upsert, kept
+  // idempotent by checking first.
+  const hasExperience = await prisma.experience.findFirst();
+  if (!hasExperience) {
+    await prisma.experience.create({
+      data: {
+        title: "Founder & Principal Engineer",
+        organization: "KSDRILL-SA",
+        startDate: new Date("2025-01-01"),
+        description: "Full-stack and AI systems engineering across fintech, GovTech, and enterprise automation.",
+      },
+    });
+  }
+
   // --- Feature flags — all Tier 2 agent tools and V1.1 capabilities ship disabled (BR-4.4) ---
   await Promise.all(
     [
