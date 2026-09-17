@@ -19,7 +19,7 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
 
   return (
     <section className="px-6 py-16 max-w-5xl mx-auto">
-      <h1 className="font-sans text-2xl text-ink mb-6">Systems</h1>
+      <h1 className="font-sans font-semibold text-2xl text-ink mb-6">Systems</h1>
       <Suspense fallback={<SystemsGridSkeleton />}>
         <SystemsResults searchParams={params} />
       </Suspense>

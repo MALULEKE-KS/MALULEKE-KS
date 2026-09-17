@@ -52,9 +52,15 @@ export async function SystemsResults({ searchParams: params }: SystemsResultsPro
 
       {systems.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="font-sans text-ink mb-4">No systems match these filters.</p>
+          {/* Voice consistent with the ledger/audit-log metaphor established
+              on the homepage ("SYSTEM LOG") — plainly stated, not apologetic
+              (Design System §4: "errors and empty states speak plainly"). */}
+          <p className="font-mono text-sm text-slate mb-1">SYSTEM LOG</p>
+          <p className="font-sans text-ink mb-4">
+            {hasFilters ? "No entries logged for this query." : "No systems logged yet."}
+          </p>
           {hasFilters && (
-            <Link href="/systems" className="font-mono text-sm text-accent underline underline-offset-2">
+            <Link href="/systems" className="rule-citation text-sm">
               Clear filters
             </Link>
           )}

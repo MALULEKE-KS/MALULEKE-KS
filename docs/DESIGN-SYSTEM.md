@@ -40,6 +40,35 @@ Built on the IBM Plex superfamily — chosen because it was designed by an engin
 
 Line length under 80 characters on body copy. No all-caps labels anywhere — sentence case throughout, including nav and buttons.
 
+### 2a. Type scale
+
+A named scale, not ad hoc font-size choices per component. Every text size on the site maps to one of these — if a new size feels needed, that's a signal to reconsider the layout, not to reach for an arbitrary value.
+
+| Token | Tailwind | Size | Role |
+|---|---|---|---|
+| `micro` | `text-xs` | 12px | Mono identifiers, margin annotations, rule citations, status badges |
+| `small` | `text-sm` | 14px | Filter labels, secondary metadata, captions |
+| `body` | `text-base` | 16px | Default UI text, form inputs |
+| `card-title` | `text-lg` | 18px | SystemCard name, list item titles |
+| `subhead` | `text-xl` | 20px | Section subheadings within a page |
+| `page-title` | `text-2xl` | 24px | Catalog/index page `<h1>` |
+| `feature-title` | `text-3xl` | 30px | Case study / detail page `<h1>` |
+| `hero` | `text-4xl` | 36px | Homepage ledger hero only |
+
+### 2b. Spacing rhythm
+
+A 4px-based scale (Tailwind's default step values), with a fixed, named subset used everywhere — not the full range picked ad hoc per component.
+
+| Token | Tailwind | Size | Role |
+|---|---|---|---|
+| `micro` | `1` / `2` | 4–8px | Icon-to-label gaps, inline chip padding |
+| `tight` | `3` | 12px | Related-item gaps (chips, inline metadata) |
+| `default` | `4` | 16px | Component internal padding, form field gaps |
+| `loose` | `6` | 24px | Card padding, gaps between related blocks |
+| `section` | `8` | 32px | Gaps between distinct content blocks on a page |
+| `major` | `12` | 48px | Gaps between major page regions |
+| `page` | `16` | 64px | Page top/bottom padding |
+
 ## 3. Layout
 
 Left-aligned, not centered — a drafting-table reading order, not a marketing-page one. A narrow annotation column on wide viewports carries rule citations and metadata as literal margin notes (collapses to inline badges under 768px).
@@ -64,6 +93,12 @@ Left-aligned, not centered — a drafting-table reading order, not a marketing-p
 Section dividers are hairline rules with a left border-accent bar, not rounded cards with drop shadows. Numbered sequence markers (01, 02, 03) are used exactly twice on the whole site — the Build Phases (0→3) and rule citations — because that content genuinely is a sequence; nowhere else.
 
 Motion: one deliberate moment on the homepage — the hero fact "types out" once on load, like a line being logged, then stops. No hover-fade-in on every card, no scroll-triggered reveal per section.
+
+### 3a. The margin-annotation mechanic
+
+A single reusable pattern (`components/shared/MarginAnnotations.tsx`), not a per-page improvisation. On viewports ≥768px, real metadata — organization, domain, dates, rule citations — renders in a narrow (`w-40`/160px) right-hand column, vertically aligned with the content it annotates, in `micro` scale mono type with a hairline left border (`border-l border-slate/20`) separating it from the body content. Below 768px, the same data collapses into an inline row of badges directly under the heading it would have annotated — same information, no column, since there's no margin to put it in.
+
+This is the mechanism, not decoration: every annotation is real data (an actual domain, an actual date, an actual rule ID) — never a label invented to fill the column. A page with nothing worth annotating simply doesn't render the column rather than padding it with filler.
 
 ## 4. Principles
 

@@ -2,7 +2,13 @@
 // Colocated — only used on /systems. Writes filters to URL query params
 // (docs/PAGE-SPECIFICATIONS.md: "filters write to URL query params — the
 // filtered view is a shareable link, not throwaway client state").
-// Mono labels per Design System §2, not icons standing in for text.
+//
+// Deliberately not a row of boxed generic-SaaS <select> elements — each
+// filter is a mono label + an underline-only control, reusing the same
+// dashed-underline-to-accent interaction language already established for
+// rule citations (globals.css .rule-citation), rather than inventing a
+// third, unrelated interaction style. Reads as a query line on a spec
+// sheet, not a form.
 
 "use client";
 
@@ -17,6 +23,37 @@ interface SystemsFilterBarProps {
   organizations: { slug: string; name: string }[];
   domains: FilterOption[];
   statuses: FilterOption[];
+}
+
+function FilterField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="flex items-center gap-2 border-b border-slate/30 focus-within:border-accent pb-1 min-w-0">
+      <span className="font-mono text-xs text-slate shrink-0">{label}</span>
+      <select
+        aria-label={`Filter by ${label}`}
+        className="font-mono text-sm bg-transparent text-ink outline-none min-w-0 py-1.5 flex-1"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">All</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 export function SystemsFilterBar({ organizations, domains, statuses }: SystemsFilterBarProps) {
@@ -35,58 +72,38 @@ export function SystemsFilterBar({ organizations, domains, statuses }: SystemsFi
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const selectClassName =
-    "font-mono text-sm border border-slate/30 bg-paper px-2 py-1 text-ink outline-none focus:border-ink";
+  const hasFilters = Boolean(
+    searchParams.get("organization") || searchParams.get("domain") || searchParams.get("status")
+  );
 
   return (
-    <div className="flex flex-wrap gap-3 border-b border-slate/20 pb-4 mb-6">
-      <select
-        aria-label="Filter by organization"
-        className={selectClassName}
-        value={searchParams.get("organization") ?? ""}
-        onChange={(e) => setFilter("organization", e.target.value)}
-      >
-        <option value="">All organizations</option>
-        {organizations.map((org) => (
-          <option key={org.slug} value={org.slug}>
-            {org.name}
-          </option>
-        ))}
-      </select>
+    <div className="border-t border-b border-slate/20 py-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4">
+        <FilterField
+          label="organization"
+          value={searchParams.get("organization") ?? ""}
+          onChange={(v) => setFilter("organization", v)}
+          options={organizations.map((org) => ({ value: org.slug, label: org.name }))}
+        />
+        <FilterField
+          label="domain"
+          value={searchParams.get("domain") ?? ""}
+          onChange={(v) => setFilter("domain", v)}
+          options={domains.map((d) => ({ value: d.key, label: d.label }))}
+        />
+        <FilterField
+          label="status"
+          value={searchParams.get("status") ?? ""}
+          onChange={(v) => setFilter("status", v)}
+          options={statuses.map((s) => ({ value: s.key, label: s.label }))}
+        />
+      </div>
 
-      <select
-        aria-label="Filter by domain"
-        className={selectClassName}
-        value={searchParams.get("domain") ?? ""}
-        onChange={(e) => setFilter("domain", e.target.value)}
-      >
-        <option value="">All domains</option>
-        {domains.map((domain) => (
-          <option key={domain.key} value={domain.key}>
-            {domain.label}
-          </option>
-        ))}
-      </select>
-
-      <select
-        aria-label="Filter by status"
-        className={selectClassName}
-        value={searchParams.get("status") ?? ""}
-        onChange={(e) => setFilter("status", e.target.value)}
-      >
-        <option value="">All statuses</option>
-        {statuses.map((status) => (
-          <option key={status.key} value={status.key}>
-            {status.label}
-          </option>
-        ))}
-      </select>
-
-      {(searchParams.get("organization") || searchParams.get("domain") || searchParams.get("status")) && (
+      {hasFilters && (
         <button
           type="button"
           onClick={() => router.push(pathname)}
-          className="font-mono text-sm text-slate underline underline-offset-2"
+          className="rule-citation text-sm mt-4 inline-block"
         >
           Clear filters
         </button>
