@@ -55,7 +55,10 @@ export type SystemWithPublicDetailRelations = Prisma.SystemGetPayload<
 // rather than a bare "a client", per the business rule's own example.
 function publicOrganizationName(system: SystemWithPublicRelations): string {
   if (system.clientVisibility === "ANONYMIZED_ONLY" && !system.nameDisclosureApproved) {
-    return system.domain ? `a ${system.domain.label.toLowerCase()} client` : "a client";
+    if (!system.domain) return "a client";
+    const label = system.domain.label.toLowerCase();
+    const article = /^[aeiou]/.test(label) ? "an" : "a";
+    return `${article} ${label} client`;
   }
   return system.organization.name;
 }
@@ -79,6 +82,11 @@ export function toPublicSystem(system: SystemWithPublicRelations) {
     slug: system.slug,
     organization: publicOrganizationName(system),
     status: system.status.label,
+    // Status color is data, not code (EXT-1 — see Status.colorToken,
+    // seeded per key). Exposed alongside the label so any renderer — this
+    // app's own SystemCard, or a future external consumer of this same
+    // public JSON — can render the status color without a hardcoded map.
+    statusColorToken: system.status.colorToken,
     domain: system.domain?.label ?? null,
     description: system.description,
     repoUrl: publicRepoUrl(system),
