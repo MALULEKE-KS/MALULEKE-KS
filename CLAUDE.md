@@ -44,6 +44,13 @@ npx prisma migrate dev    # apply schema changes — additive only, see BR-8.2 d
 npx prisma db seed        # seed lookup tables, orgs, feature flags
 ```
 
+## Local database setup
+
+Two options — pick whichever is already working for you, neither is required over the other:
+
+- **Docker (easier)**: `docker compose up -d` starts Postgres with `pgvector` already built in (`docker-compose.yml`, same image proven in CI). Set `DATABASE_URL` in `.env.local` to `postgresql://malulekeks:malulekeks_dev@localhost:5432/malulekeks?schema=public` (or match whatever host port you mapped it to), then run the commands above.
+- **Native Postgres**: works too, but `pgvector` has no prebuilt Windows binaries — it must be compiled from source (Visual Studio Build Tools + `nmake`, following [pgvector's own Windows build docs](https://github.com/pgvector/pgvector#windows)). Docker sidesteps this entirely, which is why it's the easier default for a fresh clone.
+
 ## Non-negotiables when implementing
 
 - BR-1.1: publishing blocked server-side when `clientApproved=false` and `clientVisibility != PUBLIC` — never a client-side-only check.
