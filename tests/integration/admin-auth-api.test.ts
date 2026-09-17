@@ -42,6 +42,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // If beforeAll threw before assigning adminId, there's nothing to clean
+  // up — without this guard, the cleanup itself throws a second,
+  // confusingly different error that obscures the real failure above it.
+  if (!adminId) return;
   await db.loginChallenge.deleteMany({ where: { adminUserId: adminId } });
   await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
   await db.adminUser.delete({ where: { id: adminId } });
