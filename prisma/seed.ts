@@ -95,6 +95,75 @@ async function main() {
     )
   );
 
+  // --- Systems ---
+  // A small, real set for local dev/testing until the GitHub sync job has a
+  // real token to run against. Deliberately covers three BR-1.x states:
+  // plain public, ANONYMIZED_ONLY+approved (exercises the org-name masking
+  // in lib/rules/publishing.ts), and an unpublished draft (exercises the
+  // published-only filter / generic-404 behavior).
+  const ksdrillSa = await prisma.organization.findUniqueOrThrow({ where: { slug: "ksdrill-sa" } });
+  const sunduza = await prisma.organization.findUniqueOrThrow({ where: { slug: "sunduza" } });
+  const growthcore = await prisma.organization.findUniqueOrThrow({ where: { slug: "growthcore-solutions" } });
+  const finishedStatus = await prisma.status.findUniqueOrThrow({ where: { key: "finished" } });
+  const inProgressStatus = await prisma.status.findUniqueOrThrow({ where: { key: "in_progress" } });
+  const fintechDomain = await prisma.domain.findUniqueOrThrow({ where: { key: "fintech" } });
+  const architectureDomain = await prisma.domain.findUniqueOrThrow({ where: { key: "architecture" } });
+  const edtechDomain = await prisma.domain.findUniqueOrThrow({ where: { key: "edtech" } });
+
+  await prisma.system.upsert({
+    where: { slug: "xkimm-xa-mali" },
+    update: {},
+    create: {
+      name: "Xkimm Xa Mali",
+      slug: "xkimm-xa-mali",
+      organizationId: ksdrillSa.id,
+      statusId: finishedStatus.id,
+      domainId: fintechDomain.id,
+      description: "A private savings collective platform, built for real money and real family stakes.",
+      isFlagship: true,
+      clientVisibility: "PUBLIC",
+      contentStatus: "PUBLISHED",
+    },
+  });
+
+  await prisma.system.upsert({
+    where: { slug: "sunduza-case-study" },
+    update: {},
+    create: {
+      name: "Sunduza Case Study",
+      slug: "sunduza-case-study",
+      organizationId: sunduza.id,
+      statusId: finishedStatus.id,
+      domainId: architectureDomain.id,
+      description: "Architectural and project management systems for a construction client.",
+      isFlagship: false,
+      // ANONYMIZED_ONLY + clientApproved=true (required to publish at all,
+      // BR-1.1) + nameDisclosureApproved=false (default): publishable, but
+      // the organization name still masks to a generic label (BR-1.4) — a
+      // deliberately separate authorization from clientApproved.
+      clientVisibility: "ANONYMIZED_ONLY",
+      clientApproved: true,
+      nameDisclosureApproved: false,
+      contentStatus: "PUBLISHED",
+    },
+  });
+
+  await prisma.system.upsert({
+    where: { slug: "fundslink-academy" },
+    update: {},
+    create: {
+      name: "FundsLink-Academy",
+      slug: "fundslink-academy",
+      organizationId: growthcore.id,
+      statusId: inProgressStatus.id,
+      domainId: edtechDomain.id,
+      description: "In-progress EdTech platform — not yet published.",
+      isFlagship: false,
+      clientVisibility: "PUBLIC",
+      contentStatus: "DRAFT",
+    },
+  });
+
   // --- Feature flags — all Tier 2 agent tools and V1.1 capabilities ship disabled (BR-4.4) ---
   await Promise.all(
     [

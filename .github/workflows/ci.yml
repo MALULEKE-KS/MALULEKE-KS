@@ -48,6 +48,10 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npx prisma migrate deploy
+      # Direct tsx invocation, not `npm run db:seed` — that script wraps with
+      # `dotenv -e .env.local`, which doesn't exist in CI. The job's own
+      # `env:` block above already provides DATABASE_URL directly.
+      - run: npx tsx prisma/seed.ts
       - run: npx playwright install --with-deps chromium
       # 70/20/10 unit/integration/E2E per Constitution §2 — a single script
       # composing all three so CI has one gate, not three separately maintained ones.
