@@ -69,6 +69,16 @@ describe("toPublicSystem", () => {
     expect(result.organization).toBe("a fintech client");
   });
 
+  it("uses \"an\" instead of \"a\" for a vowel-starting domain label", () => {
+    const result = toPublicSystem(
+      makeSystem({
+        clientVisibility: "ANONYMIZED_ONLY",
+        domain: { id: "domain_2", key: "architecture", label: "Architecture & Construction", active: true },
+      })
+    );
+    expect(result.organization).toBe("an architecture & construction client");
+  });
+
   it("keeps the organization name masked even when clientApproved=true (the publish-gate flag)", () => {
     const result = toPublicSystem(
       makeSystem({ clientVisibility: "ANONYMIZED_ONLY", clientApproved: true, nameDisclosureApproved: false })

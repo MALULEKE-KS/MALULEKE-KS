@@ -88,6 +88,7 @@ export const SystemPublicSchema = z.object({
   slug: z.string(),
   organization: z.string(),
   status: z.string(),
+  statusColorToken: z.string(),
   domain: z.string().nullable(),
   description: z.string(),
   // Null enforced server-side whenever clientVisibility = NDA_RESTRICTED (BR-1.3)

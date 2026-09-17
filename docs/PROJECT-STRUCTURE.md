@@ -122,6 +122,7 @@ malulekeks/
 │           ├── systems/
 │           │   ├── route.ts
 │           │   └── [slug]/route.ts
+│           ├── organizations/route.ts
 │           ├── inquiries/route.ts
 │           ├── lookups/[type]/route.ts
 │           ├── admin/
