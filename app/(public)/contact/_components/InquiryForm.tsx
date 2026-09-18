@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { INQUIRY_TYPES } from "@/lib/content/inquiry";
+import { OWNER } from "@/lib/content/sheets";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
 
 
@@ -74,7 +75,16 @@ export function InquiryForm() {
   if (state === "success") {
     return (
       <div className="border-t border-slate/20 pt-6">
-        <p className="font-sans text-ink">Received. I&rsquo;ll get back to you within 48 hours.</p>
+        {/* BR-2.2: every inquiry is reviewed within 48 hours — a review, not
+            a promised reply. BR-5.5: the removal route is stated here. */}
+        <p className="font-sans text-ink">Received. I review every inquiry within 48 hours.</p>
+        <p className="mt-2 font-sans text-sm text-slate">
+          To request removal of this submission, email{" "}
+          <a className="underline underline-offset-4" href={`mailto:${OWNER.email}`}>
+            {OWNER.email}
+          </a>
+          .
+        </p>
       </div>
     );
   }
