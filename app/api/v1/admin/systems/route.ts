@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       description: parsed.data.description,
       repoUrl: parsed.data.repoUrl ?? null,
       liveUrl: parsed.data.liveUrl ?? null,
+      screenshotUrl: parsed.data.screenshotUrl ?? null,
       techStack: parsed.data.techStack,
       // BR-1.2 — never trusts the request body's clientVisibility directly
       // when the org is a client.

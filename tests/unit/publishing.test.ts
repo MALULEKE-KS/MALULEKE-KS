@@ -28,6 +28,7 @@ function makeSystem(overrides: Partial<SystemWithPublicRelations> = {}): SystemW
     description: "A description.",
     repoUrl: "https://github.com/example/repo",
     liveUrl: "https://example.com",
+    screenshotUrl: "https://example.com/screenshot.png",
     techStack: ["TypeScript"],
     isFlagship: false,
     sortOrder: 0,
@@ -50,18 +51,25 @@ describe("toPublicSystem", () => {
     expect(result.liveUrl).toBe("https://example.com");
   });
 
-  it("hides repoUrl/liveUrl for an NDA_RESTRICTED system (BR-1.3)", () => {
+  it("hides repoUrl/liveUrl/screenshotUrl for an NDA_RESTRICTED system (BR-1.3)", () => {
     const result = toPublicSystem(makeSystem({ clientVisibility: "NDA_RESTRICTED" }));
     expect(result.repoUrl).toBeNull();
     expect(result.liveUrl).toBeNull();
+    expect(result.screenshotUrl).toBeNull();
   });
 
-  it("hides repoUrl/liveUrl for NDA_RESTRICTED even if clientApproved is true", () => {
+  it("hides repoUrl/liveUrl/screenshotUrl for NDA_RESTRICTED even if clientApproved is true", () => {
     const result = toPublicSystem(
       makeSystem({ clientVisibility: "NDA_RESTRICTED", clientApproved: true })
     );
     expect(result.repoUrl).toBeNull();
     expect(result.liveUrl).toBeNull();
+    expect(result.screenshotUrl).toBeNull();
+  });
+
+  it("exposes screenshotUrl for a PUBLIC system", () => {
+    const result = toPublicSystem(makeSystem({ clientVisibility: "PUBLIC" }));
+    expect(result.screenshotUrl).toBe("https://example.com/screenshot.png");
   });
 
   it("masks the organization name for ANONYMIZED_ONLY by default (BR-1.4)", () => {

@@ -887,6 +887,7 @@ components:
         description: { type: string }
         repoUrl: { type: string, nullable: true, description: "Null when clientVisibility = NDA_RESTRICTED (BR-1.3)" }
         liveUrl: { type: string, nullable: true }
+        screenshotUrl: { type: string, nullable: true, description: "Homepage preview image; renders a technical placeholder when absent" }
         techStack: { type: array, items: { type: string } }
         isFlagship: { type: boolean }
 
@@ -940,6 +941,7 @@ components:
         description: { type: string }
         repoUrl: { type: string, nullable: true }
         liveUrl: { type: string, nullable: true }
+        screenshotUrl: { type: string, nullable: true }
         techStack: { type: array, items: { type: string } }
         clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
 
@@ -952,6 +954,9 @@ components:
         isFlagship: { type: boolean }
         sortOrder: { type: integer }
         caseStudyBody: { type: string }
+        repoUrl: { type: string, nullable: true }
+        liveUrl: { type: string, nullable: true }
+        screenshotUrl: { type: string, nullable: true }
 
     InquiryCreateInput:
       type: object

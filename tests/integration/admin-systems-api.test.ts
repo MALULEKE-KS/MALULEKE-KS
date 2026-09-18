@@ -185,6 +185,38 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     expect((await res.json()).needsCuration).toBe(false);
   });
 
+  it("updates repoUrl/liveUrl/screenshotUrl and returns them unmasked on the admin serializer", async () => {
+    const system = await db.system.create({
+      data: {
+        name: "URL Fields Fixture",
+        slug: "url-fields-fixture",
+        organizationId: publicOrgId,
+        statusId,
+        description: "Fixture.",
+      },
+    });
+    createdSystemIds.push(system.id);
+
+    const res = await patchSystem(
+      makeRequest(
+        `http://localhost/api/v1/admin/systems/${system.id}`,
+        "PATCH",
+        {
+          repoUrl: "https://github.com/example/repo",
+          liveUrl: "https://example.com",
+          screenshotUrl: "https://example.com/screenshot.png",
+        },
+        true
+      ),
+      { params: Promise.resolve({ id: system.id }) }
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.repoUrl).toBe("https://github.com/example/repo");
+    expect(body.liveUrl).toBe("https://example.com");
+    expect(body.screenshotUrl).toBe("https://example.com/screenshot.png");
+  });
+
   it("rejects an unauthenticated request", async () => {
     const system = await db.system.create({
       data: {

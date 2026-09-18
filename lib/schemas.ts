@@ -94,6 +94,9 @@ export const SystemPublicSchema = z.object({
   // Null enforced server-side whenever clientVisibility = NDA_RESTRICTED (BR-1.3)
   repoUrl: z.string().url().nullable(),
   liveUrl: z.string().url().nullable(),
+  // Homepage preview image; absence renders a technical placeholder rather
+  // than a broken image, so this is nullable, never required.
+  screenshotUrl: z.string().url().nullable(),
   techStack: z.array(z.string()),
   isFlagship: z.boolean(),
 });
@@ -141,6 +144,7 @@ export const SystemCreateInputSchema = z.object({
   description: z.string().min(1),
   repoUrl: z.string().url().nullable().optional(),
   liveUrl: z.string().url().nullable().optional(),
+  screenshotUrl: z.string().url().nullable().optional(),
   techStack: z.array(z.string()).default([]),
   clientVisibility: ClientVisibilityEnum.default("PUBLIC"),
   // Note: server overrides this default to REQUIRES_APPROVAL when the linked
@@ -156,6 +160,9 @@ export const SystemUpdateInputSchema = z
     isFlagship: z.boolean().optional(),
     sortOrder: z.number().int().optional(),
     caseStudyBody: z.string().optional(),
+    repoUrl: z.string().url().nullable().optional(),
+    liveUrl: z.string().url().nullable().optional(),
+    screenshotUrl: z.string().url().nullable().optional(),
   })
   .refine(
     // Mirrors BR-1.1 at the validation layer, in addition to the API-level

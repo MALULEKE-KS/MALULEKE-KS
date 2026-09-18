@@ -7,12 +7,14 @@
 // root layout only owns what's truly global (fonts, <html>/<body>).
 
 import { SiteHeader } from "@/components/shared/SiteHeader";
+import { SiteFooter } from "@/components/shared/SiteFooter";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      {children}
-    </>
+      <div className="flex-1 flex flex-col">{children}</div>
+      <SiteFooter />
+    </div>
   );
 }

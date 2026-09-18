@@ -62,6 +62,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           ...(parsed.data.isFlagship !== undefined && { isFlagship: parsed.data.isFlagship }),
           ...(parsed.data.sortOrder !== undefined && { sortOrder: parsed.data.sortOrder }),
           ...(parsed.data.caseStudyBody !== undefined && { caseStudyBody: parsed.data.caseStudyBody }),
+          ...(parsed.data.repoUrl !== undefined && { repoUrl: parsed.data.repoUrl }),
+          ...(parsed.data.liveUrl !== undefined && { liveUrl: parsed.data.liveUrl }),
+          ...(parsed.data.screenshotUrl !== undefined && { screenshotUrl: parsed.data.screenshotUrl }),
           // BR-1.8 — cleared on every successful save, whether or not this
           // save published anything.
           needsCuration: false,
