@@ -12,7 +12,7 @@
 // serialization that leaks repoUrl is still a BR-1.3 violation, and correct
 // serialization applied to an unfiltered query still leaks drafts.
 
-import { Prisma, ContentStatus } from "@prisma/client";
+import { Prisma, ContentStatus, type ClientVisibility } from "@prisma/client";
 
 export const PUBLISHED_WHERE = { contentStatus: ContentStatus.PUBLISHED } as const;
 
@@ -111,3 +111,81 @@ export function toPublicSystemDetailed(system: SystemWithPublicDetailRelations) 
 }
 
 export { systemWithPublicRelations, systemWithPublicDetailRelations };
+
+// ============================================================
+// ADMIN-SIDE RULES (BR-1.1, BR-1.2, BR-1.10)
+// ============================================================
+
+const systemWithAdminRelations = Prisma.validator<Prisma.SystemDefaultArgs>()({
+  include: {
+    organization: true,
+    status: true,
+    domain: true,
+    impacts: { orderBy: { sortOrder: "asc" } },
+    testimonials: true, // admin sees all testimonials, not just hasPermission=true (BR-6.1 is a public-surface rule)
+  },
+});
+
+export type SystemWithAdminRelations = Prisma.SystemGetPayload<typeof systemWithAdminRelations>;
+export { systemWithAdminRelations };
+
+// Admin sees everything, unmasked — no BR-1.3/1.4 filtering, since this is
+// never served to a visitor.
+export function toAdminSystem(system: SystemWithAdminRelations) {
+  return {
+    id: system.id,
+    name: system.name,
+    slug: system.slug,
+    organization: system.organization.name,
+    status: system.status.label,
+    statusColorToken: system.status.colorToken,
+    domain: system.domain?.label ?? null,
+    description: system.description,
+    repoUrl: system.repoUrl,
+    liveUrl: system.liveUrl,
+    techStack: system.techStack,
+    isFlagship: system.isFlagship,
+    sortOrder: system.sortOrder,
+    caseStudyBody: system.caseStudyBody ?? "",
+    impacts: system.impacts.map((i) => ({ label: i.label, value: i.value })),
+    testimonials: system.testimonials.map((t) => ({
+      id: t.id,
+      authorName: t.authorName,
+      authorRole: t.authorRole,
+      organization: t.organization,
+      quote: t.quote,
+      hasPermission: t.hasPermission,
+    })),
+    contentStatus: system.contentStatus,
+    clientVisibility: system.clientVisibility,
+    clientApproved: system.clientApproved,
+    nameDisclosureApproved: system.nameDisclosureApproved,
+    needsCuration: system.needsCuration,
+    createdAt: system.createdAt.toISOString(),
+    updatedAt: system.updatedAt.toISOString(),
+  };
+}
+
+// BR-1.2 — clientVisibility defaults to REQUIRES_APPROVAL at creation time
+// for any System linked to an Organization where isClient=true. Client
+// input is not trusted to set this correctly on its own — this function is
+// the single place that decision gets made, called from the create route,
+// never left to whatever the request body happened to send.
+export function defaultClientVisibility(
+  organizationIsClient: boolean,
+  requested: ClientVisibility | undefined
+): ClientVisibility {
+  if (organizationIsClient) return "REQUIRES_APPROVAL";
+  return requested ?? "PUBLIC";
+}
+
+// BR-1.1 — the actual publish gate. Takes the CURRENT database values (not
+// the request body) so BR-1.10's transactional re-read is meaningful: this
+// function must be called with state read inside the same transaction that
+// performs the update, never with a value cached from earlier in the request.
+export function canPublish(current: {
+  clientVisibility: ClientVisibility;
+  clientApproved: boolean;
+}): boolean {
+  return current.clientVisibility === "PUBLIC" || current.clientApproved;
+}

@@ -102,3 +102,18 @@ export const SESSION_COOKIE_OPTIONS = {
   path: "/",
   maxAge: ABSOLUTE_TIMEOUT_MS / 1000,
 };
+
+// For use inside route handlers under /api/v1/admin/* — proxy.ts already
+// rejected the request if the session were invalid, so by the time a route
+// handler runs, this should always resolve to a real admin ID. Still
+// returns null rather than throwing on the (should-be-impossible) case of
+// a route handler ever running without the proxy in front of it, so a
+// caller can fail closed explicitly instead of the app crashing.
+export async function getSessionAdminId(request: Request): Promise<string | null> {
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const match = cookieHeader.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`));
+  if (!match || !match[1]) return null;
+
+  const result = checkSession(decodeURIComponent(match[1]));
+  return result.valid ? result.adminUserId! : null;
+}
