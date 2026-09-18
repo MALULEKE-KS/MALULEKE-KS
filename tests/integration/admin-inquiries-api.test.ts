@@ -42,17 +42,29 @@ afterAll(async () => {
   await db.adminUser.delete({ where: { id: adminId } });
 });
 
+// The database enforces BR-2.1 itself: every inquiry starts NEW and only moves
+// along valid transitions. So a fixture in a later state is walked there the
+// same way a real inquiry would be, never inserted mid-workflow.
+const PATH_TO: Record<"NEW" | "REVIEWED" | "RESPONDED" | "CLOSED", Array<"REVIEWED" | "RESPONDED" | "CLOSED">> = {
+  NEW: [],
+  REVIEWED: ["REVIEWED"],
+  RESPONDED: ["REVIEWED", "RESPONDED"],
+  CLOSED: ["REVIEWED", "CLOSED"],
+};
+
 async function createFixtureInquiry(overrides: { status?: "NEW" | "REVIEWED" | "RESPONDED" | "CLOSED" } = {}) {
-  const inquiry = await db.inquiry.create({
+  let inquiry = await db.inquiry.create({
     data: {
       name: "Fixture Visitor",
       email: "visitor@example.com",
       message: "This is a fixture inquiry message, at least twenty characters long.",
       inquiryTypeId,
-      status: overrides.status ?? "NEW",
     },
   });
   createdInquiryIds.push(inquiry.id);
+  for (const status of PATH_TO[overrides.status ?? "NEW"]) {
+    inquiry = await db.inquiry.update({ where: { id: inquiry.id }, data: { status } });
+  }
   return inquiry;
 }
 

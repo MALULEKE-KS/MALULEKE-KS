@@ -198,7 +198,9 @@ describe("POST /api/v1/admin/auth/verify-2fa", () => {
     const { createHash } = await import("node:crypto");
     await db.loginChallenge.update({
       where: { tokenHash: createHash("sha256").update(challengeToken).digest("hex") },
-      data: { expiresAt: new Date(Date.now() - 1000) },
+      // A real expired challenge was issued 5 minutes before it expired —
+      // the database enforces that TTL (BR-3.5), so move both timestamps.
+      data: { createdAt: new Date(Date.now() - 6 * 60_000), expiresAt: new Date(Date.now() - 60_000) },
     });
 
     const res = await verify2fa(

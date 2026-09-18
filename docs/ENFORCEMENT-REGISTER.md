@@ -19,24 +19,24 @@
 
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| BR-1.1 | No publish while `clientVisibility ≠ PUBLIC` and `clientApproved = false`, server-side | `lib/rules/publishing.ts` `canPublish`, `PATCH /admin/systems/[id]` (409) | 🟡 | App + DB CHECK | F1.2 |
-| BR-1.2 | `REQUIRES_APPROVAL` default for client orgs | `POST /admin/systems`, `github-sync.ts` | 🟡 | App + DB trigger | F1.2 |
+| BR-1.1 | No publish while `clientVisibility ≠ PUBLIC` and `clientApproved = false`, server-side | `canPublish` + 409 in the API; CHECK `System_br_1_1_publish_requires_approval` — enforced in the database too (F1.2, #60) | ✅ | App + DB CHECK | — |
+| BR-1.2 | `REQUIRES_APPROVAL` default for client orgs | API + sync; trigger `System_br_1_2_client_default` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
 | BR-1.3 | `NDA_RESTRICTED` never exposes repo/live URL publicly | Serialization in `publishing.ts` | 🟡 | DB public view | F1.7 |
 | BR-1.4 | `ANONYMIZED_ONLY` never exposes the org name unless `nameDisclosureApproved` | Serialization in `publishing.ts` | 🟡 | DB public view | F1.7 |
 | BR-1.5 | `contentStatus` fixed draft/published/archived | Prisma enum | ✅ | DB | — |
 | BR-1.6 | Sync-created systems land `DRAFT` + `needsCuration` | `github-sync.ts` (sync never run) | 🟡 | App + DB default | F1.6 / F4 |
 | BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Current code skips private repos; rule text not yet updated | ❌ | Rule text + DB flag + public view | F1.6 / F1.7 / F4 |
 | BR-1.8 | `needsCuration` cleared on admin save | `PATCH /admin/systems/[id]` | ✅ | App | — |
-| BR-1.9 | `System` never hard-deleted | No DELETE route exists | 🟡 | DB trigger blocks DELETE | F1.2 |
-| BR-1.10 | Publish evaluated inside one transaction, re-reading state | `db.$transaction` in `PATCH /admin/systems/[id]` | ✅ | App (+ DB CHECK makes the race moot) | F1.2 |
+| BR-1.9 | `System` never hard-deleted | No DELETE route; trigger `System_br_1_9_no_delete` — enforced in the database too (F1.2, #60) | ✅ | DB trigger | — |
+| BR-1.10 | Publish evaluated inside one transaction, re-reading state | `db.$transaction` in `PATCH /admin/systems/[id]`; the BR-1.1 CHECK now makes the race moot | ✅ | App + DB | — |
 
 ## 2. Inquiries (BR-2.x)
 
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`, `PATCH /admin/inquiries/[id]` | 🟡 | App + DB trigger | F1.2 |
+| BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
 | BR-2.2 | Every `new` inquiry reviewed within 48 hours | Nothing surfaces overdue inquiries | ❌ | Admin surfacing (overdue flag/query) | F2 |
-| BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod `InquiryCreateInputSchema` | 🟡 | App + DB CHECK | F1.2 |
+| BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
 | BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `lib/auth/rate-limit.ts` — **check-then-increment race**; raw IP stored | ❌ | Atomic DB function, hashed key | F1.5 |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |
 | BR-2.6 | Idempotency key dedupes within 10 minutes | `POST /inquiries` + unique index | ✅ | App + DB unique | — |
@@ -50,12 +50,12 @@
 | BR-3.2 | Progressive delay → lockout on failed logins | `failedLoginCount`/`lockedUntil` in login route | 🟡 | App + atomic counter | F3 |
 | BR-3.3 | 30-minute idle expiry | `lib/auth/session.ts`, `proxy.ts` | 🟡 | App (verify) | F3 |
 | BR-3.4 | Every mutation and every login attempt logged | 18/18 mutating routes call `logActivity`; **unknown-email failures not logged** (required FK); log is editable | ❌ | DB: append-only trigger, nullable actor; App: one shared layer | F1.3 / F2 |
-| BR-3.5 | Challenge token: 5 minutes, single use | Login + verify-2fa routes | 🟡 | App + DB CHECK | F3 |
+| BR-3.5 | Challenge token: 5 minutes, single use | Routes; CHECK `LoginChallenge_br_3_5_ttl` caps lifetime at 5 min — enforced in the database too (F1.2, #60). App flow re-verified in F3 | 🟡 | App + DB CHECK | F3 |
 | BR-3.6 | 5 failed TOTP attempts invalidate the token | verify-2fa route (`attempts`) | 🟡 | App + atomic increment | F3 |
 | BR-3.7 | 12-hour absolute session lifetime | `lib/auth/session.ts` | 🟡 | App (verify) | F3 |
 | BR-3.8 | New session ID minted after 2FA | `verify-2fa` + `session.ts` | 🟡 | App (verify) | F3 |
 | BR-3.9 | CSRF protection on admin mutations | `SameSite=Strict` cookie | 🟡 | App + origin check | F3 |
-| BR-3.10 | Admin email lowercase on write and lookup | App `toLowerCase` | 🟡 | DB CHECK / citext | F1.2 |
+| BR-3.10 | Admin email lowercase on write and lookup | App `toLowerCase`; CHECK `AdminUser_br_3_10_email_lowercase` — enforced in the database too (F1.2, #60) | ✅ | App + DB CHECK | — |
 | BR-3.11 | Exactly 10 recovery codes, hashed, single-use | `create-admin.ts`, verify-2fa | 🟡 | App (verify) | F3 |
 | BR-3.12 | Dashboard warns when < 3 recovery codes remain | **Not implemented** | ❌ | App | F3 |
 | BR-3.13 | No self-serve reset; manual operator procedure | No reset route exists; procedure documented? | 🟡 | Docs runbook | F3 |
@@ -88,7 +88,7 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-7.1 | Generated from live data at generation time | `POST /cv/generate` | ✅ | App | — |
-| BR-7.2 | Prior documents superseded, not deleted | `lib/rules/cv.ts` | 🟡 | App + DB trigger blocks DELETE | F1.2 |
+| BR-7.2 | Prior documents superseded, not deleted | `lib/rules/cv.ts`; trigger `DocumentGen_br_7_2_no_delete` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
 
 ## 8. Extension governance (BR-8.x) & Constitution
 
@@ -102,6 +102,7 @@
 | Every admin mutation logged at the middleware layer | CLAUDE.md, BR-3.4 | Per-route calls (18/18), not a shared layer | 🟡 | One shared layer | F2 |
 | New tools/lenses/sections ship disabled | EXT-1, BR-4.4 | `Flag.enabled` defaults false | ✅ | DB default | — |
 | Versioned API `/api/v1` | EXT-1 | All routes under `/api/v1` | ✅ | App | — |
+| Nothing hardcoded unless that's the recommended practice — tunables are data | Owner directive 2026-09-19 | Tunables written as constants: inquiry rate limit (5/24h), retention (24 months), review SLA (48h), challenge TTL (5 min), message bounds (20–5000), status keys in homepage queries | ❌ | DB settings table, admin-editable | F1.6 |
 | Nothing about the owner hardcoded | Owner directive 2026-09-18 | Name, role, links, mission, principles in `lib/content/*` | ❌ | DB `Profile`, `Achievement`, content | F1.6 |
 | Pre-launch: sitemap, OG images, JSON-LD, canonical URLs | Constitution §9 | Not verified | ❌/? | App | F5 |
 | Pre-launch: static CV PDF hosted independently | Constitution §9 | Not verified | ❌/? | Ops | F4 |
