@@ -29,7 +29,7 @@ const PRINCIPLES = [
 
 export default function HowIBuildPage() {
   return (
-    <article className="px-6 py-16 max-w-2xl mx-auto">
+    <article className="py-16 max-w-2xl">
       <h1 className="font-sans font-semibold text-2xl text-ink mb-8">How I build</h1>
 
       <p className="font-serif text-lg text-ink leading-relaxed mb-12 max-w-prose">

@@ -39,7 +39,7 @@ export default async function CvPage() {
   }
 
   return (
-    <article className="cv-page px-6 py-16 max-w-3xl mx-auto">
+    <article className="cv-page py-16 max-w-3xl">
       <div className="flex items-start justify-between gap-4 mb-1">
         <div>
           <h1 className="font-sans font-semibold text-3xl text-ink">{OWNER_NAME}</h1>

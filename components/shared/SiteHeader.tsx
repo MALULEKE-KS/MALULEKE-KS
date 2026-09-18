@@ -7,6 +7,7 @@
 // of the drafting-table language.
 
 import Link from "next/link";
+import { Container } from "@/components/shared/Container";
 
 const NAV_LINKS = [
   { href: "/systems", label: "Systems" },
@@ -20,7 +21,7 @@ const NAV_LINKS = [
 export function SiteHeader() {
   return (
     <header className="border-b border-slate/20 bg-paper">
-      <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <Container className="py-4 flex flex-wrap items-center justify-between gap-4">
         <Link href="/" className="font-mono font-medium text-sm text-ink tracking-tight">
           MALULEKE-KS
         </Link>
@@ -35,7 +36,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-      </div>
+      </Container>
     </header>
   );
 }

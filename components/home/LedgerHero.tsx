@@ -34,9 +34,9 @@ export function LedgerHero({
   const { revealedLines, currentLineText, done, totalDurationMs } = useTypewriterLines(lines);
 
   return (
-    <section className="ledger-hero bg-paper px-6 py-24 md:py-32">
-      <div className="max-w-prose flex items-start gap-8">
-        <div className="flex-1">
+    <section className="ledger-hero pt-16 pb-12">
+      <div className="md:flex md:items-start md:gap-8">
+        <div className="min-w-0 flex-1">
           <p className="font-mono text-sm text-slate mb-4">MALULEKE-KS — SYSTEM LOG</p>
 
           <div className="font-sans text-2xl md:text-4xl text-ink leading-snug space-y-1">
@@ -66,7 +66,14 @@ export function LedgerHero({
         {/* Decorative reinforcement of the text, not content in its own
             right — aria-hidden, and ScaleFigure itself handles the
             prefers-reduced-motion fallback (fully drawn, no animation). */}
-        <ScaleFigure durationMs={totalDurationMs} className="hidden md:block w-16 shrink-0" />
+        {/* Margin column — same hairline treatment as MarginAnnotations
+            (Design System §3a), hidden below 768px. Sized to the 64px figure
+            (w-20 = figure + pl-4) rather than §3a's w-40: the third ledger
+            line is ~820px wide at text-4xl and a wider column would push
+            its last word onto a line of its own. */}
+        <div className="hidden md:block md:w-20 md:shrink-0 md:border-l md:border-slate/20 md:pl-4">
+          <ScaleFigure durationMs={totalDurationMs} className="block w-16" />
+        </div>
       </div>
     </section>
   );

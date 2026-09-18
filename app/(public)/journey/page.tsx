@@ -41,7 +41,7 @@ export default async function JourneyPage({
   const activeLabel = milestoneTypes.find((t) => t.key === activeType)?.label ?? activeType;
 
   return (
-    <section className="px-6 py-16 max-w-3xl mx-auto">
+    <section className="py-16 max-w-3xl">
       <h1 className="font-sans font-semibold text-2xl text-ink mb-6">Journey</h1>
 
       <div className="flex flex-wrap gap-2 mb-10 font-mono text-xs">

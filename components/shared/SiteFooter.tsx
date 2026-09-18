@@ -5,6 +5,8 @@
 // Real destinations only, sourced from the README's own contact block —
 // never placeholder links.
 
+import { Container } from "@/components/shared/Container";
+
 const CONTACT_LINKS = [
   {
     label: "LinkedIn",
@@ -41,7 +43,7 @@ const CONTACT_LINKS = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-slate/20 bg-paper mt-auto">
-      <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <Container className="py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <a
           href="https://github.com/MALULEKE-KS"
           target="_blank"
@@ -65,7 +67,7 @@ export function SiteFooter() {
             </a>
           ))}
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

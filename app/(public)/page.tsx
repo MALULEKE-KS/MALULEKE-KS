@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 function HomeSkeleton() {
   return (
-    <section className="px-6 py-24 md:py-32 bg-paper">
+    <section className="pt-16 pb-12">
       <div className="max-w-prose h-24 bg-slate/10 animate-pulse" />
     </section>
   );

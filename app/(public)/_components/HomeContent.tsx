@@ -17,7 +17,7 @@ export async function HomeContent() {
       <LedgerHero {...stats} />
 
       {prioritySystems.length > 0 && (
-        <section className="px-6 py-16 max-w-5xl mx-auto">
+        <section className="pb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prioritySystems.map((system) => (
               <SystemCard
@@ -36,7 +36,7 @@ export async function HomeContent() {
         </section>
       )}
 
-      <section className="px-6 py-12 max-w-5xl mx-auto border-t border-slate/20">
+      <section className="py-12 border-t border-slate/20">
         <p className="font-serif text-ink max-w-prose leading-relaxed mb-3">
           I build systems disciplined enough to be trusted with real money, real institutions, and real
           people&rsquo;s outcomes — engineered in South Africa, held to a global standard.
@@ -46,7 +46,7 @@ export async function HomeContent() {
         </Link>
       </section>
 
-      <section className="px-6 py-12 max-w-5xl mx-auto border-t border-slate/20">
+      <section className="pt-12 pb-16 border-t border-slate/20">
         <p className="font-sans text-ink mb-3">Have something to build, or something to say?</p>
         <Link
           href="/contact"
