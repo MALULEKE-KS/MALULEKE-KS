@@ -2,7 +2,7 @@
 // Real PDF generation (BR-7.1) and supersede behavior (BR-7.2) against the
 // real database. No admin session needed — this is the public download flow.
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { POST as generateCv } from "@/app/api/v1/cv/generate/route";
 import { GET as downloadCv } from "@/app/api/v1/cv/documents/[id]/route";
@@ -27,9 +27,8 @@ function makeRequest(body: object): NextRequest {
   });
 }
 
-afterAll(async () => {
-  await db.documentGen.deleteMany({ where: { id: { in: createdDocumentIds } } });
-});
+// No cleanup of generated documents: they are superseded, never deleted
+// (BR-7.2, enforced by the database). The test database is disposable.
 
 describe("POST /api/v1/cv/generate", () => {
   it("generates a real PDF and returns a downloadable fileUrl", async () => {

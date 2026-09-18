@@ -62,6 +62,8 @@ npx prisma db seed        # seed lookup tables, orgs, feature flags
 
 ## Non-negotiables when implementing
 
+- **Nothing hardcoded unless hardcoding is the recommended practice** (owner's rule). Tunables — limits, windows, durations, SLAs, copy, owner details — are data (admin-editable settings/profile/lookup tables) or env config. Business *laws* (an inquiry starts NEW, systems are never deleted) are database constraints, which is the recommended practice, not hardcoding; if a law contains a tunable number, the constraint reads it from settings.
+- Every claim the platform makes is enforced somewhere real — see `/docs/ENFORCEMENT-REGISTER.md`, and update its row in the same PR.
 - BR-1.1: publishing blocked server-side when `clientApproved=false` and `clientVisibility != PUBLIC` — never a client-side-only check.
 - BR-3.1: no write action succeeds without verified 2FA on the admin session.
 - BR-4.1/4.2: agent tools are read-only except `submit_inquiry`, which goes through the identical validation and rate limit as the human form. No privileged bypass, ever.

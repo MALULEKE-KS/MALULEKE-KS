@@ -14,6 +14,9 @@ let clientOrgId: string;
 let publicOrgId: string;
 let statusId: string;
 const createdSystemIds: string[] = [];
+// Systems are never hard-deleted (BR-1.9, enforced by the database), so
+// fixtures can't be cleaned up by deletion — each run uses its own slugs.
+const RUN = Date.now().toString(36);
 
 function makeRequest(url: string, method: string, body: object | null, withCookie: boolean): NextRequest {
   return new NextRequest(url, {
@@ -34,12 +37,12 @@ beforeAll(async () => {
   sessionCookie = createSessionCookieValue(adminId);
 
   const clientOrg = await db.organization.create({
-    data: { name: "Test Client Org", slug: "test-client-org-fixture", isClient: true },
+    data: { name: "Test Client Org", slug: `test-client-org-fixture-${RUN}`, isClient: true },
   });
   clientOrgId = clientOrg.id;
 
   const publicOrg = await db.organization.create({
-    data: { name: "Test Public Org", slug: "test-public-org-fixture", isClient: false },
+    data: { name: "Test Public Org", slug: `test-public-org-fixture-${RUN}`, isClient: false },
   });
   publicOrgId = publicOrg.id;
 
@@ -50,8 +53,9 @@ beforeAll(async () => {
 afterAll(async () => {
   if (!adminId) return;
   await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
-  await db.system.deleteMany({ where: { id: { in: createdSystemIds } } });
-  await db.organization.deleteMany({ where: { id: { in: [clientOrgId, publicOrgId] } } });
+  // Retire, don't delete (BR-1.9). The fixture organizations stay too: an
+  // archived System still references its Organization (FK RESTRICT).
+  await db.system.updateMany({ where: { id: { in: createdSystemIds } }, data: { contentStatus: "ARCHIVED" } });
   await db.adminUser.delete({ where: { id: adminId } });
 });
 
@@ -65,7 +69,7 @@ describe("GET/POST /api/v1/admin/systems", () => {
     const res = await createSystem(
       makeRequest("http://localhost/api/v1/admin/systems", "POST", {
         name: "Should Not Be Created",
-        slug: "should-not-be-created",
+        slug: `should-not-be-created-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
@@ -78,7 +82,7 @@ describe("GET/POST /api/v1/admin/systems", () => {
     const res = await createSystem(
       makeRequest("http://localhost/api/v1/admin/systems", "POST", {
         name: "Client Fixture System",
-        slug: "client-fixture-system",
+        slug: `client-fixture-system-${RUN}`,
         organizationId: clientOrgId,
         statusId,
         description: "A fixture system for a client org.",
@@ -97,7 +101,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Blocked Publish Fixture",
-        slug: "blocked-publish-fixture",
+        slug: `blocked-publish-fixture-${RUN}`,
         organizationId: clientOrgId,
         statusId,
         description: "Fixture.",
@@ -119,7 +123,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Combined Approve Publish Fixture",
-        slug: "combined-approve-publish-fixture",
+        slug: `combined-approve-publish-fixture-${RUN}`,
         organizationId: clientOrgId,
         statusId,
         description: "Fixture.",
@@ -148,7 +152,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Public System Fixture",
-        slug: "public-system-fixture",
+        slug: `public-system-fixture-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
@@ -168,7 +172,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Needs Curation Fixture",
-        slug: "needs-curation-fixture",
+        slug: `needs-curation-fixture-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
@@ -189,7 +193,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "URL Fields Fixture",
-        slug: "url-fields-fixture",
+        slug: `url-fields-fixture-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
@@ -221,7 +225,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Unauth Fixture",
-        slug: "unauth-fixture",
+        slug: `unauth-fixture-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
@@ -240,7 +244,7 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
     const system = await db.system.create({
       data: {
         name: "Activity Log Fixture",
-        slug: "activity-log-fixture",
+        slug: `activity-log-fixture-${RUN}`,
         organizationId: publicOrgId,
         statusId,
         description: "Fixture.",
