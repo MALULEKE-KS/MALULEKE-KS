@@ -2,13 +2,22 @@
 // Real PDF generation (BR-7.1) and supersede behavior (BR-7.2) against the
 // real database. No admin session needed — this is the public download flow.
 
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { POST as generateCv } from "@/app/api/v1/cv/generate/route";
 import { GET as downloadCv } from "@/app/api/v1/cv/documents/[id]/route";
 import { db } from "@/lib/db";
 
 const createdDocumentIds: string[] = [];
+
+// getClientIp falls back to "unknown" for these test requests (no
+// x-forwarded-for header), so the rate-limit bucket is shared across every
+// run of this file against the real dev database — clear it first so
+// repeated local runs within the same hour don't accumulate toward the
+// real 10/hour cap the route enforces.
+beforeAll(async () => {
+  await db.rateLimitEntry.deleteMany({ where: { bucketKey: "cv-generate:ip:unknown" } });
+});
 
 function makeRequest(body: object): NextRequest {
   return new NextRequest("http://localhost/api/v1/cv/generate", {
