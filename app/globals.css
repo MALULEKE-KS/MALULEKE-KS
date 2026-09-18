@@ -153,6 +153,10 @@
    no navigation, no hero. This is a print-cascade concern Tailwind's
    utility model has no equivalent for. */
 @media print {
+  /* Site chrome, not CV content: navigation, the header wordmark and the
+     footer's contact links must not print (Design System §7). */
+  header,
+  footer,
   nav,
   .ledger-hero,
   .no-print {

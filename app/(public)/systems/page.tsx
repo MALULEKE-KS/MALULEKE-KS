@@ -10,6 +10,8 @@ import { Suspense } from "react";
 import { SystemsResults } from "./_components/SystemsResults";
 import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
 
+export const metadata = { title: "Systems" };
+
 interface SystemsPageProps {
   searchParams: Promise<Record<string, string | undefined>>;
 }

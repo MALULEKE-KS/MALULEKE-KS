@@ -17,27 +17,22 @@ interface AnnotationItem {
 
 interface MarginAnnotationsProps {
   items: AnnotationItem[];
+  // The heading the annotations belong to. Below 768px the badge row renders
+  // directly under it (§3a), which is why the heading is a slot here rather
+  // than part of `children`: the row can't be placed "under the heading" if
+  // it can only ever come after everything.
+  header?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function MarginAnnotations({ items, children }: MarginAnnotationsProps) {
+export function MarginAnnotations({ items, header, children }: MarginAnnotationsProps) {
   return (
     <div className="md:flex md:items-start md:gap-8">
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0 flex-1">
+        {header}
 
-      {items.length > 0 && (
-        <>
-          {/* >=768px: vertical margin column, hairline-divided */}
-          <dl className="hidden md:block md:w-40 md:shrink-0 md:border-l md:border-slate/20 md:pl-4 md:pt-1">
-            {items.map((item) => (
-              <div key={item.label} className="mb-3 last:mb-0">
-                <dt className="font-mono text-xs text-slate">{item.label}</dt>
-                <dd className="font-mono text-xs text-ink">{item.value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          {/* <768px: inline badge row, no column */}
+        {/* <768px: inline badge row directly under the heading, no column */}
+        {items.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3 md:hidden">
             {items.map((item) => (
               <span
@@ -48,7 +43,21 @@ export function MarginAnnotations({ items, children }: MarginAnnotationsProps) {
               </span>
             ))}
           </div>
-        </>
+        )}
+
+        {children}
+      </div>
+
+      {/* >=768px: vertical margin column, hairline-divided */}
+      {items.length > 0 && (
+        <dl className="hidden md:block md:w-40 md:shrink-0 md:border-l md:border-slate/20 md:pl-4 md:pt-1">
+          {items.map((item) => (
+            <div key={item.label} className="mb-3 last:mb-0">
+              <dt className="font-mono text-xs text-slate">{item.label}</dt>
+              <dd className="font-mono text-xs text-ink">{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       )}
     </div>
   );
