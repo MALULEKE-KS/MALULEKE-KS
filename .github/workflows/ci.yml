@@ -39,6 +39,7 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_test
+      DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_test
       # Test-only dummy values — not real secrets, just satisfying the env
       # vars lib/auth/crypto.ts and lib/auth/session.ts require to run at
       # all. Real deployments get real values from Vercel's env config.
@@ -98,10 +99,12 @@ jobs:
           # validate the provider — only SHADOW_DATABASE_URL is actually
           # connected to for this diff.
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
+          DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
           SHADOW_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci_shadow
       - run: npx prisma migrate deploy
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
+          DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
 
   ai-eval:
     runs-on: ubuntu-latest

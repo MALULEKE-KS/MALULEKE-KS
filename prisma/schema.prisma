@@ -11,6 +11,9 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
+  // Migrations run over a direct (non-pooled) connection — the pooler is for
+  // the app's many short-lived queries, not schema changes (docs/DATABASE.md).
+  directUrl  = env("DATABASE_URL_UNPOOLED")
   extensions = [vector, pgcrypto]
 }
 
@@ -19,36 +22,35 @@ datasource db {
 // ============================================================
 
 model AdminUser {
-  id               String    @id @default(cuid())
-  email            String    @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
+  id               String           @id @default(cuid())
+  email            String           @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
   passwordHash     String
-  role             String    @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
+  role             String           @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
   twoFactorSecret  String? // encrypted at rest with TWO_FACTOR_ENCRYPTION_KEY, not plaintext
-  twoFactorEnabled Boolean   @default(false)
+  twoFactorEnabled Boolean          @default(false)
   recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
-  failedLoginCount Int       @default(0)
+  failedLoginCount Int              @default(0)
   lockedUntil      DateTime? // BR-3.2
   lastLoginAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   activityLogs     ActivityLog[]
   loginChallenges  LoginChallenge[]
-
-  @@index([email])
+  // No separate @@index([email]): the @unique above already is one.
 }
 
 model LoginChallenge {
   // Bridges step-1 (credentials) and step-2 (TOTP) of admin login.
   // Short-lived and single-use by design (BR-3.5, BR-3.6) — this table is
   // pruned continuously and is never part of the 24-month retention policy.
-  id            String    @id @default(cuid())
-  tokenHash     String    @unique // the challengeToken is never stored raw
-  adminUserId   String
-  adminUser     AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
-  attempts      Int       @default(0) // BR-3.6 — invalidated at 5
-  consumedAt    DateTime? // set on first verify attempt, success or failure (BR-3.5)
-  expiresAt     DateTime  // issuedAt + 5 minutes (BR-3.5)
-  createdAt     DateTime  @default(now())
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique // the challengeToken is never stored raw
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  attempts    Int       @default(0) // BR-3.6 — invalidated at 5
+  consumedAt  DateTime? // set on first verify attempt, success or failure (BR-3.5)
+  expiresAt   DateTime // issuedAt + 5 minutes (BR-3.5)
+  createdAt   DateTime  @default(now())
 
   @@index([expiresAt])
 }
@@ -58,11 +60,11 @@ model RateLimitEntry {
   // Deliberately its own table with its own short retention, separate from
   // Inquiry/Event's 24-month policy — an IP address here is kept only as
   // long as the relevant window requires (BR-2.4).
-  id         String   @id @default(cuid())
-  bucketKey  String   // e.g. "inquiry:ip:203.0.113.4" or "login2fa:challenge:<id>"
-  windowEnd  DateTime // entry is inert/prunable once now() > windowEnd
-  count      Int      @default(1)
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  bucketKey String // e.g. "inquiry:ip:203.0.113.4" or "login2fa:challenge:<id>"
+  windowEnd DateTime // entry is inert/prunable once now() > windowEnd
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
 
   @@unique([bucketKey, windowEnd])
   @@index([windowEnd])
@@ -72,7 +74,7 @@ model ActivityLog {
   id          String    @id @default(cuid())
   adminUserId String
   adminUser   AdminUser @relation(fields: [adminUserId], references: [id])
-  action      String    // "system.update" | "auth.login" | "auth.login_failed" | ... (BR-3.4)
+  action      String // "system.update" | "auth.login" | "auth.login_failed" | ... (BR-3.4)
   entityType  String?
   entityId    String?
   before      Json?
@@ -88,27 +90,27 @@ model ActivityLog {
 // ============================================================
 
 model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  role      String?  // "Founder" | "Co-founder"
-  isClient  Boolean  @default(false) // drives BR-1.2 default at System creation time only — never retroactive
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  role         String? // "Founder" | "Co-founder"
+  isClient     Boolean  @default(false) // drives BR-1.2 default at System creation time only — never retroactive
   // Optional override for GitHub org/user login names that don't slugify to
   // this Organization's slug (e.g. GitHub login "MALULEKE-KS" -> this row's
   // slug "personal"). github-sync.ts checks this before falling back to
   // slugify(githubLogin) == slug.
   githubLogins String[] @default([])
-  systems   System[]
-  createdAt DateTime @default(now())
+  systems      System[]
+  createdAt    DateTime @default(now())
 }
 
 model Status {
   id         String   @id @default(cuid())
   key        String   @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
   label      String
-  colorToken String   // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
-                       // New Status values carry their own color as data (this field), so
-                       // a new admin-added status never needs a component code change (EXT-1).
+  colorToken String // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
+  // New Status values carry their own color as data (this field), so
+  // a new admin-added status never needs a component code change (EXT-1).
   active     Boolean  @default(true) // BR-8.2 soft-deprecation
   systems    System[]
 }
@@ -138,48 +140,49 @@ enum ContentStatus {
 }
 
 model System {
-  id               String            @id @default(cuid())
-  name             String
-  slug             String            @unique
+  id                     String           @id @default(cuid())
+  name                   String
+  slug                   String           @unique
   // Stable GitHub identity, independent of name/slug — used to match an
   // existing System across a repo rename instead of matching by slugify(name),
   // which would otherwise create a duplicate row on every rename.
-  githubRepoId     Int?              @unique
-  organizationId   String
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  statusId         String
-  status           Status            @relation(fields: [statusId], references: [id], onDelete: Restrict)
-  domainId         String?
-  domain           Domain?           @relation(fields: [domainId], references: [id], onDelete: SetNull)
-  description      String
-  repoUrl          String?
-  liveUrl          String?
-  screenshotUrl    String? // homepage preview image for the public case study/card (Constitution §8 systems catalog)
-  techStack        String[]
-  isFlagship       Boolean           @default(false)
-  sortOrder        Int               @default(0)
-  clientVisibility ClientVisibility  @default(PUBLIC) // BR-1.2 default is applied in app logic on create
-  clientApproved   Boolean           @default(false) // authorizes publishing (BR-1.1) — NOT the same authorization as revealing the real org name
+  githubRepoId           Int?             @unique
+  organizationId         String
+  organization           Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  statusId               String
+  status                 Status           @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  domainId               String?
+  domain                 Domain?          @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  description            String
+  repoUrl                String?
+  liveUrl                String?
+  screenshotUrl          String? // homepage preview image for the public case study/card (Constitution §8 systems catalog)
+  techStack              String[]
+  isFlagship             Boolean          @default(false)
+  sortOrder              Int              @default(0)
+  clientVisibility       ClientVisibility @default(PUBLIC) // BR-1.2 default is applied in app logic on create
+  clientApproved         Boolean          @default(false) // authorizes publishing (BR-1.1) — NOT the same authorization as revealing the real org name
   // Separate from clientApproved on purpose (BR-1.4): a client can approve
   // publishing an ANONYMIZED_ONLY case study without approving disclosure of
   // their real name in it. Reusing clientApproved for both would make name
   // masking unreachable for any published system, since BR-1.1 already
   // requires clientApproved=true to publish anything non-PUBLIC.
-  nameDisclosureApproved Boolean      @default(false)
-  contentStatus    ContentStatus     @default(DRAFT)  // BR-1.6: sync-created rows always start here
-  needsCuration    Boolean           @default(false)  // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
+  nameDisclosureApproved Boolean          @default(false)
+  contentStatus          ContentStatus    @default(DRAFT) // BR-1.6: sync-created rows always start here
+  needsCuration          Boolean          @default(false) // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
   // No delete endpoint exists for System anywhere in the contract — retirement
   // is always contentStatus = ARCHIVED (BR-1.9). Rows are never hard-deleted.
-  caseStudyBody    String?           // MDX
-  impacts          Impact[]
-  testimonials     Testimonial[]
-  skills           SkillOnSystem[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  caseStudyBody          String? // MDX
+  impacts                Impact[]
+  testimonials           Testimonial[]
+  skills                 SkillOnSystem[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
 
   @@index([contentStatus])
   @@index([organizationId])
   @@index([domainId])
+  @@index([statusId])
 }
 
 model Impact {
@@ -189,6 +192,8 @@ model Impact {
   label     String // "Audit findings closed"
   value     String // "58"
   sortOrder Int    @default(0)
+
+  @@index([systemId, sortOrder])
 }
 
 model Testimonial {
@@ -201,6 +206,8 @@ model Testimonial {
   quote         String
   hasPermission Boolean  @default(false) // BR-6.1 — absolute gate, checked at read time
   createdAt     DateTime @default(now())
+
+  @@index([systemId])
 }
 
 // ============================================================
@@ -227,6 +234,7 @@ model Timeline {
   createdAt       DateTime      @default(now())
 
   @@index([date])
+  @@index([milestoneTypeId])
 }
 
 model Experience {
@@ -264,6 +272,8 @@ model Skill {
   yearsExperience Float?
   systems         SkillOnSystem[]
   experiences     SkillOnExperience[]
+
+  @@index([categoryId])
 }
 
 model SkillOnSystem {
@@ -273,6 +283,7 @@ model SkillOnSystem {
   system   System @relation(fields: [systemId], references: [id], onDelete: Cascade)
 
   @@id([skillId, systemId])
+  @@index([systemId]) // the composite PK leads with skillId; this serves "skills of a system"
 }
 
 model SkillOnExperience {
@@ -282,19 +293,20 @@ model SkillOnExperience {
   experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
 
   @@id([skillId, experienceId])
+  @@index([experienceId])
 }
 
 model DocumentGen {
-  id          String   @id @default(cuid())
-  type        String   // "cv" | "resume-tailored"
-  targetRole  String?
-  generatedAt DateTime @default(now()) // BR-7.1 — always reflects live data at this timestamp
+  id                  String   @id @default(cuid())
+  type                String // "cv" | "resume-tailored"
+  targetRole          String?
+  generatedAt         DateTime @default(now()) // BR-7.1 — always reflects live data at this timestamp
   // Self-hosted per Constitution §9 — the generated PDF's actual bytes, not
   // just a reference to external object storage. Small documents (a CV),
   // low volume (one admin, generated on visitor demand): Postgres is the
   // right store here, not a reason to add a new external dependency.
-  fileData    Bytes
-  fileUrl     String   // resolves to the /api/v1/cv/documents/{id} download route
+  fileData            Bytes
+  fileUrl             String // resolves to the /api/v1/cv/documents/{id} download route
   supersededByFileUrl String? // BR-7.2 — prior versions kept, not deleted
 }
 
@@ -324,13 +336,14 @@ model Inquiry {
   inquiryType    InquiryType   @relation(fields: [inquiryTypeId], references: [id])
   name           String
   email          String
-  message        String        // BR-2.3: 20-5000 chars, enforced in lib/schemas.ts
-  source         String?       // captured server-side only; "direct" when no Referer (BR-2.5)
+  message        String // BR-2.3: 20-5000 chars, enforced in lib/schemas.ts
+  source         String? // captured server-side only; "direct" when no Referer (BR-2.5)
   status         InquiryStatus @default(NEW)
   idempotencyKey String?       @unique // BR-2.6 — dedupes a resubmit within the client-held window
   createdAt      DateTime      @default(now())
 
   @@index([status, createdAt])
+  @@index([inquiryTypeId])
 }
 
 // ============================================================
@@ -347,7 +360,7 @@ model VisitorLens {
 
 model Event {
   id         String   @id @default(cuid())
-  eventType  String   // "page_view" | "system_viewed" | "concierge_message" | "resume_downloaded"
+  eventType  String // "page_view" | "system_viewed" | "concierge_message" | "resume_downloaded"
   entityType String?
   entityId   String?
   sessionId  String
@@ -359,12 +372,12 @@ model Event {
 }
 
 model ContentChunk {
-  id         String                    @id @default(cuid())
-  entityType String                    // "system" | "timeline" | "skill" | "document"
+  id         String                      @id @default(cuid())
+  entityType String // "system" | "timeline" | "skill" | "document"
   entityId   String
   content    String
   embedding  Unsupported("vector(1536)")
-  createdAt  DateTime                  @default(now())
+  createdAt  DateTime                    @default(now())
 
   @@index([entityType, entityId])
 }

@@ -51,6 +51,38 @@ ADMIN_EMAIL="you@example.com" ADMIN_PASSWORD="..." \
 rm .env.production.local
 ```
 
+## Database migrations — how schema changes reach each environment
+
+Migrations are applied **by the deployment build**, before the new code is built (`vercel.ts` → `scripts/vercel-build.mjs`):
+
+1. If `DB_MIGRATE_ON_BUILD=true` for that Vercel environment, `prisma migrate deploy` runs over the direct connection (`DATABASE_URL_UNPOOLED`, the schema's `directUrl`).
+2. Then `next build`.
+3. If the migration fails, the build fails and nothing is deployed — code never goes live against a schema it doesn't match.
+
+This is safe while the previous deployment is still serving because every migration is **additive** (EXT-1: add → backfill → switch readers → only then remove), so old code keeps working on the new schema.
+
+**Enable per environment** (Vercel → Project → Settings → Environment Variables):
+
+| Environment | `DB_MIGRATE_ON_BUILD` | Precondition |
+|---|---|---|
+| Production | `true` | — |
+| Preview | `true` **only after** preview branching is on | Otherwise a PR's migration would run against production |
+
+**Preview branching** (isolates every PR's database): Vercel → Project → Storage → `neon-blue-planet` → integration settings → enable *create a database branch for each preview deployment*. Each preview then gets its own Neon branch (a copy-on-write copy of production) with its own `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, so the PR's migration is tested on real data without touching production.
+
+## Local development — never against production
+
+`.env.local` holds the production connection string (pulled from Vercel). Nothing local uses it for the database anymore:
+
+| File | Database | Used by |
+|---|---|---|
+| `.env.development.local` | local `malulekeks_dev` (Postgres 16 on this machine) | `next dev` (Next loads it ahead of `.env.local`) and every `npm run prisma:*`, `db:seed`, `sync:github`, `create-admin` script |
+| `.env.test.local` | local `malulekeks_test` (disposable) | Vitest — and `vitest.config.mts` **refuses to run** against any non-local host outside CI |
+
+Both databases need the `vector` and `pgcrypto` extensions (created once by a superuser); the app connects as a dedicated `malulekeks_dev` role, never `postgres`.
+
+Production data operations (bootstrap, admin creation) keep their explicit, separate runbook above, using a temporary `.env.production.local` that's deleted afterwards.
+
 ## Redeploying
 
 Normal case: push to `main`, Vercel deploys automatically. Manual trigger from local (matches whatever's currently checked out, not necessarily what's on GitHub — prefer a real push):
