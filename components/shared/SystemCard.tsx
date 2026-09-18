@@ -25,7 +25,7 @@ export function SystemCard({ slug, name, description, status, isFlagship }: Syst
   return (
     <Link
       href={`/systems/${slug}`}
-      className="group relative block border border-slate/25 bg-white px-6 py-5 outline-none transition-colors hover:border-slate/40"
+      className="group border-slate/25 hover:border-slate/40 relative block border bg-white px-6 py-5 transition-colors outline-none"
     >
       {/* Four corner brackets — the CAD/drafting selection indicator,
           replacing the rounded-card-plus-shadow treatment this design
@@ -33,10 +33,10 @@ export function SystemCard({ slug, name, description, status, isFlagship }: Syst
       <span className={`${CORNER_BASE} top-0 left-0 border-t-2 border-l-2`} />
       <span className={`${CORNER_BASE} top-0 right-0 border-t-2 border-r-2`} />
       <span className={`${CORNER_BASE} bottom-0 left-0 border-b-2 border-l-2`} />
-      <span className={`${CORNER_BASE} bottom-0 right-0 border-b-2 border-r-2`} />
+      <span className={`${CORNER_BASE} right-0 bottom-0 border-r-2 border-b-2`} />
 
       <div className="flex items-start justify-between gap-4">
-        <h3 className="font-sans font-semibold text-lg text-ink">{name}</h3>
+        <h3 className="text-ink font-sans text-lg font-semibold">{name}</h3>
         <StatusBadge label={status.label} colorToken={status.colorToken} />
       </div>
 
@@ -46,12 +46,12 @@ export function SystemCard({ slug, name, description, status, isFlagship }: Syst
         // accent" is a deliberate reuse), so a flagship system that's also
         // in_progress needs a cue beyond "this text is brass" to read as
         // two distinct facts rather than one repeated one.
-        <p className="font-mono text-xs text-accent mt-1 flex items-center gap-1">
+        <p className="text-accent mt-1 flex items-center gap-1 font-mono text-xs">
           <span aria-hidden="true">■</span> Flagship
         </p>
       )}
 
-      <p className="font-serif text-sm text-slate mt-3 max-w-prose">{description}</p>
+      <p className="text-slate mt-3 max-w-prose font-serif text-sm">{description}</p>
     </Link>
   );
 }

@@ -1,73 +1,84 @@
 // components/shared/SiteFooter.tsx
-// Persistent, low-noise contact affordances across every public page — the
-// conventional home for this, not the header (which stays focused on
-// primary nav + the real /contact inquiry form as the primary CTA).
-// Real destinations only, sourced from the README's own contact block —
-// never placeholder links.
+// The back cover of the drawing set: who, the sheet index, direct contact,
+// and a colophon naming the platform's real stack (DESIGN-SYSTEM.md v2 §3).
+// Real destinations only — never placeholder links.
 
+import Link from "next/link";
+import { BrandMark } from "@/components/shared/BrandMark";
 import { Container } from "@/components/shared/Container";
+import { OWNER, PLATFORM_STACK, SHEETS } from "@/lib/content/sheets";
 
-const CONTACT_LINKS = [
-  {
-    label: "LinkedIn",
-    href: "https://za.linkedin.com/in/kurhula-success-maluleke-32153231a",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-        <rect x="2" y="9" width="4" height="12" />
-        <circle cx="4" cy="4" r="2" />
-      </svg>
-    ),
-  },
-  {
-    label: "WhatsApp",
-    href: "https://wa.me/27640708649",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Email",
-    href: "mailto:kurhula04s@gmail.com",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-        <polyline points="22,6 12,13 2,6" />
-      </svg>
-    ),
-  },
+const CONTACT = [
+  { label: "Email", value: OWNER.email, href: `mailto:${OWNER.email}` },
+  { label: "LinkedIn", value: "kurhula-success-maluleke", href: OWNER.linkedin },
+  { label: "WhatsApp", value: "+27 64 070 8649", href: OWNER.whatsapp },
+  { label: "GitHub", value: "MALULEKE-KS", href: OWNER.github },
 ];
 
 export function SiteFooter() {
-  return (
-    <footer className="border-t border-slate/20 bg-paper mt-auto">
-      <Container className="py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <a
-          href="https://github.com/MALULEKE-KS"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-xs text-slate hover:text-accent transition-colors"
-        >
-          MALULEKE-KS
-        </a>
+  const external = (href: string) => !href.startsWith("mailto:");
 
-        <div className="flex flex-wrap items-center gap-6 sm:gap-8">
-          {CONTACT_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target={link.href.startsWith("mailto:") ? undefined : "_blank"}
-              rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-              className="group inline-flex items-center gap-2 font-sans text-sm text-ink hover:text-accent transition-colors"
-            >
-              <span className="text-slate group-hover:text-accent transition-colors">{link.icon}</span>
-              {link.label}
-            </a>
-          ))}
+  return (
+    <footer className="bg-blueprint-deep text-paper">
+      <Container className="grid gap-12 py-16 md:grid-cols-12">
+        <div className="md:col-span-5">
+          <Link href="/" className="focus-visible:outline-amber inline-flex items-center gap-3 focus-visible:outline-2">
+            <BrandMark className="text-paper size-8" />
+            <span className="font-mono text-sm font-medium">MALULEKE-KS</span>
+          </Link>
+          <p className="text-mist mt-6 max-w-sm font-serif text-lg leading-relaxed">
+            Systems disciplined enough to be trusted with real money, real institutions and real people&rsquo;s
+            outcomes.
+          </p>
+        </div>
+
+        <div className="md:col-span-3">
+          <h2 className="text-line font-mono text-xs">Sheets</h2>
+          <ul className="mt-4 space-y-2">
+            {SHEETS.map((s) => (
+              <li key={s.href}>
+                <Link
+                  href={s.href}
+                  className="group text-mist hover:text-paper inline-flex items-baseline gap-3 text-sm"
+                >
+                  <span className="text-line group-hover:text-amber font-mono text-xs">{s.number}</span>
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="md:col-span-4">
+          <h2 className="text-line font-mono text-xs">Direct</h2>
+          <dl className="mt-4 space-y-3">
+            {CONTACT.map((c) => (
+              <div key={c.label} className="grid grid-cols-[5.5rem_1fr] items-baseline gap-2">
+                <dt className="text-line font-mono text-xs">{c.label}</dt>
+                <dd className="min-w-0">
+                  <a
+                    href={c.href}
+                    target={external(c.href) ? "_blank" : undefined}
+                    rel={external(c.href) ? "noopener noreferrer" : undefined}
+                    className="text-paper decoration-line/40 hover:text-amber hover:decoration-amber text-sm break-words underline underline-offset-4"
+                  >
+                    {c.value}
+                  </a>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </Container>
+
+      <div className="border-line/15 border-t">
+        <Container className="text-line flex flex-col gap-2 py-5 font-mono text-xs md:flex-row md:items-center md:justify-between">
+          <p>
+            &copy; {new Date().getFullYear()} {OWNER.name}. Engineered in {OWNER.location}.
+          </p>
+          <p>Rev 2.0 / {PLATFORM_STACK.join(" / ")}</p>
+        </Container>
+      </div>
     </footer>
   );
 }
