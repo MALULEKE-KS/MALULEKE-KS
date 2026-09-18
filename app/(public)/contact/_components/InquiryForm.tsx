@@ -8,6 +8,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
 
 const INQUIRY_TYPES = [
@@ -177,13 +178,9 @@ export function InquiryForm() {
         <p className="font-sans text-sm text-critical">Something went wrong. Try again.</p>
       )}
 
-      <button
-        type="submit"
-        disabled={state === "submitting"}
-        className="font-sans text-sm font-medium bg-ink text-paper px-6 py-2.5 transition-colors hover:bg-ink/85 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={state === "submitting"}>
         {state === "submitting" ? "Sending…" : "Send"}
-      </button>
+      </Button>
     </form>
   );
 }

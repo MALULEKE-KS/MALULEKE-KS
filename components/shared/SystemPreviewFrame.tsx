@@ -14,7 +14,7 @@ interface SystemPreviewFrameProps {
 
 export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPreviewFrameProps) {
   return (
-    <div className="relative aspect-video w-full border border-slate/20 bg-[#E2E7ED] overflow-hidden">
+    <div className="relative aspect-video w-full border border-slate/20 bg-slate/10 overflow-hidden">
       {screenshotUrl ? (
         // Plain <img>, not next/image: screenshotUrl is arbitrary
         // admin-supplied text (there's no file upload yet, see
@@ -36,9 +36,9 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPrevi
           }}
         >
           <div className="w-full max-w-[280px] border border-dashed border-slate/40 bg-paper/85 p-4 flex flex-col gap-2">
-            <div className="flex justify-between font-mono text-[9px] text-slate">
-              <span>PREVIEW</span>
-              <span className="text-accent">[PENDING]</span>
+            <div className="flex justify-between font-mono text-xs text-slate">
+              <span>Preview</span>
+              <span>Pending</span>
             </div>
             <div className="h-1.5 w-full bg-slate/20" />
             <div className="h-1.5 w-full bg-slate/20" />
@@ -49,7 +49,7 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPrevi
 
       {/* Mono URL bar along the bottom — real live URL when we have one,
           otherwise names the state plainly rather than showing nothing. */}
-      <div className="absolute bottom-0 inset-x-0 bg-paper/95 border-t border-slate/20 px-3 py-1.5 flex items-center gap-1.5 font-mono text-[11px] text-slate">
+      <div className="absolute bottom-0 inset-x-0 bg-paper/95 border-t border-slate/20 px-3 py-1.5 flex items-center gap-1.5 font-mono text-xs text-slate">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" className="shrink-0">
           <rect x="3" y="11" width="18" height="11" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />

@@ -5,6 +5,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function DownloadCvButton() {
   const [state, setState] = useState<"idle" | "generating" | "error">("idle");
@@ -31,14 +32,9 @@ export function DownloadCvButton() {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={handleDownload}
-        disabled={state === "generating"}
-        className="font-mono text-xs uppercase tracking-wide px-4 py-2 border border-accent text-accent hover:bg-accent/5 transition-colors disabled:opacity-50"
-      >
+      <Button type="button" variant="outline" onClick={handleDownload} disabled={state === "generating"}>
         {state === "generating" ? "Generating…" : "Download PDF"}
-      </button>
+      </Button>
       {state === "error" && <p className="font-mono text-xs text-critical mt-2">Could not generate the PDF.</p>}
     </div>
   );

@@ -4,6 +4,7 @@
 // BR-1.3/1.4). See docs/PAGE-SPECIFICATIONS.md, docs/DESIGN-SYSTEM.md §2a/§3a.
 
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemCard } from "@/components/shared/SystemCard";
 import { MarginAnnotations } from "@/components/shared/MarginAnnotations";
@@ -103,32 +104,26 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         {(system.repoUrl || system.liveUrl) && (
           <div className="flex flex-wrap gap-3 mb-8 pt-4 border-t border-dashed border-slate/20">
             {system.liveUrl && (
-              <a
-                href={system.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wide px-4 py-2 border border-accent text-accent hover:bg-accent/5 transition-colors"
-              >
-                View live
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </a>
+              <Button asChild>
+                <a href={system.liveUrl} target="_blank" rel="noopener noreferrer">
+                  View live
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </Button>
             )}
             {system.repoUrl && (
-              <a
-                href={system.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wide px-4 py-2 border border-slate/40 text-ink hover:bg-slate/5 transition-colors"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                </svg>
-                View source
-              </a>
+              <Button asChild variant="outline">
+                <a href={system.repoUrl} target="_blank" rel="noopener noreferrer">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                  </svg>
+                  View source
+                </a>
+              </Button>
             )}
           </div>
         )}
@@ -136,7 +131,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
       {relatedSystems.length > 0 && (
         <div className="border-t border-slate/20 pt-6 mt-8">
-          <h2 className="font-mono text-xs text-slate mb-4">More systems</h2>
+          <h2 className="font-sans font-semibold text-xl text-ink mb-4">More systems</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {relatedSystems.map((related) => (
               <SystemCard

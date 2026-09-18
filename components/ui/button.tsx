@@ -4,27 +4,30 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Restyled to DESIGN-SYSTEM.md rather than shadcn's defaults: flat (no
+// shadows, §0), sharp corners (§3), sans sentence-case labels (§2), brass
+// kept off buttons (§4.2 — accent is for flagship markers, active states and
+// the numbers). Focus is an outline, not a ring: Tailwind rings render as
+// box-shadow, which this system doesn't use.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        // Primary action — one per view.
+        default: "bg-ink text-paper hover:bg-ink/85",
+        destructive: "bg-critical text-paper hover:bg-critical/90",
+        // Secondary / utility action.
+        outline: "border border-ink text-ink hover:bg-ink hover:text-paper",
+        secondary: "bg-slate text-paper hover:bg-slate/90",
+        ghost: "text-ink hover:bg-slate/10",
+        link: "text-ink underline underline-offset-4 decoration-slate/40 hover:decoration-ink",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: "h-10 px-6",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-12 px-8",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {

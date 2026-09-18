@@ -1,8 +1,8 @@
 // components/shared/SiteHeader.tsx
 // The persistent site frame every page was missing — see DESIGN-SYSTEM.md
 // §3's own mockup ("MALULEKE-KS   Systems  Journey…"), which described this
-// but it was never actually built. Wordmark in mono (matching the ledger
-// hero's "MALULEKE-KS — SYSTEM LOG" treatment), nav in sans, hairline
+// but it was never actually built. Wordmark in mono (the platform's own
+// identifier, like the ledger hero's mono log header), nav in sans, hairline
 // bottom border — no shadow, no rounded pill nav, consistent with the rest
 // of the drafting-table language.
 

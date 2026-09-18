@@ -7,6 +7,8 @@
 import Link from "next/link";
 import { LedgerHero } from "@/components/home/LedgerHero";
 import { SystemCard } from "@/components/shared/SystemCard";
+import { TextLink } from "@/components/shared/TextLink";
+import { Button } from "@/components/ui/button";
 import { getHomepageStats, getPrioritySystems } from "@/lib/queries/homepage";
 
 export async function HomeContent() {
@@ -30,9 +32,9 @@ export async function HomeContent() {
               />
             ))}
           </div>
-          <Link href="/systems" className="rule-citation text-sm inline-block mt-6">
+          <TextLink href="/systems" className="inline-block mt-6">
             View all systems
-          </Link>
+          </TextLink>
         </section>
       )}
 
@@ -41,19 +43,14 @@ export async function HomeContent() {
           I build systems disciplined enough to be trusted with real money, real institutions, and real
           people&rsquo;s outcomes — engineered in South Africa, held to a global standard.
         </p>
-        <Link href="/how-i-build" className="rule-citation text-sm">
-          How I build
-        </Link>
+        <TextLink href="/how-i-build">How I build</TextLink>
       </section>
 
       <section className="pt-12 pb-16 border-t border-slate/20">
         <p className="font-sans text-ink mb-3">Have something to build, or something to say?</p>
-        <Link
-          href="/contact"
-          className="font-sans text-sm font-medium bg-ink text-paper px-6 py-2.5 inline-block transition-colors hover:bg-ink/85"
-        >
-          Get in touch
-        </Link>
+        <Button asChild>
+          <Link href="/contact">Get in touch</Link>
+        </Button>
       </section>
     </>
   );

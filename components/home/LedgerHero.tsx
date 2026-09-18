@@ -37,7 +37,7 @@ export function LedgerHero({
     <section className="ledger-hero pt-16 pb-12">
       <div className="md:flex md:items-start md:gap-8">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-sm text-slate mb-4">MALULEKE-KS — SYSTEM LOG</p>
+          <p className="font-mono text-sm text-slate mb-4">System log</p>
 
           <div className="font-sans text-2xl md:text-4xl text-ink leading-snug space-y-1">
             {revealedLines.map((line, i) => (

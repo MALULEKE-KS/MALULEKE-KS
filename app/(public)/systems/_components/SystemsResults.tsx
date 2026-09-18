@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 import { SystemCard } from "@/components/shared/SystemCard";
+import { TextLink } from "@/components/shared/TextLink";
 import { SystemsFilterBar } from "./SystemsFilterBar";
 import { getPublicSystems, getFilterOrganizations } from "@/lib/queries/systems";
 import { listLookupValues } from "@/lib/rules/lookups";
@@ -48,22 +49,18 @@ export async function SystemsResults({ searchParams: params }: SystemsResultsPro
         organizations={organizations}
         domains={domains.map((d) => ({ key: d.key, label: d.label }))}
         statuses={statuses.map((s) => ({ key: s.key, label: s.label }))}
+        showClear={systems.length > 0}
       />
 
       {systems.length === 0 ? (
-        <div className="py-16 text-center">
-          {/* Voice consistent with the ledger/audit-log metaphor established
-              on the homepage ("SYSTEM LOG") — plainly stated, not apologetic
-              (Design System §4: "errors and empty states speak plainly"). */}
-          <p className="font-mono text-sm text-slate mb-1">SYSTEM LOG</p>
+        <div className="py-16">
+          {/* Plainly stated, left-aligned, never a dead end (Design System §4:
+              "errors and empty states speak plainly"; PAGE-SPECIFICATIONS
+              /systems: one-click clear-filters). */}
           <p className="font-sans text-ink mb-4">
-            {hasFilters ? "No entries logged for this query." : "No systems logged yet."}
+            {hasFilters ? "No systems match these filters." : "No systems published yet."}
           </p>
-          {hasFilters && (
-            <Link href="/systems" className="rule-citation text-sm">
-              Clear filters
-            </Link>
-          )}
+          {hasFilters && <TextLink href="/systems">Clear filters</TextLink>}
         </div>
       ) : (
         <>
