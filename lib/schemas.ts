@@ -281,6 +281,32 @@ export const CvGenerateResultSchema = z.object({
   generatedAt: z.string().datetime(),
 });
 
+export const FlagEntrySchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  enabled: z.boolean(),
+  notes: z.string().nullable(),
+});
+
+export const FlagUpdateInputSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export const VisitorLensEntrySchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  label: z.string(),
+  priorityContent: z.record(z.string(), z.unknown()),
+  aiFramingPrompt: z.string(),
+});
+
+export const VisitorLensInputSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  priorityContent: z.record(z.string(), z.unknown()),
+  aiFramingPrompt: z.string().min(1),
+});
+
 export const TimelineCreateInputSchema = z.object({
   milestoneTypeId: z.string(),
   title: z.string().min(1),
