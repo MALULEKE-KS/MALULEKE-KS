@@ -12,42 +12,46 @@
    token at runtime. `-on-dark` variants are the same meaning, re-measured
    for blueprint surfaces (DESIGN-SYSTEM.md §1). */
 :root {
-  --color-paper: #f4f1ea;
-  --color-sheet: #fffdf8;
-  --color-blueprint: #0b2a4a;
-  --color-blueprint-deep: #06182e;
-  --color-ink: #0f1729;
-  --color-slate: #3d4a5c;
-  --color-mist: #b7c9df;
-  --color-line: #7ca7d6;
-  --color-amber: #f5b335;
-  --color-accent: #8a5d12;
-  --color-signal-finished: #1f6f5c;
-  --color-signal-progress: #8a5d12;
-  --color-signal-planned: #5a6470;
-  --color-critical: #9b3a2e;
+  --color-paper: #f4f2ee;
+  --color-sheet: #fcfbf9;
+  --color-night: #131519;
+  --color-night-deep: #0b0c0e;
+  --color-ink: #121417;
+  --color-slate: #4b5159;
+  --color-mist: #a3a9b1;
+  --color-line: #7c858f;
+  --color-ember: #ff5b1f;
+  --color-accent: #c2410c;
+  --color-signal-finished: #0f7a4b;
+  --color-signal-progress: #c2410c;
+  --color-signal-planned: #5b616a;
+  --color-critical: #b42318;
 
-  --color-signal-finished-on-dark: #4cd1a0;
-  --color-signal-progress-on-dark: #f5b335;
-  --color-signal-planned-on-dark: #9fb0c4;
-  --color-accent-on-dark: #f5b335;
-  --color-slate-on-dark: #b7c9df;
+  --color-signal-finished-on-dark: #3ddc97;
+  --color-signal-progress-on-dark: #ff5b1f;
+  --color-signal-planned-on-dark: #a3a9b1;
+  --color-accent-on-dark: #ff5b1f;
+  --color-slate-on-dark: #a3a9b1;
 
   /* shadcn/ui semantic tokens (HSL triplets) mapped onto the palette. */
-  --background: 43 33% 94%; /* paper */
-  --foreground: 222 46% 11%; /* ink */
-  --border: 215 20% 30%; /* slate */
-  --input: 215 20% 30%; /* slate */
-  --ring: 37 77% 31%; /* brass */
-  --primary: 211 74% 17%; /* blueprint */
-  --primary-foreground: 43 33% 94%; /* paper */
-  --secondary: 215 20% 30%; /* slate */
-  --secondary-foreground: 43 33% 94%;
-  --muted: 40 20% 88%;
-  --muted-foreground: 215 20% 30%;
-  --destructive: 7 54% 39%; /* critical */
-  --destructive-foreground: 43 33% 94%;
-  --radius: 2px;
+  --background: 40 22% 95%; /* paper */
+  --foreground: 216 12% 8%; /* ink */
+  --card: 40 33% 98%; /* sheet */
+  --card-foreground: 216 12% 8%;
+  --popover: 216 12% 8%; /* tooltips are dark */
+  --popover-foreground: 40 22% 95%;
+  --border: 216 8% 84%;
+  --input: 216 8% 78%;
+  --ring: 18 100% 56%; /* ember */
+  --primary: 216 12% 8%; /* ink */
+  --primary-foreground: 40 22% 95%;
+  --secondary: 40 14% 90%;
+  --secondary-foreground: 216 12% 8%;
+  --muted: 40 14% 90%;
+  --muted-foreground: 216 8% 32%;
+  --destructive: 4 77% 40%;
+  --destructive-foreground: 40 22% 95%;
+  --radius: 0.75rem;
 }
 
 html {
@@ -59,27 +63,74 @@ html {
   }
 }
 
-/* ---- Drafting grids (DESIGN-SYSTEM.md §3) ----
-   Two line layers — fine 24px, major 120px — like a sheet of graph vellum.
-   These are hairlines, not gradient fills. */
-.bp-grid {
-  background-color: var(--color-blueprint);
-  background-image:
-    linear-gradient(to right, rgb(124 167 214 / 0.16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(124 167 214 / 0.16) 1px, transparent 1px),
-    linear-gradient(to right, rgb(124 167 214 / 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(124 167 214 / 0.07) 1px, transparent 1px);
-  background-size:
-    120px 120px,
-    120px 120px,
-    24px 24px,
-    24px 24px;
+/* ---- Hero field (DESIGN-SYSTEM.md v3 §3) ----
+   One quiet dot matrix that fades out from the top-left, plus a single soft
+   ember glow and one cool counter-glow. Replaces v2's full-bleed grid, which
+   read as noise. */
+.hero-field {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-night-deep);
 }
-.paper-grid {
-  background-image:
-    linear-gradient(to right, rgb(11 42 74 / 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(11 42 74 / 0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
+.hero-field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgb(255 255 255 / 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 30% 20%, #000 20%, transparent 75%);
+}
+.hero-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(40rem 26rem at 85% 10%, rgb(255 91 31 / 0.16), transparent 70%),
+    radial-gradient(34rem 24rem at 5% 100%, rgb(96 130 170 / 0.12), transparent 70%);
+}
+
+/* Numbers in the ledger: ember → warm gold, the guide's "gradient on 1–3
+   keywords" (§5). Solid ember fallback where clip-text is unsupported. */
+.text-ember-gradient {
+  color: var(--color-ember);
+  background: linear-gradient(135deg, #ff5b1f 0%, #ffb547 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---- Spotlight cards ----
+   A soft radial light that follows the cursor inside a card. Position comes
+   from --mx/--my, set by Spotlight.tsx on pointermove. Pointer devices only. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), var(--spot, rgb(255 91 31 / 0.1)), transparent 60%);
+}
+@media (hover: hover) {
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Live indicator: the one pulsing dot, on the hero's "live" badge. */
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+.live-ping {
+  animation: live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 /* ---- draw: SVG strokes draw themselves in ----
@@ -156,7 +207,7 @@ html {
   height: 0.9em;
   margin-left: 4px;
   vertical-align: -0.08em;
-  background-color: var(--color-amber);
+  background-color: var(--color-ember);
   animation: caret-blink 0.85s step-end infinite;
 }
 
@@ -174,7 +225,8 @@ html {
   .draw,
   .node-in,
   .orbit,
-  .ledger-caret {
+  .ledger-caret,
+  .live-ping {
     animation: none !important;
   }
   .draw {
@@ -192,7 +244,7 @@ html {
 
 /* ---- Signature small details ---- */
 ::selection {
-  background-color: var(--color-amber);
+  background-color: var(--color-ember);
   color: var(--color-ink);
 }
 
@@ -203,7 +255,7 @@ html {
   background: var(--color-paper);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-blueprint);
+  background: var(--color-line);
   border: 2px solid var(--color-paper);
 }
 

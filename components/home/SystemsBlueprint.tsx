@@ -107,9 +107,6 @@ function Drawing({
       role="group"
       aria-label={`Drawing of the platform: ${placed.length} published system${placed.length === 1 ? "" : "s"} around the architect`}
     >
-      <text x={layout.slots[0]!.x} y="16" className="fill-line font-mono" fontSize="11">
-        Fig. 1 — Published systems, drawn from live data
-      </text>
 
       {/* Crosshair + construction circles */}
       <g aria-hidden="true" fill="none">
@@ -193,28 +190,29 @@ function Drawing({
               pathLength={1}
               fill="none"
               strokeWidth="1.25"
-              className="draw stroke-line group-hover:stroke-amber group-focus-visible:stroke-amber transition-colors"
+              className="draw stroke-line group-hover:stroke-ember group-focus-visible:stroke-ember transition-colors"
               style={timing(t, 700)}
             />
-            <circle cx={ringX} cy={ringY} r="3.5" className="node-in fill-amber" style={timing(t + 600)} />
+            <circle cx={ringX} cy={ringY} r="3.5" className="node-in fill-ember" style={timing(t + 600)} />
             <g className="node-in" style={timing(t + 450)}>
               <rect
                 x={slot.x}
                 y={slot.y}
                 width={node.w}
                 height={node.h}
-                className="fill-blueprint-deep stroke-line/60 group-hover:stroke-amber group-focus-visible:stroke-amber transition-colors group-focus-visible:[stroke-width:2.5]"
+                rx="10"
+                className="fill-night-soft stroke-line/60 group-hover:stroke-ember group-focus-visible:stroke-ember transition-colors group-focus-visible:[stroke-width:2.5]"
                 strokeWidth="1.25"
               />
               {system.isFlagship && (
-                <rect x={slot.x} y={slot.y} width="8" height="8" className="fill-amber">
+                <rect x={slot.x + node.w - 42} y={slot.y + 10} width="8" height="8" rx="4" className="fill-ember">
                   <title>Flagship</title>
                 </rect>
               )}
               <text x={slot.x + 14} y={slot.y + 26} className="fill-paper font-sans font-medium" fontSize={node.name}>
                 {truncate(system.name, node.max)}
               </text>
-              <rect x={slot.x + 14} y={slot.y + 39} width="7" height="7" style={{ fill: color }} />
+              <circle cx={slot.x + 17.5} cy={slot.y + 42.5} r="3.5" style={{ fill: color }} />
               <text x={slot.x + 27} y={slot.y + 46} className="font-mono" fontSize="11" style={{ fill: color }}>
                 {system.status}
               </text>
@@ -222,7 +220,7 @@ function Drawing({
                 d={`M${slot.x + node.w - 22} ${slot.y + 38} L${slot.x + node.w - 12} ${slot.y + 28} M${slot.x + node.w - 20} ${slot.y + 28} H${slot.x + node.w - 12} V${slot.y + 36}`}
                 fill="none"
                 strokeWidth="1.5"
-                className="stroke-line group-hover:stroke-amber group-focus-visible:stroke-amber transition-colors"
+                className="stroke-line group-hover:stroke-ember group-focus-visible:stroke-ember transition-colors"
               />
             </g>
           </Link>
@@ -240,7 +238,7 @@ function Drawing({
           style={timing(2300, 900)}
         />
         <g className="node-in" style={timing(2900)}>
-          <rect x={w / 2 - labelWidth / 2} y={dimY - 9} width={labelWidth} height="18" className="fill-blueprint" />
+          <rect x={w / 2 - labelWidth / 2} y={dimY - 9} width={labelWidth} height="18" rx="9" className="fill-night-deep" />
           <text
             x={w / 2}
             y={dimY + 4}

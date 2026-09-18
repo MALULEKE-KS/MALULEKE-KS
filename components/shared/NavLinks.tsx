@@ -1,14 +1,15 @@
 // components/shared/NavLinks.tsx
-// Primary nav with a current-sheet indicator (aria-current + amber rule —
-// DESIGN-SYSTEM.md v2 §4.2, the accent marks "where you are"). Each link
-// carries its sheet number in mono. Below md the nav collapses behind a
-// Menu button into a full-width panel instead of wrapping onto two rows.
+// Primary nav: pill links with an active state (filled pill + ember dot,
+// plus aria-current so it isn't colour alone). Below md, a Menu button opens
+// a full-width glass panel. The panel is open *for a given path*, so any
+// navigation closes it without an effect.
 
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { SHEETS } from "@/lib/content/sheets";
 import { cn } from "@/lib/utils";
 
@@ -16,81 +17,75 @@ const NAV = SHEETS.filter((s) => s.href !== "/");
 
 export function NavLinks() {
   const pathname = usePathname();
-  // The panel is open *for a given path*: navigating anywhere changes the
-  // pathname, so it closes itself with no effect needed.
   const [openFor, setOpenFor] = useState<string | null>(null);
   const open = openFor === pathname;
-  const setOpen = (fn: (v: boolean) => boolean) => setOpenFor(fn(open) ? pathname : null);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <>
-      <nav aria-label="Primary" className="hidden md:flex md:items-center md:gap-7">
-        {NAV.map((s) => {
-          const active = isActive(s.href);
-          return (
-            <Link
-              key={s.href}
-              href={s.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "group relative py-5 font-sans text-sm transition-colors",
-                active ? "text-paper" : "text-mist hover:text-paper"
-              )}
-            >
-              <span className="text-line group-hover:text-amber mr-1.5 font-mono text-xs">{s.number}</span>
-              {s.label}
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "bg-amber absolute inset-x-0 bottom-0 h-0.5 origin-left transition-transform duration-200",
-                  active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
-          );
-        })}
+      <nav aria-label="Primary" className="hidden md:block">
+        <ul className="flex items-center gap-1">
+          {NAV.map((s) => {
+            const active = isActive(s.href);
+            return (
+              <li key={s.href}>
+                <Link
+                  href={s.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-ember",
+                    active ? "bg-white/10 text-paper" : "text-mist hover:bg-white/5 hover:text-paper",
+                  )}
+                >
+                  {active && <span aria-hidden="true" className="size-1.5 rounded-full bg-ember" />}
+                  {s.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
 
       <button
         type="button"
-        className="border-mist/40 text-paper focus-visible:outline-amber inline-flex items-center gap-2 border px-3 py-2 font-mono text-xs focus-visible:outline-2 md:hidden"
+        className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-paper focus-visible:outline-2 focus-visible:outline-ember md:hidden"
         aria-expanded={open}
         aria-controls="mobile-nav"
-        onClick={() => setOpen((v) => !v)}
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpenFor(open ? null : pathname)}
       >
-        <span aria-hidden="true" className="flex flex-col gap-1">
-          <span className={cn("bg-paper block h-px w-4 transition-transform", open && "translate-y-[5px] rotate-45")} />
-          <span className={cn("bg-paper block h-px w-4 transition-opacity", open && "opacity-0")} />
-          <span
-            className={cn("bg-paper block h-px w-4 transition-transform", open && "-translate-y-[5px] -rotate-45")}
-          />
-        </span>
-        {open ? "Close" : "Menu"}
+        {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </button>
 
       {open && (
         <nav
           id="mobile-nav"
           aria-label="Primary"
-          className="border-line/20 bg-blueprint-deep absolute inset-x-0 top-full border-b md:hidden"
+          className="absolute inset-x-0 top-full border-b border-white/10 bg-night-deep/95 backdrop-blur-xl md:hidden"
         >
-          <ul className="mx-auto max-w-6xl px-6 py-2">
+          <ul className="mx-auto max-w-6xl px-6 py-3">
             {NAV.map((s) => {
               const active = isActive(s.href);
               return (
-                <li key={s.href} className="border-line/15 border-b last:border-b-0">
+                <li key={s.href}>
                   <Link
                     href={s.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-baseline gap-3 py-4 font-sans text-lg",
-                      active ? "text-amber" : "text-paper"
+                      "flex items-center justify-between rounded-xl px-3 py-3.5 text-lg transition-colors",
+                      active ? "bg-white/10 text-paper" : "text-mist hover:bg-white/5 hover:text-paper",
                     )}
                   >
-                    <span className="text-line font-mono text-xs">{s.number}</span>
-                    {s.label}
+                    <span className="flex items-baseline gap-3">
+                      <span className="font-mono text-xs text-line">{s.number}</span>
+                      {s.label}
+                    </span>
+                    {active ? (
+                      <span aria-hidden="true" className="size-2 rounded-full bg-ember" />
+                    ) : (
+                      <ArrowUpRight className="size-4 text-line" aria-hidden="true" />
+                    )}
                   </Link>
                 </li>
               );

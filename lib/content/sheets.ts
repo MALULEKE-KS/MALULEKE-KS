@@ -22,7 +22,9 @@ export const SHEETS: Sheet[] = [
 export const OWNER = {
   name: "Kurhula Success Maluleke",
   initials: "K.S. Maluleke",
-  role: "Systems architect & full-stack engineer",
+  // From prisma/seed.ts (KSDRILL-SA organization role / experience title) —
+  // never an invented title (see the no-invented-personal-info rule).
+  role: "Founder & Principal Engineer, KSDRILL-SA",
   location: "South Africa",
   email: "kurhula04s@gmail.com",
   linkedin: "https://za.linkedin.com/in/kurhula-success-maluleke-32153231a",

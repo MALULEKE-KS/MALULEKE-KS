@@ -19,10 +19,10 @@ import { HomeContent } from "./_components/HomeContent";
 // the real current numbers on every visit.
 export const dynamic = "force-dynamic";
 
-// Loading state: the hero's blueprint band, already laid down, so the page
+// Loading state: the hero's graphite field, already laid down, so the page
 // doesn't flash from vellum to blue when the data arrives.
 function HomeSkeleton() {
-  return <section aria-busy="true" className="bp-grid min-h-[640px]" />;
+  return <section aria-busy="true" className="hero-field min-h-[640px]" />;
 }
 
 export default function HomePage() {

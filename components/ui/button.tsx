@@ -4,34 +4,30 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// DESIGN-SYSTEM.md v2 §6. Sharp corners; hover is the `print` lift — the
-// button shifts up-left and a hard, unblurred shadow appears under it, like
-// a misregistered print plate (§4.3). Focus is a 2px outline, never a glow.
+// DESIGN-SYSTEM.md v3 §6. Pill buttons; hover = a small lift plus a soft,
+// tinted shadow (the ember button glows). A trailing icon nudges forward on
+// hover. Focus is a 2px ember outline with offset — visible on light and dark.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-sm font-medium transition-[transform,box-shadow,background-color,color] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-x-0.5 motion-safe:hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 active:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "group/btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-sans text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5 active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg:last-child]:transition-transform motion-safe:hover:[&_svg:last-child]:translate-x-0.5",
   {
     variants: {
       variant: {
-        // Primary structure: blueprint.
-        default:
-          "bg-blueprint text-paper hover:shadow-[3px_3px_0_0_#F5B335] focus-visible:outline-accent",
-        // Secondary signal: the one "do this next" per view.
-        accent:
-          "bg-amber text-ink hover:shadow-print-sm focus-visible:outline-ink",
-        destructive: "bg-critical text-paper hover:shadow-print-sm focus-visible:outline-ink",
-        outline:
-          "border border-ink text-ink hover:bg-ink hover:text-paper hover:shadow-[3px_3px_0_0_#F5B335] focus-visible:outline-accent",
-        // For blueprint bands.
-        "outline-light":
-          "border border-paper/70 text-paper hover:border-amber hover:text-amber hover:shadow-[3px_3px_0_0_#F5B335] focus-visible:outline-amber",
-        secondary: "bg-slate text-paper hover:shadow-print-sm focus-visible:outline-accent",
-        ghost: "text-ink hover:bg-ink/5 focus-visible:outline-accent",
-        link: "text-ink underline underline-offset-4 decoration-slate/40 hover:decoration-ink hover:translate-x-0 hover:translate-y-0 focus-visible:outline-accent",
+        default: "bg-ink text-paper shadow-soft hover:bg-ink/90 hover:shadow-lift",
+        // The one "do this next" per view: ember fill, ink text (5.95:1).
+        accent: "bg-ember font-semibold text-ink hover:shadow-glow-ember",
+        outline: "border border-ink/15 bg-sheet text-ink shadow-soft hover:border-ink/30 hover:shadow-lift",
+        // For dark surfaces.
+        glass: "border border-white/15 bg-white/5 text-paper backdrop-blur-md hover:border-white/30 hover:bg-white/10",
+        "outline-light": "border border-white/15 bg-white/5 text-paper backdrop-blur-md hover:border-white/30 hover:bg-white/10",
+        destructive: "bg-critical text-paper hover:bg-critical/90",
+        secondary: "bg-secondary text-ink hover:bg-secondary/80",
+        ghost: "text-ink hover:bg-ink/5",
+        link: "rounded-none text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink motion-safe:hover:translate-y-0",
       },
       size: {
         default: "h-11 px-6",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-12 px-8 text-base",
+        sm: "h-9 px-4 text-sm",
+        lg: "h-12 px-7 text-base",
         icon: "h-11 w-11",
       },
     },
