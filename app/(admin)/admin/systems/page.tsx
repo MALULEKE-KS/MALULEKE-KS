@@ -7,6 +7,11 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
 
+// Auth-gated and reads live curation state — must never be statically
+// prerendered (CI's build job has no DATABASE_URL, and baked-in HTML
+// would hide real-time needsCuration/status changes anyway).
+export const dynamic = "force-dynamic";
+
 export default async function AdminSystemsListPage() {
   const systems = await db.system.findMany({
     ...systemWithAdminRelations,
