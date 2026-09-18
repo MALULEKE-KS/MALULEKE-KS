@@ -56,7 +56,7 @@ export default async function CvPage() {
 
       {experience.length > 0 && (
         <section className="mb-10 pt-8 border-t border-slate/20">
-          <h2 className="font-mono text-xs text-slate uppercase tracking-wide mb-4">Experience</h2>
+          <h2 className="font-sans font-semibold text-xl text-ink mb-4">Experience</h2>
           <div className="space-y-6">
             {experience.map((entry) => (
               <div key={entry.id}>
@@ -85,7 +85,7 @@ export default async function CvPage() {
 
       {education.length > 0 && (
         <section className="mb-10 pt-8 border-t border-slate/20">
-          <h2 className="font-mono text-xs text-slate uppercase tracking-wide mb-4">Education</h2>
+          <h2 className="font-sans font-semibold text-xl text-ink mb-4">Education</h2>
           <div className="space-y-6">
             {education.map((entry) => (
               <div key={entry.id}>
@@ -105,7 +105,7 @@ export default async function CvPage() {
 
       {skillsByCategory.size > 0 && (
         <section className="pt-8 border-t border-slate/20">
-          <h2 className="font-mono text-xs text-slate uppercase tracking-wide mb-4">Skills</h2>
+          <h2 className="font-sans font-semibold text-xl text-ink mb-4">Skills</h2>
           <div className="space-y-4">
             {[...skillsByCategory.entries()].map(([category, categorySkills]) => (
               <div key={category}>

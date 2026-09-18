@@ -48,7 +48,7 @@ export function SiteFooter() {
           href="https://github.com/MALULEKE-KS"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-[11px] text-slate uppercase tracking-widest hover:text-accent transition-colors"
+          className="font-mono text-xs text-slate hover:text-accent transition-colors"
         >
           MALULEKE-KS
         </a>
@@ -60,7 +60,7 @@ export function SiteFooter() {
               href={link.href}
               target={link.href.startsWith("mailto:") ? undefined : "_blank"}
               rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-              className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink hover:text-accent transition-colors"
+              className="group inline-flex items-center gap-2 font-sans text-sm text-ink hover:text-accent transition-colors"
             >
               <span className="text-slate group-hover:text-accent transition-colors">{link.icon}</span>
               {link.label}

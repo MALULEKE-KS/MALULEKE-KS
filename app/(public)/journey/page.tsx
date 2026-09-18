@@ -74,7 +74,7 @@ export default async function JourneyPage({
         <ol className="space-y-8 border-l border-slate/20 pl-6">
           {entries.map((entry) => (
             <li key={entry.id} className="relative">
-              <span className="absolute -left-[27px] top-1.5 w-2 h-2 bg-accent" aria-hidden="true" />
+              <span className="absolute -left-[27px] top-1.5 w-2 h-2 bg-ink" aria-hidden="true" />
               <p className="font-mono text-xs text-slate mb-1">{formatDate(entry.date)}</p>
               <h2 className="font-sans font-medium text-ink">{entry.title}</h2>
               {entry.description && (

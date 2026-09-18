@@ -11,13 +11,15 @@
 // below for a lens-driven one once VisitorLensProvider is real.
 // See docs/PAGE-SPECIFICATIONS.md ("/about").
 
-import Link from "next/link";
+import { TextLink } from "@/components/shared/TextLink";
 
 export default function AboutPage() {
   return (
     <article className="py-16 max-w-2xl">
       <h1 className="font-sans font-semibold text-2xl text-ink mb-1">About</h1>
-      <p className="font-sans text-slate mb-10">Final-year BSc Computer Science &amp; Mathematics · South Africa</p>
+      <p className="font-sans text-slate mb-10">
+        Final-year BSc in Computer Science and Mathematics, based in South Africa.
+      </p>
 
       <div className="font-serif text-ink leading-relaxed space-y-5 max-w-prose">
         <p>
@@ -35,7 +37,7 @@ export default function AboutPage() {
       </div>
 
       <div className="border-t border-slate/20 pt-6 mt-10">
-        <h2 className="font-mono text-xs text-slate uppercase tracking-wide mb-4">Organizations</h2>
+        <h2 className="font-sans font-semibold text-xl text-ink mb-4">Organizations</h2>
         <dl className="space-y-3">
           <div>
             <dt className="font-sans text-sm font-medium text-ink">KSDRILL-SA</dt>
@@ -48,13 +50,9 @@ export default function AboutPage() {
         </dl>
       </div>
 
-      <div className="border-t border-slate/20 pt-6 mt-10 flex gap-6 font-mono text-xs">
-        <Link href="/journey" className="text-accent underline underline-offset-2">
-          The full journey →
-        </Link>
-        <Link href="/how-i-build" className="text-accent underline underline-offset-2">
-          How I build →
-        </Link>
+      <div className="border-t border-slate/20 pt-6 mt-10 flex gap-6">
+        <TextLink href="/journey">The full journey</TextLink>
+        <TextLink href="/how-i-build">How I build</TextLink>
       </div>
     </article>
   );

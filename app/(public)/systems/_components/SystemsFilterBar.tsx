@@ -13,6 +13,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface FilterOption {
   key: string;
@@ -23,6 +24,10 @@ interface SystemsFilterBarProps {
   organizations: { slug: string; name: string }[];
   domains: FilterOption[];
   statuses: FilterOption[];
+  // The empty state carries its own clear-filters action (PAGE-SPECIFICATIONS
+  // /systems), so the bar hides its copy when there are no results — two
+  // identical links on one screen is clutter, not affordance.
+  showClear?: boolean;
 }
 
 function FilterField({
@@ -56,7 +61,7 @@ function FilterField({
   );
 }
 
-export function SystemsFilterBar({ organizations, domains, statuses }: SystemsFilterBarProps) {
+export function SystemsFilterBar({ organizations, domains, statuses, showClear = true }: SystemsFilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -99,14 +104,15 @@ export function SystemsFilterBar({ organizations, domains, statuses }: SystemsFi
         />
       </div>
 
-      {hasFilters && (
-        <button
+      {hasFilters && showClear && (
+        <Button
           type="button"
+          variant="link"
           onClick={() => router.push(pathname)}
-          className="rule-citation text-sm mt-4 inline-block"
+          className="mt-4 h-auto px-0 font-normal"
         >
           Clear filters
-        </button>
+        </Button>
       )}
     </div>
   );
