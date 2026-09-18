@@ -3,6 +3,8 @@
 
 import { InquiryForm } from "./_components/InquiryForm";
 
+export const metadata = { title: "Contact" };
+
 export default function ContactPage() {
   return (
     <section className="py-16">

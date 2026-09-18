@@ -11,6 +11,8 @@ import { DownloadCvButton } from "./_components/DownloadCvButton";
 // build time (no DATABASE_URL in CI's build job; same fix as the homepage).
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "CV" };
+
 const OWNER_NAME = "Kurhula Success Maluleke";
 
 function formatDateRange(startDate: string, endDate: string | null): string {
@@ -40,7 +42,7 @@ export default async function CvPage() {
 
   return (
     <article className="cv-page py-16 max-w-3xl">
-      <div className="flex items-start justify-between gap-4 mb-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-1">
         <div>
           <h1 className="font-sans font-semibold text-3xl text-ink">{OWNER_NAME}</h1>
           <p className="font-sans text-slate mt-1">{roleLine}</p>

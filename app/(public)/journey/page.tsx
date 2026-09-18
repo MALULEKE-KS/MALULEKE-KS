@@ -12,6 +12,8 @@ import { timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline
 // build time (no DATABASE_URL in CI's build job; same fix as the homepage).
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Journey" };
+
 function formatDate(dateOnly: string): string {
   return new Date(`${dateOnly}T00:00:00Z`).toLocaleDateString("en-US", {
     month: "short",
@@ -47,7 +49,7 @@ export default async function JourneyPage({
       <div className="flex flex-wrap gap-2 mb-10 font-mono text-xs">
         <Link
           href="/journey"
-          className={`px-2 py-1 border ${
+          className={`px-3 py-2 border ${
             !activeType ? "border-accent text-accent" : "border-slate/30 text-slate hover:border-slate"
           }`}
         >
@@ -57,7 +59,7 @@ export default async function JourneyPage({
           <Link
             key={type.id}
             href={`/journey?type=${type.key}`}
-            className={`px-2 py-1 border ${
+            className={`px-3 py-2 border ${
               activeType === type.key ? "border-accent text-accent" : "border-slate/30 text-slate hover:border-slate"
             }`}
           >

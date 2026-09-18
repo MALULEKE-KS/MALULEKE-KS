@@ -8,6 +8,8 @@
 
 import { RuleCitation } from "@/components/shared/RuleCitation";
 
+export const metadata = { title: "How I build" };
+
 const PRINCIPLES = [
   {
     name: "Extension Over Modification (EXT-1)",

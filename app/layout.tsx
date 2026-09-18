@@ -35,7 +35,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata = {
-  title: "MALULEKE-KS",
+  // Each page sets its own `title`; the template keeps the platform name on
+  // every tab. Pages that set none (home, 404) fall back to the default.
+  title: { default: "MALULEKE-KS", template: "%s | MALULEKE-KS" },
   description: "Kurhula Success Maluleke's personal platform.",
 };
 

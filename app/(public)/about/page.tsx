@@ -13,6 +13,8 @@
 
 import { TextLink } from "@/components/shared/TextLink";
 
+export const metadata = { title: "About" };
+
 export default function AboutPage() {
   return (
     <article className="py-16 max-w-2xl">

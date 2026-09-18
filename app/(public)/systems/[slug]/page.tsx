@@ -3,6 +3,8 @@
 // generic 404 as a real not-found (never a distinct "private" message —
 // BR-1.3/1.4). See docs/PAGE-SPECIFICATIONS.md, docs/DESIGN-SYSTEM.md §2a/§3a.
 
+import { cache } from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -16,9 +18,20 @@ interface SystemDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Memoised per request so generateMetadata and the page share one query.
+const getSystem = cache(getPublicSystemBySlug);
+
+// An unknown or unpublished slug gets no title of its own — the page then
+// calls notFound() and both fall through to the same generic 404 (BR-1.3/1.4).
+export async function generateMetadata({ params }: SystemDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const system = await getSystem(slug);
+  return system ? { title: system.name, description: system.description } : {};
+}
+
 export default async function SystemDetailPage({ params }: SystemDetailPageProps) {
   const { slug } = await params;
-  const system = await getPublicSystemBySlug(slug);
+  const system = await getSystem(slug);
 
   if (!system) notFound();
 
@@ -37,12 +50,15 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
   return (
     <article className="py-16">
-      <MarginAnnotations items={annotations}>
-        <div className="flex items-start justify-between gap-4 mb-1">
-          <h1 className="font-sans font-semibold text-3xl text-ink">{system.name}</h1>
-          <StatusBadge label={system.status} colorToken={system.statusColorToken} />
-        </div>
-
+      <MarginAnnotations
+        items={annotations}
+        header={
+          <div className="flex items-start justify-between gap-4 mb-1">
+            <h1 className="font-sans font-semibold text-3xl text-ink">{system.name}</h1>
+            <StatusBadge label={system.status} colorToken={system.statusColorToken} />
+          </div>
+        }
+      >
         <div className="mb-8 mt-4">
           <SystemPreviewFrame
             screenshotUrl={system.screenshotUrl}
