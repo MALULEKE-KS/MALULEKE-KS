@@ -289,7 +289,12 @@ model DocumentGen {
   type        String   // "cv" | "resume-tailored"
   targetRole  String?
   generatedAt DateTime @default(now()) // BR-7.1 — always reflects live data at this timestamp
-  fileUrl     String
+  // Self-hosted per Constitution §9 — the generated PDF's actual bytes, not
+  // just a reference to external object storage. Small documents (a CV),
+  // low volume (one admin, generated on visitor demand): Postgres is the
+  // right store here, not a reason to add a new external dependency.
+  fileData    Bytes
+  fileUrl     String   // resolves to the /api/v1/cv/documents/{id} download route
   supersededByFileUrl String? // BR-7.2 — prior versions kept, not deleted
 }
 
