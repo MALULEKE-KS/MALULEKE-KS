@@ -16,7 +16,8 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/openapi-contract.yaml` | The API contract — implement to this, don't improvise shapes |
 | `/docs/DESIGN-SYSTEM.md` | What it looks like — the authoritative visual identity, cite by §n |
 | `/docs/PAGE-SPECIFICATIONS.md` | What's on each route, section by section |
-| `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, real env vars vs. documented-but-unused ones |
+| `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, migration pipeline, local dev/test databases |
+| `/docs/ENFORCEMENT-REGISTER.md` | Where every claim is actually enforced — update the row in the same PR that adds, changes or enforces a claim |
 
 Every implementation decision should be able to cite a rule from one of these. If it can't, stop and ask rather than inventing new structure.
 
