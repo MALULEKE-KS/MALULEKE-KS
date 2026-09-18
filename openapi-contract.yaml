@@ -336,13 +336,45 @@ paths:
               properties:
                 key: { type: string }
                 label: { type: string }
+                stage: { $ref: "#/components/schemas/PipelineStage" }
+                colorToken: { $ref: "#/components/schemas/StatusColorToken" }
       responses:
         "201":
-          description: Lookup value created
+          description: Lookup value created. For type=status, stage defaults to queued and colorToken to signal-planned when omitted; both are ignored for other types.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/LookupValue" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /lookups/{type}/{id}:
+    patch:
+      tags: [Lookups]
+      summary: Edit an existing lookup value (label; for status also stage and colour)
+      description: The key is immutable (BR-8.3 keeps keys unique and stable). Changing a status's stage moves every system in that status between the shipped / in-progress / queued counts with no code change (EXT-1).
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string }
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LookupUpdateInput" }
+      responses:
+        "200":
+          description: Updated lookup value
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LookupValue" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /lookups/{type}/{id}/deprecate:
     post:
@@ -873,6 +905,25 @@ components:
         key: { type: string }
         label: { type: string }
         active: { type: boolean }
+        stage: { $ref: "#/components/schemas/PipelineStage", description: "type=status only" }
+        colorToken: { $ref: "#/components/schemas/StatusColorToken", description: "type=status only" }
+
+    PipelineStage:
+      type: string
+      enum: [shipped, building, queued]
+      description: Which homepage count a Status belongs to. A fixed control dimension (EXT-1 exception, like ContentStatus); the statuses themselves stay an open lookup.
+
+    StatusColorToken:
+      type: string
+      enum: [signal-finished, signal-progress, signal-planned]
+      description: Curated, contrast-checked palette a Status may use (DESIGN-SYSTEM.md §1).
+
+    LookupUpdateInput:
+      type: object
+      properties:
+        label: { type: string, minLength: 1 }
+        stage: { $ref: "#/components/schemas/PipelineStage" }
+        colorToken: { $ref: "#/components/schemas/StatusColorToken" }
 
     SystemPublic:
       type: object
@@ -928,6 +979,8 @@ components:
             nameDisclosureApproved: { type: boolean, description: "Separate from clientApproved (BR-1.4) — authorizes revealing the real org name for an ANONYMIZED_ONLY system" }
             needsCuration: { type: boolean }
             sortOrder: { type: integer }
+            featuredOnHome: { type: boolean, description: "Admin-chosen for the homepage (published systems only are shown)" }
+            homeOrder: { type: integer, description: "Order among homepage-featured systems, ascending" }
 
     SystemCreateInput:
       type: object
@@ -953,6 +1006,8 @@ components:
         nameDisclosureApproved: { type: boolean }
         isFlagship: { type: boolean }
         sortOrder: { type: integer }
+        featuredOnHome: { type: boolean }
+        homeOrder: { type: integer }
         caseStudyBody: { type: string }
         repoUrl: { type: string, nullable: true }
         liveUrl: { type: string, nullable: true }
