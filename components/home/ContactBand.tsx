@@ -36,7 +36,7 @@ export function ContactBand() {
                 </p>
                 <p className="mt-4 inline-flex items-center gap-2 text-sm text-paper">
                   <Clock aria-hidden="true" className="size-4 text-ember" />
-                  Reply within 48 hours
+                  Reviewed within 48 hours
                 </p>
 
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row">

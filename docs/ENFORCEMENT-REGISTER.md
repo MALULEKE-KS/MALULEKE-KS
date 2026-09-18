@@ -73,7 +73,7 @@
 | BR-5.1 / 5.4 | No event before consent; applies to Vercel Analytics too | No events are collected yet; no consent banner | 🟡 (vacuously true) | App — required before any analytics ships | F5 |
 | BR-5.2 | `Inquiry`/`Event` anonymized or purged after 24 months; scheduled | **Not implemented** (scheduler is a `TODO`) | ❌ | DB function + scheduled job + `JobRun` log | F1.6 / F4 |
 | BR-5.3 | Public stats are curated, point-in-time | Home counts come from curated `System` rows | ✅ | App | — |
-| BR-5.5 | Deletion right honoured manually; stated on confirmation | Confirmation copy doesn't state it | ❌ | App copy | F5 |
+| BR-5.5 | Deletion right honoured manually; stated on confirmation | Contact confirmation states the removal route (email) — #58 | ✅ | App copy | — |
 | BR-2.4 (privacy) | IP kept only as long as the window needs | Raw IPs stored; expired rows never pruned | ❌ | Hashed keys + prune job | F1.5 / F4 |
 
 ## 6. Testimonials (BR-6.x)
@@ -111,7 +111,7 @@
 
 | Where | Claim | Backed by | Status |
 |---|---|---|---|
-| Footer, home contact band, contact confirmation | "Reply within 48 hours" / "I'll get back to you within 48 hours" | BR-2.2 promises **review** within 48h, not a reply — and nothing enforces even that | ❌ owner decision |
+| Footer, home contact band, contact confirmation | "Reviewed within 48 hours" (owner chose to keep BR-2.2 as written — #58) | Copy now matches BR-2.2; the review SLA itself is surfaced to the admin in F2 (BR-2.2 row) | ✅ copy / ❌ SLA → F2 |
 | Home hero | "Live data, as of …" | Counts computed per request | ✅ |
 | Home stack card | "Type-checked end to end", "Tested in CI on every change", "Deployed on Vercel from main" | `tsc --noEmit` in CI; CI on every PR; Vercel Git integration | ✅ |
 | Home pipeline | "N shipped / N in the queue" | Status keys hardcoded; "in progress" not counted separately | 🟡 → F1.6 |

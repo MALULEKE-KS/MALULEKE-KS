@@ -74,7 +74,7 @@ Single vertical log, not a generic icon-and-card timeline component — visually
 
 1. `InquiryForm` — a real `<select>` for the six `InquiryType` values, not six separate buttons competing for attention.
 2. Name / email / message fields, validated client-side against `InquiryCreateInputSchema` before submit.
-3. Inline confirmation on success — no redirect: *"Received. I'll get back to you within 48 hours."* — states the actual BR-2.2 SLA rather than a vague "soon."
+3. Inline confirmation on success — no redirect: *"Received. I review every inquiry within 48 hours."* — states the actual BR-2.2 commitment (a review, not a promised reply) rather than a vague "soon", followed by the BR-5.5 removal route: *"To request removal of this submission, email <owner email>."*
 4. Rate-limit error state: *"Too many requests from this connection — try again tomorrow."*
 
 **Behavior:** a hidden honeypot field for basic bot filtering, in addition to the server-side rate limit (BR-2.4).

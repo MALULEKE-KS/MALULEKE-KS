@@ -48,7 +48,7 @@ export function SiteFooter() {
           >
             {OWNER.email}
           </a>
-          <p className="mt-3 text-sm text-mist">Every inquiry gets a reply within 48 hours.</p>
+          <p className="mt-3 text-sm text-mist">Every inquiry is reviewed within 48 hours.</p>
         </div>
       </Container>
 
