@@ -281,6 +281,55 @@ export const CvGenerateResultSchema = z.object({
   generatedAt: z.string().datetime(),
 });
 
+export const ExperienceEntrySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  organization: z.string(),
+  startDate: z.string().date(),
+  endDate: z.string().date().nullable(),
+  description: z.string(),
+  skills: z.array(z.string()),
+});
+
+export const ExperienceInputSchema = z.object({
+  title: z.string().min(1),
+  organization: z.string().min(1),
+  startDate: z.string().date(),
+  endDate: z.string().date().nullable().optional(),
+  description: z.string().min(1),
+  skillIds: z.array(z.string()).default([]),
+});
+
+export const EducationEntrySchema = z.object({
+  id: z.string(),
+  institution: z.string(),
+  qualification: z.string(),
+  startDate: z.string().date(),
+  endDate: z.string().date().nullable(),
+  honors: z.string().nullable(),
+});
+
+export const EducationInputSchema = z.object({
+  institution: z.string().min(1),
+  qualification: z.string().min(1),
+  startDate: z.string().date(),
+  endDate: z.string().date().nullable().optional(),
+  honors: z.string().nullable().optional(),
+});
+
+export const SkillEntrySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.string(),
+  yearsExperience: z.number().nullable(),
+});
+
+export const SkillInputSchema = z.object({
+  name: z.string().min(1),
+  categoryId: z.string(),
+  yearsExperience: z.number().nullable().optional(),
+});
+
 // ============================================================
 // AGENT TOOL BOUNDARY (BR-4.1, BR-4.2)
 // ============================================================
