@@ -15,7 +15,7 @@ import Link from "next/link";
 
 export default function AboutPage() {
   return (
-    <article className="px-6 py-16 max-w-2xl mx-auto">
+    <article className="py-16 max-w-2xl">
       <h1 className="font-sans font-semibold text-2xl text-ink mb-1">About</h1>
       <p className="font-sans text-slate mb-10">Final-year BSc Computer Science &amp; Mathematics · South Africa</p>
 

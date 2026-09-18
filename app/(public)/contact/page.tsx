@@ -5,7 +5,7 @@ import { InquiryForm } from "./_components/InquiryForm";
 
 export default function ContactPage() {
   return (
-    <section className="px-6 py-16 max-w-5xl mx-auto">
+    <section className="py-16">
       <h1 className="font-sans font-semibold text-2xl text-ink mb-6">Contact</h1>
       <InquiryForm />
     </section>

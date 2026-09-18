@@ -35,7 +35,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
   ];
 
   return (
-    <article className="px-6 py-16 max-w-5xl mx-auto">
+    <article className="py-16">
       <MarginAnnotations items={annotations}>
         <div className="flex items-start justify-between gap-4 mb-1">
           <h1 className="font-sans font-semibold text-3xl text-ink">{system.name}</h1>
