@@ -331,6 +331,21 @@ export const SkillInputSchema = z.object({
 });
 
 // ============================================================
+// ACTIVITY LOG (BR-3.4)
+// ============================================================
+
+export const ActivityLogEntrySchema = z.object({
+  id: z.string(),
+  adminUserEmail: z.string().email(),
+  action: z.string(),
+  entityType: z.string().nullable(),
+  entityId: z.string().nullable(),
+  before: z.record(z.string(), z.unknown()).nullable(),
+  after: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.string().datetime(),
+});
+
+// ============================================================
 // AGENT TOOL BOUNDARY (BR-4.1, BR-4.2)
 // ============================================================
 
