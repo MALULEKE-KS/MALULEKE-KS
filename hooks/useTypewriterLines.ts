@@ -23,7 +23,7 @@ export function useTypewriterLines(
 
   // Total time the full sequence takes, computed once from the same inputs
   // driving the sequencing itself — exposed so a companion animation (e.g.
-  // ScaleFigure's self-draw) can be timed to finish in lockstep without a
+  // a line-drawing) can be timed to finish in lockstep without a
   // second, independently-maintained duration constant drifting out of sync.
   const totalDurationMs =
     lines.reduce((sum, line) => sum + line.length * msPerChar, 0) +

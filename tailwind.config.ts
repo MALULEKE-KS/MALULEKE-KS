@@ -1,5 +1,5 @@
 // tailwind.config.ts
-// Every value here maps directly to DESIGN-SYSTEM.md §1/§2 — no magic hex
+// Every value here maps directly to DESIGN-SYSTEM.md v2 §1/§2 — no magic hex
 // values or ad hoc font-family strings should appear in components.
 
 import type { Config } from "tailwindcss";
@@ -9,27 +9,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Surfaces
+        paper: "#F4F1EA", // vellum — base surface
+        sheet: "#FFFDF8", // raised surface — cards, fields, title block
+        blueprint: {
+          DEFAULT: "#0B2A4A", // primary
+          deep: "#06182E", // header, footer, deep bands
+        },
+        // Ink
         ink: "#0F1729",
-        paper: "#F5F7FA",
-        slate: {
-          DEFAULT: "#3D4A5C",
-        },
-        accent: {
-          DEFAULT: "#906722", // corrected from #C08A2E — the original failed WCAG AA
-          // as text (2.83:1). This value passes at 4.72:1 while still reading
-          // as brass/gold. See DESIGN-SYSTEM.md §1 for the verification.
-        },
+        slate: { DEFAULT: "#3D4A5C" },
+        mist: "#B7C9DF", // secondary text on blueprint (8.61:1)
+        line: "#7CA7D6", // drafting linework on blueprint (non-text)
+        // Accent — one hue, two values (§1): amber on dark / as a fill,
+        // brass as text or line on light. Amber text on paper fails (1.64:1).
+        amber: "#F5B335",
+        accent: { DEFAULT: "#8A5D12" },
         signal: {
           finished: "#1F6F5C",
-          progress: "#906722", // == accent, unchanged from the original design intent
-          planned: "#5A6470", // corrected from #6B7684 — original failed AA-normal (4.30:1); this passes at 5.60:1
+          progress: "#8A5D12", // == accent
+          planned: "#5A6470",
         },
         critical: "#9B3A2E",
-        // shadcn/ui semantic tokens — mapped to this project's own palette
-        // (globals.css :root, via HSL custom properties) rather than
-        // shadcn's default gray/blue, so a component pulled in later via
-        // the CLI (`npx shadcn add ...`) is on-brand by default instead of
-        // needing every instance restyled by hand.
+        // shadcn/ui semantic tokens — mapped onto this palette (globals.css
+        // :root) so anything added via the CLI inherits it.
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         border: "hsl(var(--border))",
@@ -61,10 +64,7 @@ const config: Config = {
         prose: "72ch", // keeps body copy under the 80-character line length rule
       },
       borderRadius: {
-        // Deliberately minimal — the design system avoids the uniform
-        // rounded-card treatment. Sharp or barely-softened corners only.
-        // lg/md/sm derive from --radius (globals.css, set to 2px) so any
-        // shadcn component using them inherits the same restraint.
+        // Sharp corners — drawings don't have rounded sheets.
         DEFAULT: "2px",
         none: "0px",
         lg: "var(--radius)",
@@ -72,8 +72,10 @@ const config: Config = {
         sm: "calc(var(--radius) - 1px)",
       },
       boxShadow: {
-        // No default drop shadow token defined on purpose — dividers use
-        // hairline borders (Design System §3), not soft shadows.
+        // §4.3 — depth is printed, not lit: hard offsets, no blur.
+        print: "6px 6px 0 0 #0B2A4A",
+        "print-sm": "3px 3px 0 0 #0F1729",
+        "print-amber": "6px 6px 0 0 #F5B335",
       },
     },
   },

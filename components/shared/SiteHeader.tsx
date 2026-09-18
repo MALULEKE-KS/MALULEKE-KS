@@ -1,24 +1,24 @@
 // components/shared/SiteHeader.tsx
-// The persistent site frame every page was missing — see DESIGN-SYSTEM.md
-// §3's own mockup ("MALULEKE-KS   Systems  Journey…"), which described this
-// but it was never actually built. Wordmark in mono (the platform's own
-// identifier, like the ledger hero's mono log header), nav in sans, hairline
-// bottom border — no shadow, no rounded pill nav, consistent with the rest
-// of the drafting-table language.
-//
-// Vertical padding is on the links themselves (NavLinks) so each tap target
-// is ~36px tall without making the desktop header any taller than before.
+// Sticky blueprint-deep bar — the binding edge of the drawing set. Brand
+// mark + mono wordmark on the left, numbered sheets on the right
+// (DESIGN-SYSTEM.md v2 §3/§6). `relative` so the mobile menu panel can hang
+// directly beneath it.
 
 import Link from "next/link";
+import { BrandMark } from "@/components/shared/BrandMark";
 import { Container } from "@/components/shared/Container";
 import { NavLinks } from "@/components/shared/NavLinks";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-slate/20 bg-paper">
-      <Container className="py-2 flex flex-wrap items-center justify-between gap-x-4">
-        <Link href="/" className="py-2 font-mono font-medium text-sm text-ink tracking-tight">
-          MALULEKE-KS
+    <header className="border-line/20 bg-blueprint-deep text-paper sticky top-0 z-40 border-b">
+      <Container className="relative flex h-16 items-center justify-between gap-6 md:h-auto">
+        <Link
+          href="/"
+          className="group focus-visible:outline-amber flex items-center gap-3 py-3 focus-visible:outline-2"
+        >
+          <BrandMark className="text-paper size-7 transition-transform duration-300 group-hover:rotate-90" />
+          <span className="font-mono text-sm font-medium tracking-tight">MALULEKE-KS</span>
         </Link>
         <NavLinks />
       </Container>

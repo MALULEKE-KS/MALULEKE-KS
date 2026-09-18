@@ -9,20 +9,23 @@
 // Copy follows Design System §4.4: what happened, what to do next, no apology.
 
 import { TextLink } from "@/components/shared/TextLink";
+import { Container } from "@/components/shared/Container";
 
 export function NotFoundContent() {
   return (
-    <section className="py-16 max-w-2xl">
-      {/* The HTTP status is a literal identifier, which is what mono is for. */}
-      <p className="font-mono text-xs text-slate mb-2">404</p>
-      <h1 className="font-sans font-semibold text-2xl text-ink mb-4">Page not found</h1>
-      <p className="font-sans text-ink mb-6">
-        Nothing exists at this address. Check the URL, or start from the home page or the systems catalog.
-      </p>
-      <div className="flex gap-6">
-        <TextLink href="/">Home</TextLink>
-        <TextLink href="/systems">Systems</TextLink>
-      </div>
-    </section>
+    <Container>
+      <section className="max-w-2xl py-16">
+        {/* The HTTP status is a literal identifier, which is what mono is for. */}
+        <p className="text-slate mb-2 font-mono text-xs">404</p>
+        <h1 className="text-ink mb-4 font-sans text-2xl font-semibold">Page not found</h1>
+        <p className="text-ink mb-6 font-sans">
+          Nothing exists at this address. Check the URL, or start from the home page or the systems catalog.
+        </p>
+        <div className="flex gap-6">
+          <TextLink href="/">Home</TextLink>
+          <TextLink href="/systems">Systems</TextLink>
+        </div>
+      </section>
+    </Container>
   );
 }

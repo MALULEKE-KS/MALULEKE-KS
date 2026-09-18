@@ -10,6 +10,7 @@
 // project's structure was first scaffolded.
 
 import { IBM_Plex_Sans, IBM_Plex_Serif, IBM_Plex_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { VisitorLensProvider } from "@/components/shared/VisitorLensProvider";
 
@@ -46,9 +47,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={`${ibmPlexSans.variable} ${ibmPlexSerif.variable} ${ibmPlexMono.variable}`}
+      // The js-flag script in <body> adds `js` before hydration; React must not treat
+      // that one extra class as a hydration mismatch.
+      suppressHydrationWarning
     >
-      <body className="font-sans bg-paper text-ink">
+      <body className="font-sans bg-paper text-ink antialiased">
         <VisitorLensProvider>{children}</VisitorLensProvider>
+        {/* Scroll reveals only hide content once we know JS is running
+            (globals.css ".js [data-reveal]"), so a no-JS visitor never sees an
+            invisible page. beforeInteractive is injected into the initial
+            HTML and runs before hydration (next/script docs). */}
+        <Script id="js-flag" strategy="beforeInteractive">
+          {"document.documentElement.classList.add('js')"}
+        </Script>
       </body>
     </html>
   );

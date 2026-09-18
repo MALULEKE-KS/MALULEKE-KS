@@ -7,60 +7,45 @@
 // See docs/PAGE-SPECIFICATIONS.md ("/how-i-build"), docs/PLATFORM-CONSTITUTION-v1.md §1.
 
 import { RuleCitation } from "@/components/shared/RuleCitation";
+import { Container } from "@/components/shared/Container";
+import { PRINCIPLES } from "@/lib/content/principles";
 
 export const metadata = { title: "How I build" };
 
-const PRINCIPLES = [
-  {
-    name: "Extension Over Modification (EXT-1)",
-    body: "Anything expected to grow — a new project category, a new type of visitor, a new skill — lives in a lookup table or config, never a hard-coded list. A new chapter of the work shouldn't require rebuilding the platform to fit it.",
-  },
-  {
-    name: "Smart Not Hard",
-    body: "Buy the commodity, build the differentiated. Off-the-shelf tools handle what's already a solved problem; real engineering time goes into the parts that actually need building.",
-  },
-  {
-    name: "Controlled Imperfection Engineering",
-    body: "Failures are made predictable and traceable, not chased into an impossible zero. Every admin action on this platform writes to an audit log — what goes wrong feeds directly into what gets fixed next, the same discipline an incident produces a runbook.",
-  },
-  {
-    name: "Permission Boundaries",
-    body: "No AI acts autonomously on anything that matters. The one write path an automated agent can ever trigger here is the same inquiry form a human uses — never a more privileged shortcut.",
-  },
-];
-
 export default function HowIBuildPage() {
   return (
-    <article className="py-16 max-w-2xl">
-      <h1 className="font-sans font-semibold text-2xl text-ink mb-8">How I build</h1>
+    <Container>
+      <article className="max-w-2xl py-16">
+        <h1 className="text-ink mb-8 font-sans text-2xl font-semibold">How I build</h1>
 
-      <p className="font-serif text-lg text-ink leading-relaxed mb-12 max-w-prose">
-        &ldquo;I build systems disciplined enough to be trusted with real money, real institutions, and real
-        people&rsquo;s outcomes — engineered in South Africa, held to a global standard.&rdquo;
-      </p>
+        <p className="text-ink mb-12 max-w-prose font-serif text-lg leading-relaxed">
+          &ldquo;I build systems disciplined enough to be trusted with real money, real institutions, and real
+          people&rsquo;s outcomes — engineered in South Africa, held to a global standard.&rdquo;
+        </p>
 
-      <div className="space-y-8 border-t border-slate/20 pt-8">
-        {PRINCIPLES.map((principle) => (
-          <div key={principle.name}>
-            <h2 className="font-sans font-semibold text-ink mb-1.5">{principle.name}</h2>
-            <p className="font-serif text-sm text-slate leading-relaxed max-w-prose">{principle.body}</p>
-          </div>
-        ))}
-      </div>
+        <div className="border-slate/20 space-y-8 border-t pt-8">
+          {PRINCIPLES.map((principle) => (
+            <div key={principle.name}>
+              <h2 className="text-ink mb-1.5 font-sans font-semibold">{principle.name}</h2>
+              <p className="text-slate max-w-prose font-serif text-sm leading-relaxed">{principle.body}</p>
+            </div>
+          ))}
+        </div>
 
-      <div className="border-t border-slate/20 pt-8 mt-8">
-        <p className="font-mono text-xs text-slate mb-2">This platform enforces two of its own rules literally:</p>
-        <ul className="space-y-2 font-sans text-sm text-ink">
-          <li>
-            <RuleCitation rule="BR-1.1" /> — a case study never publishes without the client&rsquo;s approval,
-            checked server-side, every time.
-          </li>
-          <li>
-            <RuleCitation rule="BR-4.1" /> — an automated agent gets no privileged write path beyond what a human
-            visitor already has.
-          </li>
-        </ul>
-      </div>
-    </article>
+        <div className="border-slate/20 mt-8 border-t pt-8">
+          <p className="text-slate mb-2 font-mono text-xs">This platform enforces two of its own rules literally:</p>
+          <ul className="text-ink space-y-2 font-sans text-sm">
+            <li>
+              <RuleCitation rule="BR-1.1" /> — a case study never publishes without the client&rsquo;s approval, checked
+              server-side, every time.
+            </li>
+            <li>
+              <RuleCitation rule="BR-4.1" /> — an automated agent gets no privileged write path beyond what a human
+              visitor already has.
+            </li>
+          </ul>
+        </div>
+      </article>
+    </Container>
   );
 }

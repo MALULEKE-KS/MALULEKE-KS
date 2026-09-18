@@ -1,185 +1,139 @@
-# MALULEKE-KS — DESIGN SYSTEM v1.0
+# MALULEKE-KS — DESIGN SYSTEM v2.0 ("Cyanotype")
 
 **Derives from:** PLATFORM-CONSTITUTION-v1.md, PLATFORM-OVERVIEW-AND-RATIONALE.md (voice & tone, mission)
-**Status:** Locked
+**Status:** Active — supersedes v1.0
+**Changed from v1.0:** v1 was deliberately flat (one brass accent, no depth, one animation on the whole site). Built out, it read as correct but lifeless — nothing a visitor would remember. v2 keeps v1's engineering-drawing DNA and gives it colour, depth and motion. What survives unchanged: IBM Plex, left-aligned reading order, mono for real identifiers, the corner-bracket selection motif, the ledger hero, status colour as data, print as a separate ink-only output.
 
 ---
 
 ## 0. Grounding
 
-This isn't a generic "developer portfolio" template. The subject is a specific one: a systems architect who governs his own work through numbered, citable rules — the same rules this platform is built from. The visual identity should read like an engineering document, not a marketing page: precise, structural, restrained, with exactly one considered accent rather than decoration.
+The subject is a systems architect who governs his own work through numbered, citable rules. The visual answer is a **drawing set**: every page is a sheet, drawn on vellum, with the platform itself drafted in blueprint. The blueprint (cyanotype) is the oldest way engineers reproduced a design — which is exactly what this platform is: the design, reproduced as a running system.
 
-Deliberately avoided, because they're the current tells of AI-generated design rather than choices for this brief: warm-cream background with a terracotta accent; near-black background with a neon accent; the SaaS rounded-card grid with a soft drop shadow under everything; tracked-out all-caps eyebrow labels; middle-dot-joined meta strings; em-dash "word — fragment" labels; arrows appended to every button.
+That metaphor is the source of every device below. If a device can't be explained by "this is how a drawing set works", it doesn't belong.
+
+Still deliberately avoided: the SaaS rounded-card grid with a soft blurred shadow; gradient text; glassmorphism; near-black with a neon accent; stock "hero headline + gradient blob"; tracked-out all-caps eyebrows.
 
 ## 1. Color
 
-Every value below was checked against WCAG contrast ratios as text on `paper` — not assumed. Two values in the original draft failed and are corrected here.
+Every value checked against WCAG 2.1 contrast, not assumed.
 
-| Token | Hex | Role | Contrast on paper |
+### Surfaces
+| Token | Hex | Role |
+|---|---|---|
+| `paper` | `#F4F1EA` | Vellum — the base surface of every page |
+| `sheet` | `#FFFDF8` | Raised surface — cards, form fields, the title block |
+| `blueprint` | `#0B2A4A` | **Primary.** Hero bands, primary buttons, the hard "print" shadow |
+| `blueprint-deep` | `#06182E` | Header, footer, deep bands |
+
+### Ink
+| Token | Hex | On | Contrast |
 |---|---|---|---|
-| `ink` | `#0F1729` | Primary text, header backgrounds | 16.65:1 — AAA |
-| `paper` | `#F5F7FA` | Base surface | — |
-| `slate` | `#3D4A5C` | Secondary text, borders, dividers | 8.39:1 — AAA |
-| `accent` (brass) | `#906722` | The one considered accent — flagship markers, active states, the numbers moment | 4.72:1 — AA. *Corrected from an earlier `#C08A2E`, which measured 2.83:1 and failed AA entirely as text* |
-| `signal-finished` | `#1F6F5C` | `Status = finished` | 5.61:1 — AA |
-| `signal-progress` | `#906722` | `Status = in_progress` — same as accent | 4.72:1 — AA |
-| `signal-planned` | `#5A6470` | `Status = planned` | 5.60:1 — AA. *Corrected from `#6B7684`, which measured 4.30:1 and narrowly failed AA-normal* |
-| `critical` | `#9B3A2E` | Errors, lockout states | 6.44:1 — AA |
+| `ink` | `#0F1729` | paper / sheet | 15.85 / 17.58 — AAA |
+| `slate` | `#3D4A5C` | paper / sheet | 7.98 / 8.86 — AAA |
+| `paper` (as text) | `#F4F1EA` | blueprint | 12.89 — AAA |
+| `mist` | `#B7C9DF` | blueprint / deep | 8.61 / 10.56 — AAA. Secondary text on dark |
+| `line` | `#7CA7D6` | blueprint | 5.79 — drafting linework on dark (non-text) |
 
-Status colors remain load-bearing, not decorative: the color on a `StatusBadge` is the actual `Status` value, never a separate stylistic choice layered on top.
+### Accent — one hue, two values
+| Token | Hex | Use | Contrast |
+|---|---|---|---|
+| `amber` | `#F5B335` | **Secondary.** Accent *on dark* (text, lines, active state) and as a *fill* on light, always with `ink` text on it | 7.88 on blueprint, ink on amber 9.69 — AAA |
+| `accent` (brass) | `#8A5D12` | The same accent as *text or line on light* | 5.09 on paper, 5.65 on sheet — AA |
+
+**Rule:** amber is never text or a meaningful line on a light surface (1.64:1 on paper — fails). On light, reach for brass; on dark, amber.
+
+### Status (data, never decoration)
+| Token | Hex | On light | On dark variant |
+|---|---|---|---|
+| `signal-finished` | `#1F6F5C` | 5.34 — AA | `#4CD1A0` 9.28 |
+| `signal-progress` | `#8A5D12` | 5.09 — AA | `#F5B335` 9.66 |
+| `signal-planned` | `#5A6470` | 5.33 — AA | `#9FB0C4` 8.05 |
+| `critical` | `#9B3A2E` | 6.13 — AA | — |
 
 ## 2. Type
 
-Built on the IBM Plex superfamily — chosen because it was designed by an engineering company specifically to read as rational and technical, which is the actual brief, not an aesthetic borrowed from an unrelated context.
+IBM Plex superfamily, unchanged from v1 — an engineering company's typeface for an engineering document.
 
 | Role | Face | Usage |
 |---|---|---|
-| Headline / UI | **IBM Plex Sans** | Nav, headings, buttons, form labels — confident, technical |
-| Long-form body | **IBM Plex Serif** | Case studies, the Journey narrative, About — same superfamily, clearly distinct register, readable at length |
-| Functional / data | **IBM Plex Mono** | Rule citations (`BR-1.1`), system IDs, timestamps, status labels — genuinely functional here, not decorative, because these are literal identifiers from the platform's own rule system |
+| Display / UI | IBM Plex Sans | Headlines, nav, buttons, labels |
+| Long-form | IBM Plex Serif | Case studies, About, Journey narrative, mission |
+| Identifiers | IBM Plex Mono | Sheet numbers, rule IDs, dates, status, stack names, the ledger |
 
-Line length under 80 characters on body copy. No all-caps labels anywhere — sentence case throughout, including nav and buttons.
+Sentence case everywhere. Line length under 80 characters on body copy.
 
 ### 2a. Type scale
+| Token | Tailwind | Role |
+|---|---|---|
+| `micro` | `text-xs` | Mono identifiers, badges, title-block cells |
+| `small` | `text-sm` | Secondary metadata, captions, nav |
+| `body` | `text-base` | Default UI text |
+| `lead` | `text-lg` | Card titles, lead paragraphs |
+| `subhead` | `text-xl` | Subsection headings |
+| `section` | `text-3xl` → `md:text-4xl` | Section titles |
+| `page-title` | `text-4xl` → `md:text-5xl` | Page `<h1>` |
+| `display` | `text-4xl` → `md:text-6xl` | Home hero ledger only |
 
-A named scale, not ad hoc font-size choices per component. Every text size on the site maps to one of these — if a new size feels needed, that's a signal to reconsider the layout, not to reach for an arbitrary value.
+Display and section sizes use `tracking-tight` and `leading-[1.05]`–`leading-tight`; that's optical correction for large sizes, not the all-caps tracking v1 banned.
 
-| Token | Tailwind | Size | Role |
-|---|---|---|---|
-| `micro` | `text-xs` | 12px | Mono identifiers, margin annotations, rule citations, status badges |
-| `small` | `text-sm` | 14px | Filter labels, secondary metadata, captions |
-| `body` | `text-base` | 16px | Default UI text, form inputs |
-| `card-title` | `text-lg` | 18px | SystemCard name, list item titles |
-| `subhead` | `text-xl` | 20px | Section subheadings within a page |
-| `page-title` | `text-2xl` | 24px | Catalog/index page `<h1>` |
-| `feature-title` | `text-3xl` | 30px | Case study / detail page `<h1>` |
-| `hero` | `text-4xl` | 36px | Homepage ledger hero only |
+### 2b. Spacing
+4px base, the same named steps as v1: `micro` 1–2, `tight` 3, `default` 4, `loose` 6, `section` 8, `major` 12, `page` 16, plus `band` = `py-20 md:py-28` for full-bleed bands.
 
-### 2b. Spacing rhythm
+## 3. Layout — the drawing set
 
-A 4px-based scale (Tailwind's default step values), with a fixed, named subset used everywhere — not the full range picked ad hoc per component.
-
-| Token | Tailwind | Size | Role |
-|---|---|---|---|
-| `micro` | `1` / `2` | 4–8px | Icon-to-label gaps, inline chip padding |
-| `tight` | `3` | 12px | Related-item gaps (chips, inline metadata) |
-| `default` | `4` | 16px | Component internal padding, form field gaps |
-| `loose` | `6` | 24px | Card padding, gaps between related blocks |
-| `section` | `8` | 32px | Gaps between distinct content blocks on a page |
-| `major` | `12` | 48px | Gaps between major page regions |
-| `page` | `16` | 64px | Page top/bottom padding |
-
-## 3. Layout
-
-Left-aligned, not centered — a drafting-table reading order, not a marketing-page one. A narrow annotation column on wide viewports carries rule citations and metadata as literal margin notes (collapses to inline badges under 768px).
-
-```
-┌─────────────────────────────────────────────┬──────────┐
-│  MALULEKE-KS              Systems  Journey…  │          │
-├─────────────────────────────────────────────┤ margin   │
-│                                               │ column:  │
-│  4 systems. 2 shipped.                       │ rule     │
-│  1 constitution governing all of them.       │ cites,   │
-│                                               │ status   │
-│  [ the actual hero — a real, literal fact,   │ refs     │
-│    not a stock headline+gradient treatment ] │          │
-├─────────────────────────────────────────────┤          │
-│  ── Xkimm Xa Mali ──────────────  [finished] │  BR-1.1  │
-│  ── Sunduza ─────────────────────  [finished]│          │
-│  ── FundsLink-Academy ──────────  [progress] │          │
-├─────────────────────────────────────────────┴──────────┤
-```
-
-Section dividers are hairline rules with a left border-accent bar, not rounded cards with drop shadows. Numbered sequence markers (01, 02, 03) are used exactly twice on the whole site — the Build Phases (0→3) and rule citations — because that content genuinely is a sequence; nowhere else.
-
-Motion: one deliberate moment on the homepage — the hero fact "types out" once on load, like a line being logged, then stops. No hover-fade-in on every card, no scroll-triggered reveal per section.
-
-### 3a. The margin-annotation mechanic
-
-A single reusable pattern (`components/shared/MarginAnnotations.tsx`), not a per-page improvisation. On viewports ≥768px, real metadata — organization, domain, dates, rule citations — renders in a narrow (`w-40`/160px) right-hand column, vertically aligned with the content it annotates, in `micro` scale mono type with a hairline left border (`border-l border-slate/20`) separating it from the body content. Below 768px, the same data collapses into an inline row of badges directly under the heading it would have annotated — same information, no column, since there's no margin to put it in.
-
-This is the mechanism, not decoration: every annotation is real data (an actual domain, an actual date, an actual rule ID) — never a label invented to fill the column. A page with nothing worth annotating simply doesn't render the column rather than padding it with filler.
+- **Frame:** one `Container` (`max-w-6xl px-6`) sets the left edge. Pages are composed of **bands** that run full-bleed (colour/grid edge to edge) with their content inside the container.
+- **Sheets:** every page is a numbered sheet. The page header is a **title block** — the drafting convention of a ruled table in the corner of every drawing — carrying the page's real facts (sheet number, title, revision date, drawn by). Sheet numbers follow the nav order: 01 Home, 02 Systems, 03 Journey, 04 CV, 05 How I build, 06 About, 07 Contact.
+- **Grid:** blueprint bands carry a drafting grid (fine 24px, major 120px) in `line` at low opacity. Light pages can carry the same grid in `blueprint` at very low opacity, sparingly.
+- **Margin annotations** (v1 §3a) remain: real metadata in a hairline-divided right column ≥768px, collapsed to badges directly under the heading below that.
 
 ## 4. Principles
 
-1. **Every visual device encodes real information.** Status color is the actual `Status`. Mono type marks actual identifiers. A margin annotation is an actual rule citation. Nothing is decoration wearing the costume of data.
-2. **One accent, spent deliberately.** Brass appears on flagship markers, active states, and the numbers section — nowhere else. Restraint is the signature, not a missing feature.
-3. **The structure reads like a spec, not a pitch.** Margins for annotation, hairlines for division, left alignment throughout — the same discipline the platform applies to its own rules applies to how it looks.
-4. **Errors and empty states speak plainly.** Per the interface's own voice: what happened, what to do next, no apology, never vague.
+1. **Every device encodes real information.** Status colour is the actual status. A node in the hero drawing is an actual published system and links to it. A title-block cell is an actual fact. Nothing is decoration wearing the costume of data.
+2. **Primary builds, secondary signals.** Blueprint carries structure (bands, primary actions, shadows). Amber/brass marks what matters now: the numbers, the active page, the thing to click next.
+3. **Depth is printed, not lit.** Elevation is a hard offset shadow in blueprint with no blur (`6px 6px 0`), like a misregistered print plate — never a soft light-source shadow.
+4. **Motion draws; it doesn't decorate.** Lines draw themselves in, facts log themselves, sections are laid down as you reach them. Everything settles and stops. Nothing loops except the slow rotation of one construction circle in the hero.
+5. **Errors and empty states speak plainly.** What happened, what to do next, no apology.
 
-## 5. Login Flow
+## 5. Motion
 
-Two steps, matching BR-3.1 through BR-3.3 exactly — this is the one screen where the design has to be as precise as the rule it implements.
+All motion lives in `globals.css` (timed, sequenced) or Tailwind state variants (hover/focus). Everything is disabled under `prefers-reduced-motion: reduce`, rendering the final state immediately.
 
-**Step 1 — Credentials**
-```
-┌──────────────────────────────┐
-│  MALULEKE-KS                 │
-│  Admin                       │
-│                               │
-│  Email                       │
-│  [______________________]    │
-│  Password                    │
-│  [______________________]    │
-│                               │
-│  [        Continue        ]  │
-└──────────────────────────────┘
-```
-- Generic failure copy on invalid credentials: "Email or password is incorrect." Never states which field was wrong.
-- After 2 consecutive failures: append "2 attempts remaining before a temporary lock." — the interface stating a fact, not a warning tone.
-- On the lock itself (BR-3.2): "Too many attempts. Try again in 14 minutes." — a live countdown, not a static message.
+| Name | What | Timing |
+|---|---|---|
+| `draw` | SVG stroke draws in (`pathLength=1`, dashoffset 1 → 0) | 900–1400ms, `--delay` staggered |
+| `node-in` | Drawing node fades + settles into place | 500ms after its line |
+| `reveal` | Section content rises 16px + fades in when it enters the viewport (once) | 700ms, children staggered 80ms |
+| `ledger` | Hero lines type out, caret blinks, stops | ~28ms/char |
+| `orbit` | One dashed construction circle rotates | 90s linear, the only loop |
+| `print` | Hover lift: translate(-4px,-4px) + hard shadow grows | 180ms |
 
-**Step 2 — Verification**
-```
-┌──────────────────────────────┐
-│  Enter your 6-digit code     │
-│  [ _ ][ _ ][ _ ][ _ ][ _ ][ _]│
-│                               │
-│  Use a recovery code instead  │
-└──────────────────────────────┘
-```
-- Auto-submits on the 6th digit — no separate "verify" click.
-- "Use a recovery code instead" swaps the six single-digit boxes for one text field accepting a recovery code, consuming it on success (one-time use, per the schema).
+Reveal is progressive enhancement: content is only hidden when a `js` class is on `<html>` (set before paint), so without JS nothing is ever invisible.
 
-**Session end (BR-3.3)**
-- At 25 minutes idle: a toast — "Session ending in 5 minutes." Dismissing it or any activity resets the timer.
-- At 30 minutes: redirect to `/admin/login` with a neutral message — "Session ended for inactivity." — not styled as an error; nothing went wrong.
+## 6. Components
 
-## 6. Tailwind mapping
+- **Button:** `primary` (blueprint fill, paper text), `accent` (amber fill, ink text — one per view, the thing to do next), `outline` (ink border), `outline-light` (paper border, for dark bands). Sharp corners. Hover = the `print` lift with a hard ink shadow. Focus = 2px outline in the accent for the surface.
+- **SystemCard:** a `sheet` on vellum. Mono header row (organization / domain), name, status badge, serif summary, stack chips, "Read case study" footer. Hover/focus: `print` lift with blueprint shadow **and** the four corner brackets in brass — the v1 selection motif, kept.
+- **Title block:** ruled mono table (Sheet, Title, Rev, Drawn) — the page header device.
+- **Section header:** mono sheet-section index (`02.1`), section title, optional right-aligned link.
+- **Status badge:** mono, bordered, colour = status token; `on-dark` variant uses the dark status values.
+- **Hero drawing (`SystemsBlueprint`):** the scale figure at the centre of construction circles, published systems as linked nodes on orthogonal leader lines, a dimension line carrying this platform's real stack.
 
-See `tailwind.config.ts` — every token above is a named Tailwind color/font, not a magic hex value scattered through components.
+## 7. Home (Sheet 01)
 
-## 7. Signature Interaction Layer — Tailwind and custom CSS, doing what each is best at
+1. **Blueprint hero** — full bleed. Left: who (name, role), the ledger typing live facts with the numbers in amber, primary actions. Right: the hero drawing. Bottom-right: the title block.
+2. **Featured system** — the flagship, as a spread: preview frame + story + stack. The full catalog is `/systems`; home features one and links through.
+3. **How I build** — deep band, the four principles as a numbered spec sheet.
+4. **Contact** — amber band, one line, one action.
 
-**The rule this section follows:** Tailwind owns composition — spacing, layout, responsive breakpoints, and any interaction expressible as discrete utility states (hover, focus, group-hover). Custom CSS owns the two things utilities genuinely can't do well — sequenced, timed animation, and print output — plus the small signature details (caret, selection color, scrollbar) that never come from a class name. Neither tool is asked to do the other's job.
+## 8. Login
 
-### The signature moment — the ledger hero
+Unchanged from v1 §5 in behaviour (two steps, generic credential errors, live lock countdown, auto-submit on the 6th digit, neutral session-ended copy); restyled onto v2 surfaces.
 
-Per the frontend-design discipline of spending boldness in exactly one place: the homepage hero doesn't open with a headline-plus-gradient treatment. It opens as a literal audit-log entry writing itself — because that's genuinely what this platform's own `ActivityLog` and audit-trail language already are, not a borrowed visual trope. Real facts type out line by line with a blinking monospace caret, then stop. One orchestrated sequence, once, on load — not a per-section scroll effect.
+## 9. Print
 
-The three lines are deliberately a blend of **Kurhula's own journey** and **the system's journey**, kept at aggregate-fact level — never a named list of individual systems, which is already the job of the systems grid directly below the hero, `/systems`, and `/journey`. All three numbers are computed server-side from live data (years active from the earliest `Experience`/`Organization` record, organizations founded, systems shipped/queued from `Status`), never hardcoded copy:
+`/cv` prints ink-only: no header, nav, footer, hero, bands, shadows, grid or accent colour. Genuinely a different output for a different job.
 
-```
-1 year building. 2 organizations founded.
-2 systems shipped. Several more queued.
-Engineered in South Africa, held to a global standard.
-```
+## 10. Tailwind mapping
 
-(Line 3 is the closing half of the locked mission statement — Overview §10 — reused verbatim, not new copy.)
-
-Built in React (`components/home/LedgerHero.tsx`) with a small `useTypewriterLines` hook, not pure CSS keyframes — sequencing, real data, and `prefers-reduced-motion` all need to be checked and controlled in code to stay reliable and accessible. The caret blink itself is custom CSS (`globals.css`), since a blinking cursor is a visual detail CSS handles natively and JS shouldn't be timing.
-
-#### The scale figure
-
-A real-world reference, not an invented gimmick: architectural and engineering drawings place a human silhouette — a "scale figure" — into a technical drawing to give it human scale and presence. `components/home/ScaleFigure.tsx` renders exactly that: a simple, unfilled line-art human outline, ink-colored stroke only, positioned in the hero's margin column. As the three ledger lines type out, the figure draws itself in — a single continuous stroke reveal via SVG `stroke-dasharray`/`stroke-dashoffset`, timed to finish exactly as the third line finishes — so the reader's own presence in the system is being drafted at the same pace the facts about them are being logged. This is the visual answer to "a real person evolving": not a cartoon mascot animating through poses, but the reader's own outline being drawn into an engineering document, once, the same way every other fact on this page is being logged rather than decorated.
-
-Mechanics: the draw duration is computed in `LedgerHero.tsx` from the same total-typing-time `useTypewriterLines` already calculates (so the two are never out of sync even if line lengths change), passed to `ScaleFigure` as a CSS custom property (`--draw-duration`), with the actual `stroke-dashoffset` transition living in `globals.css` — same Tailwind/custom-CSS split as the caret (§7 intro): JS owns timing and correctness, CSS owns the timed visual effect itself. `prefers-reduced-motion: reduce` renders the figure fully drawn and static immediately, identically to how the typewriter itself degrades (§ ledger hero above) — the figure is decorative reinforcement of the text, never load-bearing for comprehension, and is `aria-hidden`.
-
-### The corner-bracket selection state
-
-Every `SystemCard` uses a CAD/drafting-tool selection indicator on hover and keyboard focus — four corner brackets appearing at the element's edges — instead of the generic rounded-card-plus-shadow lift this design system already ruled out in §0. This is pure Tailwind: four absolutely positioned corner elements, `opacity-0` to `group-hover:opacity-100` / `group-focus-within:opacity-100`, no custom CSS required. It's the right tool for a discrete two-state interaction.
-
-### Print stylesheet
-
-`/cv` needs a working print/PDF output (Constitution §9 — continuity fallback). This is a pure custom-CSS concern — a `@media print` block in `globals.css` that strips navigation, the ledger hero, and all brass accent color (print in ink-only), and resets the page to a plain, dense CV layout. Tailwind's utility model has no equivalent for print-specific cascades this targeted.
-
+Every token is a named Tailwind colour/font in `tailwind.config.ts` and a CSS custom property in `globals.css` (so data like `Status.colorToken` can bind to it at runtime). No magic hex values in components.
