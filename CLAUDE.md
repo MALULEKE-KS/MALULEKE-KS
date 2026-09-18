@@ -14,8 +14,20 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/docs/PLATFORM-OVERVIEW-AND-RATIONALE.md` | Why it exists this way |
 | `/docs/BUSINESS-RULES-v1.md` | What must happen — enforceable behavior, cite by BR-x.x |
 | `/openapi-contract.yaml` | The API contract — implement to this, don't improvise shapes |
+| `/docs/DESIGN-SYSTEM.md` | What it looks like — the authoritative visual identity, cite by §n |
+| `/docs/PAGE-SPECIFICATIONS.md` | What's on each route, section by section |
 
 Every implementation decision should be able to cite a rule from one of these. If it can't, stop and ask rather than inventing new structure.
+
+## Visual design workflow
+
+`/docs/DESIGN-SYSTEM.md` is the authoritative visual identity for this platform — flat CAD/architectural-drafting aesthetic, sharp corners, no shadows or gradients, IBM Plex type family, one accent color spent deliberately. It exists specifically to differentiate this platform from an ordinary portfolio, and it governs every visual decision.
+
+`/modern_ui_ux_layout_structuring_guide.md` (repo root) is a **backup reference only** — general usability principles (spacing rhythm, type-scale discipline, accessible contrast, mobile-first, clear hierarchy) that are useful cross-checks. Its specific visual prescriptions (glassmorphism, gradient text, `rounded-2xl` cards, drop shadows, badge/FAQ/testimonial marketing-page patterns) describe a generic SaaS-template look and are **not** used — they'd undo the differentiation DESIGN-SYSTEM.md exists to create. Reach for this doc only to sanity-check usability fundamentals, never to source a visual style.
+
+Gemini Canvas (via the `claude-in-chrome` skill) is a prototyping tool, not a design authority. Use it to explore layout/structure ideas quickly, briefed explicitly with DESIGN-SYSTEM.md's tokens and constraints so its output starts aligned. Whatever it produces gets converted and re-implemented against this codebase's actual components, Tailwind config, and design tokens before it ships — never pasted in or ported as-is, and never a reason to introduce a visual pattern DESIGN-SYSTEM.md doesn't already sanction.
+
+When any of the three disagree, DESIGN-SYSTEM.md wins.
 
 ## Rule EXT-1 — Extension Over Modification
 
