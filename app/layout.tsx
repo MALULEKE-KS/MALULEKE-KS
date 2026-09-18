@@ -12,7 +12,6 @@
 import { IBM_Plex_Sans, IBM_Plex_Serif, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { VisitorLensProvider } from "@/components/shared/VisitorLensProvider";
-import { SiteHeader } from "@/components/shared/SiteHeader";
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -47,10 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${ibmPlexSans.variable} ${ibmPlexSerif.variable} ${ibmPlexMono.variable}`}
     >
       <body className="font-sans bg-paper text-ink">
-        <VisitorLensProvider>
-          <SiteHeader />
-          {children}
-        </VisitorLensProvider>
+        <VisitorLensProvider>{children}</VisitorLensProvider>
       </body>
     </html>
   );
