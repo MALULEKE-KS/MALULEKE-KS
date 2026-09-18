@@ -12,8 +12,8 @@ export function TextLink({ className, ...props }: React.ComponentProps<typeof Li
   return (
     <Link
       className={cn(
-        "font-sans text-sm text-ink underline underline-offset-4 decoration-slate/40 transition-colors hover:decoration-ink",
-        className,
+        "text-ink decoration-slate/40 hover:decoration-ink font-sans text-sm underline underline-offset-4 transition-colors",
+        className
       )}
       {...props}
     />

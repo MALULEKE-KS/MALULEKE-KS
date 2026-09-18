@@ -1,5 +1,5 @@
 // tailwind.config.ts
-// Every value here maps directly to DESIGN-SYSTEM.md §1/§2 — no magic hex
+// Every value here maps directly to DESIGN-SYSTEM.md v3 §1/§2 — no magic hex
 // values or ad hoc font-family strings should appear in components.
 
 import type { Config } from "tailwindcss";
@@ -9,27 +9,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#0F1729",
-        paper: "#F5F7FA",
-        slate: {
-          DEFAULT: "#3D4A5C",
+        // Graphite — the dominant dark (60%)
+        night: {
+          DEFAULT: "#131519", // raised dark surface
+          deep: "#0B0C0E", // base dark
+          soft: "#1B1E23", // cards on dark
         },
-        accent: {
-          DEFAULT: "#906722", // corrected from #C08A2E — the original failed WCAG AA
-          // as text (2.83:1). This value passes at 4.72:1 while still reading
-          // as brass/gold. See DESIGN-SYSTEM.md §1 for the verification.
+        // Bone — the light surfaces
+        paper: "#F4F2EE", // base light (also the "on dark" text colour)
+        sheet: "#FCFBF9", // cards on light
+        // Ink
+        ink: "#121417",
+        slate: { DEFAULT: "#4B5159" }, // secondary text on light (7.17:1 on paper)
+        mist: "#A3A9B1", // secondary text on dark (8.26:1)
+        line: "#7C858F", // labels / linework on dark (5.23:1)
+        // International Orange — the one accent (10%)
+        ember: {
+          DEFAULT: "#FF5B1F", // on dark (6.31:1) and as a fill with ink text (5.95:1)
+          soft: "#FFB547", // gradient partner only
         },
+        accent: { DEFAULT: "#C2410C" }, // ember as text on light (4.63:1 paper, 5.01:1 sheet)
+        // Status — data, never decoration (Status.colorToken)
         signal: {
-          finished: "#1F6F5C",
-          progress: "#906722", // == accent, unchanged from the original design intent
-          planned: "#5A6470", // corrected from #6B7684 — original failed AA-normal (4.30:1); this passes at 5.60:1
+          finished: "#0F7A4B",
+          progress: "#C2410C",
+          planned: "#5B616A",
         },
-        critical: "#9B3A2E",
-        // shadcn/ui semantic tokens — mapped to this project's own palette
-        // (globals.css :root, via HSL custom properties) rather than
-        // shadcn's default gray/blue, so a component pulled in later via
-        // the CLI (`npx shadcn add ...`) is on-brand by default instead of
-        // needing every instance restyled by hand.
+        critical: "#B42318",
+        // shadcn/ui semantic tokens, mapped onto this palette (globals.css)
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         border: "hsl(var(--border))",
@@ -51,6 +58,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
       },
       fontFamily: {
         sans: ["var(--font-ibm-plex-sans)", "system-ui", "sans-serif"],
@@ -58,22 +73,21 @@ const config: Config = {
         mono: ["var(--font-ibm-plex-mono)", "monospace"],
       },
       maxWidth: {
-        prose: "72ch", // keeps body copy under the 80-character line length rule
+        prose: "72ch",
       },
       borderRadius: {
-        // Deliberately minimal — the design system avoids the uniform
-        // rounded-card treatment. Sharp or barely-softened corners only.
-        // lg/md/sm derive from --radius (globals.css, set to 2px) so any
-        // shadcn component using them inherits the same restraint.
-        DEFAULT: "2px",
-        none: "0px",
+        // One radius family (§3): rounded-2xl cards, rounded-full buttons and
+        // chips. lg/md/sm follow --radius so shadcn components match.
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 1px)",
-        sm: "calc(var(--radius) - 1px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        // No default drop shadow token defined on purpose — dividers use
-        // hairline borders (Design System §3), not soft shadows.
+        // Layered, soft, tinted by the graphite — never pure black (§4.3).
+        soft: "0 1px 2px rgb(16 17 20 / 0.04), 0 8px 24px -12px rgb(16 17 20 / 0.18)",
+        lift: "0 2px 4px rgb(16 17 20 / 0.05), 0 28px 56px -24px rgb(16 17 20 / 0.38)",
+        "glow-ember": "0 12px 32px -10px rgb(255 91 31 / 0.6)",
+        "inset-hair": "inset 0 1px 0 0 rgb(255 255 255 / 0.06)",
       },
     },
   },

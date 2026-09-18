@@ -1,10 +1,10 @@
 // components/shared/SystemPreviewFrame.tsx
-// 16:9 homepage preview for a System's case study. Falls back to a
-// technical wireframe placeholder (not a broken image or empty box) when
-// screenshotUrl is null — most systems won't have one filled in yet, and
-// this platform never fakes content that isn't real (Design System ethos:
-// make it exist first, make it beautiful after — an honest "not yet
-// captured" placeholder beats a stretched or missing image).
+// A System's preview in a browser-window frame. With a screenshot: the image.
+// Without one (most systems, for now): an honest wireframe that says plainly
+// no preview is captured yet — never a fake screenshot or a broken image
+// (DESIGN-SYSTEM.md §4.1).
+
+import { ImageOff } from "lucide-react";
 
 interface SystemPreviewFrameProps {
   screenshotUrl: string | null;
@@ -13,48 +13,45 @@ interface SystemPreviewFrameProps {
 }
 
 export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPreviewFrameProps) {
-  return (
-    <div className="relative aspect-video w-full border border-slate/20 bg-slate/10 overflow-hidden">
-      {screenshotUrl ? (
-        // Plain <img>, not next/image: screenshotUrl is arbitrary
-        // admin-supplied text (there's no file upload yet, see
-        // Constitution §9), so there's no fixed host to whitelist in
-        // next.config.ts's remotePatterns.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={screenshotUrl}
-          alt={`${name} homepage preview`}
-          className="absolute inset-0 h-full w-full object-cover object-top"
-        />
-      ) : (
-        <div
-          className="h-full w-full flex items-center justify-center p-6"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(61,74,92,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(61,74,92,0.08) 1px, transparent 1px)",
-            backgroundSize: "16px 16px",
-          }}
-        >
-          <div className="w-full max-w-[280px] border border-dashed border-slate/40 bg-paper/85 p-4 flex flex-col gap-2">
-            <div className="flex justify-between font-mono text-xs text-slate">
-              <span>Preview</span>
-              <span>Pending</span>
-            </div>
-            <div className="h-1.5 w-full bg-slate/20" />
-            <div className="h-1.5 w-full bg-slate/20" />
-            <div className="h-1.5 w-3/5 bg-slate/20" />
-          </div>
-        </div>
-      )}
+  const host = liveUrl ? liveUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
 
-      {/* Mono URL bar along the bottom — real live URL when we have one,
-          otherwise names the state plainly rather than showing nothing. */}
-      <div className="absolute bottom-0 inset-x-0 bg-paper/95 border-t border-slate/20 px-3 py-1.5 flex items-center gap-1.5 font-mono text-xs text-slate">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" className="shrink-0">
-          <rect x="3" y="11" width="18" height="11" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-        <span className="truncate text-ink">{liveUrl ?? "No live preview captured yet"}</span>
+  return (
+    <div className="relative w-full overflow-hidden rounded-xl border border-ink/10 bg-night shadow-lift">
+      {/* Window chrome */}
+      <div className="flex items-center gap-3 border-b border-white/10 bg-night-deep px-4 py-2.5">
+        <span aria-hidden="true" className="flex gap-1.5">
+          <span className="size-2.5 rounded-full bg-white/15" />
+          <span className="size-2.5 rounded-full bg-white/15" />
+          <span className="size-2.5 rounded-full bg-white/15" />
+        </span>
+        <span className="min-w-0 flex-1 truncate rounded-md bg-white/5 px-3 py-1 text-center font-mono text-xs text-mist">
+          {host ?? `${name.toLowerCase().replace(/\s+/g, "-")}.preview`}
+        </span>
+      </div>
+
+      <div className="relative aspect-[16/10]">
+        {screenshotUrl ? (
+          // Plain <img>, not next/image: screenshotUrl is admin-supplied text
+          // with no fixed host to whitelist in next.config.ts remotePatterns.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={screenshotUrl} alt={`${name} homepage`} className="absolute inset-0 h-full w-full object-cover object-top" />
+        ) : (
+          <div className="hero-field absolute inset-0 flex items-center justify-center p-6">
+            <svg viewBox="0 0 320 190" aria-hidden="true" className="h-auto w-full max-w-[420px] text-white" fill="none">
+              {/* A wireframe page: nav, hero block, three columns */}
+              <rect x="0.5" y="0.5" width="319" height="189" rx="8" stroke="currentColor" strokeOpacity=".14" />
+              <path d="M16 18 h36 M236 18 h20 M264 18 h20 M292 18 h14" stroke="currentColor" strokeOpacity=".25" strokeLinecap="round" strokeWidth="3" />
+              <path d="M24 60 h150 M24 76 h110" stroke="currentColor" strokeWidth="7" strokeOpacity=".16" strokeLinecap="round" />
+              <rect x="24" y="92" width="58" height="16" rx="8" fill="#FF5B1F" fillOpacity=".9" />
+              <rect x="206" y="46" width="92" height="66" rx="8" fill="currentColor" fillOpacity=".05" stroke="currentColor" strokeOpacity=".16" />
+              <path d="M24 132 h84 v42 h-84 z M118 132 h84 v42 h-84 z M212 132 h84 v42 h-84 z" fill="currentColor" fillOpacity=".04" stroke="currentColor" strokeOpacity=".12" />
+            </svg>
+            <p className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-night-deep/80 px-3 py-1 text-xs text-mist backdrop-blur">
+              <ImageOff aria-hidden="true" className="size-3.5" />
+              Live preview not captured yet
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

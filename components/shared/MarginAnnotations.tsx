@@ -33,12 +33,9 @@ export function MarginAnnotations({ items, header, children }: MarginAnnotations
 
         {/* <768px: inline badge row directly under the heading, no column */}
         {items.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3 md:hidden">
+          <div className="mt-3 flex flex-wrap gap-2 md:hidden">
             {items.map((item) => (
-              <span
-                key={item.label}
-                className="font-mono text-xs border border-slate/30 text-slate px-2 py-0.5"
-              >
+              <span key={item.label} className="border-slate/30 text-slate border px-2 py-0.5 font-mono text-xs">
                 {item.label}: {item.value}
               </span>
             ))}
@@ -50,11 +47,11 @@ export function MarginAnnotations({ items, header, children }: MarginAnnotations
 
       {/* >=768px: vertical margin column, hairline-divided */}
       {items.length > 0 && (
-        <dl className="hidden md:block md:w-40 md:shrink-0 md:border-l md:border-slate/20 md:pl-4 md:pt-1">
+        <dl className="md:border-slate/20 hidden md:block md:w-40 md:shrink-0 md:border-l md:pt-1 md:pl-4">
           {items.map((item) => (
             <div key={item.label} className="mb-3 last:mb-0">
-              <dt className="font-mono text-xs text-slate">{item.label}</dt>
-              <dd className="font-mono text-xs text-ink">{item.value}</dd>
+              <dt className="text-slate font-mono text-xs">{item.label}</dt>
+              <dd className="text-ink font-mono text-xs">{item.value}</dd>
             </div>
           ))}
         </dl>

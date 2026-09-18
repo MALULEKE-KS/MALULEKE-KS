@@ -13,6 +13,7 @@ import { MarginAnnotations } from "@/components/shared/MarginAnnotations";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
 import { getPublicSystemBySlug, getRelatedSystems } from "@/lib/queries/systems";
 import { db } from "@/lib/db";
+import { Container } from "@/components/shared/Container";
 
 interface SystemDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -49,6 +50,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
   ];
 
   return (
+    <Container>
     <article className="py-16">
       <MarginAnnotations
         items={annotations}
@@ -163,5 +165,6 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         </div>
       )}
     </article>
+    </Container>
   );
 }

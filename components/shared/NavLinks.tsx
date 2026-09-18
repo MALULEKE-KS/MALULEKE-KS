@@ -1,51 +1,98 @@
 // components/shared/NavLinks.tsx
-// Primary nav with a current-section indicator. Client component only
-// because it needs usePathname; SiteHeader stays a server component.
-//
-// The indicator is brass (Design System §4.2 — brass is for flagship
-// markers, active states and the numbers) and the state is also exposed as
-// aria-current, so it isn't conveyed by color alone. A section matches on its
-// path prefix, so /systems/xkimm-xa-mali keeps "Systems" marked.
+// Primary nav: pill links with an active state (filled pill + ember dot,
+// plus aria-current so it isn't colour alone). Below md, a Menu button opens
+// a full-width glass panel. The panel is open *for a given path*, so any
+// navigation closes it without an effect.
 
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ArrowUpRight, Menu, X } from "lucide-react";
+import { SHEETS } from "@/lib/content/sheets";
 import { cn } from "@/lib/utils";
 
-const NAV_LINKS = [
-  { href: "/systems", label: "Systems" },
-  { href: "/journey", label: "Journey" },
-  { href: "/cv", label: "CV" },
-  { href: "/how-i-build", label: "How I build" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
+const NAV = SHEETS.filter((s) => s.href !== "/");
 
 export function NavLinks() {
   const pathname = usePathname();
+  const [openFor, setOpenFor] = useState<string | null>(null);
+  const open = openFor === pathname;
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <nav className="flex flex-wrap gap-x-6">
-      {NAV_LINKS.map((link) => {
-        const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            aria-current={active ? "page" : undefined}
-            // py-2 keeps the tap target around 36px tall on a phone; the
-            // border is the current-page mark, transparent otherwise so the
-            // row doesn't shift when it appears.
-            className={cn(
-              "border-b-2 py-2 font-sans text-sm transition-colors",
-              active ? "border-accent text-ink" : "border-transparent text-slate hover:text-ink",
-            )}
-          >
-            {link.label}
-          </Link>
-        );
-      })}
-    </nav>
+    <>
+      <nav aria-label="Primary" className="hidden md:block">
+        <ul className="flex items-center gap-1">
+          {NAV.map((s) => {
+            const active = isActive(s.href);
+            return (
+              <li key={s.href}>
+                <Link
+                  href={s.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-ember",
+                    active ? "bg-white/10 text-paper" : "text-mist hover:bg-white/5 hover:text-paper",
+                  )}
+                >
+                  {active && <span aria-hidden="true" className="size-1.5 rounded-full bg-ember" />}
+                  {s.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <button
+        type="button"
+        className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-paper focus-visible:outline-2 focus-visible:outline-ember md:hidden"
+        aria-expanded={open}
+        aria-controls="mobile-nav"
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpenFor(open ? null : pathname)}
+      >
+        {open ? <X className="size-5" /> : <Menu className="size-5" />}
+      </button>
+
+      {open && (
+        <nav
+          id="mobile-nav"
+          aria-label="Primary"
+          className="absolute inset-x-0 top-full border-b border-white/10 bg-night-deep/95 backdrop-blur-xl md:hidden"
+        >
+          <ul className="mx-auto max-w-6xl px-6 py-3">
+            {NAV.map((s) => {
+              const active = isActive(s.href);
+              return (
+                <li key={s.href}>
+                  <Link
+                    href={s.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl px-3 py-3.5 text-lg transition-colors",
+                      active ? "bg-white/10 text-paper" : "text-mist hover:bg-white/5 hover:text-paper",
+                    )}
+                  >
+                    <span className="flex items-baseline gap-3">
+                      <span className="font-mono text-xs text-line">{s.number}</span>
+                      {s.label}
+                    </span>
+                    {active ? (
+                      <span aria-hidden="true" className="size-2 rounded-full bg-ember" />
+                    ) : (
+                      <ArrowUpRight className="size-4 text-line" aria-hidden="true" />
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
+    </>
   );
 }

@@ -9,6 +9,7 @@
 import { Suspense } from "react";
 import { SystemsResults } from "./_components/SystemsResults";
 import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
+import { Container } from "@/components/shared/Container";
 
 export const metadata = { title: "Systems" };
 
@@ -20,11 +21,13 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
   const params = await searchParams;
 
   return (
-    <section className="py-16">
-      <h1 className="font-sans font-semibold text-2xl text-ink mb-6">Systems</h1>
-      <Suspense fallback={<SystemsGridSkeleton />}>
-        <SystemsResults searchParams={params} />
-      </Suspense>
-    </section>
+    <Container>
+      <section className="py-16">
+        <h1 className="text-ink mb-6 font-sans text-2xl font-semibold">Systems</h1>
+        <Suspense fallback={<SystemsGridSkeleton />}>
+          <SystemsResults searchParams={params} />
+        </Suspense>
+      </section>
+    </Container>
   );
 }

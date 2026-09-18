@@ -22,13 +22,15 @@ Every implementation decision should be able to cite a rule from one of these. I
 
 ## Visual design workflow
 
-`/docs/DESIGN-SYSTEM.md` is the authoritative visual identity for this platform — flat CAD/architectural-drafting aesthetic, sharp corners, no shadows or gradients, IBM Plex type family, one accent color spent deliberately. It exists specifically to differentiate this platform from an ordinary portfolio, and it governs every visual decision.
+`/docs/DESIGN-SYSTEM.md` (v3, "Graphite & International Orange") is the authoritative visual identity: a modern, product-grade interface — graphite and bone surfaces, one International Orange accent, glass on dark, soft layered depth, rounded cards, pill buttons, bento layouts, Lucide icons and real brand marks, purposeful motion. It governs every visual decision.
 
-`/modern_ui_ux_layout_structuring_guide.md` (repo root) is a **backup reference only** — general usability principles (spacing rhythm, type-scale discipline, accessible contrast, mobile-first, clear hierarchy) that are useful cross-checks. Its specific visual prescriptions (glassmorphism, gradient text, `rounded-2xl` cards, drop shadows, badge/FAQ/testimonial marketing-page patterns) describe a generic SaaS-template look and are **not** used — they'd undo the differentiation DESIGN-SYSTEM.md exists to create. Reach for this doc only to sanity-check usability fundamentals, never to source a visual style.
+`/modern_ui_ux_layout_structuring_guide.md` (repo root) is a **working reference** since v3 — layout rhythm, 60-30-10 colour, glass, card anatomy, micro-interactions. Apply it through DESIGN-SYSTEM.md's tokens, never by copying its raw colour values.
 
-Gemini Canvas (via the `claude-in-chrome` skill) is a prototyping tool, not a design authority. Use it to explore layout/structure ideas quickly, briefed explicitly with DESIGN-SYSTEM.md's tokens and constraints so its output starts aligned. Whatever it produces gets converted and re-implemented against this codebase's actual components, Tailwind config, and design tokens before it ships — never pasted in or ported as-is, and never a reason to introduce a visual pattern DESIGN-SYSTEM.md doesn't already sanction.
+Component sources, in order: this codebase's own components → shadcn/ui → Magic UI and 21st.dev (both via the shadcn registry or their MCP servers). Anything brought in is converted to the design tokens and IBM Plex before it ships — no bundled fonts, colours or CDN assets. Gemini Canvas is for quick layout prototyping only; its output is re-implemented against the real components, never pasted in.
 
-When any of the three disagree, DESIGN-SYSTEM.md wins.
+**Personal information:** nothing about the owner goes on the site unless it's already in the repo (docs, seed data, existing copy, README contact block) or the owner has said it. Ask before adding any personal detail.
+
+When the doc and a reference disagree, DESIGN-SYSTEM.md wins.
 
 ## Rule EXT-1 — Extension Over Modification
 

@@ -37,3 +37,9 @@ export async function getPrioritySystems(limit = 4) {
   // preview is still a public surface, same BR-1.1/1.3/1.4 rules apply.
   return systems.map(toPublicSystem);
 }
+
+// Count of published systems — the "All systems (n)" link on the home page.
+// Published-only (BR-1.1): this labels a link to real, visible content.
+export async function countPublishedSystems() {
+  return db.system.count({ where: { contentStatus: "PUBLISHED" } });
+}

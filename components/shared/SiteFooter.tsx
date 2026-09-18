@@ -1,73 +1,65 @@
 // components/shared/SiteFooter.tsx
-// Persistent, low-noise contact affordances across every public page — the
-// conventional home for this, not the header (which stays focused on
-// primary nav + the real /contact inquiry form as the primary CTA).
-// Real destinations only, sourced from the README's own contact block —
-// never placeholder links.
+// Brand + mission, the page index, and direct contact with real brand icons.
+// Every destination is real (lib/content/sheets.ts). Colophon names the
+// platform's actual stack.
 
+import Link from "next/link";
+import { BrandMark } from "@/components/shared/BrandMark";
 import { Container } from "@/components/shared/Container";
-
-const CONTACT_LINKS = [
-  {
-    label: "LinkedIn",
-    href: "https://za.linkedin.com/in/kurhula-success-maluleke-32153231a",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-        <rect x="2" y="9" width="4" height="12" />
-        <circle cx="4" cy="4" r="2" />
-      </svg>
-    ),
-  },
-  {
-    label: "WhatsApp",
-    href: "https://wa.me/27640708649",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Email",
-    href: "mailto:kurhula04s@gmail.com",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-        <polyline points="22,6 12,13 2,6" />
-      </svg>
-    ),
-  },
-];
+import { SocialLinks } from "@/components/shared/SocialLinks";
+import { OWNER, PLATFORM_STACK, SHEETS } from "@/lib/content/sheets";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-slate/20 bg-paper mt-auto">
-      <Container className="py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <a
-          href="https://github.com/MALULEKE-KS"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-xs text-slate hover:text-accent transition-colors"
-        >
-          MALULEKE-KS
-        </a>
+    <footer className="relative overflow-hidden bg-night-deep text-paper">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <Container className="grid gap-12 py-16 md:grid-cols-12">
+        <div className="md:col-span-5">
+          <Link href="/" className="inline-flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-ember">
+            <BrandMark className="size-8 text-paper" />
+            <span className="font-mono text-sm font-medium">MALULEKE-KS</span>
+          </Link>
+          <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-mist">
+            Systems disciplined enough to be trusted with real money, real institutions and real people&rsquo;s
+            outcomes.
+          </p>
+          <SocialLinks className="mt-8" />
+        </div>
 
-        <div className="flex flex-wrap items-center gap-6 sm:gap-8">
-          {CONTACT_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target={link.href.startsWith("mailto:") ? undefined : "_blank"}
-              rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-              className="group inline-flex items-center gap-2 font-sans text-sm text-ink hover:text-accent transition-colors"
-            >
-              <span className="text-slate group-hover:text-accent transition-colors">{link.icon}</span>
-              {link.label}
-            </a>
-          ))}
+        <nav aria-label="Footer" className="md:col-span-3">
+          <h2 className="font-mono text-xs text-line">Pages</h2>
+          <ul className="mt-4 space-y-2.5">
+            {SHEETS.map((s) => (
+              <li key={s.href}>
+                <Link href={s.href} className="group inline-flex items-baseline gap-3 text-sm text-mist transition-colors hover:text-paper">
+                  <span className="font-mono text-xs text-line transition-colors group-hover:text-ember">{s.number}</span>
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="md:col-span-4">
+          <h2 className="font-mono text-xs text-line">Write to me</h2>
+          <a
+            href={`mailto:${OWNER.email}`}
+            className="mt-4 inline-block break-all font-sans text-lg text-paper underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-ember"
+          >
+            {OWNER.email}
+          </a>
+          <p className="mt-3 text-sm text-mist">Every inquiry gets a reply within 48 hours.</p>
         </div>
       </Container>
+
+      <div className="border-t border-white/10">
+        <Container className="flex flex-col gap-2 py-5 font-mono text-xs text-line md:flex-row md:items-center md:justify-between">
+          <p>
+            &copy; {new Date().getFullYear()} {OWNER.name}. Engineered in {OWNER.location}.
+          </p>
+          <p>Built on {PLATFORM_STACK.join(" / ")}</p>
+        </Container>
+      </div>
     </footer>
   );
 }

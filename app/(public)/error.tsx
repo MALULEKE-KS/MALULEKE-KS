@@ -15,28 +15,25 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/shared/Container";
 
-export default function PublicError({
-  error,
-  retry,
-}: {
-  error: Error & { digest?: string };
-  retry: () => void;
-}) {
+export default function PublicError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     console.error(error);
   }, [error]);
 
   return (
-    <section className="py-16 max-w-2xl">
-      <h1 className="font-sans font-semibold text-2xl text-ink mb-4">This page failed to load</h1>
-      <p className="font-sans text-ink mb-6">
-        The data behind it could not be read. Try again; if it keeps failing, come back in a few minutes.
-      </p>
-      {error.digest && <p className="font-mono text-xs text-slate mb-6">Reference: {error.digest}</p>}
-      <Button type="button" onClick={() => retry()}>
-        Try again
-      </Button>
-    </section>
+    <Container>
+      <section className="max-w-2xl py-16">
+        <h1 className="text-ink mb-4 font-sans text-2xl font-semibold">This page failed to load</h1>
+        <p className="text-ink mb-6 font-sans">
+          The data behind it could not be read. Try again; if it keeps failing, come back in a few minutes.
+        </p>
+        {error.digest && <p className="text-slate mb-6 font-mono text-xs">Reference: {error.digest}</p>}
+        <Button type="button" onClick={() => retry()}>
+          Try again
+        </Button>
+      </section>
+    </Container>
   );
 }

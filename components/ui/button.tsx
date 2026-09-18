@@ -4,30 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// Restyled to DESIGN-SYSTEM.md rather than shadcn's defaults: flat (no
-// shadows, §0), sharp corners (§3), sans sentence-case labels (§2), brass
-// kept off buttons (§4.2 — accent is for flagship markers, active states and
-// the numbers). Focus is an outline, not a ring: Tailwind rings render as
-// box-shadow, which this system doesn't use.
+// DESIGN-SYSTEM.md v3 §6. Pill buttons; hover = a small lift plus a soft,
+// tinted shadow (the ember button glows). A trailing icon nudges forward on
+// hover. Focus is a 2px ember outline with offset — visible on light and dark.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "group/btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-sans text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5 active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg:last-child]:transition-transform motion-safe:hover:[&_svg:last-child]:translate-x-0.5",
   {
     variants: {
       variant: {
-        // Primary action — one per view.
-        default: "bg-ink text-paper hover:bg-ink/85",
+        default: "bg-ink text-paper shadow-soft hover:bg-ink/90 hover:shadow-lift",
+        // The one "do this next" per view: ember fill, ink text (5.95:1).
+        accent: "bg-ember font-semibold text-ink hover:shadow-glow-ember",
+        outline: "border border-ink/15 bg-sheet text-ink shadow-soft hover:border-ink/30 hover:shadow-lift",
+        // For dark surfaces.
+        glass: "border border-white/15 bg-white/5 text-paper backdrop-blur-md hover:border-white/30 hover:bg-white/10",
+        "outline-light": "border border-white/15 bg-white/5 text-paper backdrop-blur-md hover:border-white/30 hover:bg-white/10",
         destructive: "bg-critical text-paper hover:bg-critical/90",
-        // Secondary / utility action.
-        outline: "border border-ink text-ink hover:bg-ink hover:text-paper",
-        secondary: "bg-slate text-paper hover:bg-slate/90",
-        ghost: "text-ink hover:bg-slate/10",
-        link: "text-ink underline underline-offset-4 decoration-slate/40 hover:decoration-ink",
+        secondary: "bg-secondary text-ink hover:bg-secondary/80",
+        ghost: "text-ink hover:bg-ink/5",
+        link: "rounded-none text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink motion-safe:hover:translate-y-0",
       },
       size: {
-        default: "h-10 px-6",
-        sm: "h-8 px-3 text-xs",
-        lg: "h-12 px-8",
-        icon: "h-10 w-10",
+        default: "h-11 px-6",
+        sm: "h-9 px-4 text-sm",
+        lg: "h-12 px-7 text-base",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {

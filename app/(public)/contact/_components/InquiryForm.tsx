@@ -9,16 +9,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { INQUIRY_TYPES } from "@/lib/content/inquiry";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
 
-const INQUIRY_TYPES = [
-  { value: "hire", label: "Hire" },
-  { value: "partnership", label: "Partnership" },
-  { value: "service", label: "Service request" },
-  { value: "contribution", label: "Contribution" },
-  { value: "recruitment", label: "Recruitment" },
-  { value: "collaboration", label: "Collaboration" },
-];
 
 type SubmitState = "idle" | "submitting" | "success" | "rate-limited" | "error";
 
