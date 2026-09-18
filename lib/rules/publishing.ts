@@ -75,6 +75,14 @@ function publicLiveUrl(system: SystemWithPublicRelations): string | null {
   return system.clientVisibility === "NDA_RESTRICTED" ? null : system.liveUrl;
 }
 
+// Extends BR-1.3's intent to a field that didn't exist when that rule was
+// written: a homepage screenshot exposes an NDA_RESTRICTED client's actual
+// product even more directly than the raw URL text would, so it gets the
+// same treatment as repoUrl/liveUrl.
+function publicScreenshotUrl(system: SystemWithPublicRelations): string | null {
+  return system.clientVisibility === "NDA_RESTRICTED" ? null : system.screenshotUrl;
+}
+
 export function toPublicSystem(system: SystemWithPublicRelations) {
   return {
     id: system.id,
@@ -91,6 +99,7 @@ export function toPublicSystem(system: SystemWithPublicRelations) {
     description: system.description,
     repoUrl: publicRepoUrl(system),
     liveUrl: publicLiveUrl(system),
+    screenshotUrl: publicScreenshotUrl(system),
     techStack: system.techStack,
     isFlagship: system.isFlagship,
   };
@@ -143,6 +152,7 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
     description: system.description,
     repoUrl: system.repoUrl,
     liveUrl: system.liveUrl,
+    screenshotUrl: system.screenshotUrl,
     techStack: system.techStack,
     isFlagship: system.isFlagship,
     sortOrder: system.sortOrder,

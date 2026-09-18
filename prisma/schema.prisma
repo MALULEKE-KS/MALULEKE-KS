@@ -154,6 +154,7 @@ model System {
   description      String
   repoUrl          String?
   liveUrl          String?
+  screenshotUrl    String? // homepage preview image for the public case study/card (Constitution §8 systems catalog)
   techStack        String[]
   isFlagship       Boolean           @default(false)
   sortOrder        Int               @default(0)

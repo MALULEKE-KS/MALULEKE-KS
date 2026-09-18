@@ -17,7 +17,18 @@ interface SystemEditFormProps {
     isFlagship: boolean;
     sortOrder: number;
     caseStudyBody: string;
+    repoUrl: string | null;
+    liveUrl: string | null;
+    screenshotUrl: string | null;
   };
+}
+
+// Empty input -> null (clears the field); a real value is sent as-is and
+// validated server-side (SystemUpdateInputSchema requires a valid URL when
+// not null).
+function urlOrNull(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed.length === 0 ? null : trimmed;
 }
 
 export function SystemEditForm({ system }: SystemEditFormProps) {
@@ -27,6 +38,9 @@ export function SystemEditForm({ system }: SystemEditFormProps) {
   const [isFlagship, setIsFlagship] = useState(system.isFlagship);
   const [sortOrder, setSortOrder] = useState(system.sortOrder);
   const [caseStudyBody, setCaseStudyBody] = useState(system.caseStudyBody);
+  const [repoUrl, setRepoUrl] = useState(system.repoUrl ?? "");
+  const [liveUrl, setLiveUrl] = useState(system.liveUrl ?? "");
+  const [screenshotUrl, setScreenshotUrl] = useState(system.screenshotUrl ?? "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -44,7 +58,16 @@ export function SystemEditForm({ system }: SystemEditFormProps) {
       const res = await fetch(`/api/v1/admin/systems/${system.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentStatus, clientApproved, isFlagship, sortOrder, caseStudyBody }),
+        body: JSON.stringify({
+          contentStatus,
+          clientApproved,
+          isFlagship,
+          sortOrder,
+          caseStudyBody,
+          repoUrl: urlOrNull(repoUrl),
+          liveUrl: urlOrNull(liveUrl),
+          screenshotUrl: urlOrNull(screenshotUrl),
+        }),
       });
 
       if (res.status === 409) {
@@ -112,6 +135,51 @@ export function SystemEditForm({ system }: SystemEditFormProps) {
           onChange={(e) => setSortOrder(Number(e.target.value))}
           className="border-b border-slate/30 bg-transparent px-0 py-2 font-mono text-sm text-ink outline-none focus:border-accent w-24"
         />
+      </div>
+
+      <div>
+        <label htmlFor="liveUrl" className="font-sans text-sm text-ink block mb-1">
+          Live URL
+        </label>
+        <input
+          id="liveUrl"
+          type="url"
+          value={liveUrl}
+          onChange={(e) => setLiveUrl(e.target.value)}
+          placeholder="https://example.com"
+          className="w-full border-b border-slate/30 bg-transparent px-0 py-2 font-mono text-sm text-ink outline-none focus:border-accent"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="repoUrl" className="font-sans text-sm text-ink block mb-1">
+          Repository URL
+        </label>
+        <input
+          id="repoUrl"
+          type="url"
+          value={repoUrl}
+          onChange={(e) => setRepoUrl(e.target.value)}
+          placeholder="https://github.com/org/repo"
+          className="w-full border-b border-slate/30 bg-transparent px-0 py-2 font-mono text-sm text-ink outline-none focus:border-accent"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="screenshotUrl" className="font-sans text-sm text-ink block mb-1">
+          Screenshot URL
+        </label>
+        <input
+          id="screenshotUrl"
+          type="url"
+          value={screenshotUrl}
+          onChange={(e) => setScreenshotUrl(e.target.value)}
+          placeholder="https://.../homepage-screenshot.png"
+          className="w-full border-b border-slate/30 bg-transparent px-0 py-2 font-mono text-sm text-ink outline-none focus:border-accent"
+        />
+        <p className="font-mono text-xs text-slate mt-1">
+          Left blank, the public case study shows a technical placeholder instead.
+        </p>
       </div>
 
       <div>
