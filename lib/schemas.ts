@@ -281,6 +281,15 @@ export const CvGenerateResultSchema = z.object({
   generatedAt: z.string().datetime(),
 });
 
+export const TimelineCreateInputSchema = z.object({
+  milestoneTypeId: z.string(),
+  title: z.string().min(1),
+  description: z.string().nullable().optional(),
+  date: z.string().date(),
+  media: z.string().nullable().optional(),
+  tags: z.array(z.string()).default([]),
+});
+
 export const ExperienceEntrySchema = z.object({
   id: z.string(),
   title: z.string(),
