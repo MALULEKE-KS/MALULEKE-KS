@@ -16,6 +16,7 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/openapi-contract.yaml` | The API contract — implement to this, don't improvise shapes |
 | `/docs/DESIGN-SYSTEM.md` | What it looks like — the authoritative visual identity, cite by §n |
 | `/docs/PAGE-SPECIFICATIONS.md` | What's on each route, section by section |
+| `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, real env vars vs. documented-but-unused ones |
 
 Every implementation decision should be able to cite a rule from one of these. If it can't, stop and ask rather than inventing new structure.
 
@@ -37,7 +38,7 @@ Deliberately NOT extensible, per the constitution's own exception: `ClientVisibi
 
 ## Current phase — do not build ahead of this
 
-**V1 = Phase 0 + Phase 1 only.** Systems catalog, CV generation, unified inquiry intake, admin curation, hardened 2FA auth, activity logging.
+**V1 = Phase 0 + Phase 1 only.** Systems catalog, CV generation, unified inquiry intake, admin curation, hardened 2FA auth, activity logging. **Status: feature-complete and live in production** — see `/docs/DEPLOYMENT.md`.
 
 **Explicitly out of scope right now:** AI concierge, agent tools, testimonials, public API exposure beyond `/systems` read, full analytics dashboard. These are real and specified (Constitution §6, §8) but are V1.1 — do not scaffold them speculatively while V1 is incomplete.
 
