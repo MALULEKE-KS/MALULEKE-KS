@@ -1,5 +1,5 @@
 // tailwind.config.ts
-// Every value here maps directly to DESIGN-SYSTEM.md v2 §1/§2 — no magic hex
+// Every value here maps directly to DESIGN-SYSTEM.md v3 §1/§2 — no magic hex
 // values or ad hoc font-family strings should appear in components.
 
 import type { Config } from "tailwindcss";
@@ -9,30 +9,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Surfaces
-        paper: "#F4F1EA", // vellum — base surface
-        sheet: "#FFFDF8", // raised surface — cards, fields, title block
-        blueprint: {
-          DEFAULT: "#0B2A4A", // primary
-          deep: "#06182E", // header, footer, deep bands
+        // Graphite — the dominant dark (60%)
+        night: {
+          DEFAULT: "#131519", // raised dark surface
+          deep: "#0B0C0E", // base dark
+          soft: "#1B1E23", // cards on dark
         },
+        // Bone — the light surfaces
+        paper: "#F4F2EE", // base light (also the "on dark" text colour)
+        sheet: "#FCFBF9", // cards on light
         // Ink
-        ink: "#0F1729",
-        slate: { DEFAULT: "#3D4A5C" },
-        mist: "#B7C9DF", // secondary text on blueprint (8.61:1)
-        line: "#7CA7D6", // drafting linework on blueprint (non-text)
-        // Accent — one hue, two values (§1): amber on dark / as a fill,
-        // brass as text or line on light. Amber text on paper fails (1.64:1).
-        amber: "#F5B335",
-        accent: { DEFAULT: "#8A5D12" },
-        signal: {
-          finished: "#1F6F5C",
-          progress: "#8A5D12", // == accent
-          planned: "#5A6470",
+        ink: "#121417",
+        slate: { DEFAULT: "#4B5159" }, // secondary text on light (7.17:1 on paper)
+        mist: "#A3A9B1", // secondary text on dark (8.26:1)
+        line: "#7C858F", // labels / linework on dark (5.23:1)
+        // International Orange — the one accent (10%)
+        ember: {
+          DEFAULT: "#FF5B1F", // on dark (6.31:1) and as a fill with ink text (5.95:1)
+          soft: "#FFB547", // gradient partner only
         },
-        critical: "#9B3A2E",
-        // shadcn/ui semantic tokens — mapped onto this palette (globals.css
-        // :root) so anything added via the CLI inherits it.
+        accent: { DEFAULT: "#C2410C" }, // ember as text on light (4.63:1 paper, 5.01:1 sheet)
+        // Status — data, never decoration (Status.colorToken)
+        signal: {
+          finished: "#0F7A4B",
+          progress: "#C2410C",
+          planned: "#5B616A",
+        },
+        critical: "#B42318",
+        // shadcn/ui semantic tokens, mapped onto this palette (globals.css)
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         border: "hsl(var(--border))",
@@ -54,6 +58,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
       },
       fontFamily: {
         sans: ["var(--font-ibm-plex-sans)", "system-ui", "sans-serif"],
@@ -61,21 +73,21 @@ const config: Config = {
         mono: ["var(--font-ibm-plex-mono)", "monospace"],
       },
       maxWidth: {
-        prose: "72ch", // keeps body copy under the 80-character line length rule
+        prose: "72ch",
       },
       borderRadius: {
-        // Sharp corners — drawings don't have rounded sheets.
-        DEFAULT: "2px",
-        none: "0px",
+        // One radius family (§3): rounded-2xl cards, rounded-full buttons and
+        // chips. lg/md/sm follow --radius so shadcn components match.
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 1px)",
-        sm: "calc(var(--radius) - 1px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        // §4.3 — depth is printed, not lit: hard offsets, no blur.
-        print: "6px 6px 0 0 #0B2A4A",
-        "print-sm": "3px 3px 0 0 #0F1729",
-        "print-amber": "6px 6px 0 0 #F5B335",
+        // Layered, soft, tinted by the graphite — never pure black (§4.3).
+        soft: "0 1px 2px rgb(16 17 20 / 0.04), 0 8px 24px -12px rgb(16 17 20 / 0.18)",
+        lift: "0 2px 4px rgb(16 17 20 / 0.05), 0 28px 56px -24px rgb(16 17 20 / 0.38)",
+        "glow-ember": "0 12px 32px -10px rgb(255 91 31 / 0.6)",
+        "inset-hair": "inset 0 1px 0 0 rgb(255 255 255 / 0.06)",
       },
     },
   },

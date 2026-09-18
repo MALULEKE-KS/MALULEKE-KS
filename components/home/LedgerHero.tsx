@@ -1,6 +1,6 @@
 // components/home/LedgerHero.tsx
 // The signature moment (DESIGN-SYSTEM.md v2 §5 `ledger`, §7.1): live facts
-// logging themselves, with every number set in amber — "the numbers moment".
+// logging themselves, every number in the ember gradient — "the numbers moment".
 // All numbers are server-computed props, never hardcoded copy; the lines
 // stay at aggregate level (named systems are the drawing's and /systems' job).
 //
@@ -19,11 +19,11 @@ interface LedgerHeroProps {
   systemsQueued: number;
 }
 
-// Numbers in amber — the accent spent on "the numbers" (§4.2).
+// Numbers in the ember gradient — the accent spent on "the numbers" (§4.2).
 function withNumbers(text: string) {
   return text.split(/(\d+)/).map((part, i) =>
     /^\d+$/.test(part) ? (
-      <span key={i} className="text-amber">
+      <span key={i} className="text-ember-gradient">
         {part}
       </span>
     ) : (

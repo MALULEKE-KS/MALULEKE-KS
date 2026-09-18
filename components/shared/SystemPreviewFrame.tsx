@@ -1,9 +1,10 @@
 // components/shared/SystemPreviewFrame.tsx
-// 16:10 preview of a System. With a screenshot: the image, in a window
-// frame. Without one (most systems, for now): a blueprint wireframe of a
-// browser window stating plainly that no preview is captured yet — an
-// honest drawing of what will go here, never a fake screenshot or a broken
-// image (DESIGN-SYSTEM.md v2 §4.1).
+// A System's preview in a browser-window frame. With a screenshot: the image.
+// Without one (most systems, for now): an honest wireframe that says plainly
+// no preview is captured yet — never a fake screenshot or a broken image
+// (DESIGN-SYSTEM.md §4.1).
+
+import { ImageOff } from "lucide-react";
 
 interface SystemPreviewFrameProps {
   screenshotUrl: string | null;
@@ -15,16 +16,16 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPrevi
   const host = liveUrl ? liveUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
 
   return (
-    <div className="border-blueprint bg-blueprint relative w-full overflow-hidden border">
+    <div className="relative w-full overflow-hidden rounded-xl border border-ink/10 bg-night shadow-lift">
       {/* Window chrome */}
-      <div className="border-line/25 bg-blueprint-deep flex items-center gap-3 border-b px-3 py-2">
+      <div className="flex items-center gap-3 border-b border-white/10 bg-night-deep px-4 py-2.5">
         <span aria-hidden="true" className="flex gap-1.5">
-          <span className="border-line/60 size-2 border" />
-          <span className="border-line/60 size-2 border" />
-          <span className="bg-amber size-2" />
+          <span className="size-2.5 rounded-full bg-white/15" />
+          <span className="size-2.5 rounded-full bg-white/15" />
+          <span className="size-2.5 rounded-full bg-white/15" />
         </span>
-        <span className="text-mist min-w-0 truncate font-mono text-xs">
-          {host ?? `${name.toLowerCase()} / preview`}
+        <span className="min-w-0 flex-1 truncate rounded-md bg-white/5 px-3 py-1 text-center font-mono text-xs text-mist">
+          {host ?? `${name.toLowerCase().replace(/\s+/g, "-")}.preview`}
         </span>
       </div>
 
@@ -33,37 +34,20 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPrevi
           // Plain <img>, not next/image: screenshotUrl is admin-supplied text
           // with no fixed host to whitelist in next.config.ts remotePatterns.
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={screenshotUrl}
-            alt={`${name} homepage`}
-            className="absolute inset-0 h-full w-full object-cover object-top"
-          />
+          <img src={screenshotUrl} alt={`${name} homepage`} className="absolute inset-0 h-full w-full object-cover object-top" />
         ) : (
-          <div className="bp-grid absolute inset-0 flex items-center justify-center p-6">
-            <svg viewBox="0 0 320 190" aria-hidden="true" className="text-line h-auto w-full max-w-[420px]" fill="none">
+          <div className="hero-field absolute inset-0 flex items-center justify-center p-6">
+            <svg viewBox="0 0 320 190" aria-hidden="true" className="h-auto w-full max-w-[420px] text-white" fill="none">
               {/* A wireframe page: nav, hero block, three columns */}
-              <rect x="0.5" y="0.5" width="319" height="189" stroke="currentColor" strokeOpacity=".5" />
-              <path d="M12 16 h40 M230 16 h22 M260 16 h22 M290 16 h18" stroke="currentColor" strokeOpacity=".6" />
-              <path d="M0 30 H320" stroke="currentColor" strokeOpacity=".35" />
-              <path d="M24 58 h150 M24 72 h110" stroke="currentColor" strokeWidth="6" strokeOpacity=".35" />
-              <rect x="24" y="88" width="56" height="14" className="fill-amber" fillOpacity=".85" />
-              <rect
-                x="210"
-                y="46"
-                width="88"
-                height="64"
-                stroke="currentColor"
-                strokeOpacity=".5"
-                strokeDasharray="3 4"
-              />
-              <path d="M210 46 L298 110 M298 46 L210 110" stroke="currentColor" strokeOpacity=".25" />
-              <path
-                d="M24 130 h84 v44 h-84 z M118 130 h84 v44 h-84 z M212 130 h84 v44 h-84 z"
-                stroke="currentColor"
-                strokeOpacity=".4"
-              />
+              <rect x="0.5" y="0.5" width="319" height="189" rx="8" stroke="currentColor" strokeOpacity=".14" />
+              <path d="M16 18 h36 M236 18 h20 M264 18 h20 M292 18 h14" stroke="currentColor" strokeOpacity=".25" strokeLinecap="round" strokeWidth="3" />
+              <path d="M24 60 h150 M24 76 h110" stroke="currentColor" strokeWidth="7" strokeOpacity=".16" strokeLinecap="round" />
+              <rect x="24" y="92" width="58" height="16" rx="8" fill="#FF5B1F" fillOpacity=".9" />
+              <rect x="206" y="46" width="92" height="66" rx="8" fill="currentColor" fillOpacity=".05" stroke="currentColor" strokeOpacity=".16" />
+              <path d="M24 132 h84 v42 h-84 z M118 132 h84 v42 h-84 z M212 132 h84 v42 h-84 z" fill="currentColor" fillOpacity=".04" stroke="currentColor" strokeOpacity=".12" />
             </svg>
-            <p className="border-line/40 bg-blueprint-deep text-mist absolute bottom-3 left-3 border px-2 py-1 font-mono text-xs">
+            <p className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-night-deep/80 px-3 py-1 text-xs text-mist backdrop-blur">
+              <ImageOff aria-hidden="true" className="size-3.5" />
               Live preview not captured yet
             </p>
           </div>
