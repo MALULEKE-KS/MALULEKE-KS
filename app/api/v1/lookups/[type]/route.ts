@@ -2,31 +2,61 @@
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
-import { isLookupType, listLookupValues } from "@/lib/rules/lookups";
+import { isLookupType, listLookupValues, createLookupValue } from "@/lib/rules/lookups";
+import { getSessionAdminId } from "@/lib/auth/session";
+import { logActivity } from "@/lib/auth/activity-log";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ type: string }> }) {
+function errorResponse(code: string, message: string, status: number, details?: object) {
+  return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
+}
+
+export async function GET(request: Request, { params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
 
   if (!isLookupType(type)) {
-    return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: `Unknown lookup type "${type}"` } },
-      { status: 404 }
-    );
+    return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
   }
 
-  // includeInactive is admin-only per the contract; ignored here since this
-  // route has no session check yet — every caller gets active-only until
-  // admin auth exists to gate it properly.
-  const values = await listLookupValues(type, false);
+  // includeInactive is admin-only per the contract — ignored (silently
+  // treated as false) for any caller that isn't a real authenticated admin,
+  // rather than trusting the query param on its own.
+  const { searchParams } = new URL(request.url);
+  const wantsInactive = searchParams.get("includeInactive") === "true";
+  const adminUserId = wantsInactive ? await getSessionAdminId(request) : null;
+  const includeInactive = wantsInactive && adminUserId !== null;
+
+  const values = await listLookupValues(type, includeInactive);
 
   return NextResponse.json(
     values.map((v) => ({ id: v.id, key: v.key, label: v.label, active: v.active }))
   );
 }
 
-export async function POST() {
-  return NextResponse.json(
-    { error: { code: "UNAUTHORIZED", message: "Not implemented — requires admin auth" } },
-    { status: 501 }
-  );
+export async function POST(request: Request, { params }: { params: Promise<{ type: string }> }) {
+  const adminUserId = await getSessionAdminId(request);
+  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
+
+  const { type } = await params;
+  if (!isLookupType(type)) {
+    return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
+  }
+
+  const body = await request.json().catch(() => null);
+  const key = typeof body?.key === "string" ? body.key.trim() : "";
+  const label = typeof body?.label === "string" ? body.label.trim() : "";
+  if (!key || !label) {
+    return errorResponse("VALIDATION_ERROR", "key and label are required", 400);
+  }
+
+  const value = await createLookupValue(type, key, label);
+
+  await logActivity({
+    adminUserId,
+    action: "lookup.create",
+    entityType: type,
+    entityId: value.id,
+    after: { key: value.key, label: value.label },
+  });
+
+  return NextResponse.json(value, { status: 201 });
 }
