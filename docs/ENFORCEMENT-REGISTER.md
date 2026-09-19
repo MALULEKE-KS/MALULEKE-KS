@@ -98,11 +98,11 @@
 
 | Claim | Source | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| New lookup values without a deploy | BR-8.1 | `POST /lookups/{type}` — **fails for `status`** (`colorToken` required, not supplied) | ❌ | DB default + API | F1.6 |
+| New lookup values without a deploy | BR-8.1 | `POST /lookups/{type}` for every type; a status gets its stage and a palette colour by default (#52); tested | ✅ | DB default + API | — |
 | In-use lookup values soft-deprecated, never hard-deleted | BR-8.2 | Deprecate route; no delete route | ✅ | App (+ FK RESTRICT) | — |
 | Re-creating a deprecated key returns `LOOKUP_KEY_DEPRECATED` | BR-8.3 | POST `/lookups/{type}` answers 409 `LOOKUP_KEY_DEPRECATED` or `LOOKUP_KEY_EXISTS` with the existing id, from the DB unique key (#52); tested | ✅ | DB unique + App | Done |
 | Open sets are lookup tables, not enums | EXT-1 | Status/Domain/InquiryType/MilestoneType/SkillCategory are tables; homepage counts group by each status's `stage` (`PipelineStage`), and the homepage selection is admin-curated (`featuredOnHome`, `homeOrder`) — no status keys in code (#52) | ✅ | DB | Done |
-| Additive-only migrations | EXT-1 | CI `migration-check` (drift) + review | 🟡 | CI + docs | F1.9 |
+| Additive-only migrations | EXT-1 | CI `migration-guard` on every PR: an applied migration can never be edited or deleted; a new one can't drop, rename, retype, truncate, delete or disable a trigger without a reviewed `-- migration-guard: allow <reason>` line (#78); plus the drift check | ✅ | CI | — |
 | Every admin mutation logged at the middleware layer | CLAUDE.md, BR-3.4 | Per-route calls (18/18), not a shared layer | 🟡 | One shared layer | F2 |
 | New tools/lenses/sections ship disabled | EXT-1, BR-4.4 | `Flag.enabled` defaults false | ✅ | DB default | — |
 | Versioned API `/api/v1` | EXT-1 | All routes under `/api/v1` | ✅ | App | — |
