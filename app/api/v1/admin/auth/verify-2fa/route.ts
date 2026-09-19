@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         consumedAt: exhausted ? new Date() : undefined,
       },
     });
-    await logActivity({ adminUserId: challenge.adminUserId, action: "auth.2fa_failed" });
+    await logActivity({ adminUserId: challenge.adminUserId, action: "auth.2fa_failed", request });
 
     return errorResponse(
       "CHALLENGE_INVALID",
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
   // identifier (BR-3.8).
   await db.loginChallenge.update({ where: { id: challenge.id }, data: { consumedAt: new Date() } });
   await db.adminUser.update({ where: { id: challenge.adminUserId }, data: { lastLoginAt: new Date() } });
-  await logActivity({ adminUserId: challenge.adminUserId, action: "auth.login" });
+  await logActivity({ adminUserId: challenge.adminUserId, action: "auth.login", request });
 
   const sessionCookieValue = createSessionCookieValue(challenge.adminUserId);
   const response = NextResponse.json({

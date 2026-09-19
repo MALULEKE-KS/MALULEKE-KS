@@ -1,7 +1,7 @@
 // tests/integration/inquiries-api.test.ts
 // Hits the real database and the real rate-limit table.
 
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { POST as postInquiry } from "@/app/api/v1/inquiries/route";
 import { db } from "@/lib/db";
 
@@ -13,10 +13,13 @@ import { db } from "@/lib/db";
 // that have nothing to do with the code under test.
 const TEST_IP_PREFIX = "10.0.0.";
 
+// Rate-limit keys hold keyed hashes of the IP, never the IP itself (F1.5),
+// so buckets are cleared by scope, before the run.
+beforeAll(async () => {
+  await db.rateLimitEntry.deleteMany({ where: { bucketKey: { startsWith: "inquiry:ip:" } } });
+});
+
 afterAll(async () => {
-  await db.rateLimitEntry.deleteMany({
-    where: { bucketKey: { startsWith: `inquiry:ip:${TEST_IP_PREFIX}` } },
-  });
   await db.inquiry.deleteMany({ where: { email: { contains: "@example.com" } } });
 });
 

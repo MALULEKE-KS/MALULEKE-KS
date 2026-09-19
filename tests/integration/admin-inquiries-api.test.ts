@@ -26,7 +26,7 @@ function makeRequest(url: string, method: string, body: object | null, withCooki
 
 beforeAll(async () => {
   const admin = await db.adminUser.create({
-    data: { email: "test-admin-inquiries@example.com", passwordHash: "unused-in-these-tests" },
+    data: { email: `test-admin-inquiries-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId);
@@ -36,10 +36,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // No audit/admin cleanup: ActivityLog is append-only (F1.3) and an admin it
+  // references can't be deleted. The test database is disposable, and each
+  // run uses its own admin email, so leftovers never collide.
   if (!adminId) return;
-  await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
   await db.inquiry.deleteMany({ where: { id: { in: createdInquiryIds } } });
-  await db.adminUser.delete({ where: { id: adminId } });
 });
 
 // The database enforces BR-2.1 itself: every inquiry starts NEW and only moves

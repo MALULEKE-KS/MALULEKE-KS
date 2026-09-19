@@ -81,7 +81,14 @@ describe("toPublicSystem", () => {
     const result = toPublicSystem(
       makeSystem({
         clientVisibility: "ANONYMIZED_ONLY",
-        domain: { id: "domain_2", key: "architecture", label: "Architecture & Construction", active: true },
+        domain: {
+          id: "domain_2",
+          key: "architecture",
+          label: "Architecture & Construction",
+          active: true,
+          createdAt: new Date(0),
+          updatedAt: new Date(0),
+        },
       })
     );
     expect(result.organization).toBe("an architecture & construction client");

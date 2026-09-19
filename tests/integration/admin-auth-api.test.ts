@@ -10,7 +10,7 @@ import { POST as verify2fa } from "@/app/api/v1/admin/auth/verify-2fa/route";
 import { db } from "@/lib/db";
 import { encryptSecret } from "@/lib/auth/crypto";
 
-const TEST_EMAIL = "test-admin-auth@example.com";
+const TEST_EMAIL = `test-admin-auth-${Date.now().toString(36)}@example.com`;
 const TEST_PASSWORD = "CorrectHorseBatteryStaple123!";
 let totpSecret: Secret;
 let adminId: string;
@@ -42,13 +42,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // No audit/admin cleanup: ActivityLog is append-only (F1.3) and an admin it
+  // references can't be deleted. The test database is disposable, and each
+  // run uses its own admin email, so leftovers never collide.
   // If beforeAll threw before assigning adminId, there's nothing to clean
   // up — without this guard, the cleanup itself throws a second,
   // confusingly different error that obscures the real failure above it.
   if (!adminId) return;
   await db.loginChallenge.deleteMany({ where: { adminUserId: adminId } });
-  await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
-  await db.adminUser.delete({ where: { id: adminId } });
 });
 
 describe("POST /api/v1/admin/auth/login", () => {

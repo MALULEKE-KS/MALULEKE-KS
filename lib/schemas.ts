@@ -371,7 +371,11 @@ export const SkillInputSchema = z.object({
 
 export const ActivityLogEntrySchema = z.object({
   id: z.string(),
-  adminUserEmail: z.string().email(),
+  actorType: z.enum(["admin", "anonymous", "system"]),
+  adminUserEmail: z.string().email().nullable(),
+  subjectHash: z.string().nullable(),
+  ipHash: z.string().nullable(),
+  userAgentHash: z.string().nullable(),
   action: z.string(),
   entityType: z.string().nullable(),
   entityId: z.string().nullable(),

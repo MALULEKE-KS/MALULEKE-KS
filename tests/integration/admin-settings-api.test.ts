@@ -32,7 +32,7 @@ function makeRequest(url: string, method: string, body: object | null, withCooki
 
 beforeAll(async () => {
   const admin = await db.adminUser.create({
-    data: { email: "test-admin-settings@example.com", passwordHash: "unused-in-these-tests" },
+    data: { email: `test-admin-settings-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId);
@@ -42,13 +42,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // No audit/admin cleanup: ActivityLog is append-only (F1.3) and an admin it
+  // references can't be deleted. The test database is disposable, and each
+  // run uses its own admin email, so leftovers never collide.
   if (!adminId) return;
-  await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
   await db.visitorLens.deleteMany({ where: { id: { in: createdLensIds } } });
   await db.domain.deleteMany({ where: { id: { in: createdDomainIds } } });
   // Restore the flag this suite toggles back to its original (disabled) state.
   await db.flag.update({ where: { key: flagKey }, data: { enabled: false } });
-  await db.adminUser.delete({ where: { id: adminId } });
 });
 
 describe("GET/PATCH /api/v1/admin/settings/flags", () => {

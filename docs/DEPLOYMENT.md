@@ -41,11 +41,9 @@ npx dotenv -e .env.production.local -- npx prisma migrate deploy
 #    entry, and feature flags (all disabled per BR-4.4)
 npx dotenv -e .env.production.local -- npx tsx prisma/seed.ts
 
-# 4. Create the single AdminUser row (BR-3.1/3.11) — prints a TOTP secret and
-#    10 recovery codes exactly once, never stored anywhere retrievable.
-#    Run this yourself; don't hand the password to an agent to run on your behalf.
-ADMIN_EMAIL="you@example.com" ADMIN_PASSWORD="..." \
-  npx dotenv -e .env.production.local -- npx tsx scripts/create-admin.ts
+# 4. Create the single AdminUser row (BR-3.1/3.11) — see "Admin account" below.
+#    Run it yourself, in your own terminal: it prints the TOTP secret and 10
+#    recovery codes exactly once, and they must never land in a chat or a log.
 
 # 5. Delete the local file — it holds the real production DATABASE_URL
 rm .env.production.local
@@ -82,6 +80,42 @@ This is safe while the previous deployment is still serving because every migrat
 Both databases need the `vector` and `pgcrypto` extensions (created once by a superuser); the app connects as a dedicated `malulekeks_dev` role, never `postgres`.
 
 Production data operations (bootstrap, admin creation) keep their explicit, separate runbook above, using a temporary `.env.production.local` that's deleted afterwards.
+
+## Admin account — creation and recovery
+
+Both scripts run **in your own terminal**, never through an assistant (their output and inputs are secrets). Passwords come from masked prompts and are entered **twice** — a masked prompt hides typos, which is exactly how the first production password ended up different from the one intended.
+
+**Create** (once — the platform is single-owner):
+
+```powershell
+$env:TWO_FACTOR_ENCRYPTION_KEY = "<the production key>"   # must match Vercel's Production value
+$env:ADMIN_EMAIL = "you@example.com"
+$env:ADMIN_PASSWORD = Read-Host "Password" -MaskInput
+$env:ADMIN_PASSWORD_CONFIRM = Read-Host "Confirm password" -MaskInput
+npx dotenv -e .env.local -- npx tsx scripts/create-admin.ts
+Remove-Item Env:ADMIN_PASSWORD, Env:ADMIN_PASSWORD_CONFIRM, Env:TWO_FACTOR_ENCRYPTION_KEY
+```
+
+The 2FA secret is encrypted with `TWO_FACTOR_ENCRYPTION_KEY`, and production's value is a write-only Vercel secret — so the key used here must be the one production runs. If it isn't known, rotate it first (generate → set in Vercel Production → redeploy), which is only safe while no admin exists yet. Note `npm run create-admin` targets the **local** database.
+
+**Recover a lost password** (BR-3.13 operator procedure — there is no self-serve reset):
+
+```powershell
+$env:ADMIN_EMAIL = "you@example.com"
+$env:ADMIN_PASSWORD = Read-Host "New password" -MaskInput
+$env:ADMIN_PASSWORD_CONFIRM = Read-Host "Confirm new password" -MaskInput
+npx dotenv -e .env.local -- npx tsx scripts/reset-admin-password.ts
+Remove-Item Env:ADMIN_PASSWORD, Env:ADMIN_PASSWORD_CONFIRM
+```
+
+Verifies the new hash, clears the failed-attempt counter and any lock, and writes an audit entry (SYSTEM actor). 2FA and recovery codes are untouched. A password is data: no redeploy needed.
+
+## Deploy budget (Vercel Hobby caps deployments per day)
+
+- `vercel.ts` `ignoreCommand` → `scripts/vercel-ignore.mjs` **skips builds** whose changes touch only docs, tests, CI or Markdown, and **skips previews** unless UI paths changed (CI already builds and tests every PR). Anything it can't diff, it builds.
+- Ship related issues in **one PR** (several `Closes #N`) → one production deploy.
+- Push a branch **once** when it's ready; every push is a preview build.
+- **No manual redeploys** unless an env var changed — and batch env changes into one redeploy.
 
 ## Redeploying
 

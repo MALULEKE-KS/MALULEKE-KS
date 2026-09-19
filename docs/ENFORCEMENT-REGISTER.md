@@ -37,7 +37,7 @@
 | BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
 | BR-2.2 | Every `new` inquiry reviewed within 48 hours | Nothing surfaces overdue inquiries | ❌ | Admin surfacing (overdue flag/query) | F2 |
 | BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
-| BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `lib/auth/rate-limit.ts` — **check-then-increment race**; raw IP stored | ❌ | Atomic DB function, hashed key | F1.5 |
+| BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. The 5/24h values become settings in F1.6 | ✅ | DB function + App | F1.6 (tunable) |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |
 | BR-2.6 | Idempotency key dedupes within 10 minutes | `POST /inquiries` + unique index | ✅ | App + DB unique | — |
 | BR-2.7 | Honeypot returns an identical 201, creates nothing | `POST /inquiries` | ✅ | App | — |
@@ -47,9 +47,9 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-3.1 | No write without verified 2FA | `proxy.ts` session gate + `getSessionAdminId` per route | 🟡 | App (verify every route) | F3 |
-| BR-3.2 | Progressive delay → lockout on failed logins | `failedLoginCount`/`lockedUntil` in login route | 🟡 | App + atomic counter | F3 |
+| BR-3.2 | Progressive delay → lockout on failed logins | Failed-attempt counter now incremented atomically (#62), so simultaneous guesses can't slip past the lock; flow re-verified end to end in F3 | 🟡 | App + atomic counter | F3 |
 | BR-3.3 | 30-minute idle expiry | `lib/auth/session.ts`, `proxy.ts` | 🟡 | App (verify) | F3 |
-| BR-3.4 | Every mutation and every login attempt logged | 18/18 mutating routes call `logActivity`; **unknown-email failures not logged** (required FK); log is editable | ❌ | DB: append-only trigger, nullable actor; App: one shared layer | F1.3 / F2 |
+| BR-3.4 | Every mutation and every login attempt logged | 18/18 mutating routes log; unknown-email failures now logged as ANONYMOUS with keyed hashes (#62); `ActivityLog` append-only in the database (UPDATE/DELETE/TRUNCATE refused); actor consistency CHECK. Moving the calls into one shared layer is F2 | 🟡 | DB append-only ✅ · shared app layer → F2 | F2 |
 | BR-3.5 | Challenge token: 5 minutes, single use | Routes; CHECK `LoginChallenge_br_3_5_ttl` caps lifetime at 5 min — enforced in the database too (F1.2, #60). App flow re-verified in F3 | 🟡 | App + DB CHECK | F3 |
 | BR-3.6 | 5 failed TOTP attempts invalidate the token | verify-2fa route (`attempts`) | 🟡 | App + atomic increment | F3 |
 | BR-3.7 | 12-hour absolute session lifetime | `lib/auth/session.ts` | 🟡 | App (verify) | F3 |
@@ -58,7 +58,7 @@
 | BR-3.10 | Admin email lowercase on write and lookup | App `toLowerCase`; CHECK `AdminUser_br_3_10_email_lowercase` — enforced in the database too (F1.2, #60) | ✅ | App + DB CHECK | — |
 | BR-3.11 | Exactly 10 recovery codes, hashed, single-use | `create-admin.ts`, verify-2fa | 🟡 | App (verify) | F3 |
 | BR-3.12 | Dashboard warns when < 3 recovery codes remain | **Not implemented** | ❌ | App | F3 |
-| BR-3.13 | No self-serve reset; manual operator procedure | No reset route exists; procedure documented? | 🟡 | Docs runbook | F3 |
+| BR-3.13 | No self-serve reset; manual operator procedure | `scripts/reset-admin-password.ts` — confirm-twice, verifies the stored hash, clears the lock, audited as a SYSTEM actor; documented in DEPLOYMENT.md (#65). Used for real on 2026-09-19 | ✅ | Ops script + runbook | — |
 
 ## 4. AI & agents (BR-4.x)
 
@@ -74,7 +74,7 @@
 | BR-5.2 | `Inquiry`/`Event` anonymized or purged after 24 months; scheduled | **Not implemented** (scheduler is a `TODO`) | ❌ | DB function + scheduled job + `JobRun` log | F1.6 / F4 |
 | BR-5.3 | Public stats are curated, point-in-time | Home counts come from curated `System` rows | ✅ | App | — |
 | BR-5.5 | Deletion right honoured manually; stated on confirmation | Contact confirmation states the removal route (email) — #58 | ✅ | App copy | — |
-| BR-2.4 (privacy) | IP kept only as long as the window needs | Raw IPs stored; expired rows never pruned | ❌ | Hashed keys + prune job | F1.5 / F4 |
+| BR-2.4 (privacy) | IP kept only as long as the window needs | Keys hold a keyed hash (HMAC, HKDF subkey) of the IP, never the raw address (#64); expired rows not yet pruned | 🟡 | Hashed keys ✅ · prune job → F4 | F4 |
 
 ## 6. Testimonials (BR-6.x)
 
@@ -107,6 +107,17 @@
 | Pre-launch: sitemap, OG images, JSON-LD, canonical URLs | Constitution §9 | Not verified | ❌/? | App | F5 |
 | Pre-launch: static CV PDF hosted independently | Constitution §9 | Not verified | ❌/? | Ops | F4 |
 | Backup / restore drill | Constitution §11 Phase 2 | Neon point-in-time recovery exists; never drilled | 🟡 | Ops runbook + drill | F4 |
+
+## 8a. Platform qualities (added by F1.3–F1.5)
+
+| Claim | Enforced today | Status |
+|---|---|---|
+| Login timing doesn't reveal whether an email is the admin's | Unknown emails run the same bcrypt work (cost 12) against a fixed dummy hash (#62); test asserts > 50 ms | ✅ |
+| Timestamps are unambiguous | Every timestamp column is `timestamptz(3)`, converted explicitly from UTC (#63); verified on a non-UTC machine: same instants | ✅ |
+| Every mutable row records when it was created and last changed | `createdAt` / `updatedAt` on every mutable table (#63) | ✅ |
+| Request context in the audit log can't be read back | IP, user agent and attempted emails stored as keyed hashes only (#62) | ✅ |
+| The admin can change their own password while logged in | Owner request 2026-09-19 — backend endpoint (current password + 2FA, ends older sessions) not built | ❌ → F3 |
+| An admin account exists in production | Created 2026-09-19 by the owner in their own terminal; verified read-only (2FA on, codes hashed) | ✅ |
 
 ## 9. Claims the public site makes
 
