@@ -12,12 +12,13 @@ async function main() {
   // --- Status ---
   // colorToken names a CSS custom property / Tailwind token (see globals.css,
   // tailwind.config.ts) — the color lives as data here, not in component code,
-  // so a new admin-added Status doesn't require a code change (EXT-1).
+  // so a new admin-added Status doesn't require a code change (EXT-1). The
+  // stage is the homepage count each status joins (#52); same principle.
   await Promise.all(
     [
-      { key: "finished", label: "Finished", colorToken: "signal-finished" },
-      { key: "in_progress", label: "In Progress", colorToken: "signal-progress" },
-      { key: "planned", label: "Planned", colorToken: "signal-planned" },
+      { key: "finished", label: "Finished", colorToken: "signal-finished", stage: "SHIPPED" as const },
+      { key: "in_progress", label: "In Progress", colorToken: "signal-progress", stage: "BUILDING" as const },
+      { key: "planned", label: "Planned", colorToken: "signal-planned", stage: "QUEUED" as const },
     ].map((s) =>
       prisma.status.upsert({ where: { key: s.key }, update: {}, create: s })
     )

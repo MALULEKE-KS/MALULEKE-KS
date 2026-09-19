@@ -37,7 +37,7 @@
 | BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
 | BR-2.2 | Every `new` inquiry reviewed within 48 hours | Nothing surfaces overdue inquiries | ❌ | Admin surfacing (overdue flag/query) | F2 |
 | BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
-| BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. The 5/24h values become settings in F1.6 | ✅ | DB function + App | F1.6 (tunable) |
+| BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. Limit and window are admin-editable settings (#67), bounded 1–100 per 1–168h | ✅ | DB function + settings table | Done |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |
 | BR-2.6 | Idempotency key dedupes within 10 minutes | `POST /inquiries` + unique index | ✅ | App + DB unique | — |
 | BR-2.7 | Honeypot returns an identical 201, creates nothing | `POST /inquiries` | ✅ | App | — |
@@ -96,13 +96,13 @@
 |---|---|---|---|---|---|
 | New lookup values without a deploy | BR-8.1 | `POST /lookups/{type}` — **fails for `status`** (`colorToken` required, not supplied) | ❌ | DB default + API | F1.6 |
 | In-use lookup values soft-deprecated, never hard-deleted | BR-8.2 | Deprecate route; no delete route | ✅ | App (+ FK RESTRICT) | — |
-| Re-creating a deprecated key returns `LOOKUP_KEY_DEPRECATED` | BR-8.3 | **Not implemented** — raw unique-constraint error | ❌ | App | F2 |
-| Open sets are lookup tables, not enums | EXT-1 | Status/Domain/InquiryType/MilestoneType/SkillCategory are tables — but homepage stats hardcode status keys | 🟡 | DB `PipelineStage` on `Status` | F1.6 |
+| Re-creating a deprecated key returns `LOOKUP_KEY_DEPRECATED` | BR-8.3 | POST `/lookups/{type}` answers 409 `LOOKUP_KEY_DEPRECATED` or `LOOKUP_KEY_EXISTS` with the existing id, from the DB unique key (#52); tested | ✅ | DB unique + App | Done |
+| Open sets are lookup tables, not enums | EXT-1 | Status/Domain/InquiryType/MilestoneType/SkillCategory are tables; homepage counts group by each status's `stage` (`PipelineStage`), and the homepage selection is admin-curated (`featuredOnHome`, `homeOrder`) — no status keys in code (#52) | ✅ | DB | Done |
 | Additive-only migrations | EXT-1 | CI `migration-check` (drift) + review | 🟡 | CI + docs | F1.9 |
 | Every admin mutation logged at the middleware layer | CLAUDE.md, BR-3.4 | Per-route calls (18/18), not a shared layer | 🟡 | One shared layer | F2 |
 | New tools/lenses/sections ship disabled | EXT-1, BR-4.4 | `Flag.enabled` defaults false | ✅ | DB default | — |
 | Versioned API `/api/v1` | EXT-1 | All routes under `/api/v1` | ✅ | App | — |
-| Nothing hardcoded unless that's the recommended practice — tunables are data | Owner directive 2026-09-19 | Tunables written as constants: inquiry rate limit (5/24h), retention (24 months), review SLA (48h), challenge TTL (5 min), message bounds (20–5000), status keys in homepage queries | ❌ | DB settings table, admin-editable | F1.6 |
+| Nothing hardcoded unless that's the recommended practice — tunables are data | Owner directive 2026-09-19 | `PlatformSetting` table + typed registry with bounds (#67): inquiry and CV rate limits are read from it; retention and review SLA are stored there, read once their jobs exist (F2/F4); status keys are gone from queries. Laws stay in code on purpose: challenge TTL, message bounds, 2FA and lockout policy | 🟡 | DB settings table, admin-editable | F2/F4 (consumers) |
 | Nothing about the owner hardcoded | Owner directive 2026-09-18 | Name, role, links, mission, principles in `lib/content/*` | ❌ | DB `Profile`, `Achievement`, content | F1.6 |
 | Pre-launch: sitemap, OG images, JSON-LD, canonical URLs | Constitution §9 | Not verified | ❌/? | App | F5 |
 | Pre-launch: static CV PDF hosted independently | Constitution §9 | Not verified | ❌/? | Ops | F4 |

@@ -16,6 +16,7 @@ interface LedgerHeroProps {
   yearsBuilding: number;
   organizationsFounded: number;
   systemsShipped: number;
+  systemsBuilding: number;
   systemsQueued: number;
 }
 
@@ -34,12 +35,19 @@ function withNumbers(text: string) {
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-export function LedgerHero({ yearsBuilding, organizationsFounded, systemsShipped, systemsQueued }: LedgerHeroProps) {
+export function LedgerHero({
+  yearsBuilding,
+  organizationsFounded,
+  systemsShipped,
+  systemsBuilding,
+  systemsQueued,
+}: LedgerHeroProps) {
   // One entry per line, each opening on its number — a log, not a sentence.
   const lines = [
     `${plural(yearsBuilding, "year")} building.`,
     `${plural(organizationsFounded, "organization")} founded.`,
     `${plural(systemsShipped, "system")} shipped.`,
+    ...(systemsBuilding > 0 ? [`${systemsBuilding} in progress.`] : []),
     systemsQueued > 0 ? `${systemsQueued} more queued.` : "None queued yet.",
     // Closing half of the locked mission statement (Overview §10), verbatim.
     `Engineered in South Africa, held to a global standard.`,

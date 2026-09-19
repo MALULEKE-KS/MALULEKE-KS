@@ -11,9 +11,7 @@ import { CvGenerateInputSchema } from "@/lib/schemas";
 import { experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
 import { CvDocument } from "@/lib/cv/pdf-document";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
-
-const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 10 generations per IP per hour
+import { getSetting } from "@/lib/settings";
 
 const OWNER_NAME = "Kurhula Success Maluleke";
 
@@ -29,7 +27,12 @@ export async function POST(request: Request) {
   }
   const targetRole = parsed.data.targetRole ?? null;
 
-  const rateLimit = await hitRateLimit("cv-generate", request, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+  // Admin-tunable platform settings (#67), bounded by the registry.
+  const [maxPerWindow, windowMinutes] = await Promise.all([
+    getSetting("cv.rateLimit.maxPerWindow"),
+    getSetting("cv.rateLimit.windowMinutes"),
+  ]);
+  const rateLimit = await hitRateLimit("cv-generate", request, maxPerWindow, windowMinutes * 60 * 1000);
   if (!rateLimit.allowed) {
     return errorResponse("RATE_LIMITED", "Too many requests from this connection — try again later.", 429, {
       retryAfterMs: rateLimit.retryAfterMs,
