@@ -124,17 +124,29 @@ model Organization {
   updatedAt    DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
+// Which pipeline count a Status belongs to. A fixed control dimension (EXT-1
+// exception, like ContentStatus): the statuses themselves stay an open lookup.
+enum PipelineStage {
+  SHIPPED
+  BUILDING
+  QUEUED
+}
+
 model Status {
-  id         String   @id @default(cuid())
-  key        String   @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
+  id         String        @id @default(cuid())
+  key        String        @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
   label      String
-  colorToken String // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
+  colorToken String        @default("signal-planned") // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
   // New Status values carry their own color as data (this field), so
   // a new admin-added status never needs a component code change (EXT-1).
-  active     Boolean  @default(true) // BR-8.2 soft-deprecation
+  active     Boolean       @default(true) // BR-8.2 soft-deprecation
   systems    System[]
-  createdAt  DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  createdAt  DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+  // Which homepage count this status belongs to (#52). Any status the admin
+  // creates — "Live", "Refinished" — joins shipped/building/queued by
+  // choosing a stage, with no code change (EXT-1).
+  stage      PipelineStage @default(QUEUED)
 }
 
 model Domain {
@@ -202,11 +214,16 @@ model System {
   skills                 SkillOnSystem[]
   createdAt              DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
+  // Hand-picked for the homepage by the admin (#52), shown in homeOrder.
+  // Only published systems are ever shown, whatever this says.
+  featuredOnHome         Boolean          @default(false)
+  homeOrder              Int              @default(0)
 
   @@index([contentStatus])
   @@index([organizationId])
   @@index([domainId])
   @@index([statusId])
+  @@index([featuredOnHome, homeOrder])
 }
 
 model Impact {
@@ -424,6 +441,17 @@ model ContentChunk {
   updatedAt  DateTime                    @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([entityType, entityId])
+}
+
+// Admin-editable tunables (#67) — rate limits, SLAs, retention. The typed
+// registry in lib/settings/registry.ts owns each key's schema, bounds and
+// default; a row here only overrides the default. Values a business rule
+// fixes (BR-2.3, BR-3.2, BR-3.5) are deliberately NOT settings.
+model PlatformSetting {
+  key       String   @id
+  value     Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Flag {

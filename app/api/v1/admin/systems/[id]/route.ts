@@ -61,6 +61,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           ...(parsed.data.clientApproved !== undefined && { clientApproved: parsed.data.clientApproved }),
           ...(parsed.data.isFlagship !== undefined && { isFlagship: parsed.data.isFlagship }),
           ...(parsed.data.sortOrder !== undefined && { sortOrder: parsed.data.sortOrder }),
+          // Homepage curation (#52) — the admin hand-picks and orders these.
+          ...(parsed.data.featuredOnHome !== undefined && { featuredOnHome: parsed.data.featuredOnHome }),
+          ...(parsed.data.homeOrder !== undefined && { homeOrder: parsed.data.homeOrder }),
           ...(parsed.data.caseStudyBody !== undefined && { caseStudyBody: parsed.data.caseStudyBody }),
           ...(parsed.data.repoUrl !== undefined && { repoUrl: parsed.data.repoUrl }),
           ...(parsed.data.liveUrl !== undefined && { liveUrl: parsed.data.liveUrl }),

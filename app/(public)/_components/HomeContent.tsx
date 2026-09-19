@@ -16,7 +16,7 @@ export async function HomeContent() {
     countPublishedSystems(),
   ]);
 
-  // Ordered flagship-first, so the first is the one to feature.
+  // Ordered by the admin's homepage curation, so the first is the one to feature.
   const featured = prioritySystems[0];
 
   return (
@@ -27,7 +27,7 @@ export async function HomeContent() {
           featured={featured}
           totalPublished={totalPublished}
           shipped={stats.systemsShipped}
-          queued={stats.systemsQueued}
+          queued={stats.systemsBuilding + stats.systemsQueued}
         />
       )}
       <PrinciplesBand />

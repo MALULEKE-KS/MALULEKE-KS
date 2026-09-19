@@ -156,6 +156,8 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
     techStack: system.techStack,
     isFlagship: system.isFlagship,
     sortOrder: system.sortOrder,
+    featuredOnHome: system.featuredOnHome,
+    homeOrder: system.homeOrder,
     caseStudyBody: system.caseStudyBody ?? "",
     impacts: system.impacts.map((i) => ({ label: i.label, value: i.value })),
     testimonials: system.testimonials.map((t) => ({

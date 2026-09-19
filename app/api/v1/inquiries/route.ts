@@ -9,9 +9,7 @@ import { db } from "@/lib/db";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
 import { isHoneypotFilled, sourceFromReferer } from "@/lib/rules/inquiries";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
-
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000; // BR-2.4 — 24 hours
+import { getSetting } from "@/lib/settings";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -42,11 +40,16 @@ export async function POST(request: Request) {
 
   // BR-2.4 — identical rate limit for the human form and the future agent
   // tool; keyed by IP regardless of caller.
-  const rateLimit = await hitRateLimit("inquiry", request, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+  // Limits are admin-tunable platform settings (#67), bounded by the registry.
+  const [maxPerWindow, windowHours] = await Promise.all([
+    getSetting("inquiry.rateLimit.maxPerWindow"),
+    getSetting("inquiry.rateLimit.windowHours"),
+  ]);
+  const rateLimit = await hitRateLimit("inquiry", request, maxPerWindow, windowHours * 60 * 60 * 1000);
   if (!rateLimit.allowed) {
     return errorResponse(
       "RATE_LIMITED",
-      "Too many requests from this connection — try again tomorrow.",
+      "Too many requests from this connection — try again later.",
       429,
       { retryAfterMs: rateLimit.retryAfterMs }
     );

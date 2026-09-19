@@ -1,8 +1,10 @@
 // GET/POST /api/v1/lookups/{type} — one contract for every EXT-1 lookup table (BR-8.1).
+// Status values also carry a pipeline stage and a curated colour (#52).
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
 import { isLookupType, listLookupValues, createLookupValue } from "@/lib/rules/lookups";
+import { LookupCreateInputSchema } from "@/lib/schemas";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -25,11 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
   const adminUserId = wantsInactive ? await getSessionAdminId(request) : null;
   const includeInactive = wantsInactive && adminUserId !== null;
 
-  const values = await listLookupValues(type, includeInactive);
-
-  return NextResponse.json(
-    values.map((v) => ({ id: v.id, key: v.key, label: v.label, active: v.active }))
-  );
+  return NextResponse.json(await listLookupValues(type, includeInactive));
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ type: string }> }) {
@@ -41,22 +39,33 @@ export async function POST(request: Request, { params }: { params: Promise<{ typ
     return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
   }
 
-  const body = await request.json().catch(() => null);
-  const key = typeof body?.key === "string" ? body.key.trim() : "";
-  const label = typeof body?.label === "string" ? body.label.trim() : "";
-  if (!key || !label) {
-    return errorResponse("VALIDATION_ERROR", "key and label are required", 400);
+  const parsed = LookupCreateInputSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return errorResponse("VALIDATION_ERROR", "Invalid lookup value", 400, { issues: parsed.error.issues });
   }
+  const { key, label, stage, colorToken } = parsed.data;
 
-  const value = await createLookupValue(type, key, label);
+  const result = await createLookupValue(type, key, label, { stage, colorToken });
+  if (!result.ok) {
+    // BR-8.3 — an actionable answer, never a raw uniqueness failure.
+    return result.code === "LOOKUP_KEY_DEPRECATED"
+      ? errorResponse(
+          "LOOKUP_KEY_DEPRECATED",
+          `"${key}" exists but is deprecated — reactivate it instead of creating it again.`,
+          409,
+          { existingId: result.existingId },
+        )
+      : errorResponse("LOOKUP_KEY_EXISTS", `"${key}" already exists.`, 409, { existingId: result.existingId });
+  }
 
   await logActivity({
     adminUserId,
     action: "lookup.create",
     entityType: type,
-    entityId: value.id,
-    after: { key: value.key, label: value.label },
+    entityId: result.value.id,
+    after: result.value,
+    request,
   });
 
-  return NextResponse.json(value, { status: 201 });
+  return NextResponse.json(result.value, { status: 201 });
 }

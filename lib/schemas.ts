@@ -60,6 +60,32 @@ export const LookupValueSchema = z.object({
   active: z.boolean(),
 });
 
+// F1.6a (#52, #67) — pipeline stages, curated status colours, settings.
+export const PipelineStageEnum = z.enum(["shipped", "building", "queued"]);
+export const StatusColorTokenEnum = z.enum(["signal-finished", "signal-progress", "signal-planned"]);
+
+export const LookupCreateInputSchema = z.object({
+  key: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+([_-][a-z0-9]+)*$/, "lowercase words joined by _ or -"),
+  label: z.string().trim().min(1),
+  stage: PipelineStageEnum.optional(),
+  colorToken: StatusColorTokenEnum.optional(),
+});
+
+export const LookupUpdateInputSchema = z
+  .object({
+    label: z.string().trim().min(1).optional(),
+    stage: PipelineStageEnum.optional(),
+    colorToken: StatusColorTokenEnum.optional(),
+  })
+  .refine((d) => d.label !== undefined || d.stage !== undefined || d.colorToken !== undefined, {
+    message: "Nothing to update",
+  });
+
+export const PlatformSettingUpdateInputSchema = z.object({ value: z.unknown() });
+
 export const LookupTypeEnum = z.enum([
   "status",
   "domain",
@@ -130,6 +156,8 @@ export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
   nameDisclosureApproved: z.boolean(),
   needsCuration: z.boolean(),
   sortOrder: z.number().int(),
+  featuredOnHome: z.boolean(),
+  homeOrder: z.number().int(),
 });
 
 export const SystemCreateInputSchema = z.object({
@@ -159,6 +187,8 @@ export const SystemUpdateInputSchema = z
     nameDisclosureApproved: z.boolean().optional(),
     isFlagship: z.boolean().optional(),
     sortOrder: z.number().int().optional(),
+    featuredOnHome: z.boolean().optional(),
+    homeOrder: z.number().int().min(0).optional(),
     caseStudyBody: z.string().optional(),
     repoUrl: z.string().url().nullable().optional(),
     liveUrl: z.string().url().nullable().optional(),

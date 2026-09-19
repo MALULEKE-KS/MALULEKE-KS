@@ -344,7 +344,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/LookupValue" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: |
+            The key already exists. Code LOOKUP_KEY_DEPRECATED when the existing value is soft-deprecated —
+            reactivate it instead of re-creating it (BR-8.3); LOOKUP_KEY_EXISTS when it is active.
 
   /lookups/{type}/{id}:
     patch:
@@ -736,6 +741,49 @@ paths:
   # ============================================================
   # ADMIN — SETTINGS (Flags, Visitor Lenses)
   # ============================================================
+  /admin/settings/platform:
+    get:
+      tags: [Settings]
+      summary: List every platform setting with its effective value (#67)
+      description: |
+        Tunables only — rate limits, SLAs, retention. Values a business rule fixes (BR-2.3, BR-3.2, BR-3.5)
+        are deliberately not settings. A setting with no stored value reports its default (isDefault=true).
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: All registered settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PlatformSetting" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/settings/platform/{key}:
+    patch:
+      tags: [Settings]
+      summary: Change one setting, validated against its registered schema and bounds; audited
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string, example: inquiry.rateLimit.maxPerWindow }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlatformSettingUpdateInput" }
+      responses:
+        "200":
+          description: The setting after the change
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformSetting" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /admin/settings/flags:
     get:
       tags: [Settings (Admin)]
@@ -917,6 +965,23 @@ components:
       type: string
       enum: [signal-finished, signal-progress, signal-planned]
       description: Curated, contrast-checked palette a Status may use (DESIGN-SYSTEM.md §1).
+
+    PlatformSetting:
+      type: object
+      properties:
+        key: { type: string }
+        value: { description: "Effective value (the stored override, or the default)" }
+        default: { description: "Registry default — the business-rule value" }
+        isDefault: { type: boolean }
+        description: { type: string }
+        rule: { type: string, example: BR-2.4 }
+        updatedAt: { type: string, format: date-time, nullable: true }
+
+    PlatformSettingUpdateInput:
+      type: object
+      required: [value]
+      properties:
+        value: { description: "Must satisfy the setting's registered type and bounds" }
 
     LookupUpdateInput:
       type: object

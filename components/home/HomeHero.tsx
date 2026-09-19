@@ -17,7 +17,13 @@ import { SystemsBlueprint } from "@/components/home/SystemsBlueprint";
 import { OWNER, PLATFORM_STACK } from "@/lib/content/sheets";
 
 interface HomeHeroProps {
-  stats: { yearsBuilding: number; organizationsFounded: number; systemsShipped: number; systemsQueued: number };
+  stats: {
+    yearsBuilding: number;
+    organizationsFounded: number;
+    systemsShipped: number;
+    systemsBuilding: number;
+    systemsQueued: number;
+  };
   systems: { slug: string; name: string; status: string; statusColorToken: string; isFlagship: boolean }[];
 }
 
