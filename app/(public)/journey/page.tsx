@@ -6,7 +6,7 @@
 
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { PUBLISHED_TIMELINE_WHERE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
+import { toPublicTimelineEntry } from "@/lib/rules/timeline";
 import { Container } from "@/components/shared/Container";
 
 // Reads live, admin-editable content — must not be statically baked in at
@@ -29,14 +29,11 @@ export default async function JourneyPage({ searchParams }: { searchParams: Prom
 
   const [milestoneTypes, entryRows] = await Promise.all([
     db.milestoneType.findMany({ where: { active: true }, orderBy: { label: "asc" } }),
-    db.timeline.findMany({
-      where: { ...PUBLISHED_TIMELINE_WHERE, ...(activeType && { milestoneType: { key: activeType } }) },
-      ...timelineWithMilestoneType,
-      orderBy: { date: "desc" },
-    }),
+    // The PublicTimeline view applies BR-1.12 (F1.7).
+    db.publicTimeline.findMany({ where: activeType ? { milestoneType: activeType } : {}, orderBy: { date: "desc" } }),
   ]);
 
-  const entries = entryRows.map(toTimelineEntry);
+  const entries = entryRows.map(toPublicTimelineEntry);
   const activeLabel = milestoneTypes.find((t) => t.key === activeType)?.label ?? activeType;
 
   return (

@@ -1,130 +1,36 @@
 // lib/rules/publishing.ts
-// BR-1.x as enforceable code, not just prose (docs/BUSINESS-RULES-v1.md §1).
+// BR-1.x as enforceable code (docs/BUSINESS-RULES-v1.md §1).
 //
-// Two separate layers, both required:
-//   1. PUBLISHED_WHERE — every public-facing query must filter on this, so a
-//      route can never leak an unpublished System regardless of what other
-//      query params it accepts (BR-1.1).
-//   2. toPublicSystem/toPublicSystemDetailed — serialization-layer masking
-//      for fields that stay hidden even on an already-published System
-//      (BR-1.3 NDA_RESTRICTED, BR-1.4 ANONYMIZED_ONLY).
-// Neither layer substitutes for the other: a query filter that's right but
-// serialization that leaks repoUrl is still a BR-1.3 violation, and correct
-// serialization applied to an unfiltered query still leaks drafts.
-
-import { Prisma, ContentStatus, type ClientVisibility } from "@prisma/client";
-
-export const PUBLISHED_WHERE = { contentStatus: ContentStatus.PUBLISHED } as const;
-
-// Only testimonials with hasPermission=true are ever fetched for public
-// serialization (BR-6.1) — filtered at the query layer, not after the fact.
-export const PUBLIC_TESTIMONIALS_INCLUDE = {
-  where: { hasPermission: true },
-  orderBy: { createdAt: Prisma.SortOrder.desc },
-} satisfies Prisma.System$testimonialsArgs;
-
-const systemWithPublicRelations = Prisma.validator<Prisma.SystemDefaultArgs>()({
-  include: {
-    organization: true,
-    status: true,
-    domain: true,
-  },
-});
-
-const systemWithPublicDetailRelations = Prisma.validator<Prisma.SystemDefaultArgs>()({
-  include: {
-    organization: true,
-    status: true,
-    domain: true,
-    impacts: { orderBy: { sortOrder: "asc" } },
-    testimonials: PUBLIC_TESTIMONIALS_INCLUDE,
-  },
-});
-
-export type SystemWithPublicRelations = Prisma.SystemGetPayload<typeof systemWithPublicRelations>;
-export type SystemWithPublicDetailRelations = Prisma.SystemGetPayload<
-  typeof systemWithPublicDetailRelations
->;
-
-// BR-1.4 — the linked Organization's real name never appears publicly for an
-// ANONYMIZED_ONLY system unless nameDisclosureApproved specifically
-// authorizes it. Deliberately NOT the same flag as clientApproved (BR-1.1's
-// publish gate) — approving publication of an anonymized case study is not
-// the same authorization as approving disclosure of the real name in it.
-// The generic label leans on Domain when available ("a fintech client")
-// rather than a bare "a client", per the business rule's own example.
-function publicOrganizationName(system: SystemWithPublicRelations): string {
-  if (system.clientVisibility === "ANONYMIZED_ONLY" && !system.nameDisclosureApproved) {
-    if (!system.domain) return "a client";
-    const label = system.domain.label.toLowerCase();
-    const article = /^[aeiou]/.test(label) ? "an" : "a";
-    return `${article} ${label} client`;
-  }
-  return system.organization.name;
-}
-
-// BR-1.3 — NDA_RESTRICTED systems never expose repoUrl/liveUrl publicly,
-// regardless of contentStatus. Enforced here, at serialization, so a future
-// new endpoint reusing this function can't accidentally leak it by skipping
-// a check the route author didn't know to add.
+// PUBLIC side (F1.7): every visibility and masking rule — BR-1.1 published
+// only, BR-1.3 NDA links, BR-1.4 anonymized names, BR-1.7 private repos — is
+// applied by the database, in the PublicSystem view. Public code reads that
+// view and maps its rows to the wire shape; it holds no masking logic of its
+// own, so there is nothing to forget or to drift from the SQL.
 //
-// BR-1.7 — a private repo is never linked publicly either: the public shape
-// says repoPrivate instead, and access is available on request.
-function publicRepoUrl(system: SystemWithPublicRelations): string | null {
-  if (system.repoPrivate) return null;
-  return system.clientVisibility === "NDA_RESTRICTED" ? null : system.repoUrl;
-}
+// ADMIN side (below): the unmasked shape and the publish gate.
 
-function publicLiveUrl(system: SystemWithPublicRelations): string | null {
-  return system.clientVisibility === "NDA_RESTRICTED" ? null : system.liveUrl;
-}
+import { Prisma, type ClientVisibility, type PublicSystem } from "@prisma/client";
 
-// Extends BR-1.3's intent to a field that didn't exist when that rule was
-// written: a homepage screenshot exposes an NDA_RESTRICTED client's actual
-// product even more directly than the raw URL text would, so it gets the
-// same treatment as repoUrl/liveUrl.
-function publicScreenshotUrl(system: SystemWithPublicRelations): string | null {
-  return system.clientVisibility === "NDA_RESTRICTED" ? null : system.screenshotUrl;
-}
-
-export function toPublicSystem(system: SystemWithPublicRelations) {
+/** The public wire shape (openapi SystemPublic) from a PublicSystem view row. */
+export function toPublicSystem(row: PublicSystem) {
   return {
-    id: system.id,
-    name: system.name,
-    slug: system.slug,
-    organization: publicOrganizationName(system),
-    status: system.status.label,
-    // Status color is data, not code (EXT-1 — see Status.colorToken,
-    // seeded per key). Exposed alongside the label so any renderer — this
-    // app's own SystemCard, or a future external consumer of this same
-    // public JSON — can render the status color without a hardcoded map.
-    statusColorToken: system.status.colorToken,
-    domain: system.domain?.label ?? null,
-    description: system.description,
-    repoUrl: publicRepoUrl(system),
-    liveUrl: publicLiveUrl(system),
-    screenshotUrl: publicScreenshotUrl(system),
-    techStack: system.techStack,
-    isFlagship: system.isFlagship,
-    repoPrivate: system.repoPrivate,
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    organization: row.organization,
+    status: row.status,
+    // Status colour is data, not code (EXT-1).
+    statusColorToken: row.statusColorToken,
+    domain: row.domain,
+    description: row.description,
+    repoUrl: row.repoUrl,
+    liveUrl: row.liveUrl,
+    screenshotUrl: row.screenshotUrl,
+    techStack: row.techStack,
+    isFlagship: row.isFlagship,
+    repoPrivate: row.repoPrivate,
   };
 }
-
-export function toPublicSystemDetailed(system: SystemWithPublicDetailRelations) {
-  return {
-    ...toPublicSystem(system),
-    caseStudyBody: system.caseStudyBody ?? "",
-    impacts: system.impacts.map((impact) => ({ label: impact.label, value: impact.value })),
-    testimonials: system.testimonials.map((testimonial) => ({
-      authorName: testimonial.authorName,
-      authorRole: testimonial.authorRole,
-      organization: testimonial.organization,
-      quote: testimonial.quote,
-    })),
-  };
-}
-
-export { systemWithPublicRelations, systemWithPublicDetailRelations };
 
 // ============================================================
 // ADMIN-SIDE RULES (BR-1.1, BR-1.2, BR-1.10)

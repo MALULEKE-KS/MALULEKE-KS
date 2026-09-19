@@ -5,12 +5,8 @@
 // carries no client-confidentiality dimension) and the BR-7.2 supersede
 // helper used by POST /cv/generate.
 
-import { Prisma, ContentStatus } from "@prisma/client";
+import { Prisma, type PublicEducation } from "@prisma/client";
 import { db } from "@/lib/db";
-
-// Only PUBLISHED education appears on /cv and in the generated CV (#70) —
-// the admin decides what's shown. Every public read filters on this.
-export const PUBLISHED_EDUCATION_WHERE = { contentStatus: ContentStatus.PUBLISHED } as const;
 
 const educationWithSkills = Prisma.validator<Prisma.EducationDefaultArgs>()({
   include: { skills: { include: { skill: true } } },
@@ -60,6 +56,26 @@ export function toEducationEntry(education: EducationWithSkills) {
     certificateUrl: education.certificateUrl,
     contentStatus: education.contentStatus.toLowerCase() as "draft" | "published" | "archived",
     skills: education.skills.map((s) => s.skill.name),
+  };
+}
+
+/**
+ * Public education (openapi EducationEntry) from a PublicEducation view row.
+ * The view holds only what the admin chose to show (#70, F1.7).
+ */
+export function toPublicEducationEntry(row: PublicEducation) {
+  return {
+    id: row.id,
+    institution: row.institution,
+    qualification: row.qualification,
+    fieldOfStudy: row.fieldOfStudy,
+    startDate: toDateOnly(row.startDate),
+    endDate: row.endDate ? toDateOnly(row.endDate) : null,
+    honors: row.honors,
+    description: row.description,
+    certificateUrl: row.certificateUrl,
+    contentStatus: "published" as const,
+    skills: row.skills,
   };
 }
 

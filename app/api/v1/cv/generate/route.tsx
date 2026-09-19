@@ -8,12 +8,10 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { db } from "@/lib/db";
 import { CvGenerateInputSchema } from "@/lib/schemas";
-import { PUBLISHED_EDUCATION_WHERE, educationWithSkills, experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
+import { experienceWithSkills, skillWithCategory, toPublicEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
 import { CvDocument } from "@/lib/cv/pdf-document";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
 import { getSetting } from "@/lib/settings";
-
-const OWNER_NAME = "Kurhula Success Maluleke";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -40,19 +38,22 @@ export async function POST(request: Request) {
   }
 
   // BR-7.1 — fetched fresh on every call, never a cached/static snapshot.
-  const [experienceRows, educationRows, skillRows] = await Promise.all([
+  const [experienceRows, educationRows, skillRows, profile] = await Promise.all([
     db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
-    db.education.findMany({ where: PUBLISHED_EDUCATION_WHERE, ...educationWithSkills, orderBy: { startDate: "desc" } }),
+    db.publicEducation.findMany({ orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
+    db.publicProfile.findFirst(),
   ]);
 
   const experience = experienceRows.map(toExperienceEntry);
-  const education = educationRows.map(toEducationEntry);
+  const education = educationRows.map(toPublicEducationEntry);
   const skills = skillRows.map(toSkillEntry);
-  const roleLine = experience[0]?.title ?? "Software Engineer";
+  // Name and fallback role come from the owner's profile (data, #70), never
+  // from constants or an invented title.
+  const roleLine = experience[0]?.title ?? profile?.role ?? "";
 
   const pdfBuffer = await renderToBuffer(
-    <CvDocument name={OWNER_NAME} roleLine={roleLine} targetRole={targetRole} experience={experience} education={education} skills={skills} />
+    <CvDocument name={profile?.displayName ?? ""} roleLine={roleLine} targetRole={targetRole} experience={experience} education={education} skills={skills} />
   );
 
   // Created first with a placeholder fileUrl, then updated once we know the
