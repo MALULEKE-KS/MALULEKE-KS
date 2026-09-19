@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
 import { isHoneypotFilled, sourceFromReferer } from "@/lib/rules/inquiries";
-import { checkAndIncrementRateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { hitRateLimit } from "@/lib/auth/rate-limit";
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000; // BR-2.4 — 24 hours
@@ -42,8 +42,7 @@ export async function POST(request: Request) {
 
   // BR-2.4 — identical rate limit for the human form and the future agent
   // tool; keyed by IP regardless of caller.
-  const ip = getClientIp(request);
-  const rateLimit = await checkAndIncrementRateLimit(`inquiry:ip:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+  const rateLimit = await hitRateLimit("inquiry", request, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
   if (!rateLimit.allowed) {
     return errorResponse(
       "RATE_LIMITED",

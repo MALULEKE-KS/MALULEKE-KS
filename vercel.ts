@@ -11,4 +11,7 @@ import type { VercelConfig } from "@vercel/config/v1";
 export const config: VercelConfig = {
   framework: "nextjs",
   buildCommand: "node scripts/vercel-build.mjs",
+  // Skip builds that can't change the running site (docs/tests/CI-only, and
+  // backend-only previews) — the Hobby plan caps deployments per day.
+  ignoreCommand: "node scripts/vercel-ignore.mjs",
 };

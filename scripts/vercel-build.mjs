@@ -1,8 +1,9 @@
 // scripts/vercel-build.mjs — the deployment build (see vercel.ts).
 //
-// 1. If DB_MIGRATE_ON_BUILD=true for this environment, apply pending Prisma
+// 1. Regenerate the Prisma client (never trust a cached one).
+// 2. If DB_MIGRATE_ON_BUILD=true for this environment, apply pending Prisma
 //    migrations over the direct connection (DATABASE_URL_UNPOOLED).
-// 2. Build Next.js.
+// 3. Build Next.js.
 //
 // Why migrations run *before* the new code goes live, and why that's safe:
 // every migration is additive (EXT-1 — add, backfill, never rename or drop in
@@ -30,6 +31,13 @@ function run(label, command, args) {
 }
 
 console.log(`[vercel-build] environment=${env} migrate=${migrate}`);
+
+// Always regenerate the Prisma client first. Vercel restores cached
+// node_modules between builds, which can bring back a client generated from
+// an *older* schema — then the build type-checks against stale models and
+// fails (first seen on #66, when ActivityLog gained new fields). Prisma's own
+// guidance for Vercel is to run generate explicitly in the build.
+run("generate", "npx", ["prisma", "generate"]);
 
 if (migrate) {
   if (!process.env.DATABASE_URL_UNPOOLED) {

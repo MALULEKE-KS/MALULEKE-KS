@@ -1,60 +1,39 @@
 // lib/auth/rate-limit.ts
-// Shared rate limiter, backed by RateLimitEntry (prisma/schema.prisma) — not
-// duplicated per route. Covers: BR-2.4 (5 inquiries/IP/24h). BR-3.2/BR-3.6
-// (login/2FA attempt limiting) will reuse this same primitive once admin
-// auth is built.
+// Shared rate limiter (BR-2.4 inquiries; BR-3.2/3.6 auth reuse the same
+// primitive), backed by the rate_limit_hit() database function (F1.5).
 //
-// Fixed-window counting: the first request in a window creates an entry
-// with windowEnd = now + windowMs; subsequent requests within that window
-// increment count. There's a narrow race under truly concurrent first
-// requests for the same bucketKey (two requests could each see "no active
-// window" and both create one) — an accepted tradeoff for a low-traffic
-// contact form, not worth a heavier locking scheme for. RateLimitEntry rows
-// are deliberately cheap to over-produce; pruning expired rows is a
-// separate scheduled job (not yet built — see lib/adapters/scheduler/).
+// Atomic: the database decides and records each hit in one call, serialising
+// concurrent requests for the same key, so N simultaneous requests can never
+// all pass a limit of N-1 (the old read-then-write race).
+//
+// Private: the key holds a keyed hash of the client IP (lib/security/
+// keyed-hash.ts), never the raw address (BR-2.4 privacy, POPIA). The scope
+// prefix stays readable so an operator can see *which* limit a row belongs to.
 
 import { db } from "@/lib/db";
+import { clientIp } from "@/lib/security/client-ip";
+import { keyedHash } from "@/lib/security/keyed-hash";
 
 export interface RateLimitResult {
   allowed: boolean;
   retryAfterMs?: number;
 }
 
-export async function checkAndIncrementRateLimit(
-  bucketKey: string,
-  maxCount: number,
-  windowMs: number
-): Promise<RateLimitResult> {
-  const now = new Date();
-
-  const active = await db.rateLimitEntry.findFirst({
-    where: { bucketKey, windowEnd: { gt: now } },
-    orderBy: { windowEnd: "desc" },
-  });
-
-  if (!active) {
-    await db.rateLimitEntry.create({
-      data: { bucketKey, windowEnd: new Date(now.getTime() + windowMs), count: 1 },
-    });
-    return { allowed: true };
-  }
-
-  if (active.count >= maxCount) {
-    return { allowed: false, retryAfterMs: active.windowEnd.getTime() - now.getTime() };
-  }
-
-  await db.rateLimitEntry.update({
-    where: { id: active.id },
-    data: { count: { increment: 1 } },
-  });
-  return { allowed: true };
+/** The stored bucket key for a scope + client — exported so tests can target it. */
+export function rateLimitKey(scope: string, request: Request): string {
+  return `${scope}:ip:${keyedHash("rate-limit", clientIp(request))}`;
 }
 
-// Standard Vercel/proxy header — the first entry in x-forwarded-for is the
-// original client IP. Falls back to a constant bucket if genuinely absent
-// (local dev without a proxy) rather than throwing.
-export function getClientIp(request: Request): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0]!.trim();
-  return "unknown";
+export async function hitRateLimit(
+  scope: string,
+  request: Request,
+  maxCount: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const key = rateLimitKey(scope, request);
+  const windowSeconds = Math.max(1, Math.ceil(windowMs / 1000));
+  const [row] = await db.$queryRaw<{ allowed: boolean; retry_after_seconds: number }[]>`
+    SELECT allowed, retry_after_seconds FROM rate_limit_hit(${key}, ${maxCount}::int, ${windowSeconds}::int)`;
+  if (!row) throw new Error("rate_limit_hit returned no row");
+  return row.allowed ? { allowed: true } : { allowed: false, retryAfterMs: row.retry_after_seconds * 1000 };
 }

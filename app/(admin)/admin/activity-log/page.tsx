@@ -32,7 +32,8 @@ export default async function AdminActivityLogPage({
 
   const rows = entries.map((entry) => ({
     id: entry.id,
-    adminUserEmail: entry.adminUser.email,
+    // Anonymous (e.g. unknown-email login) and system (operator script) entries have no admin.
+    adminUserEmail: entry.adminUser?.email ?? (entry.actorType === "SYSTEM" ? "system" : "anonymous"),
     action: entry.action,
     entityType: entry.entityType,
     entityId: entry.entityId,

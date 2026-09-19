@@ -17,7 +17,7 @@ function makeRequest(url: string): NextRequest {
 
 beforeAll(async () => {
   const admin = await db.adminUser.create({
-    data: { email: "test-admin-activity-log@example.com", passwordHash: "unused-in-these-tests" },
+    data: { email: `test-admin-activity-log-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId);
@@ -38,9 +38,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // No audit/admin cleanup: ActivityLog is append-only (F1.3) and an admin it
+  // references can't be deleted. The test database is disposable, and each
+  // run uses its own admin email, so leftovers never collide.
   if (!adminId) return;
-  await db.activityLog.deleteMany({ where: { id: { in: createdLogIds } } });
-  await db.adminUser.delete({ where: { id: adminId } });
 });
 
 describe("GET /api/v1/admin/activity-log", () => {
@@ -55,7 +56,9 @@ describe("GET /api/v1/admin/activity-log", () => {
     const body = await res.json();
     const fixtureEntries = body.data.filter((e: { id: string }) => createdLogIds.includes(e.id));
     expect(fixtureEntries.length).toBe(3);
-    expect(fixtureEntries[0].adminUserEmail).toBe("test-admin-activity-log@example.com");
+    // Each run uses its own admin email (ActivityLog is append-only, F1.3).
+    expect(fixtureEntries[0].adminUserEmail).toMatch(/^test-admin-activity-log-[a-z0-9]+@example\.com$/);
+    expect(fixtureEntries[0].actorType).toBe("admin");
     expect(fixtureEntries[0].before).toEqual({ status: "old" });
     expect(fixtureEntries[0].after).toEqual({ status: "new" });
     // Most recent first — the third-created fixture log sorts before the first.

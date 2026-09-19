@@ -31,7 +31,7 @@ function makeRequest(url: string, method: string, body: object | null, withCooki
 
 beforeAll(async () => {
   const admin = await db.adminUser.create({
-    data: { email: "test-admin-systems@example.com", passwordHash: "unused-in-these-tests" },
+    data: { email: `test-admin-systems-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId);
@@ -51,12 +51,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // No audit/admin cleanup: ActivityLog is append-only (F1.3) and an admin it
+  // references can't be deleted. The test database is disposable, and each
+  // run uses its own admin email, so leftovers never collide.
   if (!adminId) return;
-  await db.activityLog.deleteMany({ where: { adminUserId: adminId } });
   // Retire, don't delete (BR-1.9). The fixture organizations stay too: an
   // archived System still references its Organization (FK RESTRICT).
   await db.system.updateMany({ where: { id: { in: createdSystemIds } }, data: { contentStatus: "ARCHIVED" } });
-  await db.adminUser.delete({ where: { id: adminId } });
 });
 
 describe("GET/POST /api/v1/admin/systems", () => {

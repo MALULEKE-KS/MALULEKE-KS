@@ -13,6 +13,13 @@ const MAX_FAILED_ATTEMPTS = 5; // BR-3.2
 const LOCKOUT_MS = 14 * 60 * 1000; // Design System §5's own stated example
 const CHALLENGE_TTL_MS = 5 * 60 * 1000; // BR-3.5
 
+// A bcrypt hash (cost 12, same as real passwords) of random bytes nobody
+// knows. Comparing an unknown email's attempt against it makes that path take
+// as long as a real one, so response timing can't reveal which email is the
+// admin's. A fixed constant is the recommended practice here: it isn't a
+// tunable and holds no secret.
+const TIMING_EQUALIZER_HASH = "$2a$12$2IDjEt3DQVf4S5hpiYNcquMP4nidn/FdcLo2cHAm6m60i2uagR36a";
+
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
@@ -32,13 +39,13 @@ export async function POST(request: Request) {
   const email = parsed.data.email.toLowerCase();
   const admin = await db.adminUser.findUnique({ where: { email } });
 
-  // Generic failure for an unknown email — same response shape as a wrong
-  // password, so no distinguishable signal either way (Design System §5).
-  // Not logged to ActivityLog: adminUserId is a required FK, and there's no
-  // real AdminUser to attach an attempt against an unknown email to — see
-  // lib/auth/activity-log.ts's own scope note. This doesn't weaken the
-  // lockout, which is keyed to the one real account regardless.
+  // Unknown email: same response, same work, still audited (BR-3.4).
+  // - same shape as a wrong password (Design System §5)
+  // - same bcrypt cost, so timing doesn't reveal whether the email exists
+  // - logged as an ANONYMOUS attempt, the email stored only as a keyed hash
   if (!admin) {
+    await bcrypt.compare(parsed.data.password, TIMING_EQUALIZER_HASH);
+    await logActivity({ action: "auth.login_failed", actorType: "ANONYMOUS", subject: email, request });
     return errorResponse("UNAUTHORIZED", "Email or password is incorrect.", 401);
   }
 
@@ -51,17 +58,22 @@ export async function POST(request: Request) {
   const passwordValid = await bcrypt.compare(parsed.data.password, admin.passwordHash);
 
   if (!passwordValid) {
-    const failedLoginCount = admin.failedLoginCount + 1;
-    const lockingNow = failedLoginCount >= MAX_FAILED_ATTEMPTS;
-
-    await db.adminUser.update({
+    // Atomic increment (BR-3.2): the database adds 1 in a single statement,
+    // so simultaneous wrong guesses can't each read the same count and slip
+    // past the lockout, as a read-then-write would allow.
+    const { failedLoginCount } = await db.adminUser.update({
       where: { id: admin.id },
-      data: {
-        failedLoginCount: lockingNow ? 0 : failedLoginCount,
-        lockedUntil: lockingNow ? new Date(Date.now() + LOCKOUT_MS) : null,
-      },
+      data: { failedLoginCount: { increment: 1 } },
+      select: { failedLoginCount: true },
     });
-    await logActivity({ adminUserId: admin.id, action: "auth.login_failed" });
+    const lockingNow = failedLoginCount >= MAX_FAILED_ATTEMPTS;
+    if (lockingNow) {
+      await db.adminUser.update({
+        where: { id: admin.id },
+        data: { failedLoginCount: 0, lockedUntil: new Date(Date.now() + LOCKOUT_MS) },
+      });
+    }
+    await logActivity({ adminUserId: admin.id, action: "auth.login_failed", request });
 
     if (lockingNow) {
       return errorResponse("ACCOUNT_LOCKED", "Too many attempts. Try again later.", 401, {

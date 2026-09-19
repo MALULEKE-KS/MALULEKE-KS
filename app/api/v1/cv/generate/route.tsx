@@ -10,7 +10,7 @@ import { db } from "@/lib/db";
 import { CvGenerateInputSchema } from "@/lib/schemas";
 import { experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
 import { CvDocument } from "@/lib/cv/pdf-document";
-import { checkAndIncrementRateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { hitRateLimit } from "@/lib/auth/rate-limit";
 
 const RATE_LIMIT_MAX = 10;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 10 generations per IP per hour
@@ -29,8 +29,7 @@ export async function POST(request: Request) {
   }
   const targetRole = parsed.data.targetRole ?? null;
 
-  const ip = getClientIp(request);
-  const rateLimit = await checkAndIncrementRateLimit(`cv-generate:ip:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+  const rateLimit = await hitRateLimit("cv-generate", request, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
   if (!rateLimit.allowed) {
     return errorResponse("RATE_LIMITED", "Too many requests from this connection — try again later.", 429, {
       retryAfterMs: rateLimit.retryAfterMs,

@@ -16,7 +16,7 @@ const createdDocumentIds: string[] = [];
 // repeated local runs within the same hour don't accumulate toward the
 // real 10/hour cap the route enforces.
 beforeAll(async () => {
-  await db.rateLimitEntry.deleteMany({ where: { bucketKey: "cv-generate:ip:unknown" } });
+  await db.rateLimitEntry.deleteMany({ where: { bucketKey: { startsWith: "cv-generate:" } } }); // keys are hashed (F1.5)
 });
 
 function makeRequest(body: object): NextRequest {

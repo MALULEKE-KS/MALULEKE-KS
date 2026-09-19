@@ -37,7 +37,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     data: entries.map((entry) => ({
       id: entry.id,
-      adminUserEmail: entry.adminUser.email,
+      actorType: entry.actorType.toLowerCase(),
+      adminUserEmail: entry.adminUser?.email ?? null,
+      subjectHash: entry.subjectHash,
+      ipHash: entry.ipHash,
+      userAgentHash: entry.userAgentHash,
       action: entry.action,
       entityType: entry.entityType,
       entityId: entry.entityId,

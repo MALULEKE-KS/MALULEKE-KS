@@ -119,7 +119,8 @@ export default async function AdminDashboardPage() {
                 <li key={entry.id} className="py-2.5">
                   <p className="font-mono text-xs text-ink">{entry.action}</p>
                   <p className="font-mono text-xs text-slate">
-                    {entry.adminUser.email} · {formatTimestamp(entry.createdAt)}
+                    {entry.adminUser?.email ?? (entry.actorType === "SYSTEM" ? "system" : "anonymous")} ·{" "}
+                    {formatTimestamp(entry.createdAt)}
                   </p>
                 </li>
               ))}

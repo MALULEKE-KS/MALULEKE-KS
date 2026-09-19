@@ -30,10 +30,10 @@ model AdminUser {
   twoFactorEnabled Boolean          @default(false)
   recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
   failedLoginCount Int              @default(0)
-  lockedUntil      DateTime? // BR-3.2
-  lastLoginAt      DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  lockedUntil      DateTime?        @db.Timestamptz(3) // BR-3.2
+  lastLoginAt      DateTime?        @db.Timestamptz(3)
+  createdAt        DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @db.Timestamptz(3)
   activityLogs     ActivityLog[]
   loginChallenges  LoginChallenge[]
   // No separate @@index([email]): the @unique above already is one.
@@ -48,9 +48,10 @@ model LoginChallenge {
   adminUserId String
   adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
   attempts    Int       @default(0) // BR-3.6 — invalidated at 5
-  consumedAt  DateTime? // set on first verify attempt, success or failure (BR-3.5)
-  expiresAt   DateTime // issuedAt + 5 minutes (BR-3.5)
-  createdAt   DateTime  @default(now())
+  consumedAt  DateTime? @db.Timestamptz(3) // set on first verify attempt, success or failure (BR-3.5)
+  expiresAt   DateTime  @db.Timestamptz(3) // issuedAt + 5 minutes (BR-3.5)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([expiresAt])
 }
@@ -62,27 +63,45 @@ model RateLimitEntry {
   // long as the relevant window requires (BR-2.4).
   id        String   @id @default(cuid())
   bucketKey String // e.g. "inquiry:ip:203.0.113.4" or "login2fa:challenge:<id>"
-  windowEnd DateTime // entry is inert/prunable once now() > windowEnd
+  windowEnd DateTime @db.Timestamptz(3) // entry is inert/prunable once now() > windowEnd
   count     Int      @default(1)
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@unique([bucketKey, windowEnd])
   @@index([windowEnd])
 }
 
+// Who performed an audited action. A fixed control dimension (EXT-1
+// exception): the kinds of actor don't grow with content.
+enum ActorType {
+  ADMIN // an authenticated admin (adminUserId set)
+  ANONYMOUS // an unauthenticated attempt, e.g. a failed login for an unknown email
+  SYSTEM // a scheduled job or operator script
+}
+
+// Append-only (F1.3): the database refuses UPDATE and DELETE on this table
+// (trigger ActivityLog_append_only), so the trail can't be edited after the
+// fact. Request context is stored only as keyed hashes (lib/security/
+// keyed-hash.ts) — comparable, never readable.
 model ActivityLog {
-  id          String    @id @default(cuid())
-  adminUserId String
-  adminUser   AdminUser @relation(fields: [adminUserId], references: [id])
-  action      String // "system.update" | "auth.login" | "auth.login_failed" | ... (BR-3.4)
-  entityType  String?
-  entityId    String?
-  before      Json?
-  after       Json?
-  createdAt   DateTime  @default(now())
+  id            String     @id @default(cuid())
+  actorType     ActorType  @default(ADMIN)
+  adminUserId   String? // null for ANONYMOUS/SYSTEM actors — so every login attempt can be logged (BR-3.4)
+  adminUser     AdminUser? @relation(fields: [adminUserId], references: [id])
+  action        String // "system.update" | "auth.login" | "auth.login_failed" | ... (BR-3.4)
+  entityType    String?
+  entityId      String?
+  before        Json?
+  after         Json?
+  subjectHash   String? // keyed hash of what an anonymous actor tried (e.g. an unknown login email)
+  ipHash        String? // keyed hash of the client IP
+  userAgentHash String? // keyed hash of the user agent
+  createdAt     DateTime   @default(now()) @db.Timestamptz(3)
 
   @@index([adminUserId, createdAt])
   @@index([entityType, entityId])
+  @@index([action, createdAt])
 }
 
 // ============================================================
@@ -101,7 +120,8 @@ model Organization {
   // slugify(githubLogin) == slug.
   githubLogins String[] @default([])
   systems      System[]
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Status {
@@ -113,14 +133,18 @@ model Status {
   // a new admin-added status never needs a component code change (EXT-1).
   active     Boolean  @default(true) // BR-8.2 soft-deprecation
   systems    System[]
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Domain {
-  id      String   @id @default(cuid())
-  key     String   @unique
-  label   String
-  active  Boolean  @default(true)
-  systems System[]
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  active    Boolean  @default(true)
+  systems   System[]
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 enum ClientVisibility {
@@ -176,8 +200,8 @@ model System {
   impacts                Impact[]
   testimonials           Testimonial[]
   skills                 SkillOnSystem[]
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
+  createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
 
   @@index([contentStatus])
   @@index([organizationId])
@@ -186,12 +210,14 @@ model System {
 }
 
 model Impact {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   systemId  String
-  system    System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  system    System   @relation(fields: [systemId], references: [id], onDelete: Cascade)
   label     String // "Audit findings closed"
   value     String // "58"
-  sortOrder Int    @default(0)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([systemId, sortOrder])
 }
@@ -205,7 +231,8 @@ model Testimonial {
   organization  String?
   quote         String
   hasPermission Boolean  @default(false) // BR-6.1 — absolute gate, checked at read time
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([systemId])
 }
@@ -220,6 +247,8 @@ model MilestoneType {
   label           String
   active          Boolean    @default(true)
   timelineEntries Timeline[]
+  createdAt       DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime   @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Timeline {
@@ -228,10 +257,11 @@ model Timeline {
   milestoneType   MilestoneType @relation(fields: [milestoneTypeId], references: [id])
   title           String
   description     String?
-  date            DateTime
+  date            DateTime      @db.Timestamptz(3)
   media           String?
   tags            String[]
-  createdAt       DateTime      @default(now())
+  createdAt       DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([date])
   @@index([milestoneTypeId])
@@ -241,27 +271,33 @@ model Experience {
   id           String              @id @default(cuid())
   title        String
   organization String
-  startDate    DateTime
-  endDate      DateTime?
+  startDate    DateTime            @db.Timestamptz(3)
+  endDate      DateTime?           @db.Timestamptz(3)
   description  String
   skills       SkillOnExperience[]
+  createdAt    DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Education {
   id            String    @id @default(cuid())
   institution   String
   qualification String
-  startDate     DateTime
-  endDate       DateTime?
+  startDate     DateTime  @db.Timestamptz(3)
+  endDate       DateTime? @db.Timestamptz(3)
   honors        String?
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model SkillCategory {
-  id     String  @id @default(cuid())
-  key    String  @unique
-  label  String
-  active Boolean @default(true)
-  skills Skill[]
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  active    Boolean  @default(true)
+  skills    Skill[]
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Skill {
@@ -272,6 +308,8 @@ model Skill {
   yearsExperience Float?
   systems         SkillOnSystem[]
   experiences     SkillOnExperience[]
+  createdAt       DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([categoryId])
 }
@@ -300,7 +338,7 @@ model DocumentGen {
   id                  String   @id @default(cuid())
   type                String // "cv" | "resume-tailored"
   targetRole          String?
-  generatedAt         DateTime @default(now()) // BR-7.1 — always reflects live data at this timestamp
+  generatedAt         DateTime @default(now()) @db.Timestamptz(3) // BR-7.1 — always reflects live data at this timestamp
   // Self-hosted per Constitution §9 — the generated PDF's actual bytes, not
   // just a reference to external object storage. Small documents (a CV),
   // low volume (one admin, generated on visitor demand): Postgres is the
@@ -320,6 +358,8 @@ model InquiryType {
   label     String
   active    Boolean   @default(true)
   inquiries Inquiry[]
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 enum InquiryStatus {
@@ -340,7 +380,8 @@ model Inquiry {
   source         String? // captured server-side only; "direct" when no Referer (BR-2.5)
   status         InquiryStatus @default(NEW)
   idempotencyKey String?       @unique // BR-2.6 — dedupes a resubmit within the client-held window
-  createdAt      DateTime      @default(now())
+  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([status, createdAt])
   @@index([inquiryTypeId])
@@ -351,11 +392,13 @@ model Inquiry {
 // ============================================================
 
 model VisitorLens {
-  id              String @id @default(cuid())
-  key             String @unique // "recruiter" | "client-fintech" | "academic" | ...
+  id              String   @id @default(cuid())
+  key             String   @unique // "recruiter" | "client-fintech" | "academic" | ...
   label           String
   priorityContent Json
   aiFramingPrompt String
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Event {
@@ -365,7 +408,7 @@ model Event {
   entityId   String?
   sessionId  String
   metadata   Json?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([eventType, createdAt])
   @@index([sessionId])
@@ -377,14 +420,17 @@ model ContentChunk {
   entityId   String
   content    String
   embedding  Unsupported("vector(1536)")
-  createdAt  DateTime                    @default(now())
+  createdAt  DateTime                    @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime                    @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([entityType, entityId])
 }
 
 model Flag {
-  id      String  @id @default(cuid())
-  key     String  @unique
-  enabled Boolean @default(false) // BR-4.4 — new tools/lenses ship disabled by default
-  notes   String?
+  id        String   @id @default(cuid())
+  key       String   @unique
+  enabled   Boolean  @default(false) // BR-4.4 — new tools/lenses ship disabled by default
+  notes     String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
