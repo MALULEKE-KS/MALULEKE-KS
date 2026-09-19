@@ -133,20 +133,22 @@ enum PipelineStage {
 }
 
 model Status {
-  id         String        @id @default(cuid())
-  key        String        @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
-  label      String
-  colorToken String        @default("signal-planned") // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
+  id          String               @id @default(cuid())
+  key         String               @unique // "finished" | "in_progress" | "planned" — extendable per BR-8.1
+  label       String
+  colorToken  String               @default("signal-planned") // e.g. "signal-finished" — a CSS custom-property/Tailwind token name.
   // New Status values carry their own color as data (this field), so
   // a new admin-added status never needs a component code change (EXT-1).
-  active     Boolean       @default(true) // BR-8.2 soft-deprecation
-  systems    System[]
-  createdAt  DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+  active      Boolean              @default(true) // BR-8.2 soft-deprecation
+  systems     System[]
+  changesFrom SystemStatusChange[] @relation("fromStatus")
+  changesTo   SystemStatusChange[] @relation("toStatus")
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @default(now()) @updatedAt @db.Timestamptz(3)
   // Which homepage count this status belongs to (#52). Any status the admin
   // creates — "Live", "Refinished" — joins shipped/building/queued by
   // choosing a stage, with no code change (EXT-1).
-  stage      PipelineStage @default(QUEUED)
+  stage       PipelineStage        @default(QUEUED)
 }
 
 model Domain {
@@ -219,6 +221,32 @@ model System {
   featuredOnHome         Boolean          @default(false)
   homeOrder              Int              @default(0)
 
+  // --- Repo ownership (#69, BR-1.11) ---
+  // How this system's repo relates to the owner: owned, collaborated on, ...
+  // A lookup (EXT-1). When the relationship requires it, the repo owner's
+  // permission gates publishing, enforced by a database trigger.
+  repoRelationshipId  String?
+  repoRelationship    RepoRelationship? @relation(fields: [repoRelationshipId], references: [id], onDelete: Restrict)
+  ownerPermission     OwnerPermission   @default(NOT_REQUIRED)
+  ownerPermissionFrom String? // who granted or declined it: the repo owner's name or GitHub login
+  ownerPermissionAt   DateTime?         @db.Timestamptz(3) // set by the database whenever ownerPermission changes
+  ownerPermissionNote String?
+
+  // --- GitHub metadata (#70): sourced facts, refreshed by the sync (F4) ---
+  githubFullName   String?   @unique // "owner/repo"
+  githubOwnerLogin String?
+  repoPrivate      Boolean   @default(false) // BR-1.7: shown as private publicly, never linked
+  githubPushedAt   DateTime? @db.Timestamptz(3)
+  githubLanguages  Json? // { "TypeScript": 120345, ... } bytes per language
+  githubTopics     String[]  @default([])
+  githubStars      Int?
+  githubSyncedAt   DateTime? @db.Timestamptz(3)
+
+  statusChanges   SystemStatusChange[]
+  activityWeeks   SystemActivityWeek[]
+  timelineEntries Timeline[]
+  achievements    Achievement[]
+
   @@index([contentStatus])
   @@index([organizationId])
   @@index([domainId])
@@ -254,6 +282,64 @@ model Testimonial {
   @@index([systemId])
 }
 
+// How a system's repo relates to the owner (#69). A lookup, not an enum
+// (EXT-1): "owner", "collaborator", and whatever comes next. The flag is data
+// too: any relationship can require the repo owner's permission to publish.
+model RepoRelationship {
+  id                      String   @id @default(cuid())
+  key                     String   @unique
+  label                   String
+  requiresOwnerPermission Boolean  @default(false)
+  active                  Boolean  @default(true) // BR-8.2 soft-deprecation
+  systems                 System[]
+  createdAt               DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// The repo owner's answer for a collaborated system (BR-1.11). A fixed control
+// state, like ClientVisibility, not a growing content dimension (EXT-1
+// exception). The database keeps it consistent with the relationship.
+enum OwnerPermission {
+  NOT_REQUIRED
+  NOT_REQUESTED
+  REQUESTED
+  GRANTED
+  DECLINED
+}
+
+// Every status a system has been in, written by a database trigger (never by
+// application code) and append-only. The stage is snapshotted at the time of
+// the change, so shipped dates survive later reclassification of a status.
+// Rows marked backfilled record the state that existed when history began;
+// they are not claims about when it happened.
+model SystemStatusChange {
+  id           String         @id @default(cuid())
+  systemId     String
+  system       System         @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  fromStatusId String?
+  fromStatus   Status?        @relation("fromStatus", fields: [fromStatusId], references: [id], onDelete: Restrict)
+  toStatusId   String
+  toStatus     Status         @relation("toStatus", fields: [toStatusId], references: [id], onDelete: Restrict)
+  fromStage    PipelineStage?
+  toStage      PipelineStage
+  backfilled   Boolean        @default(false)
+  changedAt    DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([systemId, changedAt])
+}
+
+// Commits per ISO week (weekStart is a Monday), per system: "Now building"
+// and pace (#70). Filled by the GitHub sync (F4).
+model SystemActivityWeek {
+  systemId  String
+  system    System   @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  weekStart DateTime @db.Date
+  commits   Int
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@id([systemId, weekStart])
+}
+
 // ============================================================
 // CAREER & ACADEMIC RECORD
 // ============================================================
@@ -263,6 +349,9 @@ model MilestoneType {
   key             String     @unique // "education" | "job" | "launch" | "achievement" | "personal"
   label           String
   active          Boolean    @default(true)
+  // The one milestone type a system's first ship is auto-drafted as (#70).
+  // Data, not a hardcoded key; a partial unique index allows at most one.
+  autoDraftOnShip Boolean    @default(false)
   timelineEntries Timeline[]
   createdAt       DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime   @default(now()) @updatedAt @db.Timestamptz(3)
@@ -277,11 +366,73 @@ model Timeline {
   date            DateTime      @db.Timestamptz(3)
   media           String?
   tags            String[]
+  // Only PUBLISHED entries are public. Auto-drafted entries start as DRAFT
+  // and wait for the admin's approval (#70).
+  contentStatus   ContentStatus @default(PUBLISHED)
+  systemId        String?
+  system          System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  autoDrafted     Boolean       @default(false)
   createdAt       DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([date])
   @@index([milestoneTypeId])
+  @@index([contentStatus, date])
+  @@index([systemId])
+}
+
+// The owner's public profile (#70): one row, enforced by a CHECK. Everything
+// here is admin-editable data, never copy in code. Fields the owner hasn't
+// provided stay empty; nothing is invented.
+model Profile {
+  id                Int           @id @default(1)
+  displayName       String
+  initials          String?
+  role              String
+  location          String?
+  email             String
+  bio               String?
+  availability      String?
+  buildingSinceYear Int?
+  links             ProfileLink[]
+  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// Social and contact links: a growing set, so rows, not columns (EXT-1).
+// kind names the brand icon ("github", "linkedin", ...).
+model ProfileLink {
+  id        String   @id @default(cuid())
+  profileId Int      @default(1)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  kind      String   @unique
+  label     String
+  url       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([profileId, sortOrder])
+}
+
+// Certifications, awards, recognitions (#70). They start as drafts and stay
+// empty until the owner provides real ones.
+model Achievement {
+  id            String        @id @default(cuid())
+  title         String
+  issuer        String?
+  achievedOn    DateTime      @db.Date
+  description   String?
+  url           String?
+  systemId      String?
+  system        System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  contentStatus ContentStatus @default(DRAFT)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([contentStatus, achievedOn])
+  @@index([systemId])
 }
 
 model Experience {
@@ -297,14 +448,25 @@ model Experience {
 }
 
 model Education {
-  id            String    @id @default(cuid())
-  institution   String
-  qualification String
-  startDate     DateTime  @db.Timestamptz(3)
-  endDate       DateTime? @db.Timestamptz(3)
-  honors        String?
-  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  id             String             @id @default(cuid())
+  institution    String
+  qualification  String
+  startDate      DateTime           @db.Timestamptz(3)
+  endDate        DateTime?          @db.Timestamptz(3) // null = still studying
+  honors         String?
+  // #70 — what was studied, and proof of it. All optional: nothing is
+  // required that the owner hasn't provided.
+  fieldOfStudy   String?
+  description    String?
+  certificateUrl String? // https only (CHECK)
+  // Only PUBLISHED entries appear on /cv and in the generated CV; the admin
+  // decides what's shown.
+  contentStatus  ContentStatus      @default(PUBLISHED)
+  skills         SkillOnEducation[]
+  createdAt      DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([contentStatus, startDate])
 }
 
 model SkillCategory {
@@ -325,6 +487,7 @@ model Skill {
   yearsExperience Float?
   systems         SkillOnSystem[]
   experiences     SkillOnExperience[]
+  education       SkillOnEducation[]
   createdAt       DateTime            @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -349,6 +512,18 @@ model SkillOnExperience {
 
   @@id([skillId, experienceId])
   @@index([experienceId])
+}
+
+// Skills a qualification taught (#70) — feeds skill evidence alongside roles
+// and systems.
+model SkillOnEducation {
+  skillId     String
+  educationId String
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  education   Education @relation(fields: [educationId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, educationId])
+  @@index([educationId])
 }
 
 model DocumentGen {
@@ -461,4 +636,29 @@ model Flag {
   notes     String?
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// ============================================================
+// SCHEDULED JOBS
+// ============================================================
+
+enum JobRunStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+// One row per run of a scheduled job (GitHub sync, retention, ...) (#70).
+// A partial unique index allows only one RUNNING row per job: the database
+// is the lock, so overlapping runs can't happen. Finished runs are immutable.
+model JobRun {
+  id         String       @id @default(cuid())
+  job        String
+  status     JobRunStatus @default(RUNNING)
+  startedAt  DateTime     @default(now()) @db.Timestamptz(3)
+  finishedAt DateTime?    @db.Timestamptz(3)
+  summary    Json?
+  error      String?
+
+  @@index([job, startedAt])
 }

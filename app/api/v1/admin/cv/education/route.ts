@@ -3,7 +3,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { EducationInputSchema } from "@/lib/schemas";
-import { toEducationEntry } from "@/lib/rules/cv";
+import { educationWithSkills, toEducationEntry } from "@/lib/rules/cv";
+import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   const adminUserId = await getSessionAdminId(request);
   if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
 
-  const education = await db.education.findMany({ orderBy: { startDate: "desc" } });
+  const education = await db.education.findMany({ ...educationWithSkills, orderBy: { startDate: "desc" } });
   return NextResponse.json({ data: education.map(toEducationEntry) });
 }
 
@@ -36,7 +37,13 @@ export async function POST(request: Request) {
       startDate: new Date(parsed.data.startDate),
       endDate: parsed.data.endDate ? new Date(parsed.data.endDate) : null,
       honors: parsed.data.honors ?? null,
+      fieldOfStudy: parsed.data.fieldOfStudy ?? null,
+      description: parsed.data.description ?? null,
+      certificateUrl: parsed.data.certificateUrl ?? null,
+      contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
+      skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
     },
+    ...educationWithSkills,
   });
 
   await logActivity({

@@ -1,11 +1,13 @@
-// PATCH /api/v1/lookups/{type}/{id} — edit a lookup value's label; for a
-// status, also its pipeline stage and curated colour (#52). The key is
-// immutable (BR-8.3). Changing a status's stage moves every system in it
-// between the shipped / building / queued counts, with no code change (EXT-1).
+// PATCH /api/v1/lookups/{type}/{id} — edit a lookup value's label and its
+// type's extras (lib/rules/lookups.ts). The key is immutable (BR-8.3).
+// Changing a status's stage moves every system in it between the homepage
+// counts (EXT-1). Making a repo relationship require the owner's permission
+// is refused (409) while a system using it is published without one (BR-1.11).
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
-import { isLookupType, updateLookupValue } from "@/lib/rules/lookups";
+import { isLookupType, unsupportedExtras, updateLookupValue } from "@/lib/rules/lookups";
+import { ruleViolation } from "@/lib/db-errors";
 import { LookupUpdateInputSchema } from "@/lib/schemas";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
@@ -27,11 +29,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ty
   if (!parsed.success) {
     return errorResponse("VALIDATION_ERROR", "Invalid lookup update", 400, { issues: parsed.error.issues });
   }
-  if (type !== "status" && (parsed.data.stage || parsed.data.colorToken)) {
-    return errorResponse("VALIDATION_ERROR", "stage and colorToken apply to status values only", 400);
+  const { label: _label, ...extras } = parsed.data;
+  const unsupported = unsupportedExtras(type, extras);
+  if (unsupported.length) {
+    return errorResponse("VALIDATION_ERROR", `${unsupported.join(", ")} do not apply to ${type} values`, 400);
   }
 
-  const result = await updateLookupValue(type, id, parsed.data);
+  let result;
+  try {
+    result = await updateLookupValue(type, id, parsed.data);
+  } catch (err) {
+    const rule = ruleViolation(err, "BR-1.11");
+    if (rule) return errorResponse("OWNER_PERMISSION_REQUIRED", rule, 409);
+    throw err;
+  }
   if (!result) return errorResponse("NOT_FOUND", "Lookup value not found", 404);
 
   await logActivity({

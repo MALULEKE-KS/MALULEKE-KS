@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
-import { timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
+import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       date: new Date(parsed.data.date),
       media: parsed.data.media ?? null,
       tags: parsed.data.tags,
+      contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
     },
     ...timelineWithMilestoneType,
   });

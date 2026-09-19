@@ -52,15 +52,29 @@ async function main() {
   );
 
   // --- MilestoneType ---
+  // autoDraftOnShip marks the type a system's first ship is auto-drafted as
+  // (#70) — data, so the admin can hand it to another type.
   await Promise.all(
     [
       { key: "education", label: "Education" },
       { key: "job", label: "Job" },
-      { key: "launch", label: "Launch" },
+      { key: "launch", label: "Launch", autoDraftOnShip: true },
       { key: "achievement", label: "Achievement" },
       { key: "personal", label: "Personal" },
     ].map((m) =>
       prisma.milestoneType.upsert({ where: { key: m.key }, update: {}, create: m })
+    )
+  );
+
+  // --- RepoRelationship --- (#69, BR-1.11)
+  // How a system's repo relates to the owner. requiresOwnerPermission is data:
+  // any relationship can gate publishing on the repo owner's permission.
+  await Promise.all(
+    [
+      { key: "owner", label: "Owner", requiresOwnerPermission: false },
+      { key: "collaborator", label: "Collaborator", requiresOwnerPermission: true },
+    ].map((r) =>
+      prisma.repoRelationship.upsert({ where: { key: r.key }, update: {}, create: r })
     )
   );
 

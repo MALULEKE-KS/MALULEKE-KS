@@ -40,6 +40,8 @@ export const ErrorCodeEnum = z.enum([
   "CHALLENGE_EXPIRED", // BR-3.5
   "CHALLENGE_INVALID", // BR-3.6
   "LOOKUP_KEY_DEPRECATED", // BR-8.3
+  "LOOKUP_KEY_EXISTS", // BR-8.3
+  "OWNER_PERMISSION_REQUIRED", // BR-1.11
   "INTERNAL_ERROR",
 ]);
 
@@ -70,8 +72,11 @@ export const LookupCreateInputSchema = z.object({
     .trim()
     .regex(/^[a-z0-9]+([_-][a-z0-9]+)*$/, "lowercase words joined by _ or -"),
   label: z.string().trim().min(1),
+  // Type-specific extras (lib/rules/lookups.ts) — the route refuses any a type doesn't have.
   stage: PipelineStageEnum.optional(),
   colorToken: StatusColorTokenEnum.optional(),
+  requiresOwnerPermission: z.boolean().optional(),
+  autoDraftOnShip: z.boolean().optional(),
 });
 
 export const LookupUpdateInputSchema = z
@@ -79,10 +84,10 @@ export const LookupUpdateInputSchema = z
     label: z.string().trim().min(1).optional(),
     stage: PipelineStageEnum.optional(),
     colorToken: StatusColorTokenEnum.optional(),
+    requiresOwnerPermission: z.boolean().optional(),
+    autoDraftOnShip: z.boolean().optional(),
   })
-  .refine((d) => d.label !== undefined || d.stage !== undefined || d.colorToken !== undefined, {
-    message: "Nothing to update",
-  });
+  .refine((d) => Object.values(d).some((v) => v !== undefined), { message: "Nothing to update" });
 
 export const PlatformSettingUpdateInputSchema = z.object({ value: z.unknown() });
 
@@ -92,6 +97,7 @@ export const LookupTypeEnum = z.enum([
   "inquiry-type",
   "milestone-type",
   "skill-category",
+  "repo-relationship",
   // New lookup types extend this enum only — no new endpoint required (EXT-1)
 ]);
 
@@ -107,6 +113,9 @@ export const ClientVisibilityEnum = z.enum([
 ]);
 
 export const ContentStatusEnum = z.enum(["draft", "published", "archived"]);
+
+// BR-1.11 (#69) — the repo owner's answer for a collaborated system.
+export const OwnerPermissionEnum = z.enum(["not_required", "not_requested", "requested", "granted", "declined"]);
 
 export const SystemPublicSchema = z.object({
   id: z.string(),
@@ -125,6 +134,9 @@ export const SystemPublicSchema = z.object({
   screenshotUrl: z.string().url().nullable(),
   techStack: z.array(z.string()),
   isFlagship: z.boolean(),
+  // BR-1.7 — a private repo is shown as private (repoUrl is then null), with
+  // access available on request.
+  repoPrivate: z.boolean(),
 });
 
 export const TestimonialPublicSchema = z.object({
@@ -158,6 +170,22 @@ export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
   sortOrder: z.number().int(),
   featuredOnHome: z.boolean(),
   homeOrder: z.number().int(),
+  // #69 / BR-1.11 — the repo relationship's key, and the owner's answer.
+  repoRelationship: z.string().nullable(),
+  ownerPermission: OwnerPermissionEnum,
+  ownerPermissionFrom: z.string().nullable(),
+  ownerPermissionAt: z.string().datetime().nullable(),
+  ownerPermissionNote: z.string().nullable(),
+  // #70 — sourced from GitHub by the sync; null until synced.
+  github: z.object({
+    fullName: z.string().nullable(),
+    ownerLogin: z.string().nullable(),
+    pushedAt: z.string().datetime().nullable(),
+    languages: z.record(z.string(), z.number()).nullable(),
+    topics: z.array(z.string()),
+    stars: z.number().int().nullable(),
+    syncedAt: z.string().datetime().nullable(),
+  }),
 });
 
 export const SystemCreateInputSchema = z.object({
@@ -189,6 +217,13 @@ export const SystemUpdateInputSchema = z
     sortOrder: z.number().int().optional(),
     featuredOnHome: z.boolean().optional(),
     homeOrder: z.number().int().min(0).optional(),
+    // #69 — a repo-relationship key (null clears it) and the owner's answer.
+    // The database keeps these consistent and blocks publishing without a
+    // GRANTED answer where one is required (BR-1.11).
+    repoRelationship: z.string().nullable().optional(),
+    ownerPermission: OwnerPermissionEnum.exclude(["not_required"]).optional(),
+    ownerPermissionFrom: z.string().trim().min(1).nullable().optional(),
+    ownerPermissionNote: z.string().trim().nullable().optional(),
     caseStudyBody: z.string().optional(),
     repoUrl: z.string().url().nullable().optional(),
     liveUrl: z.string().url().nullable().optional(),
@@ -300,6 +335,10 @@ export const TimelineEntrySchema = z.object({
   description: z.string().nullable(),
   date: z.string().date(),
   tags: z.array(z.string()),
+  // #70 — only published entries are public; auto-drafted ones await approval.
+  contentStatus: ContentStatusEnum,
+  autoDrafted: z.boolean(),
+  systemId: z.string().nullable(),
 });
 
 export const CvGenerateInputSchema = z.object({
@@ -344,6 +383,9 @@ export const TimelineCreateInputSchema = z.object({
   date: z.string().date(),
   media: z.string().nullable().optional(),
   tags: z.array(z.string()).default([]),
+  // Omitted on create = published (an entry the admin writes is ready);
+  // omitted on update = unchanged. Approving an auto-drafted entry = "published".
+  contentStatus: ContentStatusEnum.optional(),
 });
 
 export const ExperienceEntrySchema = z.object({
@@ -369,17 +411,28 @@ export const EducationEntrySchema = z.object({
   id: z.string(),
   institution: z.string(),
   qualification: z.string(),
+  fieldOfStudy: z.string().nullable(),
   startDate: z.string().date(),
-  endDate: z.string().date().nullable(),
+  endDate: z.string().date().nullable(), // null = still studying
   honors: z.string().nullable(),
+  description: z.string().nullable(),
+  certificateUrl: z.string().url().nullable(),
+  contentStatus: ContentStatusEnum,
+  skills: z.array(z.string()),
 });
 
 export const EducationInputSchema = z.object({
-  institution: z.string().min(1),
-  qualification: z.string().min(1),
+  institution: z.string().trim().min(1),
+  qualification: z.string().trim().min(1),
+  fieldOfStudy: z.string().trim().min(1).nullable().optional(),
   startDate: z.string().date(),
   endDate: z.string().date().nullable().optional(),
   honors: z.string().nullable().optional(),
+  description: z.string().trim().nullable().optional(),
+  certificateUrl: z.string().url().startsWith("https://").nullable().optional(),
+  // Omitted on create = published; omitted on update = unchanged (#70).
+  contentStatus: ContentStatusEnum.optional(),
+  skillIds: z.array(z.string()).default([]),
 });
 
 export const SkillEntrySchema = z.object({

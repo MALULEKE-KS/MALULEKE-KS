@@ -25,10 +25,12 @@
 | BR-1.4 | `ANONYMIZED_ONLY` never exposes the org name unless `nameDisclosureApproved` | Serialization in `publishing.ts` | 🟡 | DB public view | F1.7 |
 | BR-1.5 | `contentStatus` fixed draft/published/archived | Prisma enum | ✅ | DB | — |
 | BR-1.6 | Sync-created systems land `DRAFT` + `needsCuration` | `github-sync.ts` (sync never run) | 🟡 | App + DB default | F1.6 / F4 |
-| BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Current code skips private repos; rule text not yet updated | ❌ | Rule text + DB flag + public view | F1.6 / F1.7 / F4 |
+| BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Rule text rewritten (#70); `System.repoPrivate`; the public serializer returns `repoUrl: null` + `repoPrivate: true` (tested). The sync still skips private repos until it is rebuilt | 🟡 | DB public view + sync | F1.7 / F4 |
 | BR-1.8 | `needsCuration` cleared on admin save | `PATCH /admin/systems/[id]` | ✅ | App | — |
 | BR-1.9 | `System` never hard-deleted | No DELETE route; trigger `System_br_1_9_no_delete` — enforced in the database too (F1.2, #60) | ✅ | DB trigger | — |
 | BR-1.10 | Publish evaluated inside one transaction, re-reading state | `db.$transaction` in `PATCH /admin/systems/[id]`; the BR-1.1 CHECK now makes the race moot | ✅ | App + DB | — |
+| BR-1.11 | A collaborated system is published only with the repo owner's recorded permission; relationships are a lookup | Trigger `System_br_1_11_owner_permission` (normalises the answer, stamps its time, refuses publishing without GRANTED), CHECK `System_br_1_11_answer_has_source`, trigger `RepoRelationship_br_1_11_recheck`; API answers 409 `OWNER_PERMISSION_REQUIRED` (#69); tested | ✅ | DB triggers + App | — |
+| BR-1.12 | A journey entry about a system is public only while that system is published; first ships are auto-drafted, never auto-published | Trigger `System_status_history` drafts the entry (DRAFT, one per system — partial unique index); public reads filter on `PUBLISHED_TIMELINE_WHERE` (#70); tested | 🟡 | DB public view | F1.7 |
 
 ## 2. Inquiries (BR-2.x)
 
@@ -71,7 +73,7 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-5.1 / 5.4 | No event before consent; applies to Vercel Analytics too | No events are collected yet; no consent banner | 🟡 (vacuously true) | App — required before any analytics ships | F5 |
-| BR-5.2 | `Inquiry`/`Event` anonymized or purged after 24 months; scheduled | **Not implemented** (scheduler is a `TODO`) | ❌ | DB function + scheduled job + `JobRun` log | F1.6 / F4 |
+| BR-5.2 | `Inquiry`/`Event` anonymized or purged after 24 months; scheduled | **Not implemented** — `JobRun` (run history + database lock) is ready (#70); the job itself is F4 | ❌ | DB function + scheduled job + `JobRun` log | F1.6 / F4 |
 | BR-5.3 | Public stats are curated, point-in-time | Home counts come from curated `System` rows | ✅ | App | — |
 | BR-5.5 | Deletion right honoured manually; stated on confirmation | Contact confirmation states the removal route (email) — #58 | ✅ | App copy | — |
 | BR-2.4 (privacy) | IP kept only as long as the window needs | Keys hold a keyed hash (HMAC, HKDF subkey) of the IP, never the raw address (#64); expired rows not yet pruned | 🟡 | Hashed keys ✅ · prune job → F4 | F4 |
@@ -103,7 +105,7 @@
 | New tools/lenses/sections ship disabled | EXT-1, BR-4.4 | `Flag.enabled` defaults false | ✅ | DB default | — |
 | Versioned API `/api/v1` | EXT-1 | All routes under `/api/v1` | ✅ | App | — |
 | Nothing hardcoded unless that's the recommended practice — tunables are data | Owner directive 2026-09-19 | `PlatformSetting` table + typed registry with bounds (#67): inquiry and CV rate limits are read from it; retention and review SLA are stored there, read once their jobs exist (F2/F4); status keys are gone from queries. Laws stay in code on purpose: challenge TTL, message bounds, 2FA and lockout policy | 🟡 | DB settings table, admin-editable | F2/F4 (consumers) |
-| Nothing about the owner hardcoded | Owner directive 2026-09-18 | Name, role, links, mission, principles in `lib/content/*` | ❌ | DB `Profile`, `Achievement`, content | F1.6 |
+| Nothing about the owner hardcoded | Owner directive 2026-09-18 | `Profile` (one row, CHECK), `ProfileLink`, `Achievement` hold the owner's data, moved from `lib/content/sheets.ts` using only what the repo already stated (#70). Pages still read the constants until the frontend switches over | 🟡 | DB tables ✅ · pages read them | F5 |
 | Pre-launch: sitemap, OG images, JSON-LD, canonical URLs | Constitution §9 | Not verified | ❌/? | App | F5 |
 | Pre-launch: static CV PDF hosted independently | Constitution §9 | Not verified | ❌/? | Ops | F4 |
 | Backup / restore drill | Constitution §11 Phase 2 | Neon point-in-time recovery exists; never drilled | 🟡 | Ops runbook + drill | F4 |
@@ -118,6 +120,12 @@
 | Request context in the audit log can't be read back | IP, user agent and attempted emails stored as keyed hashes only (#62) | ✅ |
 | The admin can change their own password while logged in | Owner request 2026-09-19 — backend endpoint (current password + 2FA, ends older sessions) not built | ❌ → F3 |
 | An admin account exists in production | Created 2026-09-19 by the owner in their own terminal; verified read-only (2FA on, codes hashed) | ✅ |
+| Every status change of a system is on record, and can't be rewritten | Trigger `System_status_history` writes `SystemStatusChange` with the stage at the time; append-only triggers; history that predates it is marked `backfilled` and never read as a date (#70) | ✅ |
+| Shipped dates and pace are computed, not typed | View `SystemPace` over real transitions (#70) | ✅ |
+| Every skill shows what proves it | View `SkillEvidence`: published systems (BR-1.1), roles and published education per skill (#70) | ✅ |
+| Education appears only when the admin shows it, with proof links https-only | `Education.contentStatus`; `/cv` and the generated CV read `PUBLISHED_EDUCATION_WHERE`; CHECKs `Education_certificateUrl_format`, `Education_required_present` (#70) | ✅ |
+| A scheduled job never runs twice at once, and its history can't be edited | `JobRun`: partial unique index (one RUNNING per job), CHECKs (finished ⇔ finishedAt, failed ⇒ error), finished runs immutable (#70) | ✅ |
+| GitHub metadata and weekly activity per system | Columns + `SystemActivityWeek` with format/bound CHECKs (#70); filled by the sync in F4 | 🟡 → F4 |
 
 ## 9. Claims the public site makes
 
@@ -126,7 +134,7 @@
 | Footer, home contact band, contact confirmation | "Reviewed within 48 hours" (owner chose to keep BR-2.2 as written — #58) | Copy now matches BR-2.2; the review SLA itself is surfaced to the admin in F2 (BR-2.2 row) | ✅ copy / ❌ SLA → F2 |
 | Home hero | "Live data, as of …" | Counts computed per request | ✅ |
 | Home stack card | "Type-checked end to end", "Tested in CI on every change", "Deployed on Vercel from main" | `tsc --noEmit` in CI; CI on every PR; Vercel Git integration | ✅ |
-| Home pipeline | "N shipped / N in the queue" | Status keys hardcoded; "in progress" not counted separately | 🟡 → F1.6 |
+| Home pipeline | "N shipped / N in progress / N queued" | Counted by each status's pipeline stage, archived excluded (#52) | ✅ |
 
 ---
 

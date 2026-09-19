@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { EducationInputSchema } from "@/lib/schemas";
-import { toEducationEntry } from "@/lib/rules/cv";
+import { educationWithSkills, toEducationEntry } from "@/lib/rules/cv";
+import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -24,15 +25,26 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const education = await db.education.update({
-      where: { id },
-      data: {
-        institution: parsed.data.institution,
-        qualification: parsed.data.qualification,
-        startDate: new Date(parsed.data.startDate),
-        endDate: parsed.data.endDate ? new Date(parsed.data.endDate) : null,
-        honors: parsed.data.honors ?? null,
-      },
+    const education = await db.$transaction(async (tx) => {
+      // Replace the skill links wholesale, as Experience does.
+      await tx.skillOnEducation.deleteMany({ where: { educationId: id } });
+      return tx.education.update({
+        where: { id },
+        data: {
+          institution: parsed.data.institution,
+          qualification: parsed.data.qualification,
+          startDate: new Date(parsed.data.startDate),
+          endDate: parsed.data.endDate ? new Date(parsed.data.endDate) : null,
+          honors: parsed.data.honors ?? null,
+          fieldOfStudy: parsed.data.fieldOfStudy ?? null,
+          description: parsed.data.description ?? null,
+          certificateUrl: parsed.data.certificateUrl ?? null,
+          // Showing or hiding is the admin's call (#70).
+          ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
+          skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
+        },
+        ...educationWithSkills,
+      });
     });
 
     await logActivity({
@@ -40,7 +52,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       action: "education.update",
       entityType: "Education",
       entityId: id,
-      after: { institution: education.institution, qualification: education.qualification },
+      after: {
+        institution: education.institution,
+        qualification: education.qualification,
+        contentStatus: education.contentStatus,
+      },
     });
 
     return NextResponse.json(toEducationEntry(education));

@@ -166,6 +166,9 @@ paths:
       description: >
         BR-1.1 is enforced here: a request that sets contentStatus=published
         while clientVisibility != PUBLIC and clientApproved=false returns 409.
+        BR-1.11: when the system's repo relationship requires the repo owner's
+        permission, publishing without a granted answer returns 409
+        OWNER_PERMISSION_REQUIRED. The database enforces both.
       security: [{ adminSession: [] }]
       parameters:
         - name: id
@@ -185,8 +188,11 @@ paths:
               schema: { $ref: "#/components/schemas/SystemAdmin" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "409":
-          description: Publishing blocked — client approval required (BR-1.1)
+          description: |
+            Publishing blocked. CLIENT_APPROVAL_REQUIRED — client approval required (BR-1.1).
+            OWNER_PERMISSION_REQUIRED — a collaborated system needs the repo owner's granted permission (BR-1.11).
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -295,7 +301,7 @@ paths:
       summary: Read lookup values for a given type
       description: >
         One contract for every open dimension in the system — Status, Domain,
-        InquiryType, MilestoneType, SkillCategory. A new lookup type added
+        InquiryType, MilestoneType, SkillCategory, RepoRelationship. A new lookup type added
         under EXT-1 needs no new endpoint, only a new value of {type}.
       parameters:
         - name: type
@@ -303,7 +309,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [status, domain, inquiry-type, milestone-type, skill-category]
+            enum: [status, domain, inquiry-type, milestone-type, skill-category, repo-relationship]
         - name: includeInactive
           in: query
           schema: { type: boolean, default: false }
@@ -338,9 +344,11 @@ paths:
                 label: { type: string }
                 stage: { $ref: "#/components/schemas/PipelineStage" }
                 colorToken: { $ref: "#/components/schemas/StatusColorToken" }
+                requiresOwnerPermission: { type: boolean, description: "type=repo-relationship only (BR-1.11)" }
+                autoDraftOnShip: { type: boolean, description: "type=milestone-type only; choosing one hands the flag over from any other type" }
       responses:
         "201":
-          description: Lookup value created. For type=status, stage defaults to queued and colorToken to signal-planned when omitted; both are ignored for other types.
+          description: Lookup value created. For type=status, stage defaults to queued and colorToken to signal-planned when omitted. Extras a type doesn't have are refused with 400.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/LookupValue" }
@@ -354,8 +362,8 @@ paths:
   /lookups/{type}/{id}:
     patch:
       tags: [Lookups]
-      summary: Edit an existing lookup value (label; for status also stage and colour)
-      description: The key is immutable (BR-8.3 keeps keys unique and stable). Changing a status's stage moves every system in that status between the shipped / in-progress / queued counts with no code change (EXT-1).
+      summary: Edit an existing lookup value (label and its type's extras)
+      description: The key is immutable (BR-8.3 keeps keys unique and stable). Changing a status's stage moves every system in that status between the shipped / in-progress / queued counts with no code change (EXT-1). Making a repo relationship require the owner's permission re-checks every system using it (BR-1.11).
       security: [{ adminSession: [] }]
       parameters:
         - name: type
@@ -380,6 +388,11 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: OWNER_PERMISSION_REQUIRED — a published system uses this relationship without the owner's granted permission (BR-1.11); unpublish it or record the permission first.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /lookups/{type}/{id}/deprecate:
     post:
@@ -934,6 +947,8 @@ components:
                 - CHALLENGE_EXPIRED
                 - CHALLENGE_INVALID
                 - LOOKUP_KEY_DEPRECATED
+                - LOOKUP_KEY_EXISTS
+                - OWNER_PERMISSION_REQUIRED
                 - INTERNAL_ERROR
               description: Closed set, kept in lockstep with lib/schemas.ts ErrorCodeEnum — never a freeform string.
             message: { type: string }
@@ -955,6 +970,8 @@ components:
         active: { type: boolean }
         stage: { $ref: "#/components/schemas/PipelineStage", description: "type=status only" }
         colorToken: { $ref: "#/components/schemas/StatusColorToken", description: "type=status only" }
+        requiresOwnerPermission: { type: boolean, description: "type=repo-relationship only — publishing needs the repo owner's permission (BR-1.11)" }
+        autoDraftOnShip: { type: boolean, description: "type=milestone-type only — the type a system's first ship is auto-drafted as" }
 
     PipelineStage:
       type: string
@@ -989,6 +1006,13 @@ components:
         label: { type: string, minLength: 1 }
         stage: { $ref: "#/components/schemas/PipelineStage" }
         colorToken: { $ref: "#/components/schemas/StatusColorToken" }
+        requiresOwnerPermission: { type: boolean }
+        autoDraftOnShip: { type: boolean }
+
+    OwnerPermission:
+      type: string
+      enum: [not_required, not_requested, requested, granted, declined]
+      description: The repo owner's answer for a collaborated system (BR-1.11). A fixed control state; the database keeps it consistent with the repo relationship.
 
     SystemPublic:
       type: object
@@ -1001,11 +1025,12 @@ components:
         statusColorToken: { type: string, description: "CSS custom-property/Tailwind token name (e.g. signal-finished) — status color is data (EXT-1), not a client-side hardcoded map" }
         domain: { type: string, nullable: true }
         description: { type: string }
-        repoUrl: { type: string, nullable: true, description: "Null when clientVisibility = NDA_RESTRICTED (BR-1.3)" }
+        repoUrl: { type: string, nullable: true, description: "Null when clientVisibility = NDA_RESTRICTED (BR-1.3) or the repo is private (BR-1.7)" }
         liveUrl: { type: string, nullable: true }
         screenshotUrl: { type: string, nullable: true, description: "Homepage preview image; renders a technical placeholder when absent" }
         techStack: { type: array, items: { type: string } }
         isFlagship: { type: boolean }
+        repoPrivate: { type: boolean, description: "BR-1.7 — shown as a private repository; access is available on request" }
 
     SystemPublicDetailed:
       allOf:
@@ -1046,6 +1071,22 @@ components:
             sortOrder: { type: integer }
             featuredOnHome: { type: boolean, description: "Admin-chosen for the homepage (published systems only are shown)" }
             homeOrder: { type: integer, description: "Order among homepage-featured systems, ascending" }
+            repoRelationship: { type: string, nullable: true, description: "RepoRelationship key (e.g. owner, collaborator)" }
+            ownerPermission: { $ref: "#/components/schemas/OwnerPermission" }
+            ownerPermissionFrom: { type: string, nullable: true, description: "Who granted or declined — the repo owner's name or GitHub login" }
+            ownerPermissionAt: { type: string, format: date-time, nullable: true, description: "Set by the database when the answer changes" }
+            ownerPermissionNote: { type: string, nullable: true }
+            github:
+              type: object
+              description: Sourced from GitHub by the sync; null values until synced
+              properties:
+                fullName: { type: string, nullable: true }
+                ownerLogin: { type: string, nullable: true }
+                pushedAt: { type: string, format: date-time, nullable: true }
+                languages: { type: object, nullable: true, additionalProperties: { type: integer }, description: "Bytes per language" }
+                topics: { type: array, items: { type: string } }
+                stars: { type: integer, nullable: true }
+                syncedAt: { type: string, format: date-time, nullable: true }
 
     SystemCreateInput:
       type: object
@@ -1072,7 +1113,11 @@ components:
         isFlagship: { type: boolean }
         sortOrder: { type: integer }
         featuredOnHome: { type: boolean }
-        homeOrder: { type: integer }
+        homeOrder: { type: integer, minimum: 0 }
+        repoRelationship: { type: string, nullable: true, description: "A RepoRelationship key; null clears it" }
+        ownerPermission: { type: string, enum: [not_requested, requested, granted, declined] }
+        ownerPermissionFrom: { type: string, nullable: true, description: "Required (by the database) when the answer is granted or declined" }
+        ownerPermissionNote: { type: string, nullable: true }
         caseStudyBody: { type: string }
         repoUrl: { type: string, nullable: true }
         liveUrl: { type: string, nullable: true }
@@ -1118,6 +1163,9 @@ components:
         description: { type: string, nullable: true }
         date: { type: string, format: date }
         tags: { type: array, items: { type: string } }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Public reads return published entries only" }
+        autoDrafted: { type: boolean, description: "Drafted by the database when a system first shipped; awaits the admin's approval" }
+        systemId: { type: string, nullable: true }
 
     TimelineCreateInput:
       type: object
@@ -1129,6 +1177,7 @@ components:
         date: { type: string, format: date }
         media: { type: string, nullable: true }
         tags: { type: array, items: { type: string }, default: [] }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged. Publishing an auto-drafted entry approves it." }
 
     ExperienceEntry:
       type: object
@@ -1158,9 +1207,14 @@ components:
         id: { type: string }
         institution: { type: string }
         qualification: { type: string }
+        fieldOfStudy: { type: string, nullable: true }
         startDate: { type: string, format: date }
-        endDate: { type: string, format: date, nullable: true }
+        endDate: { type: string, format: date, nullable: true, description: "null = still studying" }
         honors: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        certificateUrl: { type: string, nullable: true, description: "https only (database CHECK)" }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Only published entries appear on /cv and in the generated CV" }
+        skills: { type: array, items: { type: string }, description: "Skill names this qualification taught" }
 
     EducationInput:
       type: object
@@ -1168,9 +1222,14 @@ components:
       properties:
         institution: { type: string, minLength: 1 }
         qualification: { type: string, minLength: 1 }
+        fieldOfStudy: { type: string, nullable: true }
         startDate: { type: string, format: date }
         endDate: { type: string, format: date, nullable: true }
         honors: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        certificateUrl: { type: string, nullable: true, pattern: "^https://" }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
+        skillIds: { type: array, items: { type: string }, default: [], description: "Replaces the entry's skill links" }
 
     SkillEntry:
       type: object

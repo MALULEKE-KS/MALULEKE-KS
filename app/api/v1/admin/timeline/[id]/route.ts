@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
-import { timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
+import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -35,6 +35,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         date: new Date(parsed.data.date),
         media: parsed.data.media ?? null,
         tags: parsed.data.tags,
+        // Approving an auto-drafted entry is publishing it (#70).
+        ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
       },
       ...timelineWithMilestoneType,
     });
@@ -44,7 +46,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       action: "timeline.update",
       entityType: "Timeline",
       entityId: id,
-      after: { title: entry.title },
+      after: { title: entry.title, contentStatus: entry.contentStatus },
     });
 
     return NextResponse.json(toTimelineEntry(entry));

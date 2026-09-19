@@ -67,7 +67,11 @@ function publicOrganizationName(system: SystemWithPublicRelations): string {
 // regardless of contentStatus. Enforced here, at serialization, so a future
 // new endpoint reusing this function can't accidentally leak it by skipping
 // a check the route author didn't know to add.
+//
+// BR-1.7 — a private repo is never linked publicly either: the public shape
+// says repoPrivate instead, and access is available on request.
 function publicRepoUrl(system: SystemWithPublicRelations): string | null {
+  if (system.repoPrivate) return null;
   return system.clientVisibility === "NDA_RESTRICTED" ? null : system.repoUrl;
 }
 
@@ -102,6 +106,7 @@ export function toPublicSystem(system: SystemWithPublicRelations) {
     screenshotUrl: publicScreenshotUrl(system),
     techStack: system.techStack,
     isFlagship: system.isFlagship,
+    repoPrivate: system.repoPrivate,
   };
 }
 
@@ -131,6 +136,7 @@ const systemWithAdminRelations = Prisma.validator<Prisma.SystemDefaultArgs>()({
     status: true,
     domain: true,
     impacts: { orderBy: { sortOrder: "asc" } },
+    repoRelationship: true,
     testimonials: true, // admin sees all testimonials, not just hasPermission=true (BR-6.1 is a public-surface rule)
   },
 });
@@ -158,6 +164,21 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
     sortOrder: system.sortOrder,
     featuredOnHome: system.featuredOnHome,
     homeOrder: system.homeOrder,
+    repoRelationship: system.repoRelationship?.key ?? null,
+    ownerPermission: system.ownerPermission.toLowerCase(),
+    ownerPermissionFrom: system.ownerPermissionFrom,
+    ownerPermissionAt: system.ownerPermissionAt?.toISOString() ?? null,
+    ownerPermissionNote: system.ownerPermissionNote,
+    github: {
+      fullName: system.githubFullName,
+      ownerLogin: system.githubOwnerLogin,
+      pushedAt: system.githubPushedAt?.toISOString() ?? null,
+      languages: (system.githubLanguages as Record<string, number> | null) ?? null,
+      topics: system.githubTopics,
+      stars: system.githubStars,
+      syncedAt: system.githubSyncedAt?.toISOString() ?? null,
+    },
+    repoPrivate: system.repoPrivate,
     caseStudyBody: system.caseStudyBody ?? "",
     impacts: system.impacts.map((i) => ({ label: i.label, value: i.value })),
     testimonials: system.testimonials.map((t) => ({

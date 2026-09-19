@@ -5,7 +5,7 @@
 // See docs/PAGE-SPECIFICATIONS.md ("/admin/cv").
 
 import { db } from "@/lib/db";
-import { experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry } from "@/lib/rules/cv";
+import { educationWithSkills, experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry } from "@/lib/rules/cv";
 import { CvManager } from "./_components/CvManager";
 
 // Auth-gated and reads live CV data — must never be statically prerendered
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminCvPage() {
   const [experienceRows, educationRows, skillRows, categories, allSkills] = await Promise.all([
     db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
-    db.education.findMany({ orderBy: { startDate: "desc" } }),
+    db.education.findMany({ ...educationWithSkills, orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
     db.skillCategory.findMany({ where: { active: true }, orderBy: { label: "asc" } }),
     db.skill.findMany({ orderBy: { name: "asc" } }),
