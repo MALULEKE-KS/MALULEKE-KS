@@ -190,6 +190,9 @@ describe("PATCH /api/v1/admin/inquiries/[id]", () => {
       where: { adminUserId: adminId, entityType: "Inquiry", entityId: inquiry.id },
     });
     expect(log).not.toBeNull();
-    expect(log?.action).toBe("inquiry.status_update");
+    // Logged by the database (F2.1): only the changed column, never the PII.
+    expect(log?.action).toBe("inquiry.update");
+    expect(log?.before).toEqual({ status: "NEW" });
+    expect(log?.after).toEqual({ status: "REVIEWED" });
   });
 });

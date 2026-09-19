@@ -3,34 +3,22 @@
 
 import { NextResponse } from "next/server";
 import { isLookupType, deprecateLookupValue } from "@/lib/rules/lookups";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function POST(request: Request, { params }: { params: Promise<{ type: string; id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin<{ type: string; id: string }>(async (request, { write }, { params }) => {
   const { type, id } = await params;
   if (!isLookupType(type)) {
     return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
   }
 
-  const value = await deprecateLookupValue(type, id);
+  const value = await write((tx) => deprecateLookupValue(tx, type, id));
   if (!value) {
     return errorResponse("NOT_FOUND", "Lookup value not found", 404);
   }
 
-  await logActivity({
-    adminUserId,
-    action: "lookup.deprecate",
-    entityType: type,
-    entityId: id,
-    after: { active: false },
-  });
-
   return NextResponse.json(value);
-}
+});

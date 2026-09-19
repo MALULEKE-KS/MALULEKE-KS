@@ -6,9 +6,8 @@
 // never deleted, and approving swaps the public value atomically
 // (propose_metric_snapshot / approve_metric_snapshot, migration 20260919070000).
 
-import type { MetricSource } from "@prisma/client";
+import type { MetricSource, Prisma } from "@prisma/client";
 import { db, dbPublic } from "@/lib/db";
-import { logActivity } from "@/lib/auth/activity-log";
 import { METRIC_COMPUTATIONS, isComputedMetric } from "@/lib/metrics/registry";
 
 /** Propose one value. Returns the pending snapshot id, or null when it already is the approved value. */
@@ -35,31 +34,19 @@ export async function proposeComputedMetrics(): Promise<{ proposed: string[]; un
   return { proposed, unchanged };
 }
 
-/** The admin approves a pending value; it becomes the public one. Audited. */
-export async function approveMetricSnapshot(snapshotId: string, adminUserId: string): Promise<void> {
-  await db.$executeRaw`SELECT approve_metric_snapshot(${snapshotId}, ${adminUserId})`;
-  const snapshot = await db.metricSnapshot.findUniqueOrThrow({ where: { id: snapshotId } });
-  await logActivity({
-    adminUserId,
-    action: "metric.approve",
-    entityType: "MetricSnapshot",
-    entityId: snapshotId,
-    after: { metricKey: snapshot.metricKey, value: snapshot.value },
-  });
+// Decisions run inside the admin's audited transaction (lib/audit.ts): the
+// database logs each snapshot change, attributed to that admin (F2.1).
+
+/** The admin approves a pending value; it becomes the public one. */
+export async function approveMetricSnapshot(tx: Prisma.TransactionClient, snapshotId: string, adminUserId: string): Promise<void> {
+  await tx.$executeRaw`SELECT approve_metric_snapshot(${snapshotId}, ${adminUserId})`;
 }
 
-/** The admin rejects a pending value; the public one is unchanged. Audited. */
-export async function rejectMetricSnapshot(snapshotId: string, adminUserId: string): Promise<void> {
-  const snapshot = await db.metricSnapshot.update({
+/** The admin rejects a pending value; the public one is unchanged. */
+export async function rejectMetricSnapshot(tx: Prisma.TransactionClient, snapshotId: string, adminUserId: string): Promise<void> {
+  await tx.metricSnapshot.update({
     where: { id: snapshotId },
     data: { status: "REJECTED", decidedById: adminUserId },
-  });
-  await logActivity({
-    adminUserId,
-    action: "metric.reject",
-    entityType: "MetricSnapshot",
-    entityId: snapshotId,
-    after: { metricKey: snapshot.metricKey, value: snapshot.value },
   });
 }
 

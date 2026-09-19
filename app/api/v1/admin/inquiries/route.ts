@@ -4,7 +4,7 @@
 import { NextResponse } from "next/server";
 import type { InquiryStatus } from "@prisma/client";
 import { db } from "@/lib/db";
-import { getSessionAdminId } from "@/lib/auth/session";
+import { withAdmin } from "@/lib/auth/with-admin";
 import { toAdminInquiry } from "@/lib/rules/inquiries";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
@@ -18,10 +18,7 @@ const STATUS_QUERY_MAP: Record<string, InquiryStatus> = {
   closed: "CLOSED",
 };
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const GET = withAdmin(async (request, _admin) => {
   const { searchParams } = new URL(request.url);
   const statusParam = searchParams.get("status");
   const inquiryTypeParam = searchParams.get("inquiryType");
@@ -43,4 +40,4 @@ export async function GET(request: Request) {
   });
 
   return NextResponse.json({ data: inquiries.map(toAdminInquiry) });
-}
+});

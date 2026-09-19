@@ -3,16 +3,7 @@
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
-import { getSessionAdminId } from "@/lib/auth/session";
+import { withAdmin } from "@/lib/auth/with-admin";
 import { listSettings } from "@/lib/settings";
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) {
-    return NextResponse.json(
-      { error: { code: "UNAUTHORIZED", message: "Session expired or invalid.", details: null } },
-      { status: 401 },
-    );
-  }
-  return NextResponse.json(await listSettings());
-}
+export const GET = withAdmin(async () => NextResponse.json(await listSettings()));

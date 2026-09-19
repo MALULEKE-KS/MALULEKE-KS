@@ -3,19 +3,14 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { FlagUpdateInputSchema } from "@/lib/schemas";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ key: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ key: string }>(async (request, { write }, { params }) => {
   const { key } = await params;
   const body = await request.json().catch(() => null);
   const parsed = FlagUpdateInputSchema.safeParse(body);
@@ -24,15 +19,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ke
   }
 
   try {
-    const flag = await db.flag.update({ where: { key }, data: { enabled: parsed.data.enabled } });
-
-    await logActivity({
-      adminUserId,
-      action: "flag.update",
-      entityType: "Flag",
-      entityId: flag.id,
-      after: { key: flag.key, enabled: flag.enabled },
-    });
+    const flag = await write((tx) => tx.flag.update({ where: { key }, data: { enabled: parsed.data.enabled } }));
 
     return NextResponse.json(flag);
   } catch (err) {
@@ -41,4 +28,4 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ke
     }
     throw err;
   }
-}
+});

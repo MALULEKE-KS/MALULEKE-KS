@@ -9,17 +9,13 @@ import { NextResponse } from "next/server";
 import { isLookupType, unsupportedExtras, updateLookupValue } from "@/lib/rules/lookups";
 import { ruleViolation } from "@/lib/db-errors";
 import { LookupUpdateInputSchema } from "@/lib/schemas";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ type: string; id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ type: string; id: string }>(async (request, { write }, { params }) => {
   const { type, id } = await params;
   if (!isLookupType(type)) {
     return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
@@ -37,7 +33,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ty
 
   let result;
   try {
-    result = await updateLookupValue(type, id, parsed.data);
+    result = await write((tx) => updateLookupValue(tx, type, id, parsed.data));
   } catch (err) {
     const rule = ruleViolation(err, "BR-1.11");
     if (rule) return errorResponse("OWNER_PERMISSION_REQUIRED", rule, 409);
@@ -45,15 +41,5 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ty
   }
   if (!result) return errorResponse("NOT_FOUND", "Lookup value not found", 404);
 
-  await logActivity({
-    adminUserId,
-    action: "lookup.update",
-    entityType: type,
-    entityId: id,
-    before: result.before,
-    after: result.after,
-    request,
-  });
-
   return NextResponse.json(result.after);
-}
+});

@@ -6,17 +6,13 @@ import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { ProfileLinkUpdateInputSchema } from "@/lib/schemas";
 import { checkViolationMessage, toProfileLink } from "@/lib/rules/profile";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const parsed = ProfileLinkUpdateInputSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -27,16 +23,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!before) return errorResponse("NOT_FOUND", "Link not found", 404);
 
   try {
-    const link = await db.profileLink.update({ where: { id }, data: parsed.data });
-    await logActivity({
-      adminUserId,
-      action: "profile.link_update",
-      entityType: "ProfileLink",
-      entityId: id,
-      before: toProfileLink(before),
-      after: toProfileLink(link),
-      request,
-    });
+    const link = await write((tx) => tx.profileLink.update({ where: { id }, data: parsed.data }));
     return NextResponse.json(toProfileLink(link));
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
@@ -46,24 +33,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (message) return errorResponse("VALIDATION_ERROR", message, 400);
     throw err;
   }
-}
+});
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const DELETE = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const before = await db.profileLink.findUnique({ where: { id } });
   if (!before) return errorResponse("NOT_FOUND", "Link not found", 404);
 
-  await db.profileLink.delete({ where: { id } });
-  await logActivity({
-    adminUserId,
-    action: "profile.link_delete",
-    entityType: "ProfileLink",
-    entityId: id,
-    before: toProfileLink(before),
-    request,
-  });
+  await write((tx) => tx.profileLink.delete({ where: { id } }));
   return new NextResponse(null, { status: 204 });
-}
+});

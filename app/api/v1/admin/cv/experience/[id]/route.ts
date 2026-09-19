@@ -2,21 +2,16 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { ExperienceInputSchema } from "@/lib/schemas";
 import { experienceWithSkills, toExperienceEntry } from "@/lib/rules/cv";
 import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = ExperienceInputSchema.safeParse(body);
@@ -25,7 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const experience = await db.$transaction(async (tx) => {
+    const experience = await write(async (tx) => {
       // Replace the skill links wholesale — simpler and less error-prone
       // than diffing add/remove sets for a small per-entry list.
       await tx.skillOnExperience.deleteMany({ where: { experienceId: id } });
@@ -47,14 +42,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       });
     });
 
-    await logActivity({
-      adminUserId,
-      action: "experience.update",
-      entityType: "Experience",
-      entityId: id,
-      after: { title: experience.title, organization: experience.organization },
-    });
-
     return NextResponse.json(toExperienceEntry(experience));
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
@@ -62,17 +49,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     throw err;
   }
-}
+});
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const DELETE = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
 
   try {
-    await db.experience.delete({ where: { id } });
-    await logActivity({ adminUserId, action: "experience.delete", entityType: "Experience", entityId: id });
+    await write((tx) => tx.experience.delete({ where: { id } }));
     return new NextResponse(null, { status: 204 });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
@@ -80,4 +63,4 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
     throw err;
   }
-}
+});

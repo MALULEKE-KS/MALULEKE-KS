@@ -7,16 +7,13 @@ import { NextResponse } from "next/server";
 import { CvCheckQuerySchema } from "@/lib/schemas";
 import { buildCvModel } from "@/lib/cv/model";
 import { checkCv } from "@/lib/cv/check";
-import { getSessionAdminId } from "@/lib/auth/session";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const GET = withAdmin(async (request, _admin) => {
   const url = new URL(request.url);
   const parsed = CvCheckQuerySchema.safeParse({ targetRole: url.searchParams.get("targetRole") ?? undefined });
   if (!parsed.success) {
@@ -25,4 +22,4 @@ export async function GET(request: Request) {
 
   const model = await buildCvModel({ targetRole: parsed.data.targetRole || null, siteUrl: url.origin });
   return NextResponse.json({ ...checkCv(model), preview: model });
-}
+});

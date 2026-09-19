@@ -141,7 +141,7 @@ describe("status lookups carry a pipeline stage (#52)", () => {
     expect((await getHomepageStats()).systemsShipped).toBe(before.systemsShipped + 1);
 
     const audit = await db.activityLog.findFirst({
-      where: { action: "lookup.update", entityId: status.id },
+      where: { action: "status.update", entityId: status.id, adminUserId: adminId },
     });
     expect(audit).not.toBeNull();
   });
@@ -259,7 +259,8 @@ describe("platform settings (#67)", () => {
     expect(await getSetting("data.retentionMonths")).toBe(18);
 
     const audit = await db.activityLog.findFirst({
-      where: { action: "setting.update", entityId: "data.retentionMonths", adminUserId: adminId },
+      // First save of a setting is an insert (upsert) — logged as .create; later ones as .update.
+      where: { action: { startsWith: "platformsetting." }, entityId: "data.retentionMonths", adminUserId: adminId },
     });
     expect(audit).not.toBeNull();
   });

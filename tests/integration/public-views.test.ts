@@ -10,7 +10,20 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
 import { getFilterOrganizations, getPublicSystemBySlug, getPublicSystems } from "@/lib/queries/systems";
 import { searchPublic } from "@/lib/queries/search";
-import { approveMetricSnapshot, getPublicMetrics, proposeComputedMetrics, proposeMetric, rejectMetricSnapshot } from "@/lib/metrics";
+import {
+  approveMetricSnapshot as approveIn,
+  getPublicMetrics,
+  proposeComputedMetrics,
+  proposeMetric,
+  rejectMetricSnapshot as rejectIn,
+} from "@/lib/metrics";
+import { withActor } from "@/lib/audit";
+
+// Admin decisions run in the admin's audited transaction, as the admin API will (F2.2).
+const approveMetricSnapshot = (id: string, admin: string) =>
+  withActor({ kind: "admin", adminUserId: admin }, (tx) => approveIn(tx, id, admin));
+const rejectMetricSnapshot = (id: string, admin: string) =>
+  withActor({ kind: "admin", adminUserId: admin }, (tx) => rejectIn(tx, id, admin));
 
 const RUN = `pv${Date.now().toString(36)}`;
 
@@ -253,8 +266,11 @@ describe("curated numbers (approved feature 6, BR-5.3)", () => {
     expect(history.map((h) => h.status)).toEqual(["SUPERSEDED", "APPROVED"]);
     expect(history.every((h) => h.decidedAt !== null && h.decidedById === adminId)).toBe(true);
 
-    const audit = await db.activityLog.count({ where: { action: "metric.approve", adminUserId: adminId } });
-    expect(audit).toBe(2);
+    // The database logged both approvals, attributed to the admin (F2.1).
+    const approvals = await db.activityLog.count({
+      where: { action: "metricsnapshot.update", adminUserId: adminId, after: { path: ["status"], equals: "APPROVED" } },
+    });
+    expect(approvals).toBe(2);
   });
 
   it("a newer proposal replaces a pending one; a rejected value never goes public", async () => {

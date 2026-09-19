@@ -1,20 +1,17 @@
 // GET /api/v1/admin/activity-log — read-only, most recent first (BR-3.4).
 // See openapi-contract.yaml.
 
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { PaginationQuerySchema } from "@/lib/schemas";
-import { getSessionAdminId } from "@/lib/auth/session";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: NextRequest) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
-  const searchParams = request.nextUrl.searchParams;
+export const GET = withAdmin(async (request, _admin) => {
+  const { searchParams } = new URL(request.url);
   const entityType = searchParams.get("entityType");
   const { page, pageSize } = PaginationQuerySchema.parse({
     page: searchParams.get("page") ?? undefined,
@@ -51,4 +48,4 @@ export async function GET(request: NextRequest) {
     })),
     meta: { page, pageSize, total },
   });
-}
+});
