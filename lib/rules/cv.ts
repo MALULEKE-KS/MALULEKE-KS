@@ -5,8 +5,18 @@
 // carries no client-confidentiality dimension) and the BR-7.2 supersede
 // helper used by POST /cv/generate.
 
-import { Prisma } from "@prisma/client";
+import { Prisma, ContentStatus } from "@prisma/client";
 import { db } from "@/lib/db";
+
+// Only PUBLISHED education appears on /cv and in the generated CV (#70) —
+// the admin decides what's shown. Every public read filters on this.
+export const PUBLISHED_EDUCATION_WHERE = { contentStatus: ContentStatus.PUBLISHED } as const;
+
+const educationWithSkills = Prisma.validator<Prisma.EducationDefaultArgs>()({
+  include: { skills: { include: { skill: true } } },
+});
+export type EducationWithSkills = Prisma.EducationGetPayload<typeof educationWithSkills>;
+export { educationWithSkills };
 
 const experienceWithSkills = Prisma.validator<Prisma.ExperienceDefaultArgs>()({
   include: { skills: { include: { skill: true } } },
@@ -36,21 +46,20 @@ export function toExperienceEntry(experience: ExperienceWithSkills) {
   };
 }
 
-export function toEducationEntry(education: {
-  id: string;
-  institution: string;
-  qualification: string;
-  startDate: Date;
-  endDate: Date | null;
-  honors: string | null;
-}) {
+export function toEducationEntry(education: EducationWithSkills) {
   return {
     id: education.id,
     institution: education.institution,
     qualification: education.qualification,
+    fieldOfStudy: education.fieldOfStudy,
     startDate: toDateOnly(education.startDate),
+    // null = still studying
     endDate: education.endDate ? toDateOnly(education.endDate) : null,
     honors: education.honors,
+    description: education.description,
+    certificateUrl: education.certificateUrl,
+    contentStatus: education.contentStatus.toLowerCase() as "draft" | "published" | "archived",
+    skills: education.skills.map((s) => s.skill.name),
   };
 }
 

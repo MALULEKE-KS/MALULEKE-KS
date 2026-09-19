@@ -1,9 +1,9 @@
 // GET/POST /api/v1/lookups/{type} — one contract for every EXT-1 lookup table (BR-8.1).
-// Status values also carry a pipeline stage and a curated colour (#52).
+// Some types carry extra fields (lib/rules/lookups.ts); extras a type doesn't have are refused.
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
-import { isLookupType, listLookupValues, createLookupValue } from "@/lib/rules/lookups";
+import { isLookupType, listLookupValues, createLookupValue, unsupportedExtras } from "@/lib/rules/lookups";
 import { LookupCreateInputSchema } from "@/lib/schemas";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
@@ -43,9 +43,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ typ
   if (!parsed.success) {
     return errorResponse("VALIDATION_ERROR", "Invalid lookup value", 400, { issues: parsed.error.issues });
   }
-  const { key, label, stage, colorToken } = parsed.data;
+  const { key, label, ...extras } = parsed.data;
+  const unsupported = unsupportedExtras(type, extras);
+  if (unsupported.length) {
+    return errorResponse("VALIDATION_ERROR", `${unsupported.join(", ")} do not apply to ${type} values`, 400);
+  }
 
-  const result = await createLookupValue(type, key, label, { stage, colorToken });
+  const result = await createLookupValue(type, key, label, extras);
   if (!result.ok) {
     // BR-8.3 — an actionable answer, never a raw uniqueness failure.
     return result.code === "LOOKUP_KEY_DEPRECATED"

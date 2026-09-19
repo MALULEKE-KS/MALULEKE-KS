@@ -13,6 +13,12 @@ import { db } from "@/lib/db";
 // that have nothing to do with the code under test.
 const TEST_IP_PREFIX = "10.0.0.";
 
+// Every inquiry this file creates carries this run's marker, and cleanup
+// deletes only those. Test files run in parallel against one database, so a
+// broad filter (e.g. every @example.com email) would delete other files'
+// fixtures mid-test.
+const RUN = `inq-${Date.now().toString(36)}`;
+
 // Rate-limit keys hold keyed hashes of the IP, never the IP itself (F1.5),
 // so buckets are cleared by scope, before the run.
 beforeAll(async () => {
@@ -20,7 +26,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.inquiry.deleteMany({ where: { email: { contains: "@example.com" } } });
+  await db.inquiry.deleteMany({ where: { email: { contains: RUN } } });
 });
 
 function makeRequest(body: object, ip: string) {
@@ -33,7 +39,7 @@ function makeRequest(body: object, ip: string) {
 
 const validBody = {
   name: "Test Person",
-  email: "test@example.com",
+  email: `test-${RUN}@example.com`,
   message: "This is a genuinely long enough test message for validation.",
   inquiryType: "hire",
 };
@@ -114,10 +120,10 @@ describe("POST /api/v1/inquiries", () => {
     const ip = "10.0.0.8";
     for (let i = 0; i < 5; i++) {
       await postInquiry(
-        makeRequest({ ...validBody, email: `person${i}@example.com` }, ip)
+        makeRequest({ ...validBody, email: `person${i}-${RUN}@example.com` }, ip)
       );
     }
-    const sixth = await postInquiry(makeRequest({ ...validBody, email: "another@example.com" }, ip));
+    const sixth = await postInquiry(makeRequest({ ...validBody, email: `another-${RUN}@example.com` }, ip));
     expect(sixth.status).toBe(429);
   });
 });

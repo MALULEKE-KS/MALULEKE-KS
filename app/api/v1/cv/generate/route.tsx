@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { db } from "@/lib/db";
 import { CvGenerateInputSchema } from "@/lib/schemas";
-import { experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
+import { PUBLISHED_EDUCATION_WHERE, educationWithSkills, experienceWithSkills, skillWithCategory, toEducationEntry, toExperienceEntry, toSkillEntry, supersedePriorDocuments } from "@/lib/rules/cv";
 import { CvDocument } from "@/lib/cv/pdf-document";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
 import { getSetting } from "@/lib/settings";
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   // BR-7.1 — fetched fresh on every call, never a cached/static snapshot.
   const [experienceRows, educationRows, skillRows] = await Promise.all([
     db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
-    db.education.findMany({ orderBy: { startDate: "desc" } }),
+    db.education.findMany({ where: PUBLISHED_EDUCATION_WHERE, ...educationWithSkills, orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
   ]);
 

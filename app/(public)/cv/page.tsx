@@ -5,6 +5,8 @@
 
 import { db } from "@/lib/db";
 import {
+  PUBLISHED_EDUCATION_WHERE,
+  educationWithSkills,
   experienceWithSkills,
   skillWithCategory,
   toEducationEntry,
@@ -31,7 +33,7 @@ function formatDateRange(startDate: string, endDate: string | null): string {
 export default async function CvPage() {
   const [experienceRows, educationRows, skillRows] = await Promise.all([
     db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
-    db.education.findMany({ orderBy: { startDate: "desc" } }),
+    db.education.findMany({ where: PUBLISHED_EDUCATION_WHERE, ...educationWithSkills, orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
   ]);
 

@@ -9,7 +9,10 @@
 // Enforces at write time:
 //   BR-1.2 — clientVisibility defaults to REQUIRES_APPROVAL for client orgs
 //   BR-1.6 — every synced system starts contentStatus=DRAFT, needsCuration=true
-//   BR-1.7 — only public repos are ever synced; private/internal repos are skipped
+//   BR-1.7 — private repos are skipped here for now. The rule was rewritten
+//            (2026-09-19): private repos are synced as drafts and shown as
+//            private publicly. This job adopts that in F4, with the metadata
+//            fields (#70) and JobRun locking.
 //   BR-8.2 — never touches an existing curated row's status/description
 //
 // A concurrent run (scheduled + manual overlap) is expected, not prevented —

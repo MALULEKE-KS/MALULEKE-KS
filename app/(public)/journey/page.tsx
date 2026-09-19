@@ -6,7 +6,7 @@
 
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
+import { PUBLISHED_TIMELINE_WHERE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
 import { Container } from "@/components/shared/Container";
 
 // Reads live, admin-editable content — must not be statically baked in at
@@ -30,7 +30,7 @@ export default async function JourneyPage({ searchParams }: { searchParams: Prom
   const [milestoneTypes, entryRows] = await Promise.all([
     db.milestoneType.findMany({ where: { active: true }, orderBy: { label: "asc" } }),
     db.timeline.findMany({
-      where: activeType ? { milestoneType: { key: activeType } } : {},
+      where: { ...PUBLISHED_TIMELINE_WHERE, ...(activeType && { milestoneType: { key: activeType } }) },
       ...timelineWithMilestoneType,
       orderBy: { date: "desc" },
     }),
