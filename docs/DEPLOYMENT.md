@@ -142,7 +142,8 @@ Verifies the new hash, clears the failed-attempt counter and any lock, and write
 - `vercel.ts` `ignoreCommand` → `scripts/vercel-ignore.mjs` **skips builds** whose changes touch only docs, tests, CI or Markdown, and **skips previews** unless UI paths changed (CI already builds and tests every PR). Anything it can't diff, it builds.
 - Ship related issues in **one PR** (several `Closes #N`) → one production deploy.
 - Push a branch **once** when it's ready; every push is a preview build.
-- **No manual redeploys** unless an env var changed — and batch env changes into one redeploy.
+- **No manual redeploys** unless an env var changed — and batch env changes into one redeploy. A redeploy of the already-deployed commit always builds (the ignore script treats it as deliberate); before #78 it was skipped and shown as *Canceled*.
+- **Migrations stay additive (F1.9):** CI's `migration-guard` refuses edits to applied migrations and, in new ones, any drop / rename / type change / truncate / delete / trigger-disable that lacks a `-- migration-guard: allow <reason (#issue)>` line directly above it. Destructive changes are possible — but always deliberate, explained and reviewed.
 
 ## Redeploying
 

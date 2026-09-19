@@ -13,6 +13,10 @@
 // Whenever the diff can't be determined (first deploy, shallow clone missing
 // the previous commit), it builds. Skipping is the optimisation; building is
 // the safe default.
+//
+// A redeploy of the commit already deployed always builds: nobody triggers one
+// by accident — it's how new environment variables reach the running site
+// (F1.8 found this skipped as "no file changes" and shown as Canceled).
 
 import { execFileSync } from "node:child_process";
 
@@ -21,6 +25,7 @@ const SKIP = 0;
 
 const env = process.env.VERCEL_ENV ?? "unknown";
 const previous = process.env.VERCEL_GIT_PREVIOUS_SHA;
+const current = process.env.VERCEL_GIT_COMMIT_SHA;
 
 const NEVER_AFFECTS_RUNTIME = [/^docs\//, /^tests\//, /^\.github\//, /\.md$/i, /^\.claude\//, /^\.vscode\//];
 const UI_PATHS = [
@@ -40,6 +45,9 @@ function decide(message, code) {
 }
 
 if (!previous) decide("no previous deployment to compare against", BUILD);
+if (current && previous === current) {
+  decide("redeploy of the same commit — deliberate (e.g. new environment variables)", BUILD);
+}
 
 let files;
 try {

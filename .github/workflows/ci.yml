@@ -86,6 +86,8 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the migration guard compares against the base branch
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -99,6 +101,14 @@ jobs:
       # to touch (P3005 "schema is not empty").
       - name: Create shadow database
         run: PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE malulekeks_ci_shadow;"
+      # F1.9: applied migrations are immutable, and a new one may not drop,
+      # rename, retype, truncate or delete without an approval line
+      # (scripts/migration-guard.mjs). Pull requests only — main was checked
+      # when its PR was.
+      - name: Guard — migrations stay additive (EXT-1)
+        if: github.event_name == 'pull_request'
+        run: |
+          node scripts/migration-guard.mjs origin/${{ github.base_ref }}
       - name: Verify migrations are additive-only (BR-8.1 / Constitution EXT-1)
         run: npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url $SHADOW_DATABASE_URL --exit-code
         env:
