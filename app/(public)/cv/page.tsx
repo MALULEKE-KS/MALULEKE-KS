@@ -4,13 +4,7 @@
 // See docs/PAGE-SPECIFICATIONS.md ("/cv").
 
 import { db } from "@/lib/db";
-import {
-  experienceWithSkills,
-  skillWithCategory,
-  toExperienceEntry,
-  toPublicEducationEntry,
-  toSkillEntry,
-} from "@/lib/rules/cv";
+import { skillWithCategory, toPublicEducationEntry, toPublicExperienceEntry, toSkillEntry } from "@/lib/rules/cv";
 import { DownloadCvButton } from "./_components/DownloadCvButton";
 import { Container } from "@/components/shared/Container";
 
@@ -28,14 +22,15 @@ function formatDateRange(startDate: string, endDate: string | null): string {
 
 export default async function CvPage() {
   const [experienceRows, educationRows, skillRows, profile] = await Promise.all([
-    db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
+    // Only roles the admin chose to show (#74).
+    db.publicExperience.findMany({ orderBy: { startDate: "desc" } }),
     db.publicEducation.findMany({ orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
     // The owner's name is profile data (#70), not a constant.
     db.publicProfile.findFirst(),
   ]);
 
-  const experience = experienceRows.map(toExperienceEntry);
+  const experience = experienceRows.map(toPublicExperienceEntry);
   const education = educationRows.map(toPublicEducationEntry);
   const skills = skillRows.map(toSkillEntry);
   const roleLine = experience[0]?.title ?? "Software Engineer";

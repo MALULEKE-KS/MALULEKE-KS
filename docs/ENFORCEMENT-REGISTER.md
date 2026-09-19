@@ -89,8 +89,10 @@
 
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| BR-7.1 | Generated from live data at generation time | `POST /cv/generate` | ✅ | App | — |
-| BR-7.2 | Prior documents superseded, not deleted | `lib/rules/cv.ts`; trigger `DocumentGen_br_7_2_no_delete` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
+| BR-7.1 | Generated from live data at generation time | `lib/cv/model.ts` builds from the public views on every request; `POST /cv/generate` (#74) | ✅ | App | — |
+| BR-7.2 | Prior documents superseded, not deleted | `lib/rules/cv.ts` (per format, #74); trigger `DocumentGen_br_7_2_no_delete` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
+| BR-7.3 | The CV shows only what the site shows, and never invents | Reads `PublicSystem`/`PublicExperience`/`PublicEducation`/`PublicAchievement`/`PublicProfile*` only; completeness check reports gaps, suggested summary is offered not saved (#74); tested incl. hidden roles, drafts, excluded projects | ✅ | DB views + App | — |
+| BR-7.4 | ATS-safe, identical PDF and Word | Shared model + formatting; PDF: text operators asserted (a blank render fails), hyphenation off; DOCX: real headings and hyperlinks, asserted table-free (#74) | ✅ | App | — |
 
 ## 8. Extension governance (BR-8.x) & Constitution
 

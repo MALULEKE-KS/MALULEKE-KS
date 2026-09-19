@@ -5,7 +5,7 @@
 // carries no client-confidentiality dimension) and the BR-7.2 supersede
 // helper used by POST /cv/generate.
 
-import { Prisma, type PublicEducation } from "@prisma/client";
+import { Prisma, type PublicEducation, type PublicExperience } from "@prisma/client";
 import { db } from "@/lib/db";
 
 const educationWithSkills = Prisma.validator<Prisma.EducationDefaultArgs>()({
@@ -35,10 +35,29 @@ export function toExperienceEntry(experience: ExperienceWithSkills) {
     id: experience.id,
     title: experience.title,
     organization: experience.organization,
+    location: experience.location,
     startDate: toDateOnly(experience.startDate),
     endDate: experience.endDate ? toDateOnly(experience.endDate) : null,
     description: experience.description,
+    highlights: experience.highlights,
+    contentStatus: experience.contentStatus.toLowerCase() as "draft" | "published" | "archived",
     skills: experience.skills.map((s) => s.skill.name),
+  };
+}
+
+/** Public roles (openapi ExperienceEntry) from a PublicExperience view row (#74). */
+export function toPublicExperienceEntry(row: PublicExperience) {
+  return {
+    id: row.id,
+    title: row.title,
+    organization: row.organization,
+    location: row.location,
+    startDate: toDateOnly(row.startDate),
+    endDate: row.endDate ? toDateOnly(row.endDate) : null,
+    description: row.description,
+    highlights: row.highlights,
+    contentStatus: "published" as const,
+    skills: row.skills,
   };
 }
 
@@ -56,6 +75,8 @@ export function toEducationEntry(education: EducationWithSkills) {
     certificateUrl: education.certificateUrl,
     contentStatus: education.contentStatus.toLowerCase() as "draft" | "published" | "archived",
     skills: education.skills.map((s) => s.skill.name),
+    expectedGraduation: education.expectedGraduation ? toDateOnly(education.expectedGraduation) : null,
+    coursework: education.coursework,
   };
 }
 
@@ -76,6 +97,8 @@ export function toPublicEducationEntry(row: PublicEducation) {
     certificateUrl: row.certificateUrl,
     contentStatus: "published" as const,
     skills: row.skills,
+    expectedGraduation: row.expectedGraduation ? toDateOnly(row.expectedGraduation) : null,
+    coursework: row.coursework,
   };
 }
 
@@ -93,9 +116,10 @@ export function toSkillEntry(skill: SkillWithCategory) {
 // supersededByFileUrl pointing at the new file. Scoped to non-superseded
 // rows only, so re-running this after several generations doesn't rewrite
 // history further back than the immediately-prior version.
-export async function supersedePriorDocuments(type: string, targetRole: string | null, newFileUrl: string) {
+// Per format (#74): a new PDF supersedes the previous PDF, a new DOCX the previous DOCX.
+export async function supersedePriorDocuments(type: string, targetRole: string | null, format: string, newFileUrl: string) {
   await db.documentGen.updateMany({
-    where: { type, targetRole, supersededByFileUrl: null, fileUrl: { not: newFileUrl } },
+    where: { type, targetRole, format, supersededByFileUrl: null, fileUrl: { not: newFileUrl } },
     data: { supersededByFileUrl: newFileUrl },
   });
 }

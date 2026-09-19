@@ -21,6 +21,7 @@ tags:
   - name: Timeline
   - name: CV
   - name: CV (Admin)
+  - name: Profile (Admin)
   - name: Settings (Admin)
   - name: Activity Log (Admin)
 
@@ -500,14 +501,22 @@ paths:
   /cv/generate:
     post:
       tags: [CV]
-      summary: Generate a CV document from current data (BR-7.1)
+      summary: Generate the CV from current data (BR-7.1) — PDF or Word, the same content
+      description: >
+        The CV engine (#74). One structured CV built from the public views and
+        the owner's profile, rendered ATS-safe (one column, standard headings,
+        real text, links written out). A target role reorders projects, bullets
+        and skills by relevance — it never rewrites content. Prior documents of
+        the same role and format are superseded, never deleted (BR-7.2).
+        Rate-limited per connection (platform settings cv.rateLimit.*).
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                targetRole: { type: string, nullable: true }
+                targetRole: { type: string, nullable: true, maxLength: 100 }
+                format: { $ref: "#/components/schemas/CvFormat" }
       responses:
         "201":
           description: Generated document reference
@@ -518,6 +527,13 @@ paths:
                 properties:
                   fileUrl: { type: string, format: uri }
                   generatedAt: { type: string, format: date-time }
+                  format: { $ref: "#/components/schemas/CvFormat" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   # ============================================================
   # ADMIN — TIMELINE
@@ -750,6 +766,171 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { description: Skill is still in use, content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  # ============================================================
+  # ADMIN — CV CHECK, PROFILE, ACHIEVEMENTS (#74)
+  # ============================================================
+  /admin/cv/check:
+    get:
+      tags: [CV (Admin)]
+      summary: CV completeness report — score, issues, suggested summary, preview
+      description: Reports what's missing or weak before generating. Never fills anything in; the suggested summary is drafted only from facts already on the CV.
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: targetRole
+          in: query
+          schema: { type: string, maxLength: 100 }
+      responses:
+        "200":
+          description: The report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CvCheck" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/profile:
+    get:
+      tags: [Profile (Admin)]
+      summary: The owner's profile and links — the CV header and the site's owner details
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    patch:
+      tags: [Profile (Admin)]
+      summary: Edit profile fields (audited)
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileUpdateInput" }
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/profile/links:
+    post:
+      tags: [Profile (Admin)]
+      summary: Add a social or contact link
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileLinkInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileLink" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/profile/links/{id}:
+    patch:
+      tags: [Profile (Admin)]
+      summary: Edit a link (including whether the CV carries it)
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileLinkInput" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileLink" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Profile (Admin)]
+      summary: Remove a link
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Removed }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/achievements:
+    get:
+      tags: [Profile (Admin)]
+      summary: List certifications and awards
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Achievement list
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/Achievement" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Profile (Admin)]
+      summary: Add a certification or award (starts as a draft unless contentStatus says otherwise)
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AchievementInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Achievement" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /admin/achievements/{id}:
+    patch:
+      tags: [Profile (Admin)]
+      summary: Edit an achievement; publishing it puts it on the site and the CV
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AchievementInput" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Achievement" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Profile (Admin)]
+      summary: Remove an achievement
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Removed }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   # ============================================================
   # ADMIN — SETTINGS (Flags, Visitor Lenses)
@@ -1071,6 +1252,8 @@ components:
             sortOrder: { type: integer }
             featuredOnHome: { type: boolean, description: "Admin-chosen for the homepage (published systems only are shown)" }
             homeOrder: { type: integer, description: "Order among homepage-featured systems, ascending" }
+            onCv: { type: boolean, description: "Listed under Projects on the CV (published systems only)" }
+            cvOrder: { type: integer }
             repoRelationship: { type: string, nullable: true, description: "RepoRelationship key (e.g. owner, collaborator)" }
             ownerPermission: { $ref: "#/components/schemas/OwnerPermission" }
             ownerPermissionFrom: { type: string, nullable: true, description: "Who granted or declined — the repo owner's name or GitHub login" }
@@ -1114,6 +1297,8 @@ components:
         sortOrder: { type: integer }
         featuredOnHome: { type: boolean }
         homeOrder: { type: integer, minimum: 0 }
+        onCv: { type: boolean }
+        cvOrder: { type: integer, minimum: 0 }
         repoRelationship: { type: string, nullable: true, description: "A RepoRelationship key; null clears it" }
         ownerPermission: { type: string, enum: [not_requested, requested, granted, declined] }
         ownerPermissionFrom: { type: string, nullable: true, description: "Required (by the database) when the answer is granted or declined" }
@@ -1185,9 +1370,12 @@ components:
         id: { type: string }
         title: { type: string }
         organization: { type: string }
+        location: { type: string, nullable: true }
         startDate: { type: string, format: date }
         endDate: { type: string, format: date, nullable: true }
         description: { type: string }
+        highlights: { type: array, items: { type: string }, description: "CV achievement bullets, in order" }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Only published roles appear on /cv and in the generated CV" }
         skills: { type: array, items: { type: string } }
 
     ExperienceInput:
@@ -1198,7 +1386,10 @@ components:
         organization: { type: string, minLength: 1 }
         startDate: { type: string, format: date }
         endDate: { type: string, format: date, nullable: true }
+        location: { type: string, nullable: true }
         description: { type: string, minLength: 1 }
+        highlights: { type: array, items: { type: string, maxLength: 300 }, maxItems: 15, default: [] }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
         skillIds: { type: array, items: { type: string }, default: [] }
 
     EducationEntry:
@@ -1215,6 +1406,8 @@ components:
         certificateUrl: { type: string, nullable: true, description: "https only (database CHECK)" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Only published entries appear on /cv and in the generated CV" }
         skills: { type: array, items: { type: string }, description: "Skill names this qualification taught" }
+        expectedGraduation: { type: string, format: date, nullable: true, description: "For a degree in progress" }
+        coursework: { type: array, items: { type: string }, description: "Relevant modules" }
 
     EducationInput:
       type: object
@@ -1230,6 +1423,8 @@ components:
         certificateUrl: { type: string, nullable: true, pattern: "^https://" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
         skillIds: { type: array, items: { type: string }, default: [], description: "Replaces the entry's skill links" }
+        expectedGraduation: { type: string, format: date, nullable: true, description: "Only for a degree in progress (no endDate) — database CHECK" }
+        coursework: { type: array, items: { type: string, maxLength: 120 }, maxItems: 30, default: [] }
 
     SkillEntry:
       type: object
@@ -1272,6 +1467,107 @@ components:
         label: { type: string, minLength: 1 }
         priorityContent: { type: object }
         aiFramingPrompt: { type: string, minLength: 1 }
+
+    CvFormat:
+      type: string
+      enum: [pdf, docx]
+      default: pdf
+      description: The same CV in two formats (#74)
+
+    CvIssue:
+      type: object
+      properties:
+        severity: { type: string, enum: [error, warning, tip], description: "error = not ready (e.g. no name or email)" }
+        section: { type: string, enum: [contact, summary, experience, projects, education, skills, targetRole] }
+        message: { type: string }
+
+    CvCheck:
+      type: object
+      properties:
+        score: { type: integer, minimum: 0, maximum: 100 }
+        ready: { type: boolean }
+        issues: { type: array, items: { $ref: "#/components/schemas/CvIssue" } }
+        suggestedSummary: { type: string, nullable: true, description: "Drafted only from facts on the CV; offered, never saved" }
+        preview: { type: object, description: "The CV model that would be rendered" }
+
+    ProfileLink:
+      type: object
+      properties:
+        id: { type: string }
+        kind: { type: string, example: github }
+        label: { type: string }
+        url: { type: string }
+        sortOrder: { type: integer }
+        onCv: { type: boolean }
+
+    ProfileLinkInput:
+      type: object
+      required: [kind, label, url]
+      properties:
+        kind: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$" }
+        label: { type: string, minLength: 1 }
+        url: { type: string, description: "https:// or mailto: only (database CHECK)" }
+        sortOrder: { type: integer, minimum: 0, default: 0 }
+        onCv: { type: boolean, default: true }
+
+    Profile:
+      type: object
+      properties:
+        displayName: { type: string }
+        initials: { type: string, nullable: true }
+        headline: { type: string, nullable: true, example: "Software & AI Engineer" }
+        role: { type: string }
+        location: { type: string, nullable: true }
+        email: { type: string }
+        phone: { type: string, nullable: true, description: "On the CV only when set" }
+        summary: { type: string, nullable: true, description: "The CV's professional summary" }
+        bio: { type: string, nullable: true }
+        availability: { type: string, nullable: true }
+        buildingSinceYear: { type: integer, nullable: true }
+        links: { type: array, items: { $ref: "#/components/schemas/ProfileLink" } }
+        updatedAt: { type: string, format: date-time }
+
+    ProfileUpdateInput:
+      type: object
+      description: Any subset of the fields; at least one.
+      properties:
+        displayName: { type: string, minLength: 1 }
+        initials: { type: string, nullable: true }
+        headline: { type: string, nullable: true }
+        role: { type: string, minLength: 1 }
+        location: { type: string, nullable: true }
+        email: { type: string, format: email }
+        phone: { type: string, nullable: true, pattern: "^\\+?[0-9][0-9 ()-]{6,19}$" }
+        summary: { type: string, nullable: true, maxLength: 1200 }
+        bio: { type: string, nullable: true }
+        availability: { type: string, nullable: true }
+        buildingSinceYear: { type: integer, nullable: true, minimum: 1990, maximum: 2100 }
+
+    Achievement:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        issuer: { type: string, nullable: true }
+        achievedOn: { type: string, format: date }
+        description: { type: string, nullable: true }
+        url: { type: string, nullable: true }
+        systemId: { type: string, nullable: true }
+        contentStatus: { type: string, enum: [draft, published, archived] }
+        sortOrder: { type: integer }
+
+    AchievementInput:
+      type: object
+      required: [title, achievedOn]
+      properties:
+        title: { type: string, minLength: 1 }
+        issuer: { type: string, nullable: true }
+        achievedOn: { type: string, format: date }
+        description: { type: string, nullable: true }
+        url: { type: string, nullable: true, pattern: "^https://" }
+        systemId: { type: string, nullable: true }
+        contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = draft" }
+        sortOrder: { type: integer, minimum: 0, default: 0 }
 
     ActivityLogEntry:
       type: object

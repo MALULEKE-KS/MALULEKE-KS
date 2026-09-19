@@ -70,6 +70,8 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
     sortOrder: system.sortOrder,
     featuredOnHome: system.featuredOnHome,
     homeOrder: system.homeOrder,
+    onCv: system.onCv,
+    cvOrder: system.cvOrder,
     repoRelationship: system.repoRelationship?.key ?? null,
     ownerPermission: system.ownerPermission.toLowerCase(),
     ownerPermissionFrom: system.ownerPermissionFrom,

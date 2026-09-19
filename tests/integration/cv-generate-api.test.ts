@@ -1,4 +1,6 @@
+// @vitest-environment node
 // tests/integration/cv-generate-api.test.ts
+// (Node, not jsdom: react-pdf renders a blank page under jsdom — #74.)
 // Real PDF generation (BR-7.1) and supersede behavior (BR-7.2) against the
 // real database. No admin session needed — this is the public download flow.
 
