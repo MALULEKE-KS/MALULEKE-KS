@@ -5,7 +5,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "views"]
 }
 
 datasource db {
@@ -14,7 +14,7 @@ datasource db {
   // Migrations run over a direct (non-pooled) connection — the pooler is for
   // the app's many short-lived queries, not schema changes (docs/DATABASE.md).
   directUrl  = env("DATABASE_URL_UNPOOLED")
-  extensions = [vector, pgcrypto]
+  extensions = [vector, pgcrypto, pg_trgm]
 }
 
 // ============================================================
@@ -23,6 +23,7 @@ datasource db {
 
 model AdminUser {
   id               String           @id @default(cuid())
+  metricDecisions  MetricSnapshot[]
   email            String           @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
   passwordHash     String
   role             String           @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
@@ -252,6 +253,7 @@ model System {
   @@index([domainId])
   @@index([statusId])
   @@index([featuredOnHome, homeOrder])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "System_name_trgm_idx")
 }
 
 model Impact {
@@ -379,6 +381,7 @@ model Timeline {
   @@index([milestoneTypeId])
   @@index([contentStatus, date])
   @@index([systemId])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "Timeline_title_trgm_idx")
 }
 
 // The owner's public profile (#70): one row, enforced by a CHECK. Everything
@@ -492,6 +495,7 @@ model Skill {
   updatedAt       DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([categoryId])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Skill_name_trgm_idx")
 }
 
 model SkillOnSystem {
@@ -661,4 +665,183 @@ model JobRun {
   error      String?
 
   @@index([job, startedAt])
+}
+
+// ============================================================
+// CURATED NUMBERS (approved feature 6, BR-5.3)
+// ============================================================
+
+enum MetricSource {
+  COMPUTED // proposed by the platform from public data
+  MANUAL // entered by the admin
+}
+
+enum MetricSnapshotStatus {
+  PROPOSED
+  APPROVED
+  REJECTED
+  SUPERSEDED
+}
+
+// Which numbers the platform can show publicly (F1.7). Rows, not code: labels
+// and order are the admin's. A key with a registered computation
+// (lib/metrics/registry.ts) is proposed automatically; any other is manual.
+model Metric {
+  key         String           @id
+  label       String
+  description String?
+  unit        String?
+  sortOrder   Int              @default(0)
+  active      Boolean          @default(true)
+  snapshots   MetricSnapshot[]
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// Every value a metric has had, proposed then decided (BR-5.3). Only an
+// APPROVED snapshot is ever public. The database fixes a snapshot's value once
+// proposed, allows only forward transitions, keeps one APPROVED and one
+// PROPOSED per metric, and never deletes history.
+model MetricSnapshot {
+  id          String               @id @default(cuid())
+  metricKey   String
+  metric      Metric               @relation(fields: [metricKey], references: [key], onDelete: Restrict)
+  value       Float
+  source      MetricSource
+  status      MetricSnapshotStatus @default(PROPOSED)
+  proposedAt  DateTime             @default(now()) @db.Timestamptz(3)
+  decidedAt   DateTime?            @db.Timestamptz(3)
+  decidedById String?
+  decidedBy   AdminUser?           @relation(fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([metricKey, status])
+}
+
+// ============================================================
+// PUBLIC VIEWS (F1.7) — the only shape public pages read
+// ============================================================
+// Created in SQL (migration 20260919070000_public_views_search_metrics).
+// Every masking and visibility rule is applied inside the view, so a public
+// query can't forget one: BR-1.1 published-only, BR-1.3 NDA links, BR-1.4
+// anonymized names (including the organization list), BR-1.7 private repos,
+// BR-1.12 journey entries, BR-6.1/6.2 testimonials, BR-5.3 approved numbers.
+// Read-only; F1.8 limits the public site's database role to these views.
+
+view PublicSystem {
+  id               String    @unique
+  name             String
+  slug             String    @unique
+  organization     String // masked for ANONYMIZED_ONLY without disclosure (BR-1.4)
+  organizationSlug String? // null when the name is masked, so filters can't correlate
+  statusKey        String
+  status           String
+  statusColorToken String
+  stage            String // shipped | building | queued
+  domainKey        String?
+  domain           String?
+  description      String
+  repoUrl          String? // null for NDA_RESTRICTED (BR-1.3) or a private repo (BR-1.7)
+  liveUrl          String?
+  screenshotUrl    String?
+  techStack        String[]
+  isFlagship       Boolean
+  repoPrivate      Boolean
+  sortOrder        Int
+  featuredOnHome   Boolean
+  homeOrder        Int
+  caseStudyBody    String
+  githubPushedAt   DateTime?
+  updatedAt        DateTime
+}
+
+view PublicImpact {
+  id        String @unique
+  systemId  String
+  label     String
+  value     String
+  sortOrder Int
+}
+
+view PublicTestimonial {
+  id           String   @unique
+  systemId     String?
+  authorName   String
+  authorRole   String?
+  organization String? // masked like the system's organization (BR-1.4)
+  quote        String
+  createdAt    DateTime
+}
+
+view PublicTimeline {
+  id                 String   @unique
+  milestoneType      String
+  milestoneTypeLabel String
+  title              String
+  description        String?
+  date               DateTime
+  tags               String[]
+  autoDrafted        Boolean
+  systemId           String?
+  systemSlug         String?
+}
+
+view PublicEducation {
+  id             String    @unique
+  institution    String
+  qualification  String
+  fieldOfStudy   String?
+  startDate      DateTime
+  endDate        DateTime?
+  honors         String?
+  description    String?
+  certificateUrl String?
+  skills         String[]
+}
+
+view PublicOrganization {
+  id   String @unique
+  name String
+  slug String @unique
+}
+
+// One row: the homepage ledger's live facts about the owner's own catalog.
+// Aggregates only — no unpublished system is ever named.
+view PublicLedger {
+  id                   Int       @unique
+  systemsShipped       Int
+  systemsBuilding      Int
+  systemsQueued        Int
+  organizationsFounded Int
+  firstExperienceAt    DateTime?
+}
+
+view PublicProfile {
+  id                Int     @unique
+  displayName       String
+  initials          String?
+  role              String
+  location          String?
+  email             String
+  bio               String?
+  availability      String?
+  buildingSinceYear Int?
+}
+
+view PublicProfileLink {
+  id        String @unique
+  kind      String
+  label     String
+  url       String
+  sortOrder Int
+}
+
+// Only admin-approved numbers (BR-5.3).
+view PublicMetric {
+  key         String   @unique
+  label       String
+  description String?
+  unit        String?
+  value       Float
+  approvedAt  DateTime
+  sortOrder   Int
 }

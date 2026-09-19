@@ -1,19 +1,14 @@
 // lib/queries/systems.ts
-// Shared query logic for public Systems data — used by both the API route
-// handlers (app/api/v1/systems/*) and Server Component pages directly.
-// A page fetching its own API route over HTTP would be an unnecessary
-// network hop in the App Router; both call this instead, so the BR-1.1
-// query gate (PUBLISHED_WHERE) and filtering logic exist in exactly one
-// place regardless of caller.
+// Public Systems data — used by the API route handlers (app/api/v1/systems/*)
+// and Server Component pages directly, so filtering exists in one place.
+//
+// Every read here goes through the database's public views (F1.7), which
+// already apply BR-1.1 (published only), BR-1.3, BR-1.4, BR-1.7 and
+// BR-6.1/6.2. Nothing in this file decides visibility or masks a field.
 
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import {
-  PUBLISHED_WHERE,
-  systemWithPublicRelations,
-  systemWithPublicDetailRelations,
-  toPublicSystem,
-  toPublicSystemDetailed,
-} from "@/lib/rules/publishing";
+import { toPublicSystem } from "@/lib/rules/publishing";
 
 export interface PublicSystemsFilters {
   organizationSlug?: string | null;
@@ -24,6 +19,8 @@ export interface PublicSystemsFilters {
   pageSize?: number;
 }
 
+const CATALOG_ORDER = [{ isFlagship: "desc" }, { sortOrder: "asc" }] satisfies Prisma.PublicSystemOrderByWithRelationInput[];
+
 export async function getPublicSystems({
   organizationSlug,
   domainKey,
@@ -32,57 +29,59 @@ export async function getPublicSystems({
   page = 1,
   pageSize = 20,
 }: PublicSystemsFilters) {
-  const where = {
-    ...PUBLISHED_WHERE,
-    ...(organizationSlug && { organization: { slug: organizationSlug } }),
-    ...(domainKey && { domain: { key: domainKey } }),
-    ...(statusKey && { status: { key: statusKey } }),
+  // organizationSlug is null in the view for a masked client (BR-1.4), so
+  // filtering by a client's slug can never surface its anonymized work.
+  const where: Prisma.PublicSystemWhereInput = {
+    ...(organizationSlug && { organizationSlug }),
+    ...(domainKey && { domainKey }),
+    ...(statusKey && { statusKey }),
     ...(flagship !== null && flagship !== undefined && { isFlagship: flagship }),
   };
 
-  const [systems, total] = await Promise.all([
-    db.system.findMany({
-      where,
-      ...systemWithPublicRelations,
-      orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    db.system.count({ where }),
+  const [rows, total] = await Promise.all([
+    db.publicSystem.findMany({ where, orderBy: CATALOG_ORDER, skip: (page - 1) * pageSize, take: pageSize }),
+    db.publicSystem.count({ where }),
   ]);
 
-  return {
-    data: systems.map(toPublicSystem),
-    meta: { page, pageSize, total },
-  };
+  return { data: rows.map(toPublicSystem), meta: { page, pageSize, total } };
 }
 
 export async function getPublicSystemBySlug(slug: string) {
-  const system = await db.system.findFirst({
-    where: { slug, ...PUBLISHED_WHERE },
-    ...systemWithPublicDetailRelations,
-  });
+  const row = await db.publicSystem.findUnique({ where: { slug } });
+  if (!row) return null;
 
-  return system ? toPublicSystemDetailed(system) : null;
+  const [impacts, testimonials] = await Promise.all([
+    db.publicImpact.findMany({ where: { systemId: row.id }, orderBy: { sortOrder: "asc" } }),
+    db.publicTestimonial.findMany({ where: { systemId: row.id }, orderBy: { createdAt: "desc" } }),
+  ]);
+
+  return {
+    ...toPublicSystem(row),
+    caseStudyBody: row.caseStudyBody,
+    impacts: impacts.map((i) => ({ label: i.label, value: i.value })),
+    testimonials: testimonials.map((t) => ({
+      authorName: t.authorName,
+      authorRole: t.authorRole,
+      organization: t.organization,
+      quote: t.quote,
+    })),
+  };
 }
 
-export async function getRelatedSystems(domainKey: string | null, excludeSlug: string, limit = 3) {
-  if (!domainKey) return [];
+/** Other published systems in the same domain as `slug`. */
+export async function getRelatedSystems(slug: string, limit = 3) {
+  const current = await db.publicSystem.findUnique({ where: { slug }, select: { domainKey: true } });
+  if (!current?.domainKey) return [];
 
-  const systems = await db.system.findMany({
-    where: { ...PUBLISHED_WHERE, domain: { key: domainKey }, slug: { not: excludeSlug } },
-    ...systemWithPublicRelations,
-    orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }],
+  const rows = await db.publicSystem.findMany({
+    where: { domainKey: current.domainKey, slug: { not: slug } },
+    orderBy: CATALOG_ORDER,
     take: limit,
   });
-
-  return systems.map(toPublicSystem);
+  return rows.map(toPublicSystem);
 }
 
+/** Organizations for the catalog filter — only ones whose name is disclosed (BR-1.4). */
 export async function getFilterOrganizations() {
-  return db.organization.findMany({
-    where: { systems: { some: PUBLISHED_WHERE } },
-    select: { id: true, name: true, slug: true },
-    orderBy: { name: "asc" },
-  });
+  return db.publicOrganization.findMany({ orderBy: { name: "asc" } });
 }

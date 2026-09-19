@@ -5,12 +5,10 @@
 
 import { db } from "@/lib/db";
 import {
-  PUBLISHED_EDUCATION_WHERE,
-  educationWithSkills,
   experienceWithSkills,
   skillWithCategory,
-  toEducationEntry,
   toExperienceEntry,
+  toPublicEducationEntry,
   toSkillEntry,
 } from "@/lib/rules/cv";
 import { DownloadCvButton } from "./_components/DownloadCvButton";
@@ -22,8 +20,6 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "CV" };
 
-const OWNER_NAME = "Kurhula Success Maluleke";
-
 function formatDateRange(startDate: string, endDate: string | null): string {
   const start = new Date(startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" });
   const end = endDate ? new Date(endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Present";
@@ -31,14 +27,16 @@ function formatDateRange(startDate: string, endDate: string | null): string {
 }
 
 export default async function CvPage() {
-  const [experienceRows, educationRows, skillRows] = await Promise.all([
+  const [experienceRows, educationRows, skillRows, profile] = await Promise.all([
     db.experience.findMany({ ...experienceWithSkills, orderBy: { startDate: "desc" } }),
-    db.education.findMany({ where: PUBLISHED_EDUCATION_WHERE, ...educationWithSkills, orderBy: { startDate: "desc" } }),
+    db.publicEducation.findMany({ orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
+    // The owner's name is profile data (#70), not a constant.
+    db.publicProfile.findFirst(),
   ]);
 
   const experience = experienceRows.map(toExperienceEntry);
-  const education = educationRows.map(toEducationEntry);
+  const education = educationRows.map(toPublicEducationEntry);
   const skills = skillRows.map(toSkillEntry);
   const roleLine = experience[0]?.title ?? "Software Engineer";
 
@@ -54,7 +52,7 @@ export default async function CvPage() {
       <article className="cv-page max-w-3xl py-16">
         <div className="mb-1 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-ink font-sans text-3xl font-semibold">{OWNER_NAME}</h1>
+            <h1 className="text-ink font-sans text-3xl font-semibold">{profile?.displayName}</h1>
             <p className="text-slate mt-1 font-sans">{roleLine}</p>
           </div>
           <div className="no-print shrink-0">

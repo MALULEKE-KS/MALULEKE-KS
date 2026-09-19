@@ -12,7 +12,6 @@ import { SystemCard } from "@/components/shared/SystemCard";
 import { MarginAnnotations } from "@/components/shared/MarginAnnotations";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
 import { getPublicSystemBySlug, getRelatedSystems } from "@/lib/queries/systems";
-import { db } from "@/lib/db";
 import { Container } from "@/components/shared/Container";
 
 interface SystemDetailPageProps {
@@ -36,13 +35,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
   if (!system) notFound();
 
-  // Domain key is needed for "related systems" but the public shape only
-  // exposes the domain's label — a small direct lookup, not worth adding a
-  // whole extra field to the public wire shape for one internal use.
-  const domainRow = system.domain
-    ? await db.domain.findFirst({ where: { label: system.domain }, select: { key: true } })
-    : null;
-  const relatedSystems = await getRelatedSystems(domainRow?.key ?? null, slug);
+  const relatedSystems = await getRelatedSystems(slug);
 
   const annotations = [
     { label: "Organization", value: system.organization },

@@ -17,8 +17,7 @@ import { GET as publicTimeline } from "@/app/api/v1/timeline/route";
 import { PATCH as patchTimeline } from "@/app/api/v1/admin/timeline/[id]/route";
 import { POST as createEducation } from "@/app/api/v1/admin/cv/education/route";
 import { PATCH as patchEducation } from "@/app/api/v1/admin/cv/education/[id]/route";
-import { PUBLISHED_EDUCATION_WHERE } from "@/lib/rules/cv";
-import { systemWithPublicRelations, toPublicSystem } from "@/lib/rules/publishing";
+import { toPublicSystem } from "@/lib/rules/publishing";
 import { getSkillEvidence, getSystemPace } from "@/lib/queries/evidence";
 import { runJob } from "@/lib/jobs/run-job";
 import { db } from "@/lib/db";
@@ -206,7 +205,7 @@ describe("BR-1.7 — a private repo is shown as private, never linked", () => {
       repoUrl: "https://github.com/example/private-repo",
       contentStatus: "PUBLISHED",
     });
-    const row = await db.system.findUniqueOrThrow({ where: { id: system.id }, ...systemWithPublicRelations });
+    const row = await db.publicSystem.findUniqueOrThrow({ where: { id: system.id } });
     const view = toPublicSystem(row);
     expect(view.repoPrivate).toBe(true);
     expect(view.repoUrl).toBeNull();
@@ -477,7 +476,7 @@ describe("education — detail, skills and the admin's show/hide (#70)", () => {
     });
 
     // Hidden: not on /cv, and not evidence.
-    expect(await db.education.count({ where: { id: entry.id, ...PUBLISHED_EDUCATION_WHERE } })).toBe(0);
+    expect(await db.publicEducation.count({ where: { id: entry.id } })).toBe(0);
     const hidden = (await getSkillEvidence()).find((e) => e.skillId === skill.id);
     expect(hidden?.studyCount).toBe(0);
 
@@ -494,7 +493,7 @@ describe("education — detail, skills and the admin's show/hide (#70)", () => {
       { params: Promise.resolve({ id: entry.id }) },
     );
     expect(shown.status).toBe(200);
-    expect(await db.education.count({ where: { id: entry.id, ...PUBLISHED_EDUCATION_WHERE } })).toBe(1);
+    expect(await db.publicEducation.count({ where: { id: entry.id } })).toBe(1);
     const visible = (await getSkillEvidence()).find((e) => e.skillId === skill.id);
     expect(visible?.studyCount).toBe(1);
 
