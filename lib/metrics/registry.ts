@@ -4,7 +4,8 @@
 // counting lives here, and it reads the public views only — a public number
 // is always about public content. A Metric row with no entry here is manual.
 
-import { db } from "@/lib/db";
+// Counted through the public role (F1.8): a public number can only ever come from public data.
+import { dbPublic as db } from "@/lib/db";
 
 export const METRIC_COMPUTATIONS = {
   "systems.published": () => db.publicSystem.count(),

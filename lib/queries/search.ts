@@ -5,7 +5,8 @@
 // meaning, trigram similarity for typos and partial words.
 
 import { z } from "zod";
-import { db } from "@/lib/db";
+// Public reads only — the platform_public role (F1.8).
+import { dbPublic as db } from "@/lib/db";
 
 export const SearchQuerySchema = z.object({
   q: z.string().trim().min(2).max(100),

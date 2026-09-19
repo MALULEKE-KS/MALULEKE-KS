@@ -2,7 +2,7 @@
 // See openapi-contract.yaml.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { db } from "@/lib/db";
+import { dbPublic as db } from "@/lib/db";
 import { toPublicTimelineEntry } from "@/lib/rules/timeline";
 
 export async function GET(request: NextRequest) {

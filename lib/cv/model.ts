@@ -7,7 +7,8 @@
 //
 // Never invents: a missing fact stays missing, and lib/cv/check.ts reports it.
 
-import { db } from "@/lib/db";
+// Public reads only — the platform_public role (F1.8).
+import { dbPublic as db } from "@/lib/db";
 import { relevance, roleTerms } from "@/lib/cv/tailor";
 
 export interface CvLink {
