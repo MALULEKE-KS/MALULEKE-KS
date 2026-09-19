@@ -41,6 +41,8 @@ export async function POST(request: Request) {
       description: parsed.data.description ?? null,
       certificateUrl: parsed.data.certificateUrl ?? null,
       contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
+      expectedGraduation: parsed.data.expectedGraduation ? new Date(parsed.data.expectedGraduation) : null,
+      coursework: parsed.data.coursework,
       skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
     },
     ...educationWithSkills,

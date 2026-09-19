@@ -46,7 +46,7 @@ Single vertical log, not a generic icon-and-card timeline component — visually
 
 ### `/cv`
 
-1. Header — name, role line, **Download PDF** button (`POST /cv/generate`).
+1. Header — name, role line, **Download PDF** and **Download Word** buttons (`POST /cv/generate` with `format`, #74) — the same ATS-safe CV in both formats.
 2. Experience — reverse-chronological.
 3. Education.
 4. Skills — grouped by `SkillCategory`, not one flat tag cloud.
@@ -108,7 +108,7 @@ Standard CRUD for `Timeline` entries only — `POST/PATCH/DELETE /admin/timeline
 
 ### `/admin/cv`
 
-Three tabbed sections — Experience, Education, Skills — each its own standard CRUD form (`/admin/cv/experience`, `/admin/cv/education`, `/admin/cv/skills`). `SkillCategory` select pulls live from its lookup table. Deleting a `Skill` still referenced by any `System` or `Experience` is blocked with an inline reason (mirrors the BR-1.1 publish-block UX pattern) rather than a raw 409.
+Tabbed sections — Profile & links (`/admin/profile`), Experience (with CV bullets and show/hide), Education (expected graduation, coursework), Skills, Certifications (`/admin/achievements`) — plus a CV check panel (`/admin/cv/check`: score, gaps, suggested summary, preview) (#74). `SkillCategory` select pulls live from its lookup table. Deleting a `Skill` still referenced by any `System` or `Experience` is blocked with an inline reason (mirrors the BR-1.1 publish-block UX pattern) rather than a raw 409.
 
 ### `/admin/settings`
 

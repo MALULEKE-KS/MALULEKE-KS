@@ -171,6 +171,8 @@ export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
   featuredOnHome: z.boolean(),
   homeOrder: z.number().int(),
   // #69 / BR-1.11 — the repo relationship's key, and the owner's answer.
+  onCv: z.boolean(),
+  cvOrder: z.number().int(),
   repoRelationship: z.string().nullable(),
   ownerPermission: OwnerPermissionEnum,
   ownerPermissionFrom: z.string().nullable(),
@@ -224,6 +226,9 @@ export const SystemUpdateInputSchema = z
     ownerPermission: OwnerPermissionEnum.exclude(["not_required"]).optional(),
     ownerPermissionFrom: z.string().trim().min(1).nullable().optional(),
     ownerPermissionNote: z.string().trim().nullable().optional(),
+    // #74 — whether and where this system is listed on the CV (published only).
+    onCv: z.boolean().optional(),
+    cvOrder: z.number().int().min(0).optional(),
     caseStudyBody: z.string().optional(),
     repoUrl: z.string().url().nullable().optional(),
     liveUrl: z.string().url().nullable().optional(),
@@ -341,13 +346,18 @@ export const TimelineEntrySchema = z.object({
   systemId: z.string().nullable(),
 });
 
+// #74 — the same CV as PDF or Word (DOCX); a target role tailors the order.
+export const CvFormatEnum = z.enum(["pdf", "docx"]);
+
 export const CvGenerateInputSchema = z.object({
-  targetRole: z.string().nullable().optional(),
+  targetRole: z.string().trim().max(100).nullable().optional(),
+  format: CvFormatEnum.default("pdf"),
 });
 
 export const CvGenerateResultSchema = z.object({
   fileUrl: z.string().url(),
   generatedAt: z.string().datetime(),
+  format: CvFormatEnum,
 });
 
 export const FlagEntrySchema = z.object({
@@ -388,22 +398,33 @@ export const TimelineCreateInputSchema = z.object({
   contentStatus: ContentStatusEnum.optional(),
 });
 
+// A CV bullet: one achievement, concise (#74).
+const CvBulletSchema = z.string().trim().min(1).max(300);
+
 export const ExperienceEntrySchema = z.object({
   id: z.string(),
   title: z.string(),
   organization: z.string(),
+  location: z.string().nullable(),
   startDate: z.string().date(),
   endDate: z.string().date().nullable(),
   description: z.string(),
+  highlights: z.array(z.string()),
+  contentStatus: ContentStatusEnum,
   skills: z.array(z.string()),
 });
 
 export const ExperienceInputSchema = z.object({
-  title: z.string().min(1),
-  organization: z.string().min(1),
+  title: z.string().trim().min(1),
+  organization: z.string().trim().min(1),
+  location: z.string().trim().min(1).nullable().optional(),
   startDate: z.string().date(),
   endDate: z.string().date().nullable().optional(),
-  description: z.string().min(1),
+  description: z.string().trim().min(1),
+  // CV achievement bullets, in order (#74).
+  highlights: z.array(CvBulletSchema).max(15).default([]),
+  // Omitted on create = published; omitted on update = unchanged (#74).
+  contentStatus: ContentStatusEnum.optional(),
   skillIds: z.array(z.string()).default([]),
 });
 
@@ -419,6 +440,8 @@ export const EducationEntrySchema = z.object({
   certificateUrl: z.string().url().nullable(),
   contentStatus: ContentStatusEnum,
   skills: z.array(z.string()),
+  expectedGraduation: z.string().date().nullable(),
+  coursework: z.array(z.string()),
 });
 
 export const EducationInputSchema = z.object({
@@ -433,6 +456,9 @@ export const EducationInputSchema = z.object({
   // Omitted on create = published; omitted on update = unchanged (#70).
   contentStatus: ContentStatusEnum.optional(),
   skillIds: z.array(z.string()).default([]),
+  // A degree in progress (no endDate): when it's expected to finish (#74).
+  expectedGraduation: z.string().date().nullable().optional(),
+  coursework: z.array(z.string().trim().min(1).max(120)).max(30).default([]),
 });
 
 export const SkillEntrySchema = z.object({
@@ -475,3 +501,92 @@ export const ActivityLogEntrySchema = z.object({
 // allowed to construct. Every other tool call must validate against a
 // read-only response schema — never against a *Input schema that mutates state.
 export const AgentSubmitInquiryInputSchema = InquiryCreateInputSchema;
+
+// ============================================================
+// PROFILE, ACHIEVEMENTS, CV CHECK (#74) — the owner's details as data
+// ============================================================
+
+const HttpsUrlSchema = z.string().url().startsWith("https://");
+
+export const ProfileLinkSchema = z.object({
+  id: z.string(),
+  kind: z.string(),
+  label: z.string(),
+  url: z.string(),
+  sortOrder: z.number().int(),
+  onCv: z.boolean(),
+});
+
+export const ProfileSchema = z.object({
+  displayName: z.string(),
+  initials: z.string().nullable(),
+  headline: z.string().nullable(),
+  role: z.string(),
+  location: z.string().nullable(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  summary: z.string().nullable(),
+  bio: z.string().nullable(),
+  availability: z.string().nullable(),
+  buildingSinceYear: z.number().int().nullable(),
+  links: z.array(ProfileLinkSchema),
+  updatedAt: z.string().datetime(),
+});
+
+export const ProfileUpdateInputSchema = z
+  .object({
+    displayName: z.string().trim().min(1).max(120),
+    initials: z.string().trim().max(40).nullable(),
+    headline: z.string().trim().min(1).max(120).nullable(),
+    role: z.string().trim().min(1).max(160),
+    location: z.string().trim().min(1).max(120).nullable(),
+    email: z.string().trim().toLowerCase().email(),
+    phone: z.string().trim().regex(/^\+?[0-9][0-9 ()-]{6,19}$/, "digits with optional + and separators").nullable(),
+    summary: z.string().trim().max(1200).nullable(),
+    bio: z.string().trim().max(4000).nullable(),
+    availability: z.string().trim().max(200).nullable(),
+    buildingSinceYear: z.number().int().min(1990).max(2100).nullable(),
+  })
+  .partial()
+  .refine((d) => Object.values(d).some((v) => v !== undefined), { message: "Nothing to update" });
+
+export const ProfileLinkInputSchema = z.object({
+  kind: z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -"),
+  label: z.string().trim().min(1).max(60),
+  url: z.string().trim().url().refine((u) => u.startsWith("https://") || u.startsWith("mailto:"), "https:// or mailto: only"),
+  sortOrder: z.number().int().min(0).default(0),
+  onCv: z.boolean().default(true),
+});
+
+export const ProfileLinkUpdateInputSchema = ProfileLinkInputSchema.partial().refine(
+  (d) => Object.values(d).some((v) => v !== undefined),
+  { message: "Nothing to update" },
+);
+
+export const AchievementEntrySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  issuer: z.string().nullable(),
+  achievedOn: z.string().date(),
+  description: z.string().nullable(),
+  url: z.string().nullable(),
+  systemId: z.string().nullable(),
+  contentStatus: ContentStatusEnum,
+  sortOrder: z.number().int(),
+});
+
+export const AchievementInputSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  issuer: z.string().trim().min(1).max(200).nullable().optional(),
+  achievedOn: z.string().date(),
+  description: z.string().trim().max(1000).nullable().optional(),
+  url: HttpsUrlSchema.nullable().optional(),
+  systemId: z.string().nullable().optional(),
+  // Omitted on create = draft (the table's default); omitted on update = unchanged.
+  contentStatus: ContentStatusEnum.optional(),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
+export const CvCheckQuerySchema = z.object({
+  targetRole: z.string().trim().max(100).optional(),
+});

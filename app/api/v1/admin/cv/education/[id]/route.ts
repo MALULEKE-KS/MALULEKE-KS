@@ -41,6 +41,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           certificateUrl: parsed.data.certificateUrl ?? null,
           // Showing or hiding is the admin's call (#70).
           ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
+          expectedGraduation: parsed.data.expectedGraduation ? new Date(parsed.data.expectedGraduation) : null,
+          coursework: parsed.data.coursework,
           skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
         },
         ...educationWithSkills,

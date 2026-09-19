@@ -99,6 +99,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           // Homepage curation (#52) — the admin hand-picks and orders these.
           ...(parsed.data.featuredOnHome !== undefined && { featuredOnHome: parsed.data.featuredOnHome }),
           ...(parsed.data.homeOrder !== undefined && { homeOrder: parsed.data.homeOrder }),
+          // CV inclusion and order (#74) — the CV lists published systems only.
+          ...(parsed.data.onCv !== undefined && { onCv: parsed.data.onCv }),
+          ...(parsed.data.cvOrder !== undefined && { cvOrder: parsed.data.cvOrder }),
           ...(parsed.data.caseStudyBody !== undefined && { caseStudyBody: parsed.data.caseStudyBody }),
           ...(parsed.data.repoUrl !== undefined && { repoUrl: parsed.data.repoUrl }),
           ...(parsed.data.liveUrl !== undefined && { liveUrl: parsed.data.liveUrl }),

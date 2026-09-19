@@ -221,6 +221,9 @@ model System {
   // Only published systems are ever shown, whatever this says.
   featuredOnHome         Boolean          @default(false)
   homeOrder              Int              @default(0)
+  // Listed under Projects on the CV (#74) — published systems only, whatever this says.
+  onCv                   Boolean          @default(true)
+  cvOrder                Int              @default(0)
 
   // --- Repo ownership (#69, BR-1.11) ---
   // How this system's repo relates to the owner: owned, collaborated on, ...
@@ -391,9 +394,16 @@ model Profile {
   id                Int           @id @default(1)
   displayName       String
   initials          String?
+  // The CV/profile headline, e.g. "Software & AI Engineer" (#74). role keeps
+  // the organizational title.
+  headline          String?
   role              String
   location          String?
   email             String
+  // Shown on the CV only when the owner sets it — never derived from links.
+  phone             String?
+  // The CV's professional summary (2–4 lines), written or approved by the owner.
+  summary           String?
   bio               String?
   availability      String?
   buildingSinceYear Int?
@@ -412,6 +422,7 @@ model ProfileLink {
   label     String
   url       String
   sortOrder Int      @default(0)
+  onCv      Boolean  @default(true) // include on the generated CV (#74)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -439,35 +450,45 @@ model Achievement {
 }
 
 model Experience {
-  id           String              @id @default(cuid())
-  title        String
-  organization String
-  startDate    DateTime            @db.Timestamptz(3)
-  endDate      DateTime?           @db.Timestamptz(3)
-  description  String
-  skills       SkillOnExperience[]
-  createdAt    DateTime            @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
+  id            String              @id @default(cuid())
+  title         String
+  organization  String
+  location      String?
+  startDate     DateTime            @db.Timestamptz(3)
+  endDate       DateTime?           @db.Timestamptz(3)
+  description   String
+  // Achievement bullets for the CV, in order (#74) — what was done and its
+  // impact. Tailoring puts the most relevant first.
+  highlights    String[]            @default([])
+  // Only PUBLISHED roles appear on /cv and in the generated CV (#74).
+  contentStatus ContentStatus       @default(PUBLISHED)
+  skills        SkillOnExperience[]
+  createdAt     DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Education {
-  id             String             @id @default(cuid())
-  institution    String
-  qualification  String
-  startDate      DateTime           @db.Timestamptz(3)
-  endDate        DateTime?          @db.Timestamptz(3) // null = still studying
-  honors         String?
+  id                 String             @id @default(cuid())
+  institution        String
+  qualification      String
+  startDate          DateTime           @db.Timestamptz(3)
+  endDate            DateTime?          @db.Timestamptz(3) // null = still studying
+  honors             String?
   // #70 — what was studied, and proof of it. All optional: nothing is
   // required that the owner hasn't provided.
-  fieldOfStudy   String?
-  description    String?
-  certificateUrl String? // https only (CHECK)
+  fieldOfStudy       String?
+  description        String?
+  certificateUrl     String? // https only (CHECK)
+  // For a degree in progress (endDate null): when it's expected to finish (#74).
+  expectedGraduation DateTime?          @db.Date
+  // Relevant modules — standard on a student's CV (#74).
+  coursework         String[]           @default([])
   // Only PUBLISHED entries appear on /cv and in the generated CV; the admin
   // decides what's shown.
-  contentStatus  ContentStatus      @default(PUBLISHED)
-  skills         SkillOnEducation[]
-  createdAt      DateTime           @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
+  contentStatus      ContentStatus      @default(PUBLISHED)
+  skills             SkillOnEducation[]
+  createdAt          DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([contentStatus, startDate])
 }
@@ -542,6 +563,10 @@ model DocumentGen {
   fileData            Bytes
   fileUrl             String // resolves to the /api/v1/cv/documents/{id} download route
   supersededByFileUrl String? // BR-7.2 — prior versions kept, not deleted
+  // "pdf" | "docx" — the same CV in two formats (#74). Supersession is per format.
+  format              String   @default("pdf")
+  // The completeness report when this document was generated (#74).
+  completeness        Json?
 }
 
 // ============================================================
@@ -752,6 +777,8 @@ view PublicSystem {
   caseStudyBody    String
   githubPushedAt   DateTime?
   updatedAt        DateTime
+  onCv             Boolean
+  cvOrder          Int
 }
 
 view PublicImpact {
@@ -786,16 +813,18 @@ view PublicTimeline {
 }
 
 view PublicEducation {
-  id             String    @unique
-  institution    String
-  qualification  String
-  fieldOfStudy   String?
-  startDate      DateTime
-  endDate        DateTime?
-  honors         String?
-  description    String?
-  certificateUrl String?
-  skills         String[]
+  id                 String    @unique
+  institution        String
+  qualification      String
+  fieldOfStudy       String?
+  startDate          DateTime
+  endDate            DateTime?
+  honors             String?
+  description        String?
+  certificateUrl     String?
+  skills             String[]
+  expectedGraduation DateTime?
+  coursework         String[]
 }
 
 view PublicOrganization {
@@ -825,14 +854,43 @@ view PublicProfile {
   bio               String?
   availability      String?
   buildingSinceYear Int?
+  headline          String?
+  phone             String?
+  summary           String?
 }
 
 view PublicProfileLink {
-  id        String @unique
+  id        String  @unique
   kind      String
   label     String
   url       String
   sortOrder Int
+  onCv      Boolean
+}
+
+// Roles the admin chose to show (#74), with their skills.
+view PublicExperience {
+  id           String    @unique
+  title        String
+  organization String
+  location     String?
+  startDate    DateTime
+  endDate      DateTime?
+  description  String
+  highlights   String[]
+  skills       String[]
+}
+
+// Certifications and awards the admin published (#74).
+view PublicAchievement {
+  id          String   @unique
+  title       String
+  issuer      String?
+  achievedOn  DateTime
+  description String?
+  url         String?
+  systemSlug  String?
+  sortOrder   Int
 }
 
 // Only admin-approved numbers (BR-5.3).

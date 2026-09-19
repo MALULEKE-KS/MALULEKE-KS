@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ExperienceInputSchema } from "@/lib/schemas";
 import { experienceWithSkills, toExperienceEntry } from "@/lib/rules/cv";
+import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { logActivity } from "@/lib/auth/activity-log";
 
@@ -36,9 +37,12 @@ export async function POST(request: Request) {
     data: {
       title: parsed.data.title,
       organization: parsed.data.organization,
+      location: parsed.data.location ?? null,
       startDate: new Date(parsed.data.startDate),
       endDate: parsed.data.endDate ? new Date(parsed.data.endDate) : null,
       description: parsed.data.description,
+      highlights: parsed.data.highlights,
+      contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
       skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
     },
     ...experienceWithSkills,

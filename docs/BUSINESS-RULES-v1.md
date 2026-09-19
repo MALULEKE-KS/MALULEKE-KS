@@ -90,7 +90,9 @@
 | Rule | Statement |
 |---|---|
 | BR-7.1 | Every `DocumentGen` output reflects the live database state at generation time — never a manually maintained static file drifting out of sync |
-| BR-7.2 | Prior generated documents are superseded, not deleted, when a new one is generated for the same `type`/`targetRole` pair — consistent with the platform's additive-only philosophy (EXT-1) |
+| BR-7.2 | Prior generated documents are superseded, not deleted, when a new one is generated for the same `type`/`targetRole`/`format` (PDF or Word) — consistent with the platform's additive-only philosophy (EXT-1) |
+| BR-7.3 | The CV carries only what the site itself shows: published roles, education, projects and certifications, with every BR-1.x masking applied, plus the owner's profile. It never invents content — a missing fact is reported by the completeness check for the owner to supply, and a suggested summary is drafted only from facts already on the CV and saved only if the owner accepts it |
+| BR-7.4 | The CV is generated ATS-safe, identically as PDF and Word: one column, standard section headings, real text in reading order (no tables, columns or images carrying content), no hyphenation, and every link written out as text. A target role may reorder projects, bullets and skills by relevance; it never rewrites or drops the owner's words |
 
 ## 8. Extension Governance
 
