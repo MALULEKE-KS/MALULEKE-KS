@@ -1,0 +1,35 @@
+# docker-compose.yml
+# Local dev database only — the Next.js app itself runs directly via
+# `npm run dev`, not in a container (no benefit to containerizing dev-mode
+# hot-reload, real cost in volume-mount/host-networking complexity).
+#
+# Uses the same pgvector/pgvector:pg16 image already proven working in CI
+# (.github/workflows/ci.yml) — no native Postgres install, no compiling
+# pgvector from source (which on Windows means installing Visual Studio
+# Build Tools first — see this repo's own history for how painful that path
+# is). This is an additional option alongside a native Postgres install,
+# not a replacement — use whichever you already have working.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: malulekeks
+      POSTGRES_PASSWORD: malulekeks_dev
+      POSTGRES_DB: malulekeks
+    ports:
+      # If you already run a native Postgres on 5432 (like this project's
+      # own dev machine does), change the host side, e.g. "5433:5432", and
+      # update DATABASE_URL in .env.local to match.
+      - "5432:5432"
+    volumes:
+      - malulekeks_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U malulekeks"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  malulekeks_postgres_data:
