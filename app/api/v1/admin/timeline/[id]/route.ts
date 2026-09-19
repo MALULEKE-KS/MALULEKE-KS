@@ -4,20 +4,15 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
 import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = TimelineCreateInputSchema.safeParse(body);
@@ -26,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const entry = await db.timeline.update({
+    const entry = await write((tx) => tx.timeline.update({
       where: { id },
       data: {
         milestoneTypeId: parsed.data.milestoneTypeId,
@@ -39,15 +34,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
       },
       ...timelineWithMilestoneType,
-    });
-
-    await logActivity({
-      adminUserId,
-      action: "timeline.update",
-      entityType: "Timeline",
-      entityId: id,
-      after: { title: entry.title, contentStatus: entry.contentStatus },
-    });
+    }));
 
     return NextResponse.json(toTimelineEntry(entry));
   } catch (err) {
@@ -56,17 +43,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     throw err;
   }
-}
+});
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const DELETE = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
 
   try {
-    await db.timeline.delete({ where: { id } });
-    await logActivity({ adminUserId, action: "timeline.delete", entityType: "Timeline", entityId: id });
+    await write((tx) => tx.timeline.delete({ where: { id } }));
     return new NextResponse(null, { status: 204 });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
@@ -74,4 +57,4 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
     throw err;
   }
-}
+});

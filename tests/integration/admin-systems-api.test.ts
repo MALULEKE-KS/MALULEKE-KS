@@ -61,8 +61,10 @@ afterAll(async () => {
 });
 
 describe("GET/POST /api/v1/admin/systems", () => {
-  it("GET returns the full list (proxy.ts, not the route itself, is the real session gate)", async () => {
-    const res = await listSystems(makeRequest("http://localhost/api/v1/admin/systems", "GET", null, false));
+  it("GET requires a session in the route itself too, not only in proxy.ts (F2.1 — defence in depth)", async () => {
+    const anonymous = await listSystems(makeRequest("http://localhost/api/v1/admin/systems", "GET", null, false));
+    expect(anonymous.status).toBe(401);
+    const res = await listSystems(makeRequest("http://localhost/api/v1/admin/systems", "GET", null, true));
     expect(res.status).toBe(200);
   });
 
@@ -262,6 +264,8 @@ describe("PATCH /api/v1/admin/systems/[id]", () => {
       where: { adminUserId: adminId, entityType: "System", entityId: system.id },
     });
     expect(log).not.toBeNull();
+    // Logged by the database (F2.1), attributed to the admin, changed columns only.
     expect(log?.action).toBe("system.update");
+    expect(log?.after).toMatchObject({ sortOrder: 9 });
   });
 });

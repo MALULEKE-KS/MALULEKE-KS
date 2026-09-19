@@ -389,7 +389,9 @@ describe("profile and achievements", () => {
     const profile = await db.profile.findUniqueOrThrow({ where: { id: 1 }, include: { links: true } });
     expect(profile.displayName).toBe("Kurhula Success Maluleke");
     expect(profile.bio).toBeNull();
-    expect(profile.links.map((l) => l.kind).sort()).toEqual(["github", "linkedin", "whatsapp"]);
+    // Other test files add a temporary link of their own in parallel, so
+    // assert the seeded links are there rather than that nothing else is.
+    expect(profile.links.map((l) => l.kind)).toEqual(expect.arrayContaining(["github", "linkedin", "whatsapp"]));
     await expect(
       db.profile.create({ data: { id: 2, displayName: "Someone", role: "Role", email: "a@b.co" } }),
     ).rejects.toThrow(/Profile_singleton/);

@@ -1579,7 +1579,7 @@ components:
         subjectHash: { type: string, nullable: true, description: "Keyed hash of what an anonymous actor tried, e.g. an unknown login email" }
         ipHash: { type: string, nullable: true }
         userAgentHash: { type: string, nullable: true }
-        action: { type: string }
+        action: { type: string, description: "Data changes are logged by the database as <table>.<create|update|delete> (e.g. system.update), with only the changed columns and secrets/PII redacted; auth events keep their own names (auth.login, auth.login_failed, …)" }
         entityType: { type: string, nullable: true }
         entityId: { type: string, nullable: true }
         before: { type: object, nullable: true }

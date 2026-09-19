@@ -7,11 +7,9 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { SystemUpdateInputSchema } from "@/lib/schemas";
 import { canPublish, systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 import { ruleViolation } from "@/lib/db-errors";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
@@ -26,10 +24,7 @@ const OWNER_PERMISSION_MAP = {
   declined: "DECLINED",
 } as const;
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = SystemUpdateInputSchema.safeParse(body);
@@ -38,7 +33,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const { updated, before } = await db.$transaction(async (tx) => {
+    const { updated, before } = await write(async (tx) => {
       // BR-1.10 — read current state INSIDE the transaction, never a value
       // cached from earlier in the request, so two concurrent PATCHes can't
       // race past this check.
@@ -116,25 +111,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return { updated, before: current };
     });
 
-    await logActivity({
-      adminUserId,
-      action: "system.update",
-      entityType: "System",
-      entityId: id,
-      before: {
-        contentStatus: before.contentStatus,
-        clientApproved: before.clientApproved,
-        repoRelationshipId: before.repoRelationshipId,
-        ownerPermission: before.ownerPermission,
-      },
-      after: {
-        contentStatus: updated.contentStatus,
-        clientApproved: updated.clientApproved,
-        repoRelationshipId: updated.repoRelationshipId,
-        ownerPermission: updated.ownerPermission,
-      },
-    });
-
     return NextResponse.json(toAdminSystem(updated));
   } catch (err) {
     if (err instanceof Error && err.message === "NOT_FOUND") {
@@ -170,4 +146,4 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     throw err;
   }
-}
+});

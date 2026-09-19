@@ -4,6 +4,7 @@
 // the site down. Writes are validated against the registry before they touch
 // the database.
 
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { SETTINGS, SETTING_KEYS, type SettingKey, type SettingValue } from "@/lib/settings/registry";
 
@@ -50,13 +51,16 @@ export type UpdateSettingResult =
   | { ok: true; before: unknown; after: unknown }
   | { ok: false; issues: unknown };
 
-/** Validate against the registry, then upsert. */
-export async function updateSetting(key: SettingKey, value: unknown): Promise<UpdateSettingResult> {
+/**
+ * Validate against the registry, then upsert — inside the caller's audited
+ * transaction (F2.1), so the change is logged with who made it.
+ */
+export async function updateSetting(tx: Prisma.TransactionClient, key: SettingKey, value: unknown): Promise<UpdateSettingResult> {
   const def = SETTINGS[key];
   const parsed = def.schema.safeParse(value);
   if (!parsed.success) return { ok: false, issues: parsed.error.issues };
   const before = await getSetting(key);
-  await db.platformSetting.upsert({
+  await tx.platformSetting.upsert({
     where: { key },
     create: { key, value: parsed.data as never },
     update: { value: parsed.data as never },

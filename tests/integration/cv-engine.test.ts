@@ -200,6 +200,8 @@ describe("everything on the CV is editable in the admin", () => {
     expect(model.summary).toBe(`${RUN} summary.`);
     expect(model.phone).toBe("+27 60 000 0000");
     expect(await db.activityLog.count({ where: { action: "profile.update", adminUserId: adminId } })).toBe(1);
+    const entry = await db.activityLog.findFirstOrThrow({ where: { action: "profile.update", adminUserId: adminId } });
+    expect(Object.keys(entry.after as object).sort()).toEqual(["phone", "summary"]); // headline didn't change
 
     const got = await getProfile(adminRequest(`${SITE}/api/v1/admin/profile`, "GET"));
     expect((await got.json()).links.length).toBeGreaterThanOrEqual(3);

@@ -3,10 +3,17 @@
 // See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
-import { isLookupType, listLookupValues, createLookupValue, unsupportedExtras } from "@/lib/rules/lookups";
+import { Prisma } from "@prisma/client";
+import {
+  createLookupValue,
+  existingLookupConflict,
+  isLookupType,
+  listLookupValues,
+  unsupportedExtras,
+} from "@/lib/rules/lookups";
 import { LookupCreateInputSchema } from "@/lib/schemas";
+import { withAdmin } from "@/lib/auth/with-admin";
 import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -30,10 +37,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
   return NextResponse.json(await listLookupValues(type, includeInactive));
 }
 
-export async function POST(request: Request, { params }: { params: Promise<{ type: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin<{ type: string }>(async (request, { write }, { params }) => {
   const { type } = await params;
   if (!isLookupType(type)) {
     return errorResponse("NOT_FOUND", `Unknown lookup type "${type}"`, 404);
@@ -49,7 +53,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ typ
     return errorResponse("VALIDATION_ERROR", `${unsupported.join(", ")} do not apply to ${type} values`, 400);
   }
 
-  const result = await createLookupValue(type, key, label, extras);
+  let result;
+  try {
+    result = await write((tx) => createLookupValue(tx, type, key, label, extras));
+  } catch (err) {
+    // A concurrent create won the race to the unique key — same answer (BR-8.3).
+    const raced = err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002"
+      ? await existingLookupConflict(type, key)
+      : null;
+    if (!raced) throw err;
+    result = raced;
+  }
   if (!result.ok) {
     // BR-8.3 — an actionable answer, never a raw uniqueness failure.
     return result.code === "LOOKUP_KEY_DEPRECATED"
@@ -62,14 +76,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ typ
       : errorResponse("LOOKUP_KEY_EXISTS", `"${key}" already exists.`, 409, { existingId: result.existingId });
   }
 
-  await logActivity({
-    adminUserId,
-    action: "lookup.create",
-    entityType: type,
-    entityId: result.value.id,
-    after: result.value,
-    request,
-  });
-
   return NextResponse.json(result.value, { status: 201 });
-}
+});

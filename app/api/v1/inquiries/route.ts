@@ -10,6 +10,7 @@ import { InquiryCreateInputSchema } from "@/lib/schemas";
 import { isHoneypotFilled, sourceFromReferer } from "@/lib/rules/inquiries";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
 import { getSetting } from "@/lib/settings";
+import { withActor } from "@/lib/audit";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -63,16 +64,20 @@ export async function POST(request: Request) {
   const source = sourceFromReferer(request.headers.get("referer"));
 
   try {
-    const inquiry = await db.inquiry.create({
-      data: {
-        name: parsed.data.name,
-        email: parsed.data.email,
-        message: parsed.data.message,
-        inquiryTypeId: inquiryType.id,
-        source,
-        idempotencyKey: parsed.data.idempotencyKey,
-      },
-    });
+    // Audited by the database as an ANONYMOUS visitor, with hashed request
+    // context; the log never holds the name, email or message (F2.1).
+    const inquiry = await withActor({ kind: "anonymous", request }, (tx) =>
+      tx.inquiry.create({
+        data: {
+          name: parsed.data.name,
+          email: parsed.data.email,
+          message: parsed.data.message,
+          inquiryTypeId: inquiryType.id,
+          source,
+          idempotencyKey: parsed.data.idempotencyKey,
+        },
+      }),
+    );
 
     return NextResponse.json(
       { id: inquiry.id, status: "new", submittedAt: inquiry.createdAt.toISOString() },

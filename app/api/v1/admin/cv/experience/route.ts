@@ -5,35 +5,28 @@ import { db } from "@/lib/db";
 import { ExperienceInputSchema } from "@/lib/schemas";
 import { experienceWithSkills, toExperienceEntry } from "@/lib/rules/cv";
 import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const GET = withAdmin(async (request, _admin) => {
   const experience = await db.experience.findMany({
     ...experienceWithSkills,
     orderBy: { startDate: "desc" },
   });
   return NextResponse.json({ data: experience.map(toExperienceEntry) });
-}
+});
 
-export async function POST(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin(async (request, { write }) => {
   const body = await request.json().catch(() => null);
   const parsed = ExperienceInputSchema.safeParse(body);
   if (!parsed.success) {
     return errorResponse("VALIDATION_ERROR", "Invalid experience entry", 400, { issues: parsed.error.issues });
   }
 
-  const experience = await db.experience.create({
+  const experience = await write((tx) => tx.experience.create({
     data: {
       title: parsed.data.title,
       organization: parsed.data.organization,
@@ -46,15 +39,7 @@ export async function POST(request: Request) {
       skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },
     },
     ...experienceWithSkills,
-  });
-
-  await logActivity({
-    adminUserId,
-    action: "experience.create",
-    entityType: "Experience",
-    entityId: experience.id,
-    after: { title: experience.title, organization: experience.organization },
-  });
+  }));
 
   return NextResponse.json(toExperienceEntry(experience), { status: 201 });
-}
+});

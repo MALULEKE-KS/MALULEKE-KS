@@ -4,25 +4,18 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
 import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const GET = withAdmin(async (request, _admin) => {
   const entries = await db.timeline.findMany({ ...timelineWithMilestoneType, orderBy: { date: "desc" } });
   return NextResponse.json({ data: entries.map(toTimelineEntry) });
-}
+});
 
-export async function POST(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin(async (request, { write }) => {
   const body = await request.json().catch(() => null);
   const parsed = TimelineCreateInputSchema.safeParse(body);
   if (!parsed.success) {
@@ -34,7 +27,7 @@ export async function POST(request: Request) {
     return errorResponse("VALIDATION_ERROR", "Unknown milestoneTypeId", 400);
   }
 
-  const entry = await db.timeline.create({
+  const entry = await write((tx) => tx.timeline.create({
     data: {
       milestoneTypeId: parsed.data.milestoneTypeId,
       title: parsed.data.title,
@@ -45,15 +38,7 @@ export async function POST(request: Request) {
       contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
     },
     ...timelineWithMilestoneType,
-  });
-
-  await logActivity({
-    adminUserId,
-    action: "timeline.create",
-    entityType: "Timeline",
-    entityId: entry.id,
-    after: { title: entry.title },
-  });
+  }));
 
   return NextResponse.json(toTimelineEntry(entry), { status: 201 });
-}
+});

@@ -4,20 +4,15 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { SkillInputSchema } from "@/lib/schemas";
 import { skillWithCategory, toSkillEntry } from "@/lib/rules/cv";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = SkillInputSchema.safeParse(body);
@@ -26,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const skill = await db.skill.update({
+    const skill = await write((tx) => tx.skill.update({
       where: { id },
       data: {
         name: parsed.data.name,
@@ -34,15 +29,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         yearsExperience: parsed.data.yearsExperience ?? null,
       },
       ...skillWithCategory,
-    });
-
-    await logActivity({
-      adminUserId,
-      action: "skill.update",
-      entityType: "Skill",
-      entityId: id,
-      after: { name: skill.name },
-    });
+    }));
 
     return NextResponse.json(toSkillEntry(skill));
   } catch (err) {
@@ -51,17 +38,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     throw err;
   }
-}
+});
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const DELETE = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
 
   try {
-    await db.skill.delete({ where: { id } });
-    await logActivity({ adminUserId, action: "skill.delete", entityType: "Skill", entityId: id });
+    await write((tx) => tx.skill.delete({ where: { id } }));
     return new NextResponse(null, { status: 204 });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
@@ -74,4 +57,4 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
     throw err;
   }
-}
+});

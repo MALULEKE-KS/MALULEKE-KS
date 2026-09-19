@@ -160,31 +160,36 @@ export type CreateLookupResult =
 // BR-8.1 — the one place a new lookup value gets created, for any type.
 // BR-8.3 — re-creating a key that exists answers with an actionable code:
 // reactivate a deprecated value rather than duplicating it.
+// Runs inside the caller's audited transaction (F2.1), so the key is checked
+// before the insert — a failed insert would abort the whole transaction.
+// A concurrent create can still hit the unique key (P2002); callers map it
+// with existingLookupConflict().
 export async function createLookupValue(
+  tx: Prisma.TransactionClient,
   type: LookupType,
   key: string,
   label: string,
   extras: LookupExtras = {},
 ): Promise<CreateLookupResult> {
-  try {
-    const row = await db.$transaction(async (tx) => {
-      await releaseAutoDraftFlag(tx, type, extras);
-      return delegate(type, tx).create({ data: { key, label, ...extrasData(type, extras) } });
-    });
-    return { ok: true, value: toLookupView(type, row) };
-  } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
-      const existing = await delegate(type).findUnique({ where: { key } });
-      if (existing) {
-        return {
-          ok: false,
-          code: existing.active ? "LOOKUP_KEY_EXISTS" : "LOOKUP_KEY_DEPRECATED",
-          existingId: existing.id,
-        };
-      }
-    }
-    throw err;
-  }
+  const existing = await delegate(type, tx).findUnique({ where: { key } });
+  if (existing) return conflict(existing);
+  await releaseAutoDraftFlag(tx, type, extras);
+  const row = await delegate(type, tx).create({ data: { key, label, ...extrasData(type, extras) } });
+  return { ok: true, value: toLookupView(type, row) };
+}
+
+function conflict(existing: LookupRow): CreateLookupResult {
+  return {
+    ok: false,
+    code: existing.active ? "LOOKUP_KEY_EXISTS" : "LOOKUP_KEY_DEPRECATED",
+    existingId: existing.id,
+  };
+}
+
+/** After a unique-key race (P2002), the same BR-8.3 answer as the pre-check. */
+export async function existingLookupConflict(type: LookupType, key: string): Promise<CreateLookupResult | null> {
+  const existing = await delegate(type).findUnique({ where: { key } });
+  return existing ? conflict(existing) : null;
 }
 
 // Edit an existing value. The key is immutable (BR-8.3 keeps keys stable).
@@ -193,18 +198,17 @@ export async function createLookupValue(
 // can start or stop requiring the owner's permission; the database re-checks
 // every system using it (BR-1.11).
 export async function updateLookupValue(
+  tx: Prisma.TransactionClient,
   type: LookupType,
   id: string,
   changes: { label?: string } & LookupExtras,
 ): Promise<{ before: LookupValueView; after: LookupValueView } | null> {
-  const existing = await delegate(type).findUnique({ where: { id } });
+  const existing = await delegate(type, tx).findUnique({ where: { id } });
   if (!existing) return null;
-  const row = await db.$transaction(async (tx) => {
-    await releaseAutoDraftFlag(tx, type, changes, id);
-    return delegate(type, tx).update({
-      where: { id },
-      data: { ...(changes.label && { label: changes.label }), ...extrasData(type, changes) },
-    });
+  await releaseAutoDraftFlag(tx, type, changes, id);
+  const row = await delegate(type, tx).update({
+    where: { id },
+    data: { ...(changes.label && { label: changes.label }), ...extrasData(type, changes) },
   });
   return { before: toLookupView(type, existing), after: toLookupView(type, row) };
 }
@@ -212,14 +216,13 @@ export async function updateLookupValue(
 // BR-8.2 — marks a value inactive without deleting it, regardless of
 // whether it's currently referenced. Hard delete is a separate, unexposed
 // operation reserved for never-used values (no route exposes it).
-export async function deprecateLookupValue(type: LookupType, id: string): Promise<LookupValueView | null> {
-  try {
-    const row = await delegate(type).update({ where: { id }, data: { active: false } });
-    return toLookupView(type, row);
-  } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
-      return null;
-    }
-    throw err;
-  }
+export async function deprecateLookupValue(
+  tx: Prisma.TransactionClient,
+  type: LookupType,
+  id: string,
+): Promise<LookupValueView | null> {
+  const existing = await delegate(type, tx).findUnique({ where: { id } });
+  if (!existing) return null;
+  const row = await delegate(type, tx).update({ where: { id }, data: { active: false } });
+  return toLookupView(type, row);
 }

@@ -1,20 +1,20 @@
 // GET/POST /api/v1/admin/systems — full list incl. drafts/NDA; create applies
 // BR-1.2 default (clientVisibility=REQUIRES_APPROVAL for isClient orgs).
-// See openapi-contract.yaml. security: adminSession (BR-3.1), enforced by proxy.ts.
+// See openapi-contract.yaml. security: adminSession (BR-3.1) — proxy.ts, and
+// withAdmin on every handler (F2.1).
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { SystemCreateInputSchema } from "@/lib/schemas";
 import { defaultClientVisibility, systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+export const GET = withAdmin(async (request) => {
+  const { searchParams } = new URL(request.url);
   const contentStatus = searchParams.get("contentStatus");
   const needsCurationParam = searchParams.get("needsCuration");
 
@@ -28,12 +28,9 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json({ data: systems.map(toAdminSystem) });
-}
+});
 
-export async function POST(request: NextRequest) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin(async (request, { write }) => {
   const body = await request.json().catch(() => null);
   const parsed = SystemCreateInputSchema.safeParse(body);
   if (!parsed.success) {
@@ -45,7 +42,7 @@ export async function POST(request: NextRequest) {
     return errorResponse("VALIDATION_ERROR", "Unknown organizationId", 400);
   }
 
-  const system = await db.system.create({
+  const system = await write((tx) => tx.system.create({
     data: {
       name: parsed.data.name,
       slug: parsed.data.slug,
@@ -62,15 +59,7 @@ export async function POST(request: NextRequest) {
       clientVisibility: defaultClientVisibility(organization.isClient, parsed.data.clientVisibility),
     },
     ...systemWithAdminRelations,
-  });
-
-  await logActivity({
-    adminUserId,
-    action: "system.create",
-    entityType: "System",
-    entityId: system.id,
-    after: { name: system.name, slug: system.slug },
-  });
+  }));
 
   return NextResponse.json(toAdminSystem(system), { status: 201 });
-}
+});

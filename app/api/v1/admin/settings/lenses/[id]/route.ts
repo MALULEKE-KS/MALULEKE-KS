@@ -2,19 +2,14 @@
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
 import { VisitorLensInputSchema } from "@/lib/schemas";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = VisitorLensInputSchema.safeParse(body);
@@ -23,7 +18,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const lens = await db.visitorLens.update({
+    const lens = await write((tx) => tx.visitorLens.update({
       where: { id },
       data: {
         key: parsed.data.key,
@@ -31,15 +26,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         priorityContent: parsed.data.priorityContent as Prisma.InputJsonValue,
         aiFramingPrompt: parsed.data.aiFramingPrompt,
       },
-    });
-
-    await logActivity({
-      adminUserId,
-      action: "visitorLens.update",
-      entityType: "VisitorLens",
-      entityId: id,
-      after: { key: lens.key, label: lens.label },
-    });
+    }));
 
     return NextResponse.json(lens);
   } catch (err) {
@@ -48,4 +35,4 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     throw err;
   }
-}
+});

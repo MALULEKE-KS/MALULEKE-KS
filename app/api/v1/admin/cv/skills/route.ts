@@ -4,25 +4,18 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { SkillInputSchema } from "@/lib/schemas";
 import { skillWithCategory, toSkillEntry } from "@/lib/rules/cv";
-import { getSessionAdminId } from "@/lib/auth/session";
-import { logActivity } from "@/lib/auth/activity-log";
+import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
-export async function GET(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const GET = withAdmin(async (request, _admin) => {
   const skills = await db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } });
   return NextResponse.json({ data: skills.map(toSkillEntry) });
-}
+});
 
-export async function POST(request: Request) {
-  const adminUserId = await getSessionAdminId(request);
-  if (!adminUserId) return errorResponse("UNAUTHORIZED", "Session expired or invalid.", 401);
-
+export const POST = withAdmin(async (request, { write }) => {
   const body = await request.json().catch(() => null);
   const parsed = SkillInputSchema.safeParse(body);
   if (!parsed.success) {
@@ -34,22 +27,14 @@ export async function POST(request: Request) {
     return errorResponse("VALIDATION_ERROR", "Unknown categoryId", 400);
   }
 
-  const skill = await db.skill.create({
+  const skill = await write((tx) => tx.skill.create({
     data: {
       name: parsed.data.name,
       categoryId: parsed.data.categoryId,
       yearsExperience: parsed.data.yearsExperience ?? null,
     },
     ...skillWithCategory,
-  });
-
-  await logActivity({
-    adminUserId,
-    action: "skill.create",
-    entityType: "Skill",
-    entityId: skill.id,
-    after: { name: skill.name },
-  });
+  }));
 
   return NextResponse.json(toSkillEntry(skill), { status: 201 });
-}
+});
