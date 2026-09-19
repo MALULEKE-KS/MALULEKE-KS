@@ -5,7 +5,7 @@
 // See docs/PAGE-SPECIFICATIONS.md ("/journey — Timeline").
 
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { dbPublic as db } from "@/lib/db";
 import { toPublicTimelineEntry } from "@/lib/rules/timeline";
 import { Container } from "@/components/shared/Container";
 

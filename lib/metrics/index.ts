@@ -7,7 +7,7 @@
 // (propose_metric_snapshot / approve_metric_snapshot, migration 20260919070000).
 
 import type { MetricSource } from "@prisma/client";
-import { db } from "@/lib/db";
+import { db, dbPublic } from "@/lib/db";
 import { logActivity } from "@/lib/auth/activity-log";
 import { METRIC_COMPUTATIONS, isComputedMetric } from "@/lib/metrics/registry";
 
@@ -65,5 +65,5 @@ export async function rejectMetricSnapshot(snapshotId: string, adminUserId: stri
 
 /** The public, approved numbers, in the admin's order. */
 export async function getPublicMetrics() {
-  return db.publicMetric.findMany({ orderBy: { sortOrder: "asc" } });
+  return dbPublic.publicMetric.findMany({ orderBy: { sortOrder: "asc" } });
 }

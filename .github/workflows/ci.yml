@@ -40,6 +40,9 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_test
       DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_test
+      # F1.8: public reads run as the restricted platform_public role, exactly
+      # as in production. The login is created after migrations (below).
+      DATABASE_URL_PUBLIC: postgresql://ci_public:ci_public@localhost:5432/malulekeks_test
       # Test-only dummy values — not real secrets, just satisfying the env
       # vars lib/auth/crypto.ts and lib/auth/session.ts require to run at
       # all. Real deployments get real values from Vercel's env config.
@@ -54,6 +57,10 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npx prisma migrate deploy
+      # A login in the platform_public group (created by the migration), so the
+      # whole suite reads public data through the restricted role.
+      - name: Create the restricted public login
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d malulekeks_test -c "CREATE ROLE ci_public LOGIN PASSWORD 'ci_public' IN ROLE platform_public;"
       # Direct tsx invocation, not `npm run db:seed` — that script wraps with
       # `dotenv -e .env.local`, which doesn't exist in CI. The job's own
       # `env:` block above already provides DATABASE_URL directly.

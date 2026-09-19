@@ -7,7 +7,8 @@
 //                  unpublished. Content facts, not statistics (BR-5.3).
 //   PublicSystem — the admin's homepage picks; published-only and masked.
 
-import { db } from "@/lib/db";
+// Public reads only — the platform_public role (F1.8).
+import { dbPublic as db } from "@/lib/db";
 import { toPublicSystem } from "@/lib/rules/publishing";
 
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;

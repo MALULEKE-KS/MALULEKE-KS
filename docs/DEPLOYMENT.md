@@ -20,7 +20,9 @@ Vercel's import flow detects 18 keys from `.env.example`, but only **3 are actua
 
 | Var | Required | Set via | Notes |
 |---|---|---|---|
-| `DATABASE_URL` | Yes | Neon integration (automatic) | Also sets `DATABASE_URL_UNPOOLED`, `PG*`, `POSTGRES_*` — none of those extra ones are read by the app; Prisma only needs `DATABASE_URL` |
+| `DATABASE_URL` | Yes | Neon integration (automatic) | Also sets `DATABASE_URL_UNPOOLED`, `PG*`, `POSTGRES_*` — none of those extra ones are read by the app; the owner URLs are used for migrations (`DATABASE_URL_UNPOOLED`) and as the fallback when the role URLs below aren't set |
+| `DATABASE_URL_RUNTIME` | Yes (F1.8) | Owner, via `scripts/create-db-roles.ts` — Sensitive, Production + Preview | The application's connection, as `app_runtime` (group `platform_runtime`): rows only, no schema changes |
+| `DATABASE_URL_PUBLIC` | Yes (F1.8) | Owner, via `scripts/create-db-roles.ts` — Sensitive, Production + Preview | Public pages' connection, as `app_public` (group `platform_public`): the masked public views only |
 | `NEXTAUTH_SECRET` | Yes | `vercel env add` (manual, fresh value) | Despite the name, this isn't NextAuth.js — it signs the hand-rolled admin session cookie (`lib/auth/session.ts`). Generated fresh for production, not reused from local dev |
 | `TWO_FACTOR_ENCRYPTION_KEY` | Yes | `vercel env add` (manual, fresh value) | Encrypts `AdminUser.twoFactorSecret` at rest (`lib/auth/crypto.ts`). Also generated fresh for production |
 | Everything else in `.env.example` | No | Not set | `NEXTAUTH_URL`, `AI_*`, `VERCEL_ANALYTICS_ID`, `ANALYTICS_CONSENT_REQUIRED`, `GITHUB_SYNC_*`, `SENTRY_DSN`, `BETTER_STACK_SOURCE_TOKEN`, `PROMETHEUS_PUSHGATEWAY_URL`, `FEATURE_FLAGS_KILL_SWITCH`. Rate limits, the review SLA and retention are not env vars: they're admin-editable platform settings in the `PlatformSetting` table (defaults and bounds in `lib/settings/registry.ts`), changed without a redeploy |
@@ -67,6 +69,31 @@ This is safe while the previous deployment is still serving because every migrat
 | Preview | `true` **only after** preview branching is on | Otherwise a PR's migration would run against production |
 
 **Preview branching** (isolates every PR's database): Vercel → Project → Storage → `neon-blue-planet` → integration settings → enable *create a database branch for each preview deployment*. Each preview then gets its own Neon branch (a copy-on-write copy of production) with its own `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, so the PR's migration is tested on real data without touching production.
+
+## Database roles — least privilege (F1.8, #76)
+
+The application never connects as the database owner. Three roles, one job each:
+
+| Role | Connects via | Can | Can't |
+|---|---|---|---|
+| owner (`neondb_owner`) | `DATABASE_URL_UNPOOLED`, during the build | everything — it runs migrations | — it isn't used at runtime |
+| `app_runtime` ∈ `platform_runtime` | `DATABASE_URL_RUNTIME` → `db` | read/write rows | alter/drop tables, triggers, constraints or views; truncate; update or delete audit/status history; delete systems, documents or metric history; read the migration ledger |
+| `app_public` ∈ `platform_public` | `DATABASE_URL_PUBLIC` → `dbPublic` | SELECT the masked public views (F1.7) and public lookups | read any raw table (inquiries, admins, unpublished systems, settings…); write anything |
+
+The group roles and their grants live in migration `20260919090000_least_privilege_roles` (safe in git: NOLOGIN, no passwords). Tables added by later migrations get the runtime's grants automatically (default privileges); a new **public** view must be granted to `platform_public` explicitly — public by opt-in.
+
+**One-time setup, per environment (production done by the owner):**
+
+1. Deploy the F1.8 migration (merging it does this).
+2. In your own terminal: `npx dotenv -e .env.local -- npx tsx scripts/create-db-roles.ts` — creates `app_runtime` and `app_public` with generated passwords, verifies each, and prints `DATABASE_URL_RUNTIME=…` and `DATABASE_URL_PUBLIC=…`.
+3. Vercel → Project → Settings → Environment Variables: add both, **Sensitive**, Production + Preview.
+4. Redeploy once. Verify: `SELECT usename, count(*) FROM pg_stat_activity GROUP BY 1` (read-only) shows `app_runtime` / `app_public` connections, not the owner.
+
+Rotating: `… create-db-roles.ts --rotate`, update both variables, redeploy.
+
+Until the variables are set, both clients fall back to `DATABASE_URL` (the owner) — nothing breaks, but nothing is restricted either.
+
+**Locally:** the dev role needs `CREATEROLE` once (`ALTER ROLE malulekeks_dev CREATEROLE` as the local superuser). `.env.development.local` / `.env.test.local` set `DATABASE_URL_PUBLIC` to a local `platform_public` login, so the test suite's public reads run restricted — as CI does.
 
 ## Local development — never against production
 

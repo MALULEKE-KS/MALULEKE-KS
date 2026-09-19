@@ -7,7 +7,8 @@
 // BR-6.1/6.2. Nothing in this file decides visibility or masks a field.
 
 import type { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
+// Public reads only — the platform_public role (F1.8).
+import { dbPublic as db } from "@/lib/db";
 import { toPublicSystem } from "@/lib/rules/publishing";
 
 export interface PublicSystemsFilters {

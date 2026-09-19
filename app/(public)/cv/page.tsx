@@ -3,7 +3,7 @@
 // BR-7.1) using the separate ink-only print stylesheet in app/globals.css.
 // See docs/PAGE-SPECIFICATIONS.md ("/cv").
 
-import { db } from "@/lib/db";
+import { dbPublic as db } from "@/lib/db";
 import { skillWithCategory, toPublicEducationEntry, toPublicExperienceEntry, toSkillEntry } from "@/lib/rules/cv";
 import { DownloadCvButton } from "./_components/DownloadCvButton";
 import { Container } from "@/components/shared/Container";

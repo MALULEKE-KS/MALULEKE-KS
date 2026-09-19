@@ -9,7 +9,7 @@
 //   milestone-type     whether it's the type a first ship is auto-drafted as (#70)
 
 import { Prisma, type PipelineStage } from "@prisma/client";
-import { db } from "@/lib/db";
+import { db, dbPublic } from "@/lib/db";
 
 export const LOOKUP_TYPES = [
   "status",
@@ -115,8 +115,10 @@ export function toLookupView(type: LookupType, row: LookupRow): LookupValueView 
   return view;
 }
 
+// Active values are public and read through the public role (F1.8); the
+// admin's view including deprecated values uses the runtime.
 export async function listLookupValues(type: LookupType, includeInactive: boolean): Promise<LookupValueView[]> {
-  const rows = await delegate(type).findMany({
+  const rows = await delegate(type, includeInactive ? db : dbPublic).findMany({
     where: includeInactive ? {} : { active: true },
     orderBy: { label: "asc" },
   });

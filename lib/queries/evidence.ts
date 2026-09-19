@@ -9,7 +9,7 @@
 //                    career roles and published education (approved feature 4).
 
 import { Prisma } from "@prisma/client";
-import { db } from "@/lib/db";
+import { db, dbPublic } from "@/lib/db";
 
 export interface SystemPace {
   systemId: string;
@@ -51,7 +51,7 @@ export interface SkillEvidence {
 
 /** Every skill with its evidence, strongest first. */
 export async function getSkillEvidence(): Promise<SkillEvidence[]> {
-  return db.$queryRaw<SkillEvidence[]>`
+  return dbPublic.$queryRaw<SkillEvidence[]>`
     SELECT "skillId", name, "categoryKey", "systemSlugs", "systemCount", "roleCount",
            "firstUsed", "lastEnded", "inCurrentRole", "studyCount"
       FROM "SkillEvidence"

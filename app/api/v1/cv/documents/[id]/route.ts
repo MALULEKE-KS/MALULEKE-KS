@@ -4,7 +4,7 @@
 // concern beyond what any public download link already has.
 
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db, dbPublic } from "@/lib/db";
 import { CV_CONTENT_TYPE, type CvFormat } from "@/lib/cv/generate";
 import { fileName } from "@/lib/cv/format";
 
@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const { id } = await params;
   const [document, profile] = await Promise.all([
     db.documentGen.findUnique({ where: { id } }),
-    db.publicProfile.findFirst({ select: { displayName: true } }),
+    dbPublic.publicProfile.findFirst({ select: { displayName: true } }),
   ]);
 
   if (!document) {
