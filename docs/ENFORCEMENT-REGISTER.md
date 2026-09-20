@@ -37,7 +37,7 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
-| BR-2.2 | Every `new` inquiry reviewed within 48 hours | Nothing surfaces overdue inquiries | ❌ | Admin surfacing (overdue flag/query) | F2 |
+| BR-2.2 | Every `new` inquiry reviewed within the configured deadline (48 hours by default) | `GET /admin/inquiries?overdue=true` filters `NEW` inquiries past the admin-editable `inquiry.reviewSlaHours` deadline; every admin inquiry shape also exposes `reviewDueAt` and `overdue`. Integration-tested (#82) | ✅ | Admin query + setting | — |
 | BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
 | BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. Limit and window are admin-editable settings (#67), bounded 1–100 per 1–168h | ✅ | DB function + settings table | Done |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |
