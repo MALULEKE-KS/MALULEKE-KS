@@ -3,7 +3,7 @@
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { PaginationQuerySchema } from "@/lib/schemas";
+import { ActivityLogQuerySchema, PaginationQuerySchema } from "@/lib/schemas";
 import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
@@ -12,13 +12,27 @@ function errorResponse(code: string, message: string, status: number, details?: 
 
 export const GET = withAdmin(async (request, _admin) => {
   const { searchParams } = new URL(request.url);
-  const entityType = searchParams.get("entityType");
+  // Filters (#82): what changed (entityType/entityId/action), who (actorType),
+  // and when (since/until, ISO timestamps).
+  const filters = ActivityLogQuerySchema.safeParse(Object.fromEntries(searchParams));
+  if (!filters.success) {
+    return errorResponse("VALIDATION_ERROR", "Invalid filters", 400, { issues: filters.error.issues });
+  }
+  const f = filters.data;
   const { page, pageSize } = PaginationQuerySchema.parse({
     page: searchParams.get("page") ?? undefined,
     pageSize: searchParams.get("pageSize") ?? undefined,
   });
 
-  const where = entityType ? { entityType } : {};
+  const where = {
+    ...(f.entityType && { entityType: f.entityType }),
+    ...(f.entityId && { entityId: f.entityId }),
+    ...(f.action && { action: f.action }),
+    ...(f.actorType && { actorType: f.actorType.toUpperCase() as "ADMIN" | "ANONYMOUS" | "SYSTEM" }),
+    ...((f.since || f.until) && {
+      createdAt: { ...(f.since && { gte: new Date(f.since) }), ...(f.until && { lte: new Date(f.until) }) },
+    }),
+  };
 
   const [entries, total] = await Promise.all([
     db.activityLog.findMany({

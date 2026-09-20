@@ -24,7 +24,8 @@
     "prisma:studio": "dotenv -e .env.development.local -- prisma studio",
     "db:seed": "dotenv -e .env.development.local -- tsx prisma/seed.ts",
     "sync:github": "dotenv -e .env.development.local -- tsx scripts/github-sync.ts",
-    "create-admin": "dotenv -e .env.development.local -- tsx scripts/create-admin.ts"
+    "create-admin": "dotenv -e .env.development.local -- tsx scripts/create-admin.ts",
+    "docs:capabilities": "tsx --tsconfig tsconfig.json scripts/generate-capability-docs.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

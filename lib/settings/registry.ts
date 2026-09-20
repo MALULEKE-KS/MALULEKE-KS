@@ -58,6 +58,18 @@ export const SETTINGS = {
     description: "Length of the CV-generation rate-limit window, in minutes.",
     rule: "BR-7.1",
   }),
+  "search.rateLimit.maxPerWindow": define({
+    schema: z.number().int().min(10).max(1000),
+    default: 60,
+    description: "Searches one visitor can run per window (instant search types as you go).",
+    rule: "F2.2",
+  }),
+  "search.rateLimit.windowMinutes": define({
+    schema: z.number().int().min(1).max(60),
+    default: 1,
+    description: "Length of the search rate-limit window, in minutes.",
+    rule: "F2.2",
+  }),
   "data.retentionMonths": define({
     schema: z.number().int().min(1).max(120),
     default: 24,

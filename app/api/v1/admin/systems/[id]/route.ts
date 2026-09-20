@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { SystemUpdateInputSchema } from "@/lib/schemas";
 import { canPublish, systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
+import { getAdminSystemDetail } from "@/lib/queries/admin-systems";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { ruleViolation } from "@/lib/db-errors";
 
@@ -43,6 +44,9 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
       }
 
       const nextClientApproved = parsed.data.clientApproved ?? current.clientApproved;
+      // A visibility change in the same request counts: the check runs on the
+      // resulting row (BR-1.10), never on a value that's about to change.
+      const nextVisibility = parsed.data.clientVisibility ?? current.clientVisibility;
       const requestingPublish =
         parsed.data.contentStatus !== undefined &&
         CONTENT_STATUS_MAP[parsed.data.contentStatus] === "PUBLISHED";
@@ -52,9 +56,31 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
       // PATCH that both approves and publishes in one shot is valid.
       if (
         requestingPublish &&
-        !canPublish({ clientVisibility: current.clientVisibility, clientApproved: nextClientApproved })
+        !canPublish({ clientVisibility: nextVisibility, clientApproved: nextClientApproved })
       ) {
         throw new Error("CLIENT_APPROVAL_REQUIRED");
+      }
+
+      // Status and domain are named by key, the organization by id; unknown
+      // or deprecated ones are a 400 (#82).
+      let statusId: string | undefined;
+      if (parsed.data.status !== undefined) {
+        const status = await tx.status.findUnique({ where: { key: parsed.data.status } });
+        if (!status || !status.active) throw new Error("UNKNOWN_STATUS");
+        statusId = status.id;
+      }
+      let domainId: string | null | undefined;
+      if (parsed.data.domain !== undefined) {
+        if (parsed.data.domain === null) domainId = null;
+        else {
+          const domain = await tx.domain.findUnique({ where: { key: parsed.data.domain } });
+          if (!domain || !domain.active) throw new Error("UNKNOWN_DOMAIN");
+          domainId = domain.id;
+        }
+      }
+      if (parsed.data.organizationId !== undefined) {
+        const org = await tx.organization.findUnique({ where: { id: parsed.data.organizationId } });
+        if (!org) throw new Error("UNKNOWN_ORGANIZATION");
       }
 
       // A relationship is named by its key; an unknown or deprecated key is a 400.
@@ -74,6 +100,15 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
       const updated = await tx.system.update({
         where: { id },
         data: {
+          ...(parsed.data.name !== undefined && { name: parsed.data.name }),
+          ...(parsed.data.description !== undefined && { description: parsed.data.description }),
+          ...(parsed.data.techStack !== undefined && { techStack: parsed.data.techStack }),
+          // A status change is recorded in the status history by the database,
+          // and a first ship drafts a journey entry (#70).
+          ...(statusId !== undefined && { statusId }),
+          ...(domainId !== undefined && { domainId }),
+          ...(parsed.data.organizationId !== undefined && { organizationId: parsed.data.organizationId }),
+          ...(parsed.data.clientVisibility !== undefined && { clientVisibility: parsed.data.clientVisibility }),
           ...(parsed.data.contentStatus !== undefined && {
             contentStatus: CONTENT_STATUS_MAP[parsed.data.contentStatus],
           }),
@@ -123,6 +158,10 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         409
       );
     }
+    const unknown = { UNKNOWN_STATUS: "status", UNKNOWN_DOMAIN: "domain", UNKNOWN_ORGANIZATION: "organization" } as const;
+    if (err instanceof Error && err.message in unknown) {
+      return errorResponse("VALIDATION_ERROR", `Unknown or deprecated ${unknown[err.message as keyof typeof unknown]}`, 400);
+    }
     if (err instanceof Error && err.message === "UNKNOWN_REPO_RELATIONSHIP") {
       return errorResponse("VALIDATION_ERROR", "Unknown or deprecated repo relationship", 400);
     }
@@ -146,4 +185,13 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
     }
     throw err;
   }
+});
+
+// GET — everything about one system for the admin (#82): the full unmasked
+// record, its skills, status history, pace and weekly GitHub activity.
+export const GET = withAdmin<{ id: string }>(async (_request, _admin, { params }) => {
+  const { id } = await params;
+  const detail = await getAdminSystemDetail(id);
+  if (!detail) return errorResponse("NOT_FOUND", "System not found", 404);
+  return NextResponse.json(detail);
 });

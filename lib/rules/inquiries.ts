@@ -67,9 +67,19 @@ export function isValidStatusTransition(current: InquiryStatus, next: InquirySta
 
 export type InquiryWithType = Inquiry & { inquiryType: InquiryType };
 
+/**
+ * BR-2.2 — when a NEW inquiry is due for review, from the admin-editable
+ * deadline (inquiry.reviewSlaHours). Reviewed ones are no longer due.
+ */
+export function reviewDeadline(inquiry: Pick<Inquiry, "createdAt" | "status">, slaHours: number, now = new Date()) {
+  const dueAt = new Date(inquiry.createdAt.getTime() + slaHours * 60 * 60 * 1000);
+  return { reviewDueAt: dueAt, overdue: inquiry.status === "NEW" && now > dueAt };
+}
+
 // Admin sees everything, unmasked — Inquiry carries no BR-1.x-style
 // visibility control, so there's no masking layer to apply here.
-export function toAdminInquiry(inquiry: InquiryWithType) {
+export function toAdminInquiry(inquiry: InquiryWithType, slaHours: number) {
+  const { reviewDueAt, overdue } = reviewDeadline(inquiry, slaHours);
   return {
     id: inquiry.id,
     status: STATUS_TO_API[inquiry.status],
@@ -79,5 +89,7 @@ export function toAdminInquiry(inquiry: InquiryWithType) {
     message: inquiry.message,
     inquiryType: inquiry.inquiryType.key,
     source: inquiry.source,
+    reviewDueAt: reviewDueAt.toISOString(),
+    overdue,
   };
 }
