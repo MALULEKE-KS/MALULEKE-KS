@@ -264,7 +264,7 @@ export const CAPABILITIES: Capability[] = [
     title: "Systems — curate, publish, feature",
     audience: "admin",
     summary: "Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, feature on the homepage, include on the CV, set skills and impacts; see status history, pace and weekly GitHub activity.",
-    db: ["System", "Impact", "SkillOnSystem", "SystemStatusChange", "SystemPace", "SystemActivityWeek", "RepoRelationship", "Testimonial", "SystemSlugHistory"],
+    db: ["System", "Impact", "SkillOnSystem", "SystemStatusChange", "SystemPace", "SystemActivityWeek", "RepoRelationship", "Testimonial", "SystemSlugHistory", "SystemContentRevision"],
     endpoints: [
       "GET /admin/systems",
       "POST /admin/systems",
@@ -274,18 +274,16 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/systems/{id}/impacts",
       "POST /admin/systems/{id}/impacts",
       "PATCH /admin/impacts/{id}",
-      "DELETE /admin/impacts/{id}",
-    ],
-    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14"],
+      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore"],
+    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14", "BR-1.15"],
     frontend: [
       { page: "/admin/systems", section: "List with curation queue, filters" },
       { page: "/admin/systems/[id]", section: "Editor, publish controls, homepage + CV placement, repo ownership" },
-      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" },
-    ],
+      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" }, { page: "/admin/systems/[id]", section: "Revision history for the case study and description: versions with who and when, restore" }],
     notes: [
       "409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.",
       "Systems are never deleted — offer Archive (BR-1.9).",
-      "Testimonials are read-only here until V1.1.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.", "Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message."],
+      "Testimonials are read-only here until V1.1.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.", "Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.", "Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten."],
   },
   {
     id: "admin.organizations",

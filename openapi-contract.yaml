@@ -1197,6 +1197,10 @@ paths:
   /admin/systems/{id}/impacts:
     get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/revisions:
+    get: { tags: [Systems (Admin)], summary: "Every version of a system's case study or description, newest first (#88, BR-1.15)", description: "field = caseStudyBody (default) or description. Each version is attributed (actorType, adminUserId) and dated; current = the newest; backfilled = the text when history began.", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: field, in: query, schema: { type: string, enum: [caseStudyBody, description], default: caseStudyBody } }], responses: { "200": { description: "{ field, revisions: ContentRevision[] }", content: { application/json: { schema: { type: object, properties: { field: { type: string }, revisions: { type: array, items: { $ref: "#/components/schemas/ContentRevision" } } } } } } }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/revisions/{revisionId}/restore:
+    post: { tags: [Systems (Admin)], summary: "Write an earlier version back — recorded as a new version (BR-1.15)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: revisionId, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ field, body, changed } — changed=false when that text is already current (nothing recorded)" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/impacts/{id}:
     patch: { tags: [Systems (Admin)], summary: Update an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
     delete: { tags: [Systems (Admin)], summary: Delete an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "204": { description: Deleted }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
@@ -1309,6 +1313,18 @@ components:
       required: [value]
       properties:
         value: { type: number }
+    ContentRevision:
+      type: object
+      properties:
+        id: { type: string }
+        field: { type: string, enum: [caseStudyBody, description] }
+        body: { type: string, nullable: true }
+        actorType: { type: string, enum: [ADMIN, ANONYMOUS, SYSTEM] }
+        adminUserId: { type: string, nullable: true }
+        backfilled: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        current: { type: boolean }
+        matchesCurrent: { type: boolean }
     CvOption:
       type: object
       description: "One CV option a visitor can choose (#92). generated → call generate; uploaded → download a file."

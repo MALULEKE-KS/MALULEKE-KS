@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**24 capabilities · 88 endpoints.**
+**24 capabilities · 90 endpoints.**
 
 ## Public
 
@@ -374,6 +374,8 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `POST /admin/systems/{id}/impacts`
 - `PATCH /admin/impacts/{id}`
 - `DELETE /admin/impacts/{id}`
+- `GET /admin/systems/{id}/revisions`
+- `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 
 **Database**
 
@@ -386,8 +388,9 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `RepoRelationship`
 - `Testimonial`
 - `SystemSlugHistory`
+- `SystemContentRevision`
 
-**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14
+**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14, BR-1.15
 
 **Notes**
 
@@ -396,6 +399,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - Testimonials are read-only here until V1.1.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 - Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
+- Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
 
 ### Organizations
 
@@ -694,6 +698,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `Status` | systems.catalog, lookups |
 | `System` | admin.overview, admin.systems |
 | `SystemActivityWeek` | admin.systems |
+| `SystemContentRevision` | admin.systems |
 | `SystemPace` | admin.systems |
 | `SystemSlugHistory` | admin.systems |
 | `SystemStatusChange` | admin.systems |
