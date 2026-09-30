@@ -17,6 +17,7 @@
 // window bounded by the fixed absolute cap.
 
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { db } from "@/lib/db";
 
 export const SESSION_COOKIE_NAME = "admin_session";
 export const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // BR-3.3
@@ -26,6 +27,7 @@ interface SessionPayload {
   sub: string; // AdminUser.id
   iat: number; // session creation time, fixed for its lifetime (BR-3.8: re-minted on each new login)
   lastActivity: number;
+  version: number; // AdminUser.sessionVersion — invalidates old signed sessions on password rotation.
 }
 
 function getSecret(): string {
@@ -62,14 +64,15 @@ function decode(cookieValue: string): SessionPayload | null {
 // Called only right after verify-2fa succeeds — never on credentials alone
 // (BR-3.1) — and always produces a fresh session, never reusing any
 // pre-2FA identifier (BR-3.8, anti session-fixation).
-export function createSessionCookieValue(adminUserId: string): string {
+export function createSessionCookieValue(adminUserId: string, version: number): string {
   const now = Date.now();
-  return encode({ sub: adminUserId, iat: now, lastActivity: now });
+  return encode({ sub: adminUserId, iat: now, lastActivity: now, version });
 }
 
 export interface SessionCheckResult {
   valid: boolean;
   adminUserId?: string;
+  sessionVersion?: number;
   refreshedCookieValue?: string;
   reason?: "expired-idle" | "expired-absolute" | "invalid";
 }
@@ -91,6 +94,7 @@ export function checkSession(cookieValue: string | undefined): SessionCheckResul
   return {
     valid: true,
     adminUserId: payload.sub,
+    sessionVersion: payload.version,
     refreshedCookieValue: encode({ ...payload, lastActivity: now }),
   };
 }
@@ -115,5 +119,12 @@ export async function getSessionAdminId(request: Request): Promise<string | null
   if (!match || !match[1]) return null;
 
   const result = checkSession(decodeURIComponent(match[1]));
-  return result.valid ? result.adminUserId! : null;
+  if (!result.valid || result.sessionVersion === undefined) return null;
+  return (await isSessionVersionCurrent(result.adminUserId!, result.sessionVersion)) ? result.adminUserId! : null;
+}
+
+/** Reject signed cookies minted before a security-sensitive account change. */
+export async function isSessionVersionCurrent(adminUserId: string, version: number): Promise<boolean> {
+  const admin = await db.adminUser.findUnique({ where: { id: adminUserId }, select: { sessionVersion: true } });
+  return admin?.sessionVersion === version;
 }

@@ -76,7 +76,7 @@ const logsFor = (entityId: string) =>
 
 beforeAll(async () => {
   adminId = (await db.adminUser.create({ data: { email: `${RUN}@example.com`, passwordHash: "hash-one" } })).id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
   orgId = (await db.organization.create({ data: { name: `${RUN} Org`, slug: `${RUN}-org` } })).id;
   plannedId = (await db.status.findUniqueOrThrow({ where: { key: "planned" } })).id;
   finishedId = (await db.status.findUniqueOrThrow({ where: { key: "finished" } })).id;

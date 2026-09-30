@@ -18,7 +18,7 @@ afterEach(() => {
 describe("checkSession", () => {
   it("accepts a freshly created session", async () => {
     const { createSessionCookieValue, checkSession } = await import("@/lib/auth/session");
-    const cookie = createSessionCookieValue("admin-1");
+    const cookie = createSessionCookieValue("admin-1", 1);
     const result = checkSession(cookie);
     expect(result.valid).toBe(true);
     expect(result.adminUserId).toBe("admin-1");
@@ -26,7 +26,7 @@ describe("checkSession", () => {
 
   it("rejects a tampered cookie value", async () => {
     const { createSessionCookieValue, checkSession } = await import("@/lib/auth/session");
-    const cookie = createSessionCookieValue("admin-1");
+    const cookie = createSessionCookieValue("admin-1", 1);
     const [payload] = cookie.split(".");
     const tampered = `${payload}.tampered-signature`;
     expect(checkSession(tampered).valid).toBe(false);
@@ -40,7 +40,7 @@ describe("checkSession", () => {
   it("expires after 30 minutes of inactivity (BR-3.3)", async () => {
     vi.useFakeTimers();
     const { createSessionCookieValue, checkSession } = await import("@/lib/auth/session");
-    const cookie = createSessionCookieValue("admin-1");
+    const cookie = createSessionCookieValue("admin-1", 1);
 
     vi.advanceTimersByTime(31 * 60 * 1000);
     const result = checkSession(cookie);
@@ -51,7 +51,7 @@ describe("checkSession", () => {
   it("expires after 12 hours regardless of activity (BR-3.7)", async () => {
     vi.useFakeTimers();
     const { createSessionCookieValue, checkSession } = await import("@/lib/auth/session");
-    let cookie = createSessionCookieValue("admin-1");
+    let cookie = createSessionCookieValue("admin-1", 1);
 
     // Simulate continuous activity every 10 minutes for 13 hours — the
     // idle window never lapses, but the absolute cap still must.
@@ -70,7 +70,7 @@ describe("checkSession", () => {
   it("refreshes lastActivity on each valid check, extending the idle window", async () => {
     vi.useFakeTimers();
     const { createSessionCookieValue, checkSession } = await import("@/lib/auth/session");
-    let cookie = createSessionCookieValue("admin-1");
+    let cookie = createSessionCookieValue("admin-1", 1);
 
     vi.advanceTimersByTime(20 * 60 * 1000);
     const first = checkSession(cookie);

@@ -20,7 +20,7 @@ beforeAll(async () => {
     data: { email: `test-admin-activity-log-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   for (let i = 0; i < 3; i++) {
     const log = await db.activityLog.create({

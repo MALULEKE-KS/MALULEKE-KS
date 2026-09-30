@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**24 capabilities · 79 endpoints.**
+**24 capabilities · 80 endpoints.**
 
 ## Public
 
@@ -306,6 +306,7 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 
 - `POST /admin/auth/login`
 - `POST /admin/auth/verify-2fa`
+- `POST /admin/auth/change-password`
 
 **Database**
 
@@ -315,11 +316,12 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 - `ActivityLog`
 - `rate_limit_hit`
 
-**Rules:** BR-3.1, BR-3.2, BR-3.4, BR-3.5, BR-3.6, BR-3.8, BR-3.10, BR-3.11
+**Rules:** BR-3.1, BR-3.2, BR-3.4, BR-3.5, BR-3.6, BR-3.8, BR-3.10, BR-3.11, BR-3.14, BR-3.15
 
 **Notes**
 
 - Show neutral copy on expiry ("session ended"), not an error.
+- Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
 
 ### Admin dashboard
 

@@ -69,7 +69,7 @@ beforeAll(async () => {
     data: { email: `test-control-plane-${RUN}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   const org = await db.organization.create({
     data: { name: "Control Plane Org", slug: `control-plane-org-${RUN}`, isClient: false },

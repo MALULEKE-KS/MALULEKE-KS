@@ -15,7 +15,7 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { checkSession, SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
+import { checkSession, isSessionVersionCurrent, SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
 
 // Never gated: the login page itself and the two auth endpoints that issue
 // the session in the first place — gating these would make login impossible.
@@ -26,7 +26,7 @@ function isProtectedPath(pathname: string): boolean {
   return isAdminSurface && !PUBLIC_ADMIN_PATHS.some((p) => pathname.startsWith(p));
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isProtectedPath(pathname)) {
@@ -34,8 +34,11 @@ export function proxy(request: NextRequest) {
   }
 
   const result = checkSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  const current = result.valid && result.sessionVersion !== undefined
+    ? await isSessionVersionCurrent(result.adminUserId!, result.sessionVersion)
+    : false;
 
-  if (!result.valid) {
+  if (!result.valid || !current) {
     const isApiRoute = pathname.startsWith("/api/v1/admin");
     if (isApiRoute) {
       return NextResponse.json(

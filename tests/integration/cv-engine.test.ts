@@ -62,7 +62,7 @@ async function docxXml(docx: Buffer): Promise<string> {
 
 beforeAll(async () => {
   adminId = (await db.adminUser.create({ data: { email: `${RUN}@example.com`, passwordHash: "unused-in-these-tests" } })).id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
   const profile = await db.profile.findUniqueOrThrow({ where: { id: 1 } });
   originalProfile = { headline: profile.headline, phone: profile.phone, summary: profile.summary };
 });

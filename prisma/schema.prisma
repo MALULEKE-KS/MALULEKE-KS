@@ -32,6 +32,11 @@ model AdminUser {
   recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
   failedLoginCount Int              @default(0)
   lockedUntil      DateTime?        @db.Timestamptz(3) // BR-3.2
+  // Incrementing this invalidates every signed session minted before the
+  // change (e.g. password rotation) without retaining server-side sessions.
+  sessionVersion   Int              @default(1)
+  // The last accepted TOTP step — a code for it or an earlier step is refused (BR-3.14).
+  lastTotpStep     Int?
   lastLoginAt      DateTime?        @db.Timestamptz(3)
   createdAt        DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt        DateTime         @updatedAt @db.Timestamptz(3)

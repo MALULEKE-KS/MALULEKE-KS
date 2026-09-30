@@ -30,10 +30,16 @@ export async function hitRateLimit(
   maxCount: number,
   windowMs: number,
 ): Promise<RateLimitResult> {
-  const key = rateLimitKey(scope, request);
+  return hitRateLimitKey(rateLimitKey(scope, request), maxCount, windowMs);
+}
+
+/** Record one hit against an explicit key (e.g. per admin session rather than per IP). */
+export async function hitRateLimitKey(key: string, maxCount: number, windowMs: number): Promise<RateLimitResult & { hits: number }> {
   const windowSeconds = Math.max(1, Math.ceil(windowMs / 1000));
-  const [row] = await db.$queryRaw<{ allowed: boolean; retry_after_seconds: number }[]>`
-    SELECT allowed, retry_after_seconds FROM rate_limit_hit(${key}, ${maxCount}::int, ${windowSeconds}::int)`;
+  const [row] = await db.$queryRaw<{ allowed: boolean; hits: number; retry_after_seconds: number }[]>`
+    SELECT allowed, hits, retry_after_seconds FROM rate_limit_hit(${key}, ${maxCount}::int, ${windowSeconds}::int)`;
   if (!row) throw new Error("rate_limit_hit returned no row");
-  return row.allowed ? { allowed: true } : { allowed: false, retryAfterMs: row.retry_after_seconds * 1000 };
+  return row.allowed
+    ? { allowed: true, hits: row.hits }
+    : { allowed: false, hits: row.hits, retryAfterMs: row.retry_after_seconds * 1000 };
 }

@@ -31,7 +31,7 @@ beforeAll(async () => {
     data: { email: `test-admin-timeline-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   const milestoneType = await db.milestoneType.findFirstOrThrow({ where: { key: "job" } });
   milestoneTypeId = milestoneType.id;
