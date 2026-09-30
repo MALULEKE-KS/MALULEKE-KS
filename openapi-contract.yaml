@@ -1138,7 +1138,7 @@ paths:
   # declared alongside the original V1 endpoints: OpenAPI remains the source
   # of the supported public and admin surface.
   /profile:
-    get: { tags: [Profile (Public)], summary: Get the public owner profile and links, responses: { "200": { description: Profile }, "404": { $ref: "#/components/responses/NotFound" } } }
+    get: { tags: [Profile (Public)], summary: Get the public owner profile and links, description: "Admin-edited profile data, its links, and affiliations (organizations founded or co-founded, #99).", responses: { "200": { description: "Profile (with links[] and affiliations[] — name, slug, role)" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /home:
     get:
       tags: [Home (Public)]
@@ -1609,7 +1609,8 @@ components:
         message: { type: string, minLength: 20, maxLength: 5000, description: "BR-2.3" }
         inquiryType:
           type: string
-          enum: [hire, partnership, service, contribution, recruitment, collaboration]
+          pattern: "^[a-z0-9]+([_-][a-z0-9]+)*$"
+          description: "An active InquiryType lookup key (GET /lookups/inquiry_type). A lookup (EXT-1): new types need no API change; unknown or deprecated keys are a 400 (BR-8.2)."
         source: { type: string, nullable: true, description: "Captured automatically, not client-supplied (BR-2.5); \"direct\" when no Referer header is present" }
         idempotencyKey: { type: string, format: uuid, nullable: true, description: "Optional; dedupes a resubmission within 10 minutes (BR-2.6)" }
 

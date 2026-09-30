@@ -401,7 +401,8 @@ describe("profile and achievements", () => {
   it("the profile exists once, from data already in the repo", async () => {
     const profile = await db.profile.findUniqueOrThrow({ where: { id: 1 }, include: { links: true } });
     expect(profile.displayName).toBe("Kurhula Success Maluleke");
-    expect(profile.bio).toBeNull();
+    // The /about narrative moved, word for word, from page code into the bio (#99).
+    expect(profile.bio).toMatch(/^I’m a final-year Computer Science and Mathematics student/);
     // Other test files add a temporary link of their own in parallel, so
     // assert the seeded links are there rather than that nothing else is.
     expect(profile.links.map((l) => l.kind)).toEqual(expect.arrayContaining(["github", "linkedin", "whatsapp"]));

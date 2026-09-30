@@ -64,7 +64,11 @@ export const LookupValueSchema = z.object({
 
 // F1.6a (#52, #67) — pipeline stages, curated status colours, settings.
 export const PipelineStageEnum = z.enum(["shipped", "building", "queued"]);
-export const StatusColorTokenEnum = z.enum(["signal-finished", "signal-progress", "signal-planned"]);
+export const StatusColorTokenEnum = z.enum([
+  "signal-finished",
+  "signal-progress",
+  "signal-planned",
+]);
 
 export const LookupCreateInputSchema = z.object({
   key: z
@@ -115,7 +119,13 @@ export const ClientVisibilityEnum = z.enum([
 export const ContentStatusEnum = z.enum(["draft", "published", "archived"]);
 
 // BR-1.11 (#69) — the repo owner's answer for a collaborated system.
-export const OwnerPermissionEnum = z.enum(["not_required", "not_requested", "requested", "granted", "declined"]);
+export const OwnerPermissionEnum = z.enum([
+  "not_required",
+  "not_requested",
+  "requested",
+  "granted",
+  "declined",
+]);
 
 export const SystemPublicSchema = z.object({
   id: z.string(),
@@ -274,25 +284,27 @@ export const SystemUpdateInputSchema = z
 // INQUIRIES
 // ============================================================
 
-export const InquiryTypeEnum = z.enum([
-  "hire",
-  "partnership",
-  "service",
-  "contribution",
-  "recruitment",
-  "collaboration",
-]);
+// An InquiryType lookup key (EXT-1, #99): any well-formed key — the server
+// checks it against the active lookup values, so a type the admin adds is
+// accepted with no code change, and a deprecated one is refused (BR-8.2).
+export const InquiryTypeKeySchema = z
+  .string()
+  .trim()
+  .min(1, "Choose what this is about")
+  .max(60)
+  .regex(/^[a-z0-9]+([_-][a-z0-9]+)*$/, "Choose what this is about");
 
 export const InquiryStatusEnum = z.enum(["new", "reviewed", "responded", "closed"]);
 
 export const InquiryCreateInputSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+  // Plain messages: they are shown to the visitor as written (#99).
+  name: z.string().trim().min(1, "Enter your name").max(200, "Keep your name under 200 characters"),
+  email: z.string().trim().email("Enter a valid email address"),
   message: z
     .string()
     .min(20, "Message must be at least 20 characters")
     .max(5000, "Message must be under 5,000 characters"), // BR-2.3
-  inquiryType: InquiryTypeEnum,
+  inquiryType: InquiryTypeKeySchema,
   // Optional client-generated key; a resubmission with the same key within
   // 10 minutes returns the original confirmation instead of creating a
   // second row (BR-2.6). Honeypot-triggered submissions never reach this
@@ -582,7 +594,11 @@ export const ProfileUpdateInputSchema = z
     role: z.string().trim().min(1).max(160),
     location: z.string().trim().min(1).max(120).nullable(),
     email: z.string().trim().toLowerCase().email(),
-    phone: z.string().trim().regex(/^\+?[0-9][0-9 ()-]{6,19}$/, "digits with optional + and separators").nullable(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\+?[0-9][0-9 ()-]{6,19}$/, "digits with optional + and separators")
+      .nullable(),
     summary: z.string().trim().max(1200).nullable(),
     bio: z.string().trim().max(4000).nullable(),
     availability: z.string().trim().max(200).nullable(),
@@ -592,16 +608,23 @@ export const ProfileUpdateInputSchema = z
   .refine((d) => Object.values(d).some((v) => v !== undefined), { message: "Nothing to update" });
 
 export const ProfileLinkInputSchema = z.object({
-  kind: z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -"),
+  kind: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -"),
   label: z.string().trim().min(1).max(60),
-  url: z.string().trim().url().refine((u) => u.startsWith("https://") || u.startsWith("mailto:"), "https:// or mailto: only"),
+  url: z
+    .string()
+    .trim()
+    .url()
+    .refine((u) => u.startsWith("https://") || u.startsWith("mailto:"), "https:// or mailto: only"),
   sortOrder: z.number().int().min(0).default(0),
   onCv: z.boolean().default(true),
 });
 
 export const ProfileLinkUpdateInputSchema = ProfileLinkInputSchema.partial().refine(
   (d) => Object.values(d).some((v) => v !== undefined),
-  { message: "Nothing to update" },
+  { message: "Nothing to update" }
 );
 
 export const AchievementEntrySchema = z.object({
@@ -657,7 +680,10 @@ export const CvCheckQuerySchema = z.object({
 // curated numbers, jobs, the activity-log filters
 // ============================================================
 
-const SlugSchema = z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -");
+const SlugSchema = z
+  .string()
+  .trim()
+  .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -");
 
 export const OrganizationInputSchema = z.object({
   name: z.string().trim().min(1).max(160),
@@ -670,7 +696,7 @@ export const OrganizationInputSchema = z.object({
 
 export const OrganizationUpdateInputSchema = OrganizationInputSchema.partial().refine(
   (d) => Object.values(d).some((v) => v !== undefined),
-  { message: "Nothing to update" },
+  { message: "Nothing to update" }
 );
 
 export const ImpactInputSchema = z.object({
@@ -681,7 +707,7 @@ export const ImpactInputSchema = z.object({
 
 export const ImpactUpdateInputSchema = ImpactInputSchema.partial().refine(
   (d) => Object.values(d).some((v) => v !== undefined),
-  { message: "Nothing to update" },
+  { message: "Nothing to update" }
 );
 
 export const SystemSkillsInputSchema = z.object({
@@ -689,7 +715,10 @@ export const SystemSkillsInputSchema = z.object({
 });
 
 export const MetricInputSchema = z.object({
-  key: z.string().trim().regex(/^[a-z][a-zA-Z0-9]*(.[a-z][a-zA-Z0-9]*)+$/, "dotted lowerCamel, e.g. clients.served"),
+  key: z
+    .string()
+    .trim()
+    .regex(/^[a-z][a-zA-Z0-9]*(.[a-z][a-zA-Z0-9]*)+$/, "dotted lowerCamel, e.g. clients.served"),
   label: z.string().trim().min(1).max(120),
   description: z.string().trim().max(500).nullable().optional(),
   unit: z.string().trim().max(40).nullable().optional(),

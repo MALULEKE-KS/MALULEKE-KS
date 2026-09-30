@@ -287,6 +287,11 @@ html {
     font-size: 11pt;
   }
 
+  /* Bone bands print white: ink on paper, nothing else (DESIGN-SYSTEM §9). */
+  main section {
+    background-color: #fff !important;
+  }
+
   .cv-page {
     max-width: 100%;
     margin: 0;
