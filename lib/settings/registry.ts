@@ -95,8 +95,22 @@ export const SETTINGS = {
     description: "Content nobody has edited or marked reviewed for this many days is flagged for a look.",
     rule: "BR-1.16",
   }),
+  "jobs.staleAfterMinutes": define({
+    // Above the platform's longest function run (5 minutes), so a live run is
+    // never mistaken for an abandoned one.
+    schema: z.number().int().min(6).max(240),
+    default: 15,
+    description: "A job still marked running after this many minutes is closed as abandoned, so it can run again.",
+    rule: "F4.1",
+  }),
+  "maintenance.challengeRetentionDays": define({
+    schema: z.number().int().min(1).max(90),
+    default: 7,
+    description: "Finished or expired sign-in challenges are deleted after this many days.",
+    rule: "BR-3.5",
+  }),
   "data.retentionMonths": define({
-    schema: z.number().int().min(1).max(120),
+    schema: z.number().int().min(6).max(120),
     default: 24,
     description: "Inquiries and analytics events are anonymised or purged after this many months.",
     rule: "BR-5.2",

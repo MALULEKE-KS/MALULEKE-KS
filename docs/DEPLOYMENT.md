@@ -25,7 +25,10 @@ Vercel's import flow detects 18 keys from `.env.example`, but only **3 are actua
 | `DATABASE_URL_PUBLIC` | Yes (F1.8) | Owner, via `scripts/create-db-roles.ts` — Sensitive, Production + Preview | Public pages' connection, as `app_public` (group `platform_public`): the masked public views only |
 | `NEXTAUTH_SECRET` | Yes | `vercel env add` (manual, fresh value) | Despite the name, this isn't NextAuth.js — it signs the hand-rolled admin session cookie (`lib/auth/session.ts`). Generated fresh for production, not reused from local dev |
 | `TWO_FACTOR_ENCRYPTION_KEY` | Yes | `vercel env add` (manual, fresh value) | Encrypts `AdminUser.twoFactorSecret` at rest (`lib/auth/crypto.ts`). Also generated fresh for production |
-| Everything else in `.env.example` | No | Not set | `NEXTAUTH_URL`, `AI_*`, `VERCEL_ANALYTICS_ID`, `ANALYTICS_CONSENT_REQUIRED`, `GITHUB_SYNC_*`, `SENTRY_DSN`, `BETTER_STACK_SOURCE_TOKEN`, `PROMETHEUS_PUSHGATEWAY_URL`, `FEATURE_FLAGS_KILL_SWITCH`. Rate limits, the review SLA and retention are not env vars: they're admin-editable platform settings in the `PlatformSetting` table (defaults and bounds in `lib/settings/registry.ts`), changed without a redeploy |
+| `CRON_SECRET` | Yes (F4) | Vercel dashboard — Sensitive, Production | Vercel Cron sends it as `Authorization: Bearer …`; `/api/cron/*` refuses every call without it (503 when unset — never open). Generate with `openssl rand -base64 32` |
+| `GITHUB_SYNC_TOKEN` | Yes (F4) | Vercel dashboard — Sensitive, Production | **Read-only** fine-grained GitHub token(s), comma-separated — one per GitHub owner (a fine-grained token covers one account or organization). Permissions: Metadata + Contents **read-only**, all repositories. Without it the `github.sync` job fails with that reason; nothing else is affected |
+| `GITHUB_SYNC_ORGS` | Yes (F4) | Vercel dashboard — Production | The owner's own GitHub accounts/organizations, comma-separated (`MALULEKE-KS,KSDRILL-SA,GrowthCore-Solutions`). Repos owned elsewhere are treated as collaborated (BR-1.11) |
+| Everything else in `.env.example` | No | Not set | `NEXTAUTH_URL`, `AI_*`, `VERCEL_ANALYTICS_ID`, `ANALYTICS_CONSENT_REQUIRED`, `SENTRY_DSN`, `BETTER_STACK_SOURCE_TOKEN`, `PROMETHEUS_PUSHGATEWAY_URL`, `FEATURE_FLAGS_KILL_SWITCH`. Rate limits, the review SLA and retention are not env vars: they're admin-editable platform settings in the `PlatformSetting` table (defaults and bounds in `lib/settings/registry.ts`), changed without a redeploy |
 
 Both manually-set secrets were generated with `openssl rand -base64 32` and stored as Vercel **Secret** type (write-only — cannot be read back via `vercel env pull`, only rotated). If they ever need rotating: generate a new value, `vercel env rm <name> production && vercel env add <name> production --value=... --sensitive`, then redeploy.
 
@@ -163,8 +166,40 @@ curl -s -o /dev/null -w "%{http_code}\n" https://maluleke-ks.vercel.app/admin/lo
 
 All three should return `200`. `/systems` returning real seeded system names (not an error page) confirms the production database connection specifically, not just that the build succeeded.
 
+## Scheduled jobs (F4, #94–#96)
+
+One Vercel Cron entry (`vercel.ts`) calls `/api/cron/daily` at 03:00 UTC. It runs the daily jobs in order (`lib/jobs/schedule.ts`): `maintenance.daily` (BR-5.2 retention, pruning), `metrics.compute` (proposals for the admin to approve, BR-5.3), `github.sync`. Each job has its own `JobRun` row (status, summary, error, what started it) and its own lock; one failing doesn't stop the others.
+
+- **Run one now:** from the admin, `POST /api/v1/admin/jobs/{job}/run` (same lock, recorded as started by the admin); or locally, `npm run sync:github` against the dev database.
+- **See runs:** `GET /api/v1/admin/jobs` — every registered job, its schedule, and the latest runs. The admin overview shows each job's last run.
+- **A run that never finished** (e.g. stopped by the 300 s function limit) is closed as FAILED ("abandoned") after `jobs.staleAfterMinutes` (setting, default 15), so the job isn't blocked.
+- **Adding a job:** one entry in `lib/jobs/registry.ts` (+ its name in `DAILY_JOBS` to schedule it). No route or cron change.
+- **Retention (BR-5.2):** `apply_retention(months)` anonymises inquiries and events older than `data.retentionMonths` (setting, default 24, never below 6 — it's irreversible): name/email/message replaced, idempotency key cleared, `anonymizedAt` stamped; type, status, source and dates stay for aggregates. An anonymised row can never be written back (database trigger).
+
+## Continuity CV (Constitution §9, #97)
+
+`.github/workflows/cv-continuity.yml` runs every Monday (and on demand from the Actions tab): it downloads the CV the site offers (`scripts/cv-continuity.mjs` — following the admin's CV options, PDF preferred) and publishes it as the asset of the `cv-latest` release — hosted by GitHub, independent of this platform:
+
+`https://github.com/MALULEKE-KS/MALULEKE-KS/releases/download/cv-latest/cv.pdf`
+
+If the site is down, or the download isn't a real PDF/Word file, the run fails and the last good copy stays. Workflow changes never trigger a Vercel build.
+
+## Backup & restore (Neon point-in-time recovery, #97)
+
+Neon keeps a history of the database (the restore window depends on the Neon plan). A restore never overwrites production directly:
+
+1. **Branch from a point in time** — Neon console → the project → *Branches* → *Create branch* → parent `production` (main) → *Past data* → the timestamp to recover to. This makes an isolated copy; production keeps running.
+2. **Verify the copy** — copy the new branch's connection string (owner role, unpooled) and run the drill check against production, read-only on both:
+   ```bash
+   DRILL_SOURCE_URL="<production URL>" DRILL_RESTORED_URL="<restored branch URL>" npx tsx scripts/backup-drill.ts
+   ```
+   It passes when the restored branch has every migration and every table and view, all readable, and prints each table's row counts side by side.
+3. **Recover** — either copy the needed rows back from the branch, or (whole-database recovery) use Neon's *Restore* on the production branch to that timestamp, then redeploy nothing: the app reconnects.
+4. **Clean up** — delete the drill/restore branch.
+
+Drill log: see "Known gaps" until a production drill is recorded here.
+
 ## Known gaps
 
 - **Custom domain** — not configured yet, still on the `*.vercel.app` subdomain.
-- **`scripts/github-sync.ts`** — reads `GITHUB_SYNC_TOKEN`/`GITHUB_SYNC_ORGS`, neither set in production. Not part of the deployed app's request path (nothing calls it automatically), so this doesn't block anything — it just means the GitHub-sync job hasn't been run against production data yet, and would need a real read-only PAT if/when it is.
 - **Env vars documented but unread** — see the table above. The rate-limit and retention vars that used to be listed here were removed: those tunables now live in the `PlatformSetting` table (#67).

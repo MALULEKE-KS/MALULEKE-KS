@@ -41,6 +41,7 @@ model AdminUser {
   lastTotpStep     Int?
   lastLoginAt      DateTime?               @db.Timestamptz(3)
   contentRevisions SystemContentRevision[]
+  jobRuns          JobRun[]
   createdAt        DateTime                @default(now()) @db.Timestamptz(3)
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
   activityLogs     ActivityLog[]
@@ -629,6 +630,8 @@ model Inquiry {
   source         String? // captured server-side only; "direct" when no Referer (BR-2.5)
   status         InquiryStatus @default(NEW)
   idempotencyKey String?       @unique // BR-2.6 — dedupes a resubmit within the client-held window
+  // BR-5.2: set when personal data was stripped after the retention period; one-way (database trigger).
+  anonymizedAt   DateTime?     @db.Timestamptz(3)
   createdAt      DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -651,13 +654,15 @@ model VisitorLens {
 }
 
 model Event {
-  id         String   @id @default(cuid())
-  eventType  String // "page_view" | "system_viewed" | "concierge_message" | "resume_downloaded"
-  entityType String?
-  entityId   String?
-  sessionId  String
-  metadata   Json?
-  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  id           String    @id @default(cuid())
+  eventType    String // "page_view" | "system_viewed" | "concierge_message" | "resume_downloaded"
+  entityType   String?
+  entityId     String?
+  sessionId    String
+  metadata     Json?
+  // BR-5.2: set when personal data was stripped after the retention period; one-way (database trigger).
+  anonymizedAt DateTime? @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
 
   @@index([eventType, createdAt])
   @@index([sessionId])
@@ -709,15 +714,20 @@ enum JobRunStatus {
 // A partial unique index allows only one RUNNING row per job: the database
 // is the lock, so overlapping runs can't happen. Finished runs are immutable.
 model JobRun {
-  id         String       @id @default(cuid())
-  job        String
-  status     JobRunStatus @default(RUNNING)
-  startedAt  DateTime     @default(now()) @db.Timestamptz(3)
-  finishedAt DateTime?    @db.Timestamptz(3)
-  summary    Json?
-  error      String?
+  id          String       @id @default(cuid())
+  job         String
+  status      JobRunStatus @default(RUNNING)
+  startedAt   DateTime     @default(now()) @db.Timestamptz(3)
+  finishedAt  DateTime?    @db.Timestamptz(3)
+  summary     Json?
+  error       String?
+  // #94 — what started the run: "schedule" | "admin" | "script" ("unknown" = before this was recorded).
+  trigger     String       @default("script")
+  adminUserId String?
+  adminUser   AdminUser?   @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
 
   @@index([job, startedAt])
+  @@index([adminUserId])
 }
 
 // ============================================================
