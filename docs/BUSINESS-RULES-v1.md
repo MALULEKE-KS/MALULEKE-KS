@@ -44,7 +44,7 @@
 | Rule | Statement |
 |---|---|
 | BR-3.1 | Two-factor authentication is mandatory before any write action succeeds. There is no "remind me later" or degraded-but-functional state — a session without verified 2FA cannot mutate data |
-| BR-3.2 | Five consecutive failed logins trigger progressive delay (reusing the existing bcrypt-cost-12 + progressive-delay pattern), escalating to a temporary lockout on continued failures |
+| BR-3.2 | Five consecutive failed logins lock the account temporarily; each further lockout without a successful login in between doubles the next one (up to a day), and a successful login resets it — so failures never buy a fresh set of guesses on a fixed schedule. A failed login answers exactly as an unknown email does, revealing nothing about which email is the admin's. *(Reworded 2026-09-30, #91: "progressive delay" described no enforceable behaviour; the rule now states the escalation that is enforced and tested.)* |
 | BR-3.3 | Admin sessions expire after 30 minutes of inactivity, full stop |
 | BR-3.4 | Every admin mutation — and every login attempt, success or failure — writes to `ActivityLog` automatically at the middleware layer. No code path is permitted to bypass this; it is not something a route handler opts into |
 | BR-3.5 | A login `challengeToken` (issued after step-1 credentials succeed) expires after 5 minutes and is single-use — consumed on the first `verify-2fa` attempt, success or failure. An expired or already-consumed token returns the same generic `401` as a wrong code, and the admin must restart from credentials |

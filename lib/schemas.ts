@@ -358,6 +358,12 @@ export const PasswordChangeInputSchema = z.object({
   code: z.string().regex(/^\d{6}$/, "Enter a 6-digit authenticator code."),
 });
 
+// BR-3.12 — regenerating recovery codes re-authenticates like a password change.
+export const RecoveryCodesRegenerateInputSchema = z.object({
+  currentPassword: z.string().min(1),
+  code: z.string().regex(/^\d{6}$/, "Enter a 6-digit authenticator code."),
+});
+
 // ============================================================
 // TIMELINE & CV
 // ============================================================

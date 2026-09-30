@@ -490,6 +490,19 @@ paths:
                   sessionExpiresAt: { type: string, format: date-time }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
+  /admin/auth/recovery-codes:
+    get: { tags: [Auth], summary: "How many unused recovery codes remain, and whether that's low (< 3, BR-3.12)", security: [{ adminSession: [] }], responses: { "200": { description: "{ remaining, low }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [Auth]
+      summary: Regenerate the recovery codes — ten new ones, shown once; every old code stops working (BR-3.11, BR-3.12)
+      description: "Needs the current password and a live, single-use TOTP code; failures count against the session like a password change (the fifth ends it: SESSION_REVOKED)."
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [currentPassword, code], properties: { currentPassword: { type: string, format: password }, code: { type: string, pattern: "^\\d{6}$" } } } } } }
+      responses:
+        "200": { description: "{ codes: string[10], remaining: 10, low: false } — show once, never retrievable again" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { description: "UNAUTHORIZED (credentials) or SESSION_REVOKED (fifth failure)", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
   /admin/auth/change-password:
     post:
       tags: [Auth]
@@ -1253,7 +1266,10 @@ components:
       type: apiKey
       in: cookie
       name: admin_session
-      description: HTTP-only session cookie, issued only after 2FA verification (BR-3.1)
+      description: >-
+        HTTP-only, SameSite=Strict session cookie, issued only after 2FA verification (BR-3.1).
+        Every state-changing admin request — and the two login steps — is refused with
+        403 CSRF_REJECTED when its Origin or Sec-Fetch-Site names another site (BR-3.9).
 
   responses:
     BadRequest:

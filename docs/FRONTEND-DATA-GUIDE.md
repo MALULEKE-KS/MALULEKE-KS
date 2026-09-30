@@ -170,6 +170,21 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
 - The threshold is the setting content.freshnessDays (default 90).
 
+### /admin (proposed: /admin/account)
+
+**Admin sign-in (password + 2FA)** — Change password; recovery codes — remaining count, low-count notice, regenerate (show the ten codes once)
+
+- Call `POST /admin/auth/login`
+- Call `POST /admin/auth/verify-2fa`
+- Call `POST /admin/auth/change-password`
+- Call `GET /admin/auth/recovery-codes`
+- Call `POST /admin/auth/recovery-codes`
+- Show neutral copy on expiry ("session ended"), not an error.
+- Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
+- Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
+- Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
+- Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
+
 ### /admin/activity-log
 
 **Audit trail** — Log with filters (entity, action, actor, date range), before/after diff
@@ -236,8 +251,13 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/auth/login`
 - Call `POST /admin/auth/verify-2fa`
 - Call `POST /admin/auth/change-password`
+- Call `GET /admin/auth/recovery-codes`
+- Call `POST /admin/auth/recovery-codes`
 - Show neutral copy on expiry ("session ended"), not an error.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
+- Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
+- Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
+- Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
 
 ### /admin/numbers (proposed)
 
@@ -381,6 +401,8 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/auth/login` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/verify-2fa` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/change-password` | Admin sign-in (password + 2FA) | admin |
+| `GET /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
+| `POST /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
 | `GET /admin/overview` | Admin dashboard | admin |
 | `GET /admin/systems` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems` | Systems — curate, publish, feature | admin |

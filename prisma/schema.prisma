@@ -31,6 +31,8 @@ model AdminUser {
   twoFactorEnabled Boolean                 @default(false)
   recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
   failedLoginCount Int                     @default(0)
+  // BR-3.2: consecutive lockouts since the last successful login; each one doubles the next.
+  lockoutCount     Int                     @default(0)
   lockedUntil      DateTime?               @db.Timestamptz(3) // BR-3.2
   // Incrementing this invalidates every signed session minted before the
   // change (e.g. password rotation) without retaining server-side sessions.
