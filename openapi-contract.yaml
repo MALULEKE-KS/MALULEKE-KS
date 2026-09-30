@@ -1397,6 +1397,7 @@ components:
         - type: object
           properties:
             contentStatus: { type: string, enum: [draft, published, archived] }
+            publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
             clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
             clientApproved: { type: boolean, description: "Authorizes publishing (BR-1.1) — see nameDisclosureApproved for real-name authorization" }
             nameDisclosureApproved: { type: boolean, description: "Separate from clientApproved (BR-1.4) — authorizes revealing the real org name for an ANONYMIZED_ONLY system" }
@@ -1443,6 +1444,7 @@ components:
       type: object
       properties:
         contentStatus: { type: string, enum: [draft, published, archived] }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         clientApproved: { type: boolean }
         nameDisclosureApproved: { type: boolean }
         isFlagship: { type: boolean }
@@ -1501,6 +1503,7 @@ components:
         date: { type: string, format: date }
         tags: { type: array, items: { type: string } }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Public reads return published entries only" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         autoDrafted: { type: boolean, description: "Drafted by the database when a system first shipped; awaits the admin's approval" }
         systemId: { type: string, nullable: true }
 
@@ -1515,6 +1518,7 @@ components:
         media: { type: string, nullable: true }
         tags: { type: array, items: { type: string }, default: [] }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged. Publishing an auto-drafted entry approves it." }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
 
     ExperienceEntry:
       type: object
@@ -1528,6 +1532,7 @@ components:
         description: { type: string }
         highlights: { type: array, items: { type: string }, description: "CV achievement bullets, in order" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Only published roles appear on /cv and in the generated CV" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         skills: { type: array, items: { type: string } }
 
     ExperienceInput:
@@ -1542,6 +1547,7 @@ components:
         description: { type: string, minLength: 1 }
         highlights: { type: array, items: { type: string, maxLength: 300 }, maxItems: 15, default: [] }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         skillIds: { type: array, items: { type: string }, default: [] }
 
     EducationEntry:
@@ -1557,6 +1563,7 @@ components:
         description: { type: string, nullable: true }
         certificateUrl: { type: string, nullable: true, description: "https only (database CHECK)" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Only published entries appear on /cv and in the generated CV" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         skills: { type: array, items: { type: string }, description: "Skill names this qualification taught" }
         expectedGraduation: { type: string, format: date, nullable: true, description: "For a degree in progress" }
         coursework: { type: array, items: { type: string }, description: "Relevant modules" }
@@ -1574,6 +1581,7 @@ components:
         description: { type: string, nullable: true }
         certificateUrl: { type: string, nullable: true, pattern: "^https://" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         skillIds: { type: array, items: { type: string }, default: [], description: "Replaces the entry's skill links" }
         expectedGraduation: { type: string, format: date, nullable: true, description: "Only for a degree in progress (no endDate) — database CHECK" }
         coursework: { type: array, items: { type: string, maxLength: 120 }, maxItems: 30, default: [] }
@@ -1706,6 +1714,7 @@ components:
         url: { type: string, nullable: true }
         systemId: { type: string, nullable: true }
         contentStatus: { type: string, enum: [draft, published, archived] }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         sortOrder: { type: integer }
 
     AchievementInput:
@@ -1719,6 +1728,7 @@ components:
         url: { type: string, nullable: true, pattern: "^https://" }
         systemId: { type: string, nullable: true }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = draft" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         sortOrder: { type: integer, minimum: 0, default: 0 }
 
     ActivityLogEntry:

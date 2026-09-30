@@ -8,6 +8,7 @@ import { AchievementInputSchema } from "@/lib/schemas";
 import { checkViolationMessage, toAchievement } from "@/lib/rules/profile";
 import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
 import { withAdmin } from "@/lib/auth/with-admin";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -35,6 +36,8 @@ export const POST = withAdmin(async (request, { write }) => {
         systemId: parsed.data.systemId ?? null,
         sortOrder: parsed.data.sortOrder,
         ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
+        // BR-1.13 — a future time schedules it; the database checks it's published.
+        ...publishAtData(parsed.data.publishAt),
       },
     }));
     return NextResponse.json(toAchievement(achievement), { status: 201 });

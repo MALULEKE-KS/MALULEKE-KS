@@ -378,13 +378,14 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `RepoRelationship`
 - `Testimonial`
 
-**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12
+**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13
 
 **Notes**
 
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### Organizations
 
@@ -446,11 +447,12 @@ Write journey entries, and approve the ones the database drafts when a system fi
 
 - `Timeline`
 
-**Rules:** BR-1.12
+**Rules:** BR-1.12, BR-1.13
 
 **Notes**
 
 - Publishing an auto-drafted entry is the approval.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### CV content, completeness and history
 
@@ -484,11 +486,12 @@ Roles (with CV bullets, show/hide), education (expected graduation, coursework),
 - `SkillOnEducation`
 - `DocumentGen`
 
-**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4
+**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-1.13
 
 **Notes**
 
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### Profile, links and achievements
 
@@ -514,11 +517,12 @@ The owner's details, social links (and which go on the CV), certifications and a
 - `ProfileLink`
 - `Achievement`
 
-**Rules:** —
+**Rules:** BR-1.13
 
 **Notes**
 
 - Achievements start as drafts; publishing puts them on the site and the CV.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### Curated numbers — define, propose, decide
 
@@ -679,3 +683,4 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `ContentChunk` | AI concierge index — V1.1 (CLAUDE.md scope). |
 | `public_client_label` | Internal helper of the public views (BR-1.4 masking). |
 | `public_name_disclosed` | Internal helper of the public views (BR-1.4 masking). |
+| `is_live` | Internal helper of the public views: published and its publish time has come (BR-1.13). |

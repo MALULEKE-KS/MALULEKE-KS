@@ -12,6 +12,7 @@ import { canPublish, systemWithAdminRelations, toAdminSystem } from "@/lib/rules
 import { getAdminSystemDetail } from "@/lib/queries/admin-systems";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { ruleViolation } from "@/lib/db-errors";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -112,6 +113,8 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
           ...(parsed.data.contentStatus !== undefined && {
             contentStatus: CONTENT_STATUS_MAP[parsed.data.contentStatus],
           }),
+          // BR-1.13 — a future time schedules it; the database checks it's published.
+          ...publishAtData(parsed.data.publishAt),
           ...(parsed.data.clientApproved !== undefined && { clientApproved: parsed.data.clientApproved }),
           ...(parsed.data.nameDisclosureApproved !== undefined && {
             nameDisclosureApproved: parsed.data.nameDisclosureApproved,

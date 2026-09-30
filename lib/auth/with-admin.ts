@@ -10,6 +10,11 @@
 import { NextResponse } from "next/server";
 import { getSessionAdminId } from "@/lib/auth/session";
 import { withActor, type Tx } from "@/lib/audit";
+import { ruleViolation } from "@/lib/db-errors";
+
+// Rules the database enforces the same way for every content type: a refusal
+// is a bad request, answered in the rule's own words wherever it happens.
+const RULES_ANSWERED_AS_400 = ["BR-1.13"];
 
 export interface AdminContext {
   adminUserId: string;
@@ -38,6 +43,16 @@ export function withAdmin<P extends Record<string, string> = Record<string, neve
       adminUserId,
       write: (work) => withActor({ kind: "admin", adminUserId, request }, work),
     };
-    return handler(request, admin, context ?? (NO_PARAMS as unknown as RouteContext<P>));
+    try {
+      return await handler(request, admin, context ?? (NO_PARAMS as unknown as RouteContext<P>));
+    } catch (err) {
+      for (const rule of RULES_ANSWERED_AS_400) {
+        const message = ruleViolation(err, rule);
+        if (message) {
+          return NextResponse.json({ error: { code: "VALIDATION_ERROR", message, details: null } }, { status: 400 });
+        }
+      }
+      throw err;
+    }
   };
 }

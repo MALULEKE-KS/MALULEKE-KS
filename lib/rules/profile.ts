@@ -4,6 +4,7 @@
 // owner details. Serializers for the admin API.
 
 import { Prisma } from "@prisma/client";
+import { publishAtWire } from "@/lib/rules/scheduling";
 
 const profileWithLinks = Prisma.validator<Prisma.ProfileDefaultArgs>()({
   include: { links: { orderBy: { sortOrder: "asc" } } },
@@ -43,6 +44,7 @@ export function toAchievement(a: Prisma.AchievementGetPayload<object>) {
     url: a.url,
     systemId: a.systemId,
     contentStatus: a.contentStatus.toLowerCase() as "draft" | "published" | "archived",
+    publishAt: publishAtWire(a.publishAt),
     sortOrder: a.sortOrder,
   };
 }

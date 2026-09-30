@@ -260,7 +260,7 @@ export const CAPABILITIES: Capability[] = [
       "PATCH /admin/impacts/{id}",
       "DELETE /admin/impacts/{id}",
     ],
-    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12"],
+    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13"],
     frontend: [
       { page: "/admin/systems", section: "List with curation queue, filters" },
       { page: "/admin/systems/[id]", section: "Editor, publish controls, homepage + CV placement, repo ownership" },
@@ -269,8 +269,7 @@ export const CAPABILITIES: Capability[] = [
     notes: [
       "409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.",
       "Systems are never deleted — offer Archive (BR-1.9).",
-      "Testimonials are read-only here until V1.1.",
-    ],
+      "Testimonials are read-only here until V1.1.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400."],
   },
   {
     id: "admin.organizations",
@@ -301,9 +300,9 @@ export const CAPABILITIES: Capability[] = [
     summary: "Write journey entries, and approve the ones the database drafts when a system first ships.",
     db: ["Timeline"],
     endpoints: ["GET /admin/timeline", "POST /admin/timeline", "PATCH /admin/timeline/{id}", "DELETE /admin/timeline/{id}"],
-    rules: ["BR-1.12"],
+    rules: ["BR-1.12", "BR-1.13"],
     frontend: [{ page: "/admin/timeline", section: "Entries, auto-drafted queue (autoDrafted + draft), publish" }],
-    notes: ["Publishing an auto-drafted entry is the approval."],
+    notes: ["Publishing an auto-drafted entry is the approval.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400."],
   },
   {
     id: "admin.cv",
@@ -327,13 +326,13 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/cv/check",
       "GET /admin/cv/documents",
     ],
-    rules: ["BR-7.1", "BR-7.2", "BR-7.3", "BR-7.4"],
+    rules: ["BR-7.1", "BR-7.2", "BR-7.3", "BR-7.4", "BR-1.13"],
     frontend: [
       { page: "/admin/cv", section: "Experience, Education, Skills tabs" },
       { page: "/admin/cv", section: "Completeness panel (score, issues, suggested summary, preview by target role)" },
       { page: "/admin/cv", section: "Generated documents" },
     ],
-    notes: ["The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts."],
+    notes: ["The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400."],
   },
   {
     id: "admin.profile",
@@ -352,9 +351,9 @@ export const CAPABILITIES: Capability[] = [
       "PATCH /admin/achievements/{id}",
       "DELETE /admin/achievements/{id}",
     ],
-    rules: [],
+    rules: ["BR-1.13"],
     frontend: [{ page: "/admin/profile (proposed)", section: "Profile form, links, achievements" }],
-    notes: ["Achievements start as drafts; publishing puts them on the site and the CV."],
+    notes: ["Achievements start as drafts; publishing puts them on the site and the CV.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400."],
   },
   {
     id: "admin.metrics",
@@ -424,4 +423,5 @@ export const NOT_EXPOSED: Record<string, string> = {
   ContentChunk: "AI concierge index — V1.1 (CLAUDE.md scope).",
   public_client_label: "Internal helper of the public views (BR-1.4 masking).",
   public_name_disclosed: "Internal helper of the public views (BR-1.4 masking).",
+  is_live: "Internal helper of the public views: published and its publish time has come (BR-1.13).",
 };

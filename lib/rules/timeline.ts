@@ -6,6 +6,7 @@
 // the admin approves it.
 
 import { Prisma, ContentStatus, type PublicTimeline } from "@prisma/client";
+import { publishAtWire } from "@/lib/rules/scheduling";
 
 export const CONTENT_STATUS_FROM_WIRE = {
   draft: ContentStatus.DRAFT,
@@ -45,5 +46,6 @@ export function toTimelineEntry(entry: TimelineWithMilestoneType) {
     contentStatus: entry.contentStatus.toLowerCase() as "draft" | "published" | "archived",
     autoDrafted: entry.autoDrafted,
     systemId: entry.systemId,
+    publishAt: publishAtWire(entry.publishAt),
   };
 }

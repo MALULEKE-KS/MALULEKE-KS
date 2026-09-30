@@ -10,6 +10,7 @@
 // ADMIN side (below): the unmasked shape and the publish gate.
 
 import { Prisma, type ClientVisibility, type PublicSystem } from "@prisma/client";
+import { publishAtWire } from "@/lib/rules/scheduling";
 
 /** The public wire shape (openapi SystemPublic) from a PublicSystem view row. */
 export function toPublicSystem(row: PublicSystem) {
@@ -98,6 +99,7 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
       hasPermission: t.hasPermission,
     })),
     contentStatus: system.contentStatus,
+    publishAt: publishAtWire(system.publishAt),
     clientVisibility: system.clientVisibility,
     clientApproved: system.clientApproved,
     nameDisclosureApproved: system.nameDisclosureApproved,

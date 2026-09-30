@@ -31,6 +31,7 @@
 | BR-1.10 | Publish evaluated inside one transaction, re-reading state | `db.$transaction` in `PATCH /admin/systems/[id]`; the BR-1.1 CHECK now makes the race moot | ✅ | App + DB | — |
 | BR-1.11 | A collaborated system is published only with the repo owner's recorded permission; relationships are a lookup | Trigger `System_br_1_11_owner_permission` (normalises the answer, stamps its time, refuses publishing without GRANTED), CHECK `System_br_1_11_answer_has_source`, trigger `RepoRelationship_br_1_11_recheck`; API answers 409 `OWNER_PERMISSION_REQUIRED` (#69); tested | ✅ | DB triggers + App | — |
 | BR-1.12 | A journey entry about a system is public only while that system is published; first ships are auto-drafted, never auto-published | Trigger `System_status_history` drafts the entry (DRAFT, one per system — partial unique index); public reads use the `PublicTimeline` view (#72); tested | ✅ | DB trigger + public view | — |
+| BR-1.13 | Scheduled content is public exactly at its time, everywhere, and every publish gate is checked when it's scheduled | `publishAt` on System/Timeline/Achievement/Experience/Education; function `is_live()` in every public view and `SkillEvidence`/`PublicLedger` (so search and the CV follow); trigger `*_br_1_13_publish_at` refuses a time on unpublished content and drops it on unpublish; CHECK backstop; `withAdmin` answers the refusal as a 400. Public pages render per request (build shows ƒ), so nothing waits on a cache or a cron (#86); tested | ✅ | DB function + trigger + CHECK | — |
 
 ## 2. Inquiries (BR-2.x)
 

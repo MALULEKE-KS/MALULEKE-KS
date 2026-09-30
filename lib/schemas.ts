@@ -159,8 +159,15 @@ export const SystemPublicDetailedSchema = SystemPublicSchema.extend({
   testimonials: z.array(TestimonialPublicSchema),
 });
 
+// BR-1.13 (#86): when published content goes live. Omitted = unchanged,
+// null = live as soon as published. Only valid while published.
+const PublishAtInputSchema = z.string().datetime({ offset: true }).nullable().optional();
+// In admin responses only — public content is live by definition.
+const PublishAtSchema = z.string().datetime().nullable().optional();
+
 export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
   contentStatus: ContentStatusEnum,
+  publishAt: PublishAtSchema,
   clientVisibility: ClientVisibilityEnum,
   clientApproved: z.boolean(),
   // Separate from clientApproved (BR-1.4) — approves real-name disclosure
@@ -222,6 +229,7 @@ export const SystemUpdateInputSchema = z
     organizationId: z.string().min(1).optional(),
     clientVisibility: ClientVisibilityEnum.optional(),
     contentStatus: ContentStatusEnum.optional(),
+    publishAt: PublishAtInputSchema,
     clientApproved: z.boolean().optional(),
     nameDisclosureApproved: z.boolean().optional(),
     isFlagship: z.boolean().optional(),
@@ -359,6 +367,7 @@ export const TimelineEntrySchema = z.object({
   contentStatus: ContentStatusEnum,
   autoDrafted: z.boolean(),
   systemId: z.string().nullable(),
+  publishAt: PublishAtSchema,
 });
 
 // #74 — the same CV as PDF or Word (DOCX); a target role tailors the order.
@@ -411,6 +420,7 @@ export const TimelineCreateInputSchema = z.object({
   // Omitted on create = published (an entry the admin writes is ready);
   // omitted on update = unchanged. Approving an auto-drafted entry = "published".
   contentStatus: ContentStatusEnum.optional(),
+  publishAt: PublishAtInputSchema,
 });
 
 // A CV bullet: one achievement, concise (#74).
@@ -426,6 +436,7 @@ export const ExperienceEntrySchema = z.object({
   description: z.string(),
   highlights: z.array(z.string()),
   contentStatus: ContentStatusEnum,
+  publishAt: PublishAtSchema,
   skills: z.array(z.string()),
 });
 
@@ -440,6 +451,7 @@ export const ExperienceInputSchema = z.object({
   highlights: z.array(CvBulletSchema).max(15).default([]),
   // Omitted on create = published; omitted on update = unchanged (#74).
   contentStatus: ContentStatusEnum.optional(),
+  publishAt: PublishAtInputSchema,
   skillIds: z.array(z.string()).default([]),
 });
 
@@ -454,6 +466,7 @@ export const EducationEntrySchema = z.object({
   description: z.string().nullable(),
   certificateUrl: z.string().url().nullable(),
   contentStatus: ContentStatusEnum,
+  publishAt: PublishAtSchema,
   skills: z.array(z.string()),
   expectedGraduation: z.string().date().nullable(),
   coursework: z.array(z.string()),
@@ -470,6 +483,7 @@ export const EducationInputSchema = z.object({
   certificateUrl: z.string().url().startsWith("https://").nullable().optional(),
   // Omitted on create = published; omitted on update = unchanged (#70).
   contentStatus: ContentStatusEnum.optional(),
+  publishAt: PublishAtInputSchema,
   skillIds: z.array(z.string()).default([]),
   // A degree in progress (no endDate): when it's expected to finish (#74).
   expectedGraduation: z.string().date().nullable().optional(),
@@ -587,6 +601,7 @@ export const AchievementEntrySchema = z.object({
   url: z.string().nullable(),
   systemId: z.string().nullable(),
   contentStatus: ContentStatusEnum,
+  publishAt: PublishAtSchema,
   sortOrder: z.number().int(),
 });
 
@@ -599,6 +614,7 @@ export const AchievementInputSchema = z.object({
   systemId: z.string().nullable().optional(),
   // Omitted on create = draft (the table's default); omitted on update = unchanged.
   contentStatus: ContentStatusEnum.optional(),
+  publishAt: PublishAtInputSchema,
   sortOrder: z.number().int().min(0).default(0),
 });
 

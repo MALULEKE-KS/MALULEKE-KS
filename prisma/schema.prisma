@@ -213,6 +213,8 @@ model System {
   // requires clientApproved=true to publish anything non-PUBLIC.
   nameDisclosureApproved Boolean          @default(false)
   contentStatus          ContentStatus    @default(DRAFT) // BR-1.6: sync-created rows always start here
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt              DateTime?        @db.Timestamptz(3)
   needsCuration          Boolean          @default(false) // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
   // No delete endpoint exists for System anywhere in the contract — retirement
   // is always contentStatus = ARCHIVED (BR-1.9). Rows are never hard-deleted.
@@ -379,6 +381,8 @@ model Timeline {
   // Only PUBLISHED entries are public. Auto-drafted entries start as DRAFT
   // and wait for the admin's approval (#70).
   contentStatus   ContentStatus @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt       DateTime?     @db.Timestamptz(3)
   systemId        String?
   system          System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
   autoDrafted     Boolean       @default(false)
@@ -446,6 +450,8 @@ model Achievement {
   systemId      String?
   system        System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
   contentStatus ContentStatus @default(DRAFT)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt     DateTime?     @db.Timestamptz(3)
   sortOrder     Int           @default(0)
   createdAt     DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
@@ -467,6 +473,8 @@ model Experience {
   highlights    String[]            @default([])
   // Only PUBLISHED roles appear on /cv and in the generated CV (#74).
   contentStatus ContentStatus       @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt     DateTime?           @db.Timestamptz(3)
   skills        SkillOnExperience[]
   createdAt     DateTime            @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
@@ -491,6 +499,8 @@ model Education {
   // Only PUBLISHED entries appear on /cv and in the generated CV; the admin
   // decides what's shown.
   contentStatus      ContentStatus      @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt          DateTime?          @db.Timestamptz(3)
   skills             SkillOnEducation[]
   createdAt          DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime           @default(now()) @updatedAt @db.Timestamptz(3)

@@ -184,6 +184,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/cv/check`
 - Call `GET /admin/cv/documents`
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### /admin/inquiries
 
@@ -245,6 +246,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/achievements/{id}`
 - Call `DELETE /admin/achievements/{id}`
 - Achievements start as drafts; publishing puts them on the site and the CV.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### /admin/settings
 
@@ -283,6 +285,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### /admin/systems/[id]
 
@@ -300,6 +303,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### /admin/timeline
 
@@ -310,6 +314,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/timeline/{id}`
 - Call `DELETE /admin/timeline/{id}`
 - Publishing an auto-drafted entry is the approval.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ## Every endpoint
 
