@@ -1,7 +1,8 @@
 // lib/queries/admin-systems.ts
 // The admin's full view of one system (#82): the unmasked record plus what
 // the database knows about it — its skills, every status change (written by
-// trigger, #70), pace (SystemPace view) and weekly GitHub activity.
+// trigger, #70), pace (SystemPace view), weekly GitHub activity, and the
+// slugs it used before — each still a permanent redirect (#87, BR-1.14).
 
 import { db } from "@/lib/db";
 import { systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
@@ -13,7 +14,7 @@ export async function getAdminSystemDetail(id: string) {
   const system = await db.system.findUnique({ where: { id }, ...systemWithAdminRelations });
   if (!system) return null;
 
-  const [skills, history, [pace], activity] = await Promise.all([
+  const [skills, history, [pace], activity, previousSlugs] = await Promise.all([
     db.skillOnSystem.findMany({ where: { systemId: id }, include: { skill: true }, orderBy: { skill: { name: "asc" } } }),
     db.systemStatusChange.findMany({
       where: { systemId: id },
@@ -22,6 +23,7 @@ export async function getAdminSystemDetail(id: string) {
     }),
     getSystemPace([id]),
     db.systemActivityWeek.findMany({ where: { systemId: id }, orderBy: { weekStart: "desc" }, take: WEEKS_OF_ACTIVITY }),
+    db.systemSlugHistory.findMany({ where: { systemId: id }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
@@ -44,5 +46,6 @@ export async function getAdminSystemDetail(id: string) {
       daysToShip: pace?.daysToShip ?? null,
     },
     activity: activity.map((a) => ({ weekStart: a.weekStart.toISOString().slice(0, 10), commits: a.commits })),
+    previousSlugs: previousSlugs.map((h) => ({ slug: h.slug, retiredAt: h.createdAt.toISOString() })),
   };
 }

@@ -219,9 +219,15 @@ export const SystemCreateInputSchema = z.object({
 
 export const SystemUpdateInputSchema = z
   .object({
-    // #82 — the whole system is editable here. The slug isn't: renaming a
-    // URL needs slug history (F2.3) so old links keep working.
+    // #82 — the whole system is editable here. #87 — the slug too: the
+    // database keeps the old one as a permanent redirect (BR-1.14).
     name: z.string().trim().min(1).max(120).optional(),
+    slug: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -")
+      .max(100)
+      .optional(),
     description: z.string().trim().min(1).max(2000).optional(),
     techStack: z.array(z.string().trim().min(1).max(60)).max(40).optional(),
     status: z.string().trim().min(1).optional(), // a Status key (pipeline stage follows it)

@@ -91,6 +91,8 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/SystemPublicDetailed" }
+        "308":
+          description: "The slug the system used before a rename — permanent redirect (Location) to its current slug (#87, BR-1.14). Only for a system the visitor can see."
         "404": { $ref: "#/components/responses/NotFound" }
 
   /organizations:
@@ -1181,7 +1183,7 @@ paths:
       tags: [Systems (Public)]
       summary: List related published systems
       parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 12, default: 3 } }]
-      responses: { "200": { description: Related systems }, "404": { $ref: "#/components/responses/NotFound" } }
+      responses: { "200": { description: Related systems }, "308": { description: "Old slug — permanent redirect to the current one, query kept (#87, BR-1.14)" }, "404": { $ref: "#/components/responses/NotFound" } }
 
   /admin/overview:
     get: { tags: [Overview (Admin)], summary: Get the admin attention dashboard, security: [{ adminSession: [] }], responses: { "200": { description: Dashboard data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
@@ -1540,6 +1542,7 @@ components:
     SystemUpdateInput:
       type: object
       properties:
+        slug: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$", maxLength: 100, description: "#87 / BR-1.14 — rename the URL; the old slug keeps redirecting permanently. 409 SLUG_TAKEN (another system's current slug) or SLUG_RESERVED (another system's old slug)" }
         contentStatus: { type: string, enum: [draft, published, archived] }
         publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         clientApproved: { type: boolean }

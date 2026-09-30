@@ -47,6 +47,16 @@ export async function getPublicSystems({
   return { data: rows.map(toPublicSystem), meta: { page, pageSize, total } };
 }
 
+export async function isPublicSystemSlug(slug: string): Promise<boolean> {
+  return (await db.publicSystem.count({ where: { slug } })) > 0;
+}
+
+/** The current slug an old one redirects to, if its system is public (#87, BR-1.14). */
+export async function publicSlugRedirect(slug: string): Promise<string | null> {
+  const row = await db.publicSlugRedirect.findUnique({ where: { fromSlug: slug } });
+  return row?.toSlug ?? null;
+}
+
 export async function getPublicSystemBySlug(slug: string) {
   const row = await db.publicSystem.findUnique({ where: { slug } });
   if (!row) return null;

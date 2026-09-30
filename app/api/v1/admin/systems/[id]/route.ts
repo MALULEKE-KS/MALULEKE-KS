@@ -102,6 +102,9 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         where: { id },
         data: {
           ...(parsed.data.name !== undefined && { name: parsed.data.name }),
+          // #87 — the database records the old slug as a permanent redirect
+          // and refuses another system's old one (BR-1.14).
+          ...(parsed.data.slug !== undefined && { slug: parsed.data.slug }),
           ...(parsed.data.description !== undefined && { description: parsed.data.description }),
           ...(parsed.data.techStack !== undefined && { techStack: parsed.data.techStack }),
           // A status change is recorded in the status history by the database,
@@ -167,6 +170,15 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
     }
     if (err instanceof Error && err.message === "UNKNOWN_REPO_RELATIONSHIP") {
       return errorResponse("VALIDATION_ERROR", "Unknown or deprecated repo relationship", 400);
+    }
+    const reservedSlug = ruleViolation(err, "BR-1.14");
+    if (reservedSlug) return errorResponse("SLUG_RESERVED", reservedSlug, 409);
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002" &&
+      JSON.stringify(err.meta?.target ?? "").includes("slug")
+    ) {
+      return errorResponse("SLUG_TAKEN", "Another system already uses that slug.", 409);
     }
     const ownerRule = ruleViolation(err, "BR-1.11");
     if (ownerRule) {

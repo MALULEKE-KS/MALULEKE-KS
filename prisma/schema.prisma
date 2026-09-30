@@ -254,6 +254,7 @@ model System {
   githubSyncedAt   DateTime? @db.Timestamptz(3)
 
   statusChanges   SystemStatusChange[]
+  slugHistory     SystemSlugHistory[]
   activityWeeks   SystemActivityWeek[]
   timelineEntries Timeline[]
   achievements    Achievement[]
@@ -760,6 +761,18 @@ model MetricSnapshot {
 // ============================================================
 // PUBLIC VIEWS (F1.7) — the only shape public pages read
 
+// #87 / BR-1.14 — every slug a system gave up, written by a database trigger on
+// rename (admin or GitHub sync). An old slug redirects permanently to the
+// system's current one and stays reserved for it.
+model SystemSlugHistory {
+  slug      String   @id
+  systemId  String
+  system    System   @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([systemId])
+}
+
 // #92 — a CV file the owner uploads, offered to visitors beside the generated
 // CV (BR-7.1). Versions are superseded, never deleted or altered (BR-7.2,
 // enforced by a trigger and the runtime role's grants). One current per format.
@@ -970,4 +983,10 @@ view PublicCvUpload {
   byteSize   Int
   uploadedAt DateTime
   fileData   Bytes
+}
+
+// #87 — old slug → current slug, live systems only (BR-1.14).
+view PublicSlugRedirect {
+  fromSlug String @unique
+  toSlug   String
 }

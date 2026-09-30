@@ -96,13 +96,15 @@ One published system in full — case study body, measured impacts, permitted te
 - `PublicSystem`
 - `PublicImpact`
 - `PublicTestimonial`
+- `PublicSlugRedirect`
 
-**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2
+**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2, BR-1.14
 
 **Notes**
 
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
+- An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
 
 ### Instant search
 
@@ -383,8 +385,9 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `SystemActivityWeek`
 - `RepoRelationship`
 - `Testimonial`
+- `SystemSlugHistory`
 
-**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13
+**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14
 
 **Notes**
 
@@ -392,6 +395,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+- Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
 
 ### Organizations
 
@@ -673,6 +677,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `PublicOrganization` | systems.catalog |
 | `PublicProfile` | profile, cv |
 | `PublicProfileLink` | profile, cv |
+| `PublicSlugRedirect` | systems.caseStudy |
 | `PublicSystem` | home, systems.catalog, systems.caseStudy |
 | `PublicTestimonial` | systems.caseStudy |
 | `PublicTimeline` | journey |
@@ -690,6 +695,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `System` | admin.overview, admin.systems |
 | `SystemActivityWeek` | admin.systems |
 | `SystemPace` | admin.systems |
+| `SystemSlugHistory` | admin.systems |
 | `SystemStatusChange` | admin.systems |
 | `Testimonial` | admin.systems |
 | `Timeline` | admin.overview, admin.journey |
