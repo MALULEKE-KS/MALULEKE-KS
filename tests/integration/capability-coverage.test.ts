@@ -59,7 +59,9 @@ describe("#82 capability coverage", () => {
 
   it("keeps both generated capability guides current", async () => {
     const docs = path.join(process.cwd(), "docs");
-    await expect(readFile(path.join(docs, "BACKEND-API-GUIDE.md"), "utf8")).resolves.toBe(renderBackendGuide());
-    await expect(readFile(path.join(docs, "FRONTEND-DATA-GUIDE.md"), "utf8")).resolves.toBe(renderFrontendGuide());
+    // Line endings follow the checkout (CRLF on Windows), not the content.
+    const read = async (file: string) => (await readFile(path.join(docs, file), "utf8")).replace(/\r\n/g, "\n");
+    expect(await read("BACKEND-API-GUIDE.md")).toBe(renderBackendGuide());
+    expect(await read("FRONTEND-DATA-GUIDE.md")).toBe(renderFrontendGuide());
   });
 });
