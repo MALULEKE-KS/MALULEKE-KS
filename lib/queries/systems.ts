@@ -20,7 +20,15 @@ export interface PublicSystemsFilters {
   pageSize?: number;
 }
 
-const CATALOG_ORDER = [{ isFlagship: "desc" }, { sortOrder: "asc" }] satisfies Prisma.PublicSystemOrderByWithRelationInput[];
+// Name and id break ties: most systems share a sortOrder, and without a total
+// order the database may return ties in any order — so paging could show a
+// system on two pages, or on none.
+const CATALOG_ORDER = [
+  { isFlagship: "desc" },
+  { sortOrder: "asc" },
+  { name: "asc" },
+  { id: "asc" },
+] satisfies Prisma.PublicSystemOrderByWithRelationInput[];
 
 export async function getPublicSystems({
   organizationSlug,
