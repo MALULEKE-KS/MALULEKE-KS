@@ -34,7 +34,9 @@ export const DESTRUCTIVE = [
   { kind: "DROP SCHEMA", re: /\bDROP\s+SCHEMA\b/i },
   { kind: "RENAME", re: /\bRENAME\b/i },
   { kind: "COLUMN TYPE CHANGE", re: /\bALTER\s+COLUMN\s+\S+\s+(SET\s+DATA\s+)?TYPE\b/i },
-  { kind: "TRUNCATE", re: /\bTRUNCATE\b/i },
+  // A TRUNCATE statement, not the word: "REVOKE ... TRUNCATE" (a privilege
+  // taken away) and "BEFORE TRUNCATE" (a trigger that blocks it) protect data (#92).
+  { kind: "TRUNCATE", re: /(^|;)\s*TRUNCATE\b/i },
   { kind: "DELETE", re: /\bDELETE\s+FROM\b/i },
   { kind: "DISABLE TRIGGER", re: /\bDISABLE\s+TRIGGER\b/i },
 ];
