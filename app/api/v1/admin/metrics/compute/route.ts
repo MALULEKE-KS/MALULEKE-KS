@@ -8,8 +8,8 @@ import { proposeComputedMetrics } from "@/lib/metrics";
 import { runJob } from "@/lib/jobs/run-job";
 import { withAdmin } from "@/lib/auth/with-admin";
 
-export const POST = withAdmin(async (_request, { write }) => {
-  const run = await runJob("metrics.compute", () => write((tx) => proposeComputedMetrics(tx)));
+export const POST = withAdmin(async (_request, { adminUserId, write }) => {
+  const run = await runJob("metrics.compute", () => write((tx) => proposeComputedMetrics(tx)), { kind: "admin", adminUserId });
   if (run.status === "already_running") {
     return NextResponse.json(
       { error: { code: "VALIDATION_ERROR", message: "A metrics computation is already running.", details: null } },

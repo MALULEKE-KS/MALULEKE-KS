@@ -1258,7 +1258,9 @@ paths:
   /admin/freshness/{kind}/{id}/reviewed:
     post: { tags: [Overview (Admin)], summary: "Mark content reviewed — still accurate; its clock restarts (BR-1.16)", security: [{ adminSession: [] }], parameters: [{ name: kind, in: path, required: true, schema: { type: string, enum: [system, experience, education, profile] } }, { name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ kind, id, reviewedAt }" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/jobs:
-    get: { tags: [Jobs (Admin)], summary: List recent job runs, security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: Job runs }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    get: { tags: [Jobs (Admin)], summary: "List registered jobs (with schedule) and recent runs (with what started each)", security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: "{ jobs: [{ name, description, rules, schedule }], data: [{ id, job, status, startedAt, finishedAt, durationMs, summary, error, trigger, adminUserId }] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/jobs/{job}/run:
+    post: { tags: [Jobs (Admin)], summary: "Run a registered job now (#94) — same runner and lock as the schedule, recorded as started by this admin", security: [{ adminSession: [] }], parameters: [{ name: job, in: path, required: true, schema: { type: string, enum: [maintenance.daily, metrics.compute, github.sync] } }], responses: { "200": { description: "{ status: succeeded, runId, result }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "ALREADY_RUNNING" }, "500": { description: "{ status: failed, runId, error } — the run is recorded with its error" } } }
 
 components:
   securitySchemes:

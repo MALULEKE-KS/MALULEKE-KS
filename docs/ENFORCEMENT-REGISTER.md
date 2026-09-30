@@ -24,8 +24,8 @@
 | BR-1.3 | `NDA_RESTRICTED` never exposes repo/live URL publicly | View `PublicSystem` nulls repo, live link and screenshot; every public read uses the view (#72); tested | ✅ | DB public view + `platform_public` role (#76) | — |
 | BR-1.4 | `ANONYMIZED_ONLY` never exposes the org name unless `nameDisclosureApproved` — including through the organization list and filter | View `PublicSystem` masks the name and drops the org slug; `PublicOrganization` lists only disclosed organizations; `PublicTestimonial` masks the organization. **Fixed a live leak:** the organization list named an anonymized client (#72); tested | ✅ | DB public views + `platform_public` role (#76) | — |
 | BR-1.5 | `contentStatus` fixed draft/published/archived | Prisma enum | ✅ | DB | — |
-| BR-1.6 | Sync-created systems land `DRAFT` + `needsCuration` | `github-sync.ts` (sync never run) | 🟡 | App + DB default | F1.6 / F4 |
-| BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Rule text rewritten (#70); `System.repoPrivate`; the public serializer returns `repoUrl: null` + `repoPrivate: true` (tested). The sync still skips private repos until it is rebuilt | 🟡 | DB public view + sync | F1.7 / F4 |
+| BR-1.6 | Sync-created systems land `DRAFT` + `needsCuration` | `lib/jobs/github-sync.ts` (scheduled daily, #95) creates drafts only, never publishes; tested against a fake GitHub | ✅ | App + DB default | — |
+| BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Rule text rewritten (#70); `System.repoPrivate`; view `PublicSystem` returns `repoUrl: null` for a private repo (tested). The daily `github.sync` (#95) syncs private repos as drafts with `repoPrivate` set (tested) | ✅ | DB public view + sync | — |
 | BR-1.8 | `needsCuration` cleared on admin save | `PATCH /admin/systems/[id]` | ✅ | App | — |
 | BR-1.9 | `System` never hard-deleted | No DELETE route; trigger `System_br_1_9_no_delete` — enforced in the database too (F1.2, #60) | ✅ | DB trigger | — |
 | BR-1.10 | Publish evaluated inside one transaction, re-reading state | `db.$transaction` in `PATCH /admin/systems/[id]`; the BR-1.1 CHECK now makes the race moot | ✅ | App + DB | — |
@@ -79,10 +79,10 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-5.1 / 5.4 | No event before consent; applies to Vercel Analytics too | No events are collected yet; no consent banner | 🟡 (vacuously true) | App — required before any analytics ships | F5 |
-| BR-5.2 | `Inquiry`/`Event` anonymized or purged after 24 months; scheduled | **Not implemented** — `JobRun` (run history + database lock) is ready (#70); the job itself is F4 | ❌ | DB function + scheduled job + `JobRun` log | F1.6 / F4 |
+| BR-5.2 | `Inquiry`/`Event` anonymised after the retention period; scheduled | Function `apply_retention(months)` (personal data replaced, aggregates kept, idempotent), run daily by the `maintenance.daily` job with setting `data.retentionMonths` (default 24, floor 6); trigger `*_br_5_2_anonymized` makes it one-way (#96); tested | ✅ | DB function + trigger + scheduled job | — |
 | BR-5.3 | Public statistics are admin-approved; live counts are content facts | `Metric` + `MetricSnapshot`: `propose_metric_snapshot` / `approve_metric_snapshot`, value fixed once proposed, forward-only transitions, one approved + one pending per metric, never deleted; public reads the `PublicMetric` view only (#72); tested. Homepage counts read the `PublicLedger` view | ✅ | DB | Admin endpoints → F2 |
 | BR-5.5 | Deletion right honoured manually; stated on confirmation | Contact confirmation states the removal route (email) — #58 | ✅ | App copy | — |
-| BR-2.4 (privacy) | IP kept only as long as the window needs | Keys hold a keyed hash (HMAC, HKDF subkey) of the IP, never the raw address (#64); expired rows not yet pruned | 🟡 | Hashed keys ✅ · prune job → F4 | F4 |
+| BR-2.4 (privacy) | IP kept only as long as the window needs | Keys hold a keyed hash (HMAC, HKDF subkey) of the IP, never the raw address (#64); expired windows deleted daily by `prune_expired()` in `maintenance.daily` (#96); tested | ✅ | Hashed keys + daily prune | — |
 
 ## 6. Testimonials (BR-6.x)
 
@@ -117,8 +117,8 @@
 | Nothing hardcoded unless that's the recommended practice — tunables are data | Owner directive 2026-09-19 | `PlatformSetting` table + typed registry with bounds (#67): inquiry and CV rate limits are read from it; retention and review SLA are stored there, read once their jobs exist (F2/F4); status keys are gone from queries. Laws stay in code on purpose: challenge TTL, message bounds, 2FA and lockout policy | 🟡 | DB settings table, admin-editable | F2/F4 (consumers) |
 | Nothing about the owner hardcoded | Owner directive 2026-09-18 | `Profile` (one row, CHECK), `ProfileLink`, `Achievement` hold the owner's data, moved from `lib/content/sheets.ts` using only what the repo already stated (#70). Pages still read the constants until the frontend switches over | 🟡 | DB tables ✅ · pages read them | F5 |
 | Pre-launch: sitemap, OG images, JSON-LD, canonical URLs | Constitution §9 | Not verified | ❌/? | App | F5 |
-| Pre-launch: static CV PDF hosted independently | Constitution §9 | Not verified | ❌/? | Ops | F4 |
-| Backup / restore drill | Constitution §11 Phase 2 | Neon point-in-time recovery exists; never drilled | 🟡 | Ops runbook + drill | F4 |
+| Pre-launch: static CV PDF hosted independently | Constitution §9 | `cv-continuity` workflow publishes the CV the site offers to the `cv-latest` GitHub release weekly; a failed run keeps the last good copy (#97) | ✅ | GitHub Actions + release asset | — |
+| Backup / restore drill | Constitution §11 Phase 2 | Runbook (DEPLOYMENT.md, Backup & restore: Neon point-in-time branch → verify → recover) and `scripts/backup-drill.ts` (read-only comparison: migrations, every table/view readable, row counts) (#97). A production drill is recorded in DEPLOYMENT.md when run | 🟡 | Ops runbook + drill script | F4 drill |
 
 ## 8a. Platform qualities (added by F1.3–F1.5)
 
@@ -139,7 +139,7 @@
 | Public pages can only see public data | Every public read goes through `dbPublic`, connected as `platform_public`: SELECT on the ten masked views and public lookups only — raw tables refused by the database (#72, #76). Proven in tests and CI (the whole suite's public reads run restricted). Production: verified 2026-09-19 — public reads connect as `app_public` | ✅ |
 | The application can't undo the database's rules | Runtime connects as `platform_runtime`: no ALTER/DROP/TRUNCATE, no disabling triggers, no UPDATE/DELETE on audit or status history, no DELETE of systems/documents/metric history (#76). The full suite passes as that role except the tests that deliberately attempt those. Production: verified 2026-09-19 — writes connect as `app_runtime`; the owner isn't used at runtime | ✅ |
 | Instant search never finds hidden work | `search_public()` reads the public views only: full-text + pg_trgm (typos, partial words), trigram GIN indexes (#72); tested incl. drafts and masked clients | ✅ |
-| GitHub metadata and weekly activity per system | Columns + `SystemActivityWeek` with format/bound CHECKs (#70); filled by the sync in F4 | 🟡 → F4 |
+| GitHub metadata and weekly activity per system | Filled by the daily `github.sync` job (#95): full name, owner, privacy, last push, languages, topics, stars; commit activity re-bucketed by day into ISO weeks; stats still computing (202) retried next run; tested | ✅ |
 
 ## 9. Claims the public site makes
 

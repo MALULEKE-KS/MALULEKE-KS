@@ -458,14 +458,21 @@ export const CAPABILITIES: Capability[] = [
   },
   {
     id: "admin.jobs",
-    title: "Job runs",
+    title: "Scheduled jobs and their runs",
     audience: "admin",
-    summary: "Every scheduled or on-demand job run — status, duration, summary, error.",
-    db: ["JobRun"],
-    endpoints: ["GET /admin/jobs"],
-    rules: [],
-    frontend: [{ page: "/admin/jobs (proposed)", section: "Runs by job, failures first" }],
-    notes: [],
+    summary:
+      "The registered jobs — retention and pruning, number proposals, the GitHub sync — run daily by the scheduler and on demand; every run's status, duration, summary, error and what started it (#94–#96).",
+    db: ["JobRun", "apply_retention", "prune_expired", "SystemActivityWeek", "RateLimitEntry", "LoginChallenge"],
+    endpoints: ["GET /admin/jobs", "POST /admin/jobs/{job}/run"],
+    rules: ["BR-5.2", "BR-2.4", "BR-1.6", "BR-1.7", "BR-1.11", "BR-5.3"],
+    frontend: [
+      { page: "/admin/jobs (proposed)", section: "Jobs with schedule and last run; runs by job, failures first; Run now" },
+      { page: "/admin", section: "Last run per job (overview.jobs)" },
+    ],
+    notes: [
+      "Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.",
+      "github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).",
+    ],
   },
 ];
 

@@ -1,0 +1,42 @@
+# Continuity CV (Constitution §9, #97): keep a copy of the CV the site offers
+# hosted independently of the platform — as the asset of the "cv-latest"
+# GitHub release, at a URL that never changes:
+#   https://github.com/MALULEKE-KS/MALULEKE-KS/releases/download/cv-latest/cv.pdf
+# If the site is down or the download isn't a real PDF/Word file, the job fails
+# and the last good copy stays in place.
+name: cv-continuity
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cv-continuity
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Download the CV the site currently offers
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://maluleke-ks.vercel.app' }}
+        run: node scripts/cv-continuity.mjs out
+      - name: Publish it as the cv-latest release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh release view cv-latest >/dev/null 2>&1; then
+            gh release create cv-latest --title "CV (continuity copy)" --latest=false \
+              --notes "A copy of the CV this platform offers, refreshed weekly and hosted independently of it (Constitution §9). If the site is ever unavailable, this copy still is."
+          fi
+          gh release upload cv-latest out/cv.* --clobber

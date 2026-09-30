@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**25 capabilities · 94 endpoints.**
+**25 capabilities · 95 endpoints.**
 
 ## Public
 
@@ -658,21 +658,32 @@ Live content — systems, roles, education, the profile — that nobody has edit
 - Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
 - The threshold is the setting content.freshnessDays (default 90).
 
-### Job runs
+### Scheduled jobs and their runs
 
 `admin.jobs` · admin
 
-Every scheduled or on-demand job run — status, duration, summary, error.
+The registered jobs — retention and pruning, number proposals, the GitHub sync — run daily by the scheduler and on demand; every run's status, duration, summary, error and what started it (#94–#96).
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `GET /admin/jobs`
+- `POST /admin/jobs/{job}/run`
 
 **Database**
 
 - `JobRun`
+- `apply_retention`
+- `prune_expired`
+- `SystemActivityWeek`
+- `RateLimitEntry`
+- `LoginChallenge`
 
-**Rules:** —
+**Rules:** BR-5.2, BR-2.4, BR-1.6, BR-1.7, BR-1.11, BR-5.3
+
+**Notes**
+
+- Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
 
 ## Database objects → capabilities
 
@@ -681,6 +692,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `Achievement` | admin.profile |
 | `ActivityLog` | admin.auth, admin.overview, admin.audit |
 | `AdminUser` | admin.auth |
+| `apply_retention` | admin.jobs |
 | `approve_metric_snapshot` | admin.metrics |
 | `CvOptions` | admin.cv |
 | `CvUpload` | admin.cv |
@@ -693,7 +705,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
 | `InquiryType` | inquiries.submit, lookups |
 | `JobRun` | admin.overview, admin.metrics, admin.jobs |
-| `LoginChallenge` | admin.auth |
+| `LoginChallenge` | admin.auth, admin.jobs |
 | `Metric` | admin.metrics |
 | `MetricSnapshot` | admin.overview, admin.metrics |
 | `MilestoneType` | journey, lookups |
@@ -702,6 +714,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `Profile` | admin.profile, admin.freshness |
 | `ProfileLink` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
+| `prune_expired` | admin.jobs |
 | `PublicAchievement` | achievements, cv |
 | `PublicCvOption` | cv |
 | `PublicCvUpload` | cv |
@@ -718,7 +731,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `PublicTestimonial` | systems.caseStudy |
 | `PublicTimeline` | journey |
 | `rate_limit_hit` | search, cv, inquiries.submit, admin.auth |
-| `RateLimitEntry` | admin.auth |
+| `RateLimitEntry` | admin.auth, admin.jobs |
 | `RepoRelationship` | lookups, admin.systems |
 | `search_public` | search |
 | `Skill` | skills, admin.cv |
@@ -730,7 +743,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `stale_content` | admin.freshness |
 | `Status` | systems.catalog, lookups |
 | `System` | admin.overview, admin.systems, admin.freshness |
-| `SystemActivityWeek` | admin.systems |
+| `SystemActivityWeek` | admin.systems, admin.jobs |
 | `SystemContentRevision` | admin.systems |
 | `SystemPace` | admin.systems |
 | `SystemSlugHistory` | admin.systems |

@@ -170,6 +170,13 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
 - The threshold is the setting content.freshnessDays (default 90).
 
+**Scheduled jobs and their runs** — Last run per job (overview.jobs)
+
+- Call `GET /admin/jobs`
+- Call `POST /admin/jobs/{job}/run`
+- Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
+
 ### /admin (proposed: /admin/account)
 
 **Admin sign-in (password + 2FA)** — Change password; recovery codes — remaining count, low-count notice, regenerate (show the ten codes once)
@@ -240,9 +247,12 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/jobs (proposed)
 
-**Job runs** — Runs by job, failures first
+**Scheduled jobs and their runs** — Jobs with schedule and last run; runs by job, failures first; Run now
 
 - Call `GET /admin/jobs`
+- Call `POST /admin/jobs/{job}/run`
+- Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
 
 ### /admin/login
 
@@ -470,4 +480,5 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /admin/activity-log` | Audit trail | admin |
 | `GET /admin/freshness` | Freshness nudges | admin |
 | `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
-| `GET /admin/jobs` | Job runs | admin |
+| `GET /admin/jobs` | Scheduled jobs and their runs | admin |
+| `POST /admin/jobs/{job}/run` | Scheduled jobs and their runs | admin |
