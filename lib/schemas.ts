@@ -212,6 +212,15 @@ export const SystemCreateInputSchema = z.object({
 
 export const SystemUpdateInputSchema = z
   .object({
+    // #82 — the whole system is editable here. The slug isn't: renaming a
+    // URL needs slug history (F2.3) so old links keep working.
+    name: z.string().trim().min(1).max(120).optional(),
+    description: z.string().trim().min(1).max(2000).optional(),
+    techStack: z.array(z.string().trim().min(1).max(60)).max(40).optional(),
+    status: z.string().trim().min(1).optional(), // a Status key (pipeline stage follows it)
+    domain: z.string().trim().min(1).nullable().optional(), // a Domain key; null clears it
+    organizationId: z.string().min(1).optional(),
+    clientVisibility: ClientVisibilityEnum.optional(),
     contentStatus: ContentStatusEnum.optional(),
     clientApproved: z.boolean().optional(),
     nameDisclosureApproved: z.boolean().optional(),
@@ -589,4 +598,64 @@ export const AchievementInputSchema = z.object({
 
 export const CvCheckQuerySchema = z.object({
   targetRole: z.string().trim().max(100).optional(),
+});
+
+// ============================================================
+// COMPLETE ADMIN SURFACE (#82) — organizations, impacts, a system's skills,
+// curated numbers, jobs, the activity-log filters
+// ============================================================
+
+const SlugSchema = z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "lowercase words joined by -");
+
+export const OrganizationInputSchema = z.object({
+  name: z.string().trim().min(1).max(160),
+  slug: SlugSchema,
+  role: z.string().trim().min(1).max(80).nullable().optional(), // e.g. Founder, Co-founder
+  // BR-1.2: applies to systems created afterwards — never retroactive.
+  isClient: z.boolean().default(false),
+  githubLogins: z.array(z.string().trim().min(1).max(100)).max(20).default([]),
+});
+
+export const OrganizationUpdateInputSchema = OrganizationInputSchema.partial().refine(
+  (d) => Object.values(d).some((v) => v !== undefined),
+  { message: "Nothing to update" },
+);
+
+export const ImpactInputSchema = z.object({
+  label: z.string().trim().min(1).max(120), // "Audit findings closed"
+  value: z.string().trim().min(1).max(60), // "58"
+  sortOrder: z.number().int().min(0).default(0),
+});
+
+export const ImpactUpdateInputSchema = ImpactInputSchema.partial().refine(
+  (d) => Object.values(d).some((v) => v !== undefined),
+  { message: "Nothing to update" },
+);
+
+export const SystemSkillsInputSchema = z.object({
+  skillIds: z.array(z.string().min(1)).max(60), // replaces the system's skill links
+});
+
+export const MetricInputSchema = z.object({
+  key: z.string().trim().regex(/^[a-z][a-zA-Z0-9]*(.[a-z][a-zA-Z0-9]*)+$/, "dotted lowerCamel, e.g. clients.served"),
+  label: z.string().trim().min(1).max(120),
+  description: z.string().trim().max(500).nullable().optional(),
+  unit: z.string().trim().max(40).nullable().optional(),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
+export const MetricUpdateInputSchema = MetricInputSchema.omit({ key: true })
+  .extend({ active: z.boolean() })
+  .partial()
+  .refine((d) => Object.values(d).some((v) => v !== undefined), { message: "Nothing to update" });
+
+export const MetricProposalInputSchema = z.object({ value: z.number().finite() });
+
+export const ActivityLogQuerySchema = z.object({
+  entityType: z.string().optional(),
+  entityId: z.string().optional(),
+  action: z.string().optional(),
+  actorType: z.enum(["admin", "anonymous", "system"]).optional(),
+  since: z.string().datetime().optional(),
+  until: z.string().datetime().optional(),
 });

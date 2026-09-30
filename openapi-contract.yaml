@@ -161,6 +161,16 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
 
   /admin/systems/{id}:
+    get:
+      tags: [Systems (Admin)]
+      summary: Get one system with its unmasked curation detail
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Full system detail, including skills, status history, pace and activity }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
     patch:
       tags: [Systems (Admin)]
       summary: Update a system, including publishing state transitions
@@ -1081,6 +1091,77 @@ paths:
                   meta: { $ref: "#/components/schemas/PageMeta" }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
+  # Complete API surface — F2.2 (#82). These handlers are intentionally
+  # declared alongside the original V1 endpoints: OpenAPI remains the source
+  # of the supported public and admin surface.
+  /profile:
+    get: { tags: [Profile (Public)], summary: Get the public owner profile and links, responses: { "200": { description: Profile }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /home:
+    get:
+      tags: [Home (Public)]
+      summary: Get homepage ledger, featured systems and approved metrics
+      parameters: [{ name: featured, in: query, schema: { type: integer, minimum: 1, maximum: 12, default: 4 } }]
+      responses: { "200": { description: Homepage data } }
+  /search:
+    get:
+      tags: [Search (Public)]
+      summary: Search published systems, journey entries and skills
+      parameters: [{ name: q, in: query, required: true, schema: { type: string, minLength: 2, maxLength: 100 } }, { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 25, default: 10 } }]
+      responses: { "200": { description: Search results }, "400": { $ref: "#/components/responses/BadRequest" }, "429": { description: Search rate limited } }
+  /skills:
+    get: { tags: [Profile (Public)], summary: List public skills with evidence, responses: { "200": { description: Skills and evidence } } }
+  /achievements:
+    get: { tags: [Profile (Public)], summary: List published achievements, responses: { "200": { description: Achievements } } }
+  /metrics:
+    get: { tags: [Metrics (Public)], summary: List approved public metrics, responses: { "200": { description: Approved metrics } } }
+  /cv:
+    get: { tags: [CV], summary: Get the public CV model, responses: { "200": { description: CV model }, "400": { $ref: "#/components/responses/BadRequest" } } }
+  /cv/documents/{id}:
+    get:
+      tags: [CV]
+      summary: Download a generated CV document
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: Document bytes }, "404": { $ref: "#/components/responses/NotFound" } }
+  /systems/{slug}/related:
+    get:
+      tags: [Systems (Public)]
+      summary: List related published systems
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 12, default: 3 } }]
+      responses: { "200": { description: Related systems }, "404": { $ref: "#/components/responses/NotFound" } }
+
+  /admin/overview:
+    get: { tags: [Overview (Admin)], summary: Get the admin attention dashboard, security: [{ adminSession: [] }], responses: { "200": { description: Dashboard data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/organizations:
+    get: { tags: [Organizations (Admin)], summary: List organizations, security: [{ adminSession: [] }], responses: { "200": { description: Organizations }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { tags: [Organizations (Admin)], summary: Create an organization, security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/OrganizationInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/organizations/{id}:
+    patch: { tags: [Organizations (Admin)], summary: Update an organization, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/OrganizationInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/skills:
+    put: { tags: [Systems (Admin)], summary: Replace a system's skill links, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SystemSkillsInput" } } } }, responses: { "200": { description: Updated skill links }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/impacts:
+    get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/impacts/{id}:
+    patch: { tags: [Systems (Admin)], summary: Update an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+    delete: { tags: [Systems (Admin)], summary: Delete an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "204": { description: Deleted }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/cv/documents:
+    get: { tags: [CV (Admin)], summary: List generated CV documents, security: [{ adminSession: [] }], responses: { "200": { description: Document history }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/metrics:
+    get: { tags: [Metrics (Admin)], summary: List metrics, current values, proposals and history, security: [{ adminSession: [] }], responses: { "200": { description: Metrics }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { tags: [Metrics (Admin)], summary: Define a metric, security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MetricInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/metrics/{key}:
+    patch: { tags: [Metrics (Admin)], summary: Update a metric definition, security: [{ adminSession: [] }], parameters: [{ name: key, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MetricUpdateInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/metrics/{key}/proposals:
+    post: { tags: [Metrics (Admin)], summary: Propose a manual metric value, security: [{ adminSession: [] }], parameters: [{ name: key, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MetricProposalInput" } } } }, responses: { "201": { description: Proposed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/metrics/compute:
+    post: { tags: [Metrics (Admin)], summary: Compute and propose registered metrics, security: [{ adminSession: [] }], responses: { "200": { description: Computation result }, "401": { $ref: "#/components/responses/Unauthorized" }, "409": { description: Computation already running } } }
+  /admin/metrics/snapshots/{id}/approve:
+    post: { tags: [Metrics (Admin)], summary: Approve a proposed metric snapshot, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Updated metric }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: Invalid snapshot transition } } }
+  /admin/metrics/snapshots/{id}/reject:
+    post: { tags: [Metrics (Admin)], summary: Reject a proposed metric snapshot, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Updated metric }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: Invalid snapshot transition } } }
+  /admin/jobs:
+    get: { tags: [Jobs (Admin)], summary: List recent job runs, security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: Job runs }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
 components:
   securitySchemes:
     adminSession:
@@ -1107,6 +1188,50 @@ components:
           schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   schemas:
+    OrganizationInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string, minLength: 1 }
+        slug: { type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+        isClient: { type: boolean, default: false }
+        githubLogin: { type: string, nullable: true }
+    ImpactInput:
+      type: object
+      required: [label, value]
+      properties:
+        label: { type: string, minLength: 1 }
+        value: { type: string, minLength: 1 }
+        context: { type: string, nullable: true }
+        sortOrder: { type: integer, minimum: 0, default: 0 }
+    SystemSkillsInput:
+      type: object
+      required: [skillIds]
+      properties:
+        skillIds: { type: array, items: { type: string } }
+    MetricInput:
+      type: object
+      required: [key, label, unit]
+      properties:
+        key: { type: string, pattern: "^[a-z][a-z0-9_.-]*$" }
+        label: { type: string, minLength: 1 }
+        description: { type: string, nullable: true }
+        unit: { type: string, minLength: 1 }
+        sortOrder: { type: integer, minimum: 0, default: 0 }
+        active: { type: boolean, default: true }
+    MetricUpdateInput:
+      type: object
+      properties:
+        label: { type: string, minLength: 1 }
+        description: { type: string, nullable: true }
+        unit: { type: string, minLength: 1 }
+        sortOrder: { type: integer, minimum: 0 }
+        active: { type: boolean }
+    MetricProposalInput:
+      type: object
+      required: [value]
+      properties:
+        value: { type: number }
     ErrorResponse:
       type: object
       required: [error]

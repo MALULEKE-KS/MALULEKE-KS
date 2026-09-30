@@ -21,8 +21,8 @@
 |---|---|---|---|---|---|
 | BR-1.1 | No publish while `clientVisibility ≠ PUBLIC` and `clientApproved = false`, server-side | `canPublish` + 409 in the API; CHECK `System_br_1_1_publish_requires_approval` — enforced in the database too (F1.2, #60) | ✅ | App + DB CHECK | — |
 | BR-1.2 | `REQUIRES_APPROVAL` default for client orgs | API + sync; trigger `System_br_1_2_client_default` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
-| BR-1.3 | `NDA_RESTRICTED` never exposes repo/live URL publicly | View `PublicSystem` nulls repo, live link and screenshot; every public read uses the view (#72); tested | ✅ | DB public view | Role lock-down → F1.8 |
-| BR-1.4 | `ANONYMIZED_ONLY` never exposes the org name unless `nameDisclosureApproved` — including through the organization list and filter | View `PublicSystem` masks the name and drops the org slug; `PublicOrganization` lists only disclosed organizations; `PublicTestimonial` masks the organization. **Fixed a live leak:** the organization list named an anonymized client (#72); tested | ✅ | DB public views | Role lock-down → F1.8 |
+| BR-1.3 | `NDA_RESTRICTED` never exposes repo/live URL publicly | View `PublicSystem` nulls repo, live link and screenshot; every public read uses the view (#72); tested | ✅ | DB public view + `platform_public` role (#76) | — |
+| BR-1.4 | `ANONYMIZED_ONLY` never exposes the org name unless `nameDisclosureApproved` — including through the organization list and filter | View `PublicSystem` masks the name and drops the org slug; `PublicOrganization` lists only disclosed organizations; `PublicTestimonial` masks the organization. **Fixed a live leak:** the organization list named an anonymized client (#72); tested | ✅ | DB public views + `platform_public` role (#76) | — |
 | BR-1.5 | `contentStatus` fixed draft/published/archived | Prisma enum | ✅ | DB | — |
 | BR-1.6 | Sync-created systems land `DRAFT` + `needsCuration` | `github-sync.ts` (sync never run) | 🟡 | App + DB default | F1.6 / F4 |
 | BR-1.7 | **Revised by owner (2026-09-19):** private repos are synced too, shown as private with access on request; repo URL never exposed | Rule text rewritten (#70); `System.repoPrivate`; the public serializer returns `repoUrl: null` + `repoPrivate: true` (tested). The sync still skips private repos until it is rebuilt | 🟡 | DB public view + sync | F1.7 / F4 |
@@ -37,7 +37,7 @@
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
 | BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
-| BR-2.2 | Every `new` inquiry reviewed within 48 hours | Nothing surfaces overdue inquiries | ❌ | Admin surfacing (overdue flag/query) | F2 |
+| BR-2.2 | Every `new` inquiry reviewed within the configured deadline (48 hours by default) | `GET /admin/inquiries?overdue=true` filters `NEW` inquiries past the admin-editable `inquiry.reviewSlaHours` deadline; every admin inquiry shape also exposes `reviewDueAt` and `overdue`. Integration-tested (#82) | ✅ | Admin query + setting | — |
 | BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
 | BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. Limit and window are admin-editable settings (#67), bounded 1–100 per 1–168h | ✅ | DB function + settings table | Done |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |

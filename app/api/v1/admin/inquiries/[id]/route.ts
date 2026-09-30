@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { InquiryStatusUpdateInputSchema } from "@/lib/schemas";
 import { STATUS_FROM_API, isValidStatusTransition, toAdminInquiry } from "@/lib/rules/inquiries";
+import { getSetting } from "@/lib/settings";
 import { withAdmin } from "@/lib/auth/with-admin";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
@@ -43,7 +44,7 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
       return { updated, before: current };
     });
 
-    return NextResponse.json(toAdminInquiry(updated));
+    return NextResponse.json(toAdminInquiry(updated, await getSetting("inquiry.reviewSlaHours")));
   } catch (err) {
     if (err instanceof Error && err.message === "NOT_FOUND") {
       return errorResponse("NOT_FOUND", "Inquiry not found", 404);

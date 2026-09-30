@@ -11,8 +11,13 @@ import { db, dbPublic } from "@/lib/db";
 import { METRIC_COMPUTATIONS, isComputedMetric } from "@/lib/metrics/registry";
 
 /** Propose one value. Returns the pending snapshot id, or null when it already is the approved value. */
-export async function proposeMetric(key: string, value: number, source: MetricSource): Promise<string | null> {
-  const [row] = await db.$queryRaw<{ id: string | null }[]>`
+export async function proposeMetric(
+  key: string,
+  value: number,
+  source: MetricSource,
+  client: Prisma.TransactionClient = db,
+): Promise<string | null> {
+  const [row] = await client.$queryRaw<{ id: string | null }[]>`
     SELECT propose_metric_snapshot(${key}, ${value}::double precision, ${source}::"MetricSource") AS id`;
   return row?.id ?? null;
 }
@@ -22,14 +27,16 @@ export async function proposeMetric(key: string, value: number, source: MetricSo
  * the result. Unchanged values propose nothing. Designed to run as a job
  * (lib/jobs/run-job.ts) on the scheduler in F4.
  */
-export async function proposeComputedMetrics(): Promise<{ proposed: string[]; unchanged: string[] }> {
-  const metrics = await db.metric.findMany({ where: { active: true }, select: { key: true } });
+export async function proposeComputedMetrics(
+  client: Prisma.TransactionClient = db,
+): Promise<{ proposed: string[]; unchanged: string[] }> {
+  const metrics = await client.metric.findMany({ where: { active: true }, select: { key: true } });
   const proposed: string[] = [];
   const unchanged: string[] = [];
   for (const { key } of metrics) {
     if (!isComputedMetric(key)) continue; // a manual metric: the admin enters it
     const value = await METRIC_COMPUTATIONS[key]();
-    (await proposeMetric(key, value, "COMPUTED")) ? proposed.push(key) : unchanged.push(key);
+    (await proposeMetric(key, value, "COMPUTED", client)) ? proposed.push(key) : unchanged.push(key);
   }
   return { proposed, unchanged };
 }
@@ -53,4 +60,47 @@ export async function rejectMetricSnapshot(tx: Prisma.TransactionClient, snapsho
 /** The public, approved numbers, in the admin's order. */
 export async function getPublicMetrics() {
   return dbPublic.publicMetric.findMany({ orderBy: { sortOrder: "asc" } });
+}
+
+const HISTORY_SHOWN = 10;
+
+/**
+ * Every metric for the admin (#82): its definition, whether it's computed or
+ * entered by hand, the current public value, the pending proposal awaiting a
+ * decision, and recent history.
+ */
+export async function listAdminMetrics() {
+  const [metrics, live] = await Promise.all([
+    db.metric.findMany({
+      orderBy: [{ sortOrder: "asc" }, { key: "asc" }],
+      include: { snapshots: { orderBy: { proposedAt: "desc" }, take: HISTORY_SHOWN } },
+    }),
+    // Current and pending are fetched on their own: either can be older than
+    // the recent-history window.
+    db.metricSnapshot.findMany({ where: { status: { in: ["APPROVED", "PROPOSED"] } } }),
+  ]);
+  const view = (s: (typeof metrics)[number]["snapshots"][number]) => ({
+    id: s.id,
+    value: s.value,
+    source: s.source.toLowerCase(),
+    status: s.status.toLowerCase(),
+    proposedAt: s.proposedAt.toISOString(),
+    decidedAt: s.decidedAt?.toISOString() ?? null,
+  });
+  return metrics.map((m) => {
+    const approved = live.find((s) => s.metricKey === m.key && s.status === "APPROVED");
+    const pending = live.find((s) => s.metricKey === m.key && s.status === "PROPOSED");
+    return {
+      key: m.key,
+      label: m.label,
+      description: m.description,
+      unit: m.unit,
+      sortOrder: m.sortOrder,
+      active: m.active,
+      computed: isComputedMetric(m.key),
+      current: approved ? view(approved) : null,
+      pending: pending ? view(pending) : null,
+      history: m.snapshots.map(view),
+    };
+  });
 }

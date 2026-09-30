@@ -93,6 +93,22 @@ describe("GET /api/v1/admin/inquiries", () => {
     expect(body.data.every((i: { status: string }) => i.status === "closed")).toBe(true);
     expect(body.data.some((i: { id: string }) => i.id === closed.id)).toBe(true);
   });
+
+  it("surfaces only NEW inquiries past the configured review deadline (BR-2.2)", async () => {
+    const overdue = await createFixtureInquiry();
+    const current = await createFixtureInquiry();
+    await db.inquiry.update({
+      where: { id: overdue.id },
+      data: { createdAt: new Date(Date.now() - 49 * 60 * 60 * 1000) },
+    });
+    const res = await listInquiries(
+      makeRequest("http://localhost/api/v1/admin/inquiries?overdue=true", "GET", null, true)
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.some((i: { id: string; overdue: boolean }) => i.id === overdue.id && i.overdue)).toBe(true);
+    expect(body.data.some((i: { id: string }) => i.id === current.id)).toBe(false);
+  });
 });
 
 describe("PATCH /api/v1/admin/inquiries/[id]", () => {
