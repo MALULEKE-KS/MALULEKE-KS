@@ -224,6 +224,8 @@ model System {
   testimonials           Testimonial[]
   skills                 SkillOnSystem[]
   createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt      DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
   // Hand-picked for the homepage by the admin (#52), shown in homeOrder.
   // Only published systems are ever shown, whatever this says.
@@ -421,6 +423,8 @@ model Profile {
   buildingSinceYear Int?
   links             ProfileLink[]
   createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
@@ -464,23 +468,25 @@ model Achievement {
 }
 
 model Experience {
-  id            String              @id @default(cuid())
-  title         String
-  organization  String
-  location      String?
-  startDate     DateTime            @db.Timestamptz(3)
-  endDate       DateTime?           @db.Timestamptz(3)
-  description   String
+  id                String              @id @default(cuid())
+  title             String
+  organization      String
+  location          String?
+  startDate         DateTime            @db.Timestamptz(3)
+  endDate           DateTime?           @db.Timestamptz(3)
+  description       String
   // Achievement bullets for the CV, in order (#74) — what was done and its
   // impact. Tailoring puts the most relevant first.
-  highlights    String[]            @default([])
+  highlights        String[]            @default([])
   // Only PUBLISHED roles appear on /cv and in the generated CV (#74).
-  contentStatus ContentStatus       @default(PUBLISHED)
+  contentStatus     ContentStatus       @default(PUBLISHED)
   // BR-1.13: live from this time on (null = as soon as published). Set only while published.
-  publishAt     DateTime?           @db.Timestamptz(3)
-  skills        SkillOnExperience[]
-  createdAt     DateTime            @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
+  publishAt         DateTime?           @db.Timestamptz(3)
+  skills            SkillOnExperience[]
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Education {
@@ -506,6 +512,8 @@ model Education {
   publishAt          DateTime?          @db.Timestamptz(3)
   skills             SkillOnEducation[]
   createdAt          DateTime           @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt  DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([contentStatus, startDate])

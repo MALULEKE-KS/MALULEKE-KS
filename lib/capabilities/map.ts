@@ -430,6 +430,24 @@ export const CAPABILITIES: Capability[] = [
     notes: ["\"[redacted]\" marks a secret or personal field that's never stored in the log."],
   },
   {
+    id: "admin.freshness",
+    title: "Freshness nudges",
+    audience: "admin",
+    summary:
+      "Live content — systems, roles, education, the profile — that nobody has edited or reviewed for the admin's threshold, oldest first, with a one-click \"still accurate\" (#89).",
+    db: ["stale_content", "System", "Experience", "Education", "Profile", "PlatformSetting"],
+    endpoints: ["GET /admin/freshness", "POST /admin/freshness/{kind}/{id}/reviewed"],
+    rules: ["BR-1.16"],
+    frontend: [
+      { page: "/admin", section: "Attention: stale content count (overview attention.staleContent)" },
+      { page: "/admin/freshness (proposed)", section: "Stale items oldest first — open to edit, or Mark reviewed" },
+    ],
+    notes: [
+      "Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).",
+      "The threshold is the setting content.freshnessDays (default 90).",
+    ],
+  },
+  {
     id: "admin.jobs",
     title: "Job runs",
     audience: "admin",

@@ -3,6 +3,7 @@
 // of everything else. Every number is computed from the database now.
 
 import { db } from "@/lib/db";
+import { getStaleContent } from "@/lib/queries/freshness";
 import { getSetting } from "@/lib/settings";
 import { buildCvModel } from "@/lib/cv/model";
 import { checkCv } from "@/lib/cv/check";
@@ -25,6 +26,7 @@ export async function getAdminOverview(siteUrl: string) {
     changesThisWeek,
     ledger,
     cv,
+    stale,
   ] = await Promise.all([
     db.inquiry.groupBy({ by: ["status"], _count: { _all: true } }),
     db.inquiry.count({ where: { status: "NEW", createdAt: { lt: dueBefore } } }),
@@ -38,6 +40,7 @@ export async function getAdminOverview(siteUrl: string) {
     db.activityLog.count({ where: { createdAt: { gte: weekAgo } } }),
     db.publicLedger.findFirst(),
     buildCvModel({ siteUrl }).then(checkCv),
+    getStaleContent(),
   ]);
 
 
@@ -50,6 +53,8 @@ export async function getAdminOverview(siteUrl: string) {
       journeyDraftsToApprove: journeyDrafts,
       metricProposalsToDecide: pendingMetrics,
       cvIssues: cv.issues.length,
+      // #89, BR-1.16 — live content untouched for content.freshnessDays.
+      staleContent: stale.items.length,
     },
     inquiries: {
       byStatus: Object.fromEntries(inquiriesByStatus.map((r) => [r.status.toLowerCase(), r._count._all])),

@@ -163,6 +163,13 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/overview`
 - Each attention count links to its screen, filtered (e.g. /admin/inquiries?overdue=true).
 
+**Freshness nudges** — Attention: stale content count (overview attention.staleContent)
+
+- Call `GET /admin/freshness`
+- Call `POST /admin/freshness/{kind}/{id}/reviewed`
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
+
 ### /admin/activity-log
 
 **Audit trail** — Log with filters (entity, action, actor, date range), before/after diff
@@ -198,6 +205,15 @@ Page by page, every piece of data and every action the backend offers — so a r
 - CV options: show the database's BR-7.5 message on a 400 (e.g. hiding the generated CV before any upload).
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+
+### /admin/freshness (proposed)
+
+**Freshness nudges** — Stale items oldest first — open to edit, or Mark reviewed
+
+- Call `GET /admin/freshness`
+- Call `POST /admin/freshness/{kind}/{id}/reviewed`
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
 
 ### /admin/inquiries
 
@@ -430,4 +446,6 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/settings/lenses` | Platform settings, feature flags, visitor lenses | admin |
 | `PATCH /admin/settings/lenses/{id}` | Platform settings, feature flags, visitor lenses | admin |
 | `GET /admin/activity-log` | Audit trail | admin |
+| `GET /admin/freshness` | Freshness nudges | admin |
+| `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
 | `GET /admin/jobs` | Job runs | admin |

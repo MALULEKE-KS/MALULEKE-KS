@@ -3,7 +3,7 @@
 // kept by the database, append-only and attributed; restoring writes an old
 // text back as a new version.
 
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { PATCH as patchSystem } from "@/app/api/v1/admin/systems/[id]/route";
 import { GET as listRevisions } from "@/app/api/v1/admin/systems/[id]/revisions/route";
@@ -48,6 +48,11 @@ beforeAll(async () => {
   cookie = createSessionCookieValue(adminId, 1);
   orgId = (await db.organization.create({ data: { name: `${RUN} Studio`, slug: `${RUN}-studio` } })).id;
   statusId = (await db.status.findUniqueOrThrow({ where: { key: "planned" } })).id;
+});
+
+// Systems are never deleted (BR-1.9): retire this run's fixtures.
+afterAll(async () => {
+  await db.system.updateMany({ where: { name: { startsWith: RUN } }, data: { contentStatus: "ARCHIVED" } });
 });
 
 describe("the database writes every version (BR-1.15)", () => {

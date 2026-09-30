@@ -89,6 +89,12 @@ export const SETTINGS = {
     description: "Length of the search rate-limit window, in minutes.",
     rule: "F2.2",
   }),
+  "content.freshnessDays": define({
+    schema: z.number().int().min(7).max(730),
+    default: 90,
+    description: "Content nobody has edited or marked reviewed for this many days is flagged for a look.",
+    rule: "BR-1.16",
+  }),
   "data.retentionMonths": define({
     schema: z.number().int().min(1).max(120),
     default: 24,

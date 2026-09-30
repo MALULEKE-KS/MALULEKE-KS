@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**24 capabilities · 90 endpoints.**
+**25 capabilities · 92 endpoints.**
 
 ## Public
 
@@ -626,6 +626,33 @@ Every change the database logged — who (admin / visitor / system), what change
 
 - "[redacted]" marks a secret or personal field that's never stored in the log.
 
+### Freshness nudges
+
+`admin.freshness` · admin
+
+Live content — systems, roles, education, the profile — that nobody has edited or reviewed for the admin's threshold, oldest first, with a one-click "still accurate" (#89).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /admin/freshness`
+- `POST /admin/freshness/{kind}/{id}/reviewed`
+
+**Database**
+
+- `stale_content`
+- `System`
+- `Experience`
+- `Education`
+- `Profile`
+- `PlatformSetting`
+
+**Rules:** BR-1.16
+
+**Notes**
+
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
+
 ### Job runs
 
 `admin.jobs` · admin
@@ -654,8 +681,8 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `CvUpload` | admin.cv |
 | `DocumentGen` | cv, admin.cv |
 | `Domain` | systems.catalog, lookups |
-| `Education` | admin.cv |
-| `Experience` | admin.cv |
+| `Education` | admin.cv, admin.freshness |
+| `Experience` | admin.cv, admin.freshness |
 | `Flag` | admin.settings |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
@@ -666,8 +693,8 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `MetricSnapshot` | admin.overview, admin.metrics |
 | `MilestoneType` | journey, lookups |
 | `Organization` | admin.organizations |
-| `PlatformSetting` | admin.settings |
-| `Profile` | admin.profile |
+| `PlatformSetting` | admin.settings, admin.freshness |
+| `Profile` | admin.profile, admin.freshness |
 | `ProfileLink` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `PublicAchievement` | achievements, cv |
@@ -695,8 +722,9 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `SkillOnEducation` | admin.cv |
 | `SkillOnExperience` | admin.cv |
 | `SkillOnSystem` | admin.systems |
+| `stale_content` | admin.freshness |
 | `Status` | systems.catalog, lookups |
-| `System` | admin.overview, admin.systems |
+| `System` | admin.overview, admin.systems, admin.freshness |
 | `SystemActivityWeek` | admin.systems |
 | `SystemContentRevision` | admin.systems |
 | `SystemPace` | admin.systems |
