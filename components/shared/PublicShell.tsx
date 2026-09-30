@@ -9,12 +9,17 @@
 // block, never a flex column — in a flex column a child's `mx-auto` turns
 // off stretch and the page collapses to its content width.
 
+import { connection } from "next/server";
 import { SiteHeader } from "@/components/shared/SiteHeader";
 import { SiteFooter } from "@/components/shared/SiteFooter";
 import { ConsentProvider } from "@/components/shared/Consent";
 import { getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
 
 export async function PublicShell({ children }: { children: React.ReactNode }) {
+  // The chrome reads live data, so it renders per request — never prerendered
+  // at build (the root 404 would otherwise be baked with build-time data, or
+  // fail where the build has no database, as CI's doesn't).
+  await connection();
   // The owner's details for the footer, from the admin-editable profile (#99).
   // The review promise is the admin setting, never typed-in copy (BR-2.2).
   const [profile, reviewSlaHours] = await Promise.all([getSiteProfile(), getReviewSlaHours()]);
