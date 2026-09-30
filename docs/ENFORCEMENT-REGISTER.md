@@ -61,6 +61,8 @@
 | BR-3.11 | Exactly 10 recovery codes, hashed, single-use | `create-admin.ts`, verify-2fa | 🟡 | App (verify) | F3 |
 | BR-3.12 | Dashboard warns when < 3 recovery codes remain | **Not implemented** | ❌ | App | F3 |
 | BR-3.13 | No self-serve reset; manual operator procedure | `scripts/reset-admin-password.ts` — confirm-twice, verifies the stored hash, clears the lock, audited as a SYSTEM actor; documented in DEPLOYMENT.md (#65). Used for real on 2026-09-19 | ✅ | Ops script + runbook | — |
+| BR-3.14 | TOTP codes are single-use | `lib/auth/totp.ts` `verifyTotpOnce`: validate + record `AdminUser.lastTotpStep` in one conditional `UPDATE` (atomic, no replay race); used by verify-2fa and change-password (#84); tested | ✅ | App + atomic DB update | — |
+| BR-3.15 | Password change: current password + TOTP, ends older sessions, 5 failures end the session, every attempt logged | `POST /admin/auth/change-password`; `AdminUser.sessionVersion` checked by `proxy.ts` and `withAdmin` on every admin request; per-session failure count via `rate_limit_hit()` (#84); tested | ✅ | App + DB counter | — |
 
 ## 4. AI & agents (BR-4.x)
 
@@ -120,7 +122,7 @@
 | Timestamps are unambiguous | Every timestamp column is `timestamptz(3)`, converted explicitly from UTC (#63); verified on a non-UTC machine: same instants | ✅ |
 | Every mutable row records when it was created and last changed | `createdAt` / `updatedAt` on every mutable table (#63) | ✅ |
 | Request context in the audit log can't be read back | IP, user agent and attempted emails stored as keyed hashes only (#62) | ✅ |
-| The admin can change their own password while logged in | Owner request 2026-09-19 — backend endpoint (current password + 2FA, ends older sessions) not built | ❌ → F3 |
+| The admin can change their own password while logged in | `POST /admin/auth/change-password` — BR-3.15 (#84). Admin UI arrives with the admin frontend (F5) | ✅ |
 | An admin account exists in production | Created 2026-09-19 by the owner in their own terminal; verified read-only (2FA on, codes hashed) | ✅ |
 | Every status change of a system is on record, and can't be rewritten | Trigger `System_status_history` writes `SystemStatusChange` with the stage at the time; append-only triggers; history that predates it is marked `backfilled` and never read as a date (#70) | ✅ |
 | Shipped dates and pace are computed, not typed | View `SystemPace` over real transitions (#70) | ✅ |

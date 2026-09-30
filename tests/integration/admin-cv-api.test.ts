@@ -36,7 +36,7 @@ beforeAll(async () => {
     data: { email: `test-admin-cv-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   const category = await db.skillCategory.findFirstOrThrow({ where: { key: "backend" } });
   categoryId = category.id;

@@ -35,7 +35,7 @@ beforeAll(async () => {
     data: { email: `test-admin-settings-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   const flag = await db.flag.findFirstOrThrow();
   flagKey = flag.key;

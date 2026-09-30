@@ -205,7 +205,9 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `POST /admin/auth/login`
 - Call `POST /admin/auth/verify-2fa`
+- Call `POST /admin/auth/change-password`
 - Show neutral copy on expiry ("session ended"), not an error.
+- Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
 
 ### /admin/numbers (proposed)
 
@@ -334,6 +336,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /lookups/{type}/{id}/deprecate` | Lookups — statuses, domains, types, categories, relationships | public |
 | `POST /admin/auth/login` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/verify-2fa` | Admin sign-in (password + 2FA) | admin |
+| `POST /admin/auth/change-password` | Admin sign-in (password + 2FA) | admin |
 | `GET /admin/overview` | Admin dashboard | admin |
 | `GET /admin/systems` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems` | Systems — curate, publish, feature | admin |

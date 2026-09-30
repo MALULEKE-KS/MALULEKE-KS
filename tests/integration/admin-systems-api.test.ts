@@ -34,7 +34,7 @@ beforeAll(async () => {
     data: { email: `test-admin-systems-${Date.now().toString(36)}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
 
   const clientOrg = await db.organization.create({
     data: { name: "Test Client Org", slug: `test-client-org-fixture-${RUN}`, isClient: true },

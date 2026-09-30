@@ -338,6 +338,12 @@ export const SessionResultSchema = z.object({
   sessionExpiresAt: z.string().datetime(),
 });
 
+export const PasswordChangeInputSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(12).max(256),
+  code: z.string().regex(/^\d{6}$/, "Enter a 6-digit authenticator code."),
+});
+
 // ============================================================
 // TIMELINE & CV
 // ============================================================

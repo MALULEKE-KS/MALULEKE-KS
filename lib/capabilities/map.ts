@@ -227,10 +227,10 @@ export const CAPABILITIES: Capability[] = [
     audience: "admin",
     summary: "Password then TOTP or recovery code; lockout, timing-safe, every attempt audited.",
     db: ["AdminUser", "LoginChallenge", "RateLimitEntry", "ActivityLog", "rate_limit_hit"],
-    endpoints: ["POST /admin/auth/login", "POST /admin/auth/verify-2fa"],
-    rules: ["BR-3.1", "BR-3.2", "BR-3.4", "BR-3.5", "BR-3.6", "BR-3.8", "BR-3.10", "BR-3.11"],
+    endpoints: ["POST /admin/auth/login", "POST /admin/auth/verify-2fa", "POST /admin/auth/change-password"],
+    rules: ["BR-3.1", "BR-3.2", "BR-3.4", "BR-3.5", "BR-3.6", "BR-3.8", "BR-3.10", "BR-3.11", "BR-3.14", "BR-3.15"],
     frontend: [{ page: "/admin/login", section: "Password step, 2FA step, recovery-code option" }],
-    notes: ["Show neutral copy on expiry (\"session ended\"), not an error."],
+    notes: ["Show neutral copy on expiry (\"session ended\"), not an error.", "Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in."],
   },
   {
     id: "admin.overview",

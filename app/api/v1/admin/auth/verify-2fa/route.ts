@@ -5,11 +5,10 @@
 import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import bcrypt from "bcryptjs";
-import { TOTP, Secret } from "otpauth";
 import { db } from "@/lib/db";
 import { Verify2FAInputSchema } from "@/lib/schemas";
 import { logActivity } from "@/lib/auth/activity-log";
-import { decryptSecret } from "@/lib/auth/crypto";
+import { verifyTotpOnce } from "@/lib/auth/totp";
 import { createSessionCookieValue, SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
 
 const MAX_2FA_ATTEMPTS = 5; // BR-3.6
@@ -24,12 +23,6 @@ function hashToken(rawToken: string): string {
 
 function isTotpShaped(code: string): boolean {
   return /^\d{6}$/.test(code);
-}
-
-async function verifyTotp(encryptedSecret: string, code: string): Promise<boolean> {
-  const secret = decryptSecret(encryptedSecret);
-  const totp = new TOTP({ secret: Secret.fromBase32(secret), digits: 6, period: 30 });
-  return totp.validate({ token: code, window: 1 }) !== null;
 }
 
 async function verifyAndConsumeRecoveryCode(adminId: string, hashedCodes: string[], code: string): Promise<boolean> {
@@ -66,7 +59,7 @@ export async function POST(request: Request) {
 
   const isValid = isTotpShaped(parsed.data.code)
     ? challenge.adminUser.twoFactorSecret
-      ? await verifyTotp(challenge.adminUser.twoFactorSecret, parsed.data.code)
+      ? await verifyTotpOnce(db, challenge.adminUserId, challenge.adminUser.twoFactorSecret, parsed.data.code) // BR-3.14
       : false
     : await verifyAndConsumeRecoveryCode(challenge.adminUserId, challenge.adminUser.recoveryCodes, parsed.data.code);
 
@@ -96,10 +89,14 @@ export async function POST(request: Request) {
   // outcome) and mint a brand-new session, never reusing any pre-2FA
   // identifier (BR-3.8).
   await db.loginChallenge.update({ where: { id: challenge.id }, data: { consumedAt: new Date() } });
-  await db.adminUser.update({ where: { id: challenge.adminUserId }, data: { lastLoginAt: new Date() } });
+  const admin = await db.adminUser.update({
+    where: { id: challenge.adminUserId },
+    data: { lastLoginAt: new Date() },
+    select: { sessionVersion: true },
+  });
   await logActivity({ adminUserId: challenge.adminUserId, action: "auth.login", request });
 
-  const sessionCookieValue = createSessionCookieValue(challenge.adminUserId);
+  const sessionCookieValue = createSessionCookieValue(challenge.adminUserId, admin.sessionVersion);
   const response = NextResponse.json({
     sessionExpiresAt: new Date(Date.now() + SESSION_COOKIE_OPTIONS.maxAge * 1000).toISOString(),
   });

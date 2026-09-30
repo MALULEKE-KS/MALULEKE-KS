@@ -74,7 +74,7 @@ beforeAll(async () => {
     data: { email: `${RUN}@example.com`, passwordHash: "unused-in-these-tests" },
   });
   adminId = admin.id;
-  sessionCookie = createSessionCookieValue(adminId);
+  sessionCookie = createSessionCookieValue(adminId, 1);
   orgId = (await db.organization.create({ data: { name: "F16b Org", slug: `${RUN}-org` } })).id;
   plannedId = (await db.status.findUniqueOrThrow({ where: { key: "planned" } })).id;
   inProgressId = (await db.status.findUniqueOrThrow({ where: { key: "in_progress" } })).id;
