@@ -7,7 +7,6 @@
 // code itself.
 
 import type { VercelConfig } from "@vercel/config/v1";
-import { DAILY_CRON_PATH, DAILY_CRON_SCHEDULE } from "./lib/jobs/schedule";
 
 export const config: VercelConfig = {
   framework: "nextjs",
@@ -17,5 +16,8 @@ export const config: VercelConfig = {
   ignoreCommand: "node scripts/vercel-ignore.mjs",
   // Scheduled jobs (#94): one daily entry runs the daily jobs in order
   // (lib/jobs/schedule.ts). Authorized by CRON_SECRET, which Vercel sends.
-  crons: [{ path: DAILY_CRON_PATH, schedule: DAILY_CRON_SCHEDULE }],
+  // Literals on purpose: Vercel evaluates this file on its own, without the
+  // app's modules — tests/unit/vercel-config.test.ts keeps them equal to
+  // DAILY_CRON_PATH / DAILY_CRON_SCHEDULE.
+  crons: [{ path: "/api/cron/daily", schedule: "0 3 * * *" }],
 };
