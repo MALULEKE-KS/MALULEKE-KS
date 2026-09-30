@@ -5,7 +5,8 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { CAPABILITIES } from "@/lib/capabilities/map";
+import { CAPABILITIES, NOT_EXPOSED } from "@/lib/capabilities/map";
+import { db } from "@/lib/db";
 import { renderBackendGuide, renderFrontendGuide } from "@/lib/capabilities/render";
 
 const METHODS = /export\s+(?:const|async\s+function)\s+(GET|POST|PUT|PATCH|DELETE)\b/g;
@@ -55,6 +56,23 @@ describe("#82 capability coverage", () => {
   it("declares every supported API method in the OpenAPI contract", async () => {
     const documented = CAPABILITIES.flatMap((capability) => capability.endpoints);
     expect(sorted(await contractEndpoints())).toEqual(sorted(documented));
+  });
+
+  it("maps every table, view and function in the database — or exempts it with a reason", async () => {
+    // Ours only: extension functions (pg_trgm, pgcrypto, vector) and trigger
+    // functions (internal machinery, never called directly) are excluded.
+    const objects = await db.$queryRaw<{ name: string }[]>`
+      SELECT c.relname AS name FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+       WHERE n.nspname = 'public' AND c.relkind IN ('r', 'v', 'm') AND c.relname <> '_prisma_migrations'
+      UNION
+      SELECT p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+       WHERE n.nspname = 'public' AND p.prokind = 'f' AND p.prorettype <> 'trigger'::regtype
+         AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_proc'::regclass AND d.objid = p.oid AND d.deptype = 'e')`;
+    const inDatabase = sorted(objects.map((o) => o.name));
+    const mapped = new Set([...CAPABILITIES.flatMap((c) => c.db), ...Object.keys(NOT_EXPOSED)]);
+
+    expect(inDatabase.filter((name) => !mapped.has(name)), "database objects missing from the capability map").toEqual([]);
+    expect(sorted([...mapped]).filter((name) => !inDatabase.includes(name)), "mapped names that don't exist in the database").toEqual([]);
   });
 
   it("keeps both generated capability guides current", async () => {
