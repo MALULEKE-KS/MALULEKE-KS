@@ -19,6 +19,8 @@ import { HomeContent } from "./_components/HomeContent";
 // the real current numbers on every visit.
 export const dynamic = "force-dynamic";
 
+export const metadata = { alternates: { canonical: "/" } };
+
 // Loading state: the hero's graphite field, already laid down, so the page
 // doesn't flash from vellum to blue when the data arrives.
 function HomeSkeleton() {

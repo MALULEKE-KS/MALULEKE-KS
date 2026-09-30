@@ -35,8 +35,8 @@ export const CAPABILITIES: Capability[] = [
     id: "profile",
     title: "Owner profile and links",
     audience: "public",
-    summary: "Who the owner is — name, headline, role, location, contact, summary, bio, availability, building-since year, social links. All admin-edited data.",
-    db: ["PublicProfile", "PublicProfileLink"],
+    summary: "Who the owner is — name, headline, role, location, contact, summary, bio, availability, building-since year, social links, and the organizations founded or co-founded. All admin-edited data.",
+    db: ["PublicProfile", "PublicProfileLink", "PublicAffiliation"],
     endpoints: ["GET /profile"],
     rules: [],
     frontend: [

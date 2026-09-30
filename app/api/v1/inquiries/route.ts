@@ -46,7 +46,12 @@ export async function POST(request: Request) {
     getSetting("inquiry.rateLimit.maxPerWindow"),
     getSetting("inquiry.rateLimit.windowHours"),
   ]);
-  const rateLimit = await hitRateLimit("inquiry", request, maxPerWindow, windowHours * 60 * 60 * 1000);
+  const rateLimit = await hitRateLimit(
+    "inquiry",
+    request,
+    maxPerWindow,
+    windowHours * 60 * 60 * 1000
+  );
   if (!rateLimit.allowed) {
     return errorResponse(
       "RATE_LIMITED",
@@ -56,9 +61,14 @@ export async function POST(request: Request) {
     );
   }
 
+  // The lookup decides (EXT-1): unknown or deprecated types are refused (BR-8.2).
   const inquiryType = await db.inquiryType.findUnique({ where: { key: parsed.data.inquiryType } });
-  if (!inquiryType) {
-    return errorResponse("VALIDATION_ERROR", `Unknown inquiry type "${parsed.data.inquiryType}"`, 400);
+  if (!inquiryType || !inquiryType.active) {
+    return errorResponse(
+      "VALIDATION_ERROR",
+      `Unknown inquiry type "${parsed.data.inquiryType}"`,
+      400
+    );
   }
 
   const source = sourceFromReferer(request.headers.get("referer"));
@@ -76,7 +86,7 @@ export async function POST(request: Request) {
           source,
           idempotencyKey: parsed.data.idempotencyKey,
         },
-      }),
+      })
     );
 
     return NextResponse.json(

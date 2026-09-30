@@ -6,26 +6,46 @@
 // would itself leak that a hidden system exists (BR-1.3/1.4;
 // PAGE-SPECIFICATIONS.md "/systems/[slug]" behavior).
 //
-// Copy follows Design System §4.4: what happened, what to do next, no apology.
+// Copy follows Design System §4.5: what happened, what to do next, no apology.
 
-import { TextLink } from "@/components/shared/TextLink";
+import Link from "next/link";
+import { ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 
 export function NotFoundContent() {
   return (
-    <Container>
-      <section className="max-w-2xl py-16">
+    <section aria-labelledby="nf-title" className="hero-field text-paper min-h-[60vh]">
+      <Container className="py-24 md:py-32">
         {/* The HTTP status is a literal identifier, which is what mono is for. */}
-        <p className="text-slate mb-2 font-mono text-xs">404</p>
-        <h1 className="text-ink mb-4 font-sans text-2xl font-semibold">Page not found</h1>
-        <p className="text-ink mb-6 font-sans">
-          Nothing exists at this address. Check the URL, or start from the home page or the systems catalog.
+        <p className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs">
+          <Compass aria-hidden="true" className="text-ember size-3.5" />
+          404
         </p>
-        <div className="flex gap-6">
-          <TextLink href="/">Home</TextLink>
-          <TextLink href="/systems">Systems</TextLink>
+        <h1
+          id="nf-title"
+          className="mt-6 font-sans text-4xl font-semibold tracking-tight md:text-6xl"
+        >
+          Nothing lives at this address.
+        </h1>
+        <p className="text-mist mt-5 max-w-xl text-lg leading-relaxed">
+          Check the URL, or start from the home page or the systems catalog.
+        </p>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/"
+            className="bg-ember text-ink shadow-glow-ember focus-visible:outline-paper inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Home
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+          <Link
+            href="/systems"
+            className="text-paper focus-visible:outline-ember inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            The systems
+          </Link>
         </div>
-      </section>
-    </Container>
+      </Container>
+    </section>
   );
 }

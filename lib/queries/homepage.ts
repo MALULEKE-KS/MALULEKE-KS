@@ -13,10 +13,28 @@ import { toPublicSystem } from "@/lib/rules/publishing";
 
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
+/**
+ * Years building (#100): the year the owner says they started building
+ * (Profile.buildingSinceYear, admin-editable) wins; only when it isn't set
+ * does the first published role stand in for it.
+ */
+export function yearsBuildingFrom(
+  buildingSinceYear: number | null | undefined,
+  firstRole: Date | null | undefined,
+  now = new Date()
+): number {
+  if (buildingSinceYear) return Math.max(1, now.getUTCFullYear() - buildingSinceYear);
+  return firstRole
+    ? Math.max(1, Math.floor((now.getTime() - firstRole.getTime()) / MS_PER_YEAR))
+    : 0;
+}
+
 export async function getHomepageStats() {
-  const ledger = await db.publicLedger.findFirst();
-  const first = ledger?.firstExperienceAt;
-  const yearsBuilding = first ? Math.max(1, Math.floor((Date.now() - first.getTime()) / MS_PER_YEAR)) : 0;
+  const [ledger, profile] = await Promise.all([
+    db.publicLedger.findFirst(),
+    db.publicProfile.findFirst({ select: { buildingSinceYear: true } }),
+  ]);
+  const yearsBuilding = yearsBuildingFrom(profile?.buildingSinceYear, ledger?.firstExperienceAt);
 
   return {
     yearsBuilding,
@@ -39,7 +57,10 @@ export async function getPrioritySystems(limit = 4) {
   });
   const rows = curated.length
     ? curated
-    : await db.publicSystem.findMany({ orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }], take: limit });
+    : await db.publicSystem.findMany({
+        orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }],
+        take: limit,
+      });
   return rows.map(toPublicSystem);
 }
 

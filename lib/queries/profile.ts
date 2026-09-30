@@ -5,9 +5,10 @@
 import { dbPublic } from "@/lib/db";
 
 export async function getPublicProfile() {
-  const [profile, links] = await Promise.all([
+  const [profile, links, affiliations] = await Promise.all([
     dbPublic.publicProfile.findFirst(),
     dbPublic.publicProfileLink.findMany({ orderBy: { sortOrder: "asc" } }),
+    dbPublic.publicAffiliation.findMany({ orderBy: { name: "asc" } }),
   ]);
   if (!profile) return null;
   return {
@@ -23,6 +24,8 @@ export async function getPublicProfile() {
     availability: profile.availability,
     buildingSinceYear: profile.buildingSinceYear,
     links: links.map((l) => ({ kind: l.kind, label: l.label, url: l.url, onCv: l.onCv })),
+    // Organizations the owner founded or co-founded (#99).
+    affiliations: affiliations.map((a) => ({ name: a.name, slug: a.slug, role: a.role })),
   };
 }
 

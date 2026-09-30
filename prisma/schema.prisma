@@ -1032,3 +1032,11 @@ view PublicSlugRedirect {
   fromSlug String @unique
   toSlug   String
 }
+
+// #99 — organizations the owner founded or co-founded (Organization.role set).
+view PublicAffiliation {
+  id   String @unique
+  name String
+  slug String
+  role String
+}

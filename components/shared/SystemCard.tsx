@@ -1,57 +1,84 @@
 // components/shared/SystemCard.tsx
-// The corner-bracket hover/focus state (Design System §7) — a discrete
-// two-state interaction, which is exactly what Tailwind utilities are best
-// at. No custom CSS in this file at all.
+// A system in the catalog and in "More systems" (DESIGN-SYSTEM.md v3 §3/§6,
+// #99), following the card anatomy: meta + badge header → title → muted
+// description → specs (stack) → one action. The whole card is one link; the
+// status colour is the Status row's own token (EXT-1), never a switch in code.
 
 import Link from "next/link";
+import { ArrowUpRight, Star } from "lucide-react";
+import { Spotlight } from "@/components/shared/Spotlight";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 interface SystemCardProps {
   slug: string;
   name: string;
   description: string;
-  // Status is an EXT-1 lookup table (Status model, schema.prisma), not a
-  // fixed set of code-level literals — a hardcoded union here would break
-  // the moment an admin adds a new Status value without a redeploy. The
-  // label/colorToken pair comes straight off the queried Status row.
   status: { label: string; colorToken: string };
   isFlagship?: boolean;
+  organization?: string | null;
+  domain?: string | null;
+  techStack?: string[];
 }
 
-const CORNER_BASE =
-  "absolute w-3.5 h-3.5 border-ink opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100";
+const STACK_SHOWN = 4;
 
-export function SystemCard({ slug, name, description, status, isFlagship }: SystemCardProps) {
+export function SystemCard({
+  slug,
+  name,
+  description,
+  status,
+  isFlagship,
+  organization,
+  domain,
+  techStack = [],
+}: SystemCardProps) {
+  const meta = [organization, domain].filter(Boolean).join(" / ");
+  const extra = techStack.length - STACK_SHOWN;
+
   return (
-    <Link
-      href={`/systems/${slug}`}
-      className="group border-slate/25 hover:border-slate/40 relative block border bg-white px-6 py-5 transition-colors outline-none"
-    >
-      {/* Four corner brackets — the CAD/drafting selection indicator,
-          replacing the rounded-card-plus-shadow treatment this design
-          system deliberately ruled out (Design System §0). */}
-      <span className={`${CORNER_BASE} top-0 left-0 border-t-2 border-l-2`} />
-      <span className={`${CORNER_BASE} top-0 right-0 border-t-2 border-r-2`} />
-      <span className={`${CORNER_BASE} bottom-0 left-0 border-b-2 border-l-2`} />
-      <span className={`${CORNER_BASE} right-0 bottom-0 border-r-2 border-b-2`} />
+    <Spotlight className="h-full rounded-2xl">
+      <Link
+        href={`/systems/${slug}`}
+        className="group border-ink/10 bg-sheet shadow-soft hover:border-ink/20 hover:shadow-lift focus-visible:outline-ember flex h-full flex-col rounded-2xl border p-6 transition-[box-shadow,transform,border-color] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:hover:-translate-y-0.5"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          {isFlagship && (
+            <span className="bg-ember/10 text-accent inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <Star aria-hidden="true" className="size-3 fill-current" />
+              Flagship
+            </span>
+          )}
+          <StatusBadge label={status.label} colorToken={status.colorToken} />
+        </div>
 
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-ink font-sans text-lg font-semibold">{name}</h3>
-        <StatusBadge label={status.label} colorToken={status.colorToken} />
-      </div>
+        {meta && <p className="text-slate mt-5 font-mono text-xs">{meta}</p>}
+        <h3 className="text-ink mt-1.5 font-sans text-xl font-semibold tracking-tight">{name}</h3>
+        <p className="text-slate mt-2 line-clamp-3 font-serif leading-relaxed">{description}</p>
 
-      {isFlagship && (
-        // A filled square glyph, not color alone, marks flagship — brass
-        // is also signal-progress's color (Design System §1: "progress ==
-        // accent" is a deliberate reuse), so a flagship system that's also
-        // in_progress needs a cue beyond "this text is brass" to read as
-        // two distinct facts rather than one repeated one.
-        <p className="text-accent mt-1 flex items-center gap-1 font-mono text-xs">
-          <span aria-hidden="true">■</span> Flagship
-        </p>
-      )}
-
-      <p className="text-slate mt-3 max-w-prose font-serif text-sm">{description}</p>
-    </Link>
+        <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+          {techStack.length > 0 ? (
+            <ul className="flex flex-wrap gap-1.5" aria-label="Stack">
+              {techStack.slice(0, STACK_SHOWN).map((tech) => (
+                <li
+                  key={tech}
+                  className="border-ink/10 bg-paper text-slate rounded-full border px-2.5 py-0.5 font-mono text-xs"
+                >
+                  {tech}
+                </li>
+              ))}
+              {extra > 0 && <li className="text-slate px-1 font-mono text-xs">+{extra}</li>}
+            </ul>
+          ) : (
+            <span />
+          )}
+          <span
+            aria-hidden="true"
+            className="border-ink/10 text-slate group-hover:border-ink group-hover:bg-ink group-hover:text-paper grid size-9 shrink-0 place-items-center rounded-full border transition-colors"
+          >
+            <ArrowUpRight className="size-4" />
+          </span>
+        </div>
+      </Link>
+    </Spotlight>
   );
 }

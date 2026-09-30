@@ -12,7 +12,7 @@ Every capability the platform has: the database objects behind it, the endpoints
 
 `profile` · public
 
-Who the owner is — name, headline, role, location, contact, summary, bio, availability, building-since year, social links. All admin-edited data.
+Who the owner is — name, headline, role, location, contact, summary, bio, availability, building-since year, social links, and the organizations founded or co-founded. All admin-edited data.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -22,6 +22,7 @@ Who the owner is — name, headline, role, location, contact, summary, bio, avai
 
 - `PublicProfile`
 - `PublicProfileLink`
+- `PublicAffiliation`
 
 **Rules:** —
 
@@ -716,6 +717,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `propose_metric_snapshot` | admin.metrics |
 | `prune_expired` | admin.jobs |
 | `PublicAchievement` | achievements, cv |
+| `PublicAffiliation` | profile |
 | `PublicCvOption` | cv |
 | `PublicCvUpload` | cv |
 | `PublicEducation` | cv |
