@@ -6,6 +6,7 @@ import { EducationInputSchema } from "@/lib/schemas";
 import { educationWithSkills, toEducationEntry } from "@/lib/rules/cv";
 import { CONTENT_STATUS_FROM_WIRE } from "@/lib/rules/timeline";
 import { withAdmin } from "@/lib/auth/with-admin";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -36,6 +37,8 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
           certificateUrl: parsed.data.certificateUrl ?? null,
           // Showing or hiding is the admin's call (#70).
           ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
+          // BR-1.13 — a future time schedules it; the database checks it's published.
+          ...publishAtData(parsed.data.publishAt),
           expectedGraduation: parsed.data.expectedGraduation ? new Date(parsed.data.expectedGraduation) : null,
           coursework: parsed.data.coursework,
           skills: { create: parsed.data.skillIds.map((skillId) => ({ skillId })) },

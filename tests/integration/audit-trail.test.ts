@@ -27,6 +27,7 @@ const EXEMPT = new Set([
   "_prisma_migrations",
   "ActivityLog", // the log itself
   "SystemStatusChange", // append-only history
+  "SystemContentRevision", // append-only history of case studies and descriptions (#88)
   "JobRun", // run history
   "DocumentGen", // generated on public demand; supersession is its history
   "RateLimitEntry", // auth internals

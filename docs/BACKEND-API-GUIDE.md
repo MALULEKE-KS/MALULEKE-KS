@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**24 capabilities · 80 endpoints.**
+**25 capabilities · 94 endpoints.**
 
 ## Public
 
@@ -96,13 +96,15 @@ One published system in full — case study body, measured impacts, permitted te
 - `PublicSystem`
 - `PublicImpact`
 - `PublicTestimonial`
+- `PublicSlugRedirect`
 
-**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2
+**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2, BR-1.14
 
 **Notes**
 
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
+- An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
 
 ### Instant search
 
@@ -210,20 +212,24 @@ The admin-approved statistics ("By the numbers"). A computed or entered value is
 
 - Show approvedAt as "as of" — these are point-in-time figures.
 
-### CV — view and download
+### CV — the options, view and download
 
 `cv` · public
 
-The CV as data (for on-screen rendering) and as generated PDF or Word files, identical in content, ATS-safe, optionally tailored to a target role.
+Two clearly labelled CV options (#92): the CV generated from live data — as data for on-screen rendering and as identical ATS-safe PDF or Word files, optionally tailored to a target role — and the owner's uploaded CV file. Each is offered only while the admin shows it.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
+- `GET /cv/options`
 - `GET /cv`
 - `POST /cv/generate`
 - `GET /cv/documents/{id}`
+- `GET /cv/uploads/{id}`
 
 **Database**
 
+- `PublicCvOption`
+- `PublicCvUpload`
 - `PublicExperience`
 - `PublicEducation`
 - `PublicAchievement`
@@ -233,12 +239,14 @@ The CV as data (for on-screen rendering) and as generated PDF or Word files, ide
 - `DocumentGen`
 - `rate_limit_hit`
 
-**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4
+**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-7.5, BR-7.6
 
 **Notes**
 
-- Render GET /cv exactly — it's the same model the files come from.
-- POST /cv/generate returns a fileUrl; navigate to it to download. 429 = rate-limited.
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
 ### Contact — send an inquiry
 
@@ -307,6 +315,8 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 - `POST /admin/auth/login`
 - `POST /admin/auth/verify-2fa`
 - `POST /admin/auth/change-password`
+- `GET /admin/auth/recovery-codes`
+- `POST /admin/auth/recovery-codes`
 
 **Database**
 
@@ -316,12 +326,15 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 - `ActivityLog`
 - `rate_limit_hit`
 
-**Rules:** BR-3.1, BR-3.2, BR-3.4, BR-3.5, BR-3.6, BR-3.8, BR-3.10, BR-3.11, BR-3.14, BR-3.15
+**Rules:** BR-3.1, BR-3.2, BR-3.4, BR-3.5, BR-3.6, BR-3.8, BR-3.9, BR-3.10, BR-3.11, BR-3.12, BR-3.14, BR-3.15
 
 **Notes**
 
 - Show neutral copy on expiry ("session ended"), not an error.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
+- Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
+- Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
+- Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
 
 ### Admin dashboard
 
@@ -366,6 +379,8 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `POST /admin/systems/{id}/impacts`
 - `PATCH /admin/impacts/{id}`
 - `DELETE /admin/impacts/{id}`
+- `GET /admin/systems/{id}/revisions`
+- `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 
 **Database**
 
@@ -377,14 +392,19 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `SystemActivityWeek`
 - `RepoRelationship`
 - `Testimonial`
+- `SystemSlugHistory`
+- `SystemContentRevision`
 
-**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12
+**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14, BR-1.15
 
 **Notes**
 
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+- Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
+- Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
 
 ### Organizations
 
@@ -446,17 +466,18 @@ Write journey entries, and approve the ones the database drafts when a system fi
 
 - `Timeline`
 
-**Rules:** BR-1.12
+**Rules:** BR-1.12, BR-1.13
 
 **Notes**
 
 - Publishing an auto-drafted entry is the approval.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
-### CV content, completeness and history
+### CV content, options, uploads, completeness and history
 
 `admin.cv` · admin
 
-Roles (with CV bullets, show/hide), education (expected graduation, coursework), skills; the completeness report with a suggested summary; every generated document.
+Roles (with CV bullets, show/hide), education (expected graduation, coursework), skills; the owner's uploaded CV (versions, restore) and which CV options visitors see (#92); the completeness report with a suggested summary; every generated document.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -474,6 +495,12 @@ Roles (with CV bullets, show/hide), education (expected graduation, coursework),
 - `DELETE /admin/cv/skills/{id}`
 - `GET /admin/cv/check`
 - `GET /admin/cv/documents`
+- `GET /admin/cv/uploads`
+- `POST /admin/cv/uploads`
+- `GET /admin/cv/uploads/{id}`
+- `POST /admin/cv/uploads/{id}/restore`
+- `GET /admin/cv/options`
+- `PATCH /admin/cv/options`
 
 **Database**
 
@@ -483,12 +510,17 @@ Roles (with CV bullets, show/hide), education (expected graduation, coursework),
 - `SkillOnExperience`
 - `SkillOnEducation`
 - `DocumentGen`
+- `CvUpload`
+- `CvOptions`
 
-**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4
+**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-7.5, BR-7.6, BR-1.13
 
 **Notes**
 
+- Upload is multipart/form-data, field "file". 415 = not a PDF/Word file (or has macros), 413 = over cv.upload.maxMegabytes; show the message.
+- CV options: show the database's BR-7.5 message on a 400 (e.g. hiding the generated CV before any upload).
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### Profile, links and achievements
 
@@ -514,11 +546,12 @@ The owner's details, social links (and which go on the CV), certifications and a
 - `ProfileLink`
 - `Achievement`
 
-**Rules:** —
+**Rules:** BR-1.13
 
 **Notes**
 
 - Achievements start as drafts; publishing puts them on the site and the CV.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### Curated numbers — define, propose, decide
 
@@ -598,6 +631,33 @@ Every change the database logged — who (admin / visitor / system), what change
 
 - "[redacted]" marks a secret or personal field that's never stored in the log.
 
+### Freshness nudges
+
+`admin.freshness` · admin
+
+Live content — systems, roles, education, the profile — that nobody has edited or reviewed for the admin's threshold, oldest first, with a one-click "still accurate" (#89).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /admin/freshness`
+- `POST /admin/freshness/{kind}/{id}/reviewed`
+
+**Database**
+
+- `stale_content`
+- `System`
+- `Experience`
+- `Education`
+- `Profile`
+- `PlatformSetting`
+
+**Rules:** BR-1.16
+
+**Notes**
+
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
+
 ### Job runs
 
 `admin.jobs` · admin
@@ -622,10 +682,12 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `ActivityLog` | admin.auth, admin.overview, admin.audit |
 | `AdminUser` | admin.auth |
 | `approve_metric_snapshot` | admin.metrics |
+| `CvOptions` | admin.cv |
+| `CvUpload` | admin.cv |
 | `DocumentGen` | cv, admin.cv |
 | `Domain` | systems.catalog, lookups |
-| `Education` | admin.cv |
-| `Experience` | admin.cv |
+| `Education` | admin.cv, admin.freshness |
+| `Experience` | admin.cv, admin.freshness |
 | `Flag` | admin.settings |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
@@ -636,11 +698,13 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `MetricSnapshot` | admin.overview, admin.metrics |
 | `MilestoneType` | journey, lookups |
 | `Organization` | admin.organizations |
-| `PlatformSetting` | admin.settings |
-| `Profile` | admin.profile |
+| `PlatformSetting` | admin.settings, admin.freshness |
+| `Profile` | admin.profile, admin.freshness |
 | `ProfileLink` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `PublicAchievement` | achievements, cv |
+| `PublicCvOption` | cv |
+| `PublicCvUpload` | cv |
 | `PublicEducation` | cv |
 | `PublicExperience` | cv |
 | `PublicImpact` | systems.caseStudy |
@@ -649,6 +713,7 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `PublicOrganization` | systems.catalog |
 | `PublicProfile` | profile, cv |
 | `PublicProfileLink` | profile, cv |
+| `PublicSlugRedirect` | systems.caseStudy |
 | `PublicSystem` | home, systems.catalog, systems.caseStudy |
 | `PublicTestimonial` | systems.caseStudy |
 | `PublicTimeline` | journey |
@@ -662,10 +727,13 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `SkillOnEducation` | admin.cv |
 | `SkillOnExperience` | admin.cv |
 | `SkillOnSystem` | admin.systems |
+| `stale_content` | admin.freshness |
 | `Status` | systems.catalog, lookups |
-| `System` | admin.overview, admin.systems |
+| `System` | admin.overview, admin.systems, admin.freshness |
 | `SystemActivityWeek` | admin.systems |
+| `SystemContentRevision` | admin.systems |
 | `SystemPace` | admin.systems |
+| `SystemSlugHistory` | admin.systems |
 | `SystemStatusChange` | admin.systems |
 | `Testimonial` | admin.systems |
 | `Timeline` | admin.overview, admin.journey |
@@ -679,3 +747,4 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `ContentChunk` | AI concierge index — V1.1 (CLAUDE.md scope). |
 | `public_client_label` | Internal helper of the public views (BR-1.4 masking). |
 | `public_name_disclosed` | Internal helper of the public views (BR-1.4 masking). |
+| `is_live` | Internal helper of the public views: published and its publish time has come (BR-1.13). |

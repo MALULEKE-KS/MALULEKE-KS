@@ -18,10 +18,10 @@
 // neither is ever stored or displayed again after this.
 
 import bcrypt from "bcryptjs";
-import { randomBytes } from "node:crypto";
 import { Secret } from "otpauth";
 import { PrismaClient } from "@prisma/client";
 import { encryptSecret } from "../lib/auth/crypto";
+import { generateRecoveryCodes } from "../lib/auth/recovery-codes";
 
 const prisma = new PrismaClient();
 
@@ -50,11 +50,9 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   const totpSecret = new Secret({ size: 20 });
 
-  // BR-3.11 — exactly 10 recovery codes, hashed for storage, shown once here.
-  const recoveryCodesPlain = Array.from({ length: 10 }, () => randomBytes(6).toString("hex"));
-  const recoveryCodesHashed = await Promise.all(
-    recoveryCodesPlain.map((code) => bcrypt.hash(code, BCRYPT_COST))
-  );
+  // BR-3.11 — exactly 10 recovery codes, hashed for storage, shown once here
+  // (the same generator the admin's in-app regeneration uses, BR-3.12).
+  const { plain: recoveryCodesPlain, hashed: recoveryCodesHashed } = await generateRecoveryCodes();
 
   await prisma.adminUser.create({
     data: {

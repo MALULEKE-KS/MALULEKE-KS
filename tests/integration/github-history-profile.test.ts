@@ -376,9 +376,22 @@ describe("skill evidence (approved feature 4)", () => {
         skills: { create: { skillId: skill.id } },
       },
     });
+    // A hidden role (#90): earlier and ended, so it would change every figure if it leaked.
+    await db.experience.create({
+      data: {
+        title: `${RUN} hidden role`,
+        organization: "Hidden Org",
+        startDate: new Date("2019-01-01"),
+        endDate: new Date("2020-01-01"),
+        description: "Draft role — never public.",
+        contentStatus: "DRAFT",
+        skills: { create: { skillId: skill.id } },
+      },
+    });
 
     const evidence = (await getSkillEvidence()).find((e) => e.skillId === skill.id);
-    expect(evidence).toMatchObject({ systemSlugs: [published.slug], systemCount: 1, roleCount: 1, inCurrentRole: true });
+    expect(evidence).toMatchObject({ systemSlugs: [published.slug], systemCount: 1, roleCount: 1, inCurrentRole: true, lastEnded: null });
+    expect(evidence!.firstUsed).toEqual(new Date("2024-01-01"));
 
     await db.skillOnSystem.deleteMany({ where: { skillId: skill.id } });
   });

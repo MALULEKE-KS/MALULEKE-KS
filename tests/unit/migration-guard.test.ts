@@ -52,6 +52,17 @@ describe("migration guard", () => {
     ).toEqual([]);
   });
 
+  it("doesn't mistake protecting data for destroying it (#92)", () => {
+    expect(
+      kinds(`
+        REVOKE DELETE, TRUNCATE ON "CvUpload" FROM platform_runtime;
+        CREATE TRIGGER "CvUpload_no_truncate" BEFORE TRUNCATE ON "CvUpload"
+          FOR EACH STATEMENT EXECUTE FUNCTION enforce();
+      `),
+    ).toEqual([]);
+    expect(kinds(`SELECT 1; TRUNCATE "Y";`)).toEqual(["TRUNCATE"]);
+  });
+
   it("accepts a destructive statement approved on the line above, with a reason", () => {
     expect(
       kinds(`

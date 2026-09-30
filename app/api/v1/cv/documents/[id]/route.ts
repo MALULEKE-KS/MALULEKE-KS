@@ -7,8 +7,11 @@ import { NextResponse } from "next/server";
 import { db, dbPublic } from "@/lib/db";
 import { CV_CONTENT_TYPE, type CvFormat } from "@/lib/cv/generate";
 import { fileName } from "@/lib/cv/format";
+import { cvOptionNotOffered, isCvOptionOffered } from "@/lib/cv/options";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  // BR-7.5 — a hidden option is refused, not just unlisted (#92).
+  if (!(await isCvOptionOffered("generated"))) return cvOptionNotOffered();
   const { id } = await params;
   const [document, profile] = await Promise.all([
     db.documentGen.findUnique({ where: { id } }),
@@ -26,6 +29,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     headers: {
       "Content-Type": CV_CONTENT_TYPE[format],
       "Content-Disposition": `attachment; filename="${fileName(profile?.displayName ?? "", format, document.generatedAt)}"`,
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

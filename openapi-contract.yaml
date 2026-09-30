@@ -91,6 +91,8 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/SystemPublicDetailed" }
+        "308":
+          description: "The slug the system used before a rename — permanent redirect (Location) to its current slug (#87, BR-1.14). Only for a system the visitor can see."
         "404": { $ref: "#/components/responses/NotFound" }
 
   /organizations:
@@ -488,6 +490,19 @@ paths:
                   sessionExpiresAt: { type: string, format: date-time }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
+  /admin/auth/recovery-codes:
+    get: { tags: [Auth], summary: "How many unused recovery codes remain, and whether that's low (< 3, BR-3.12)", security: [{ adminSession: [] }], responses: { "200": { description: "{ remaining, low }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [Auth]
+      summary: Regenerate the recovery codes — ten new ones, shown once; every old code stops working (BR-3.11, BR-3.12)
+      description: "Needs the current password and a live, single-use TOTP code; failures count against the session like a password change (the fifth ends it: SESSION_REVOKED)."
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [currentPassword, code], properties: { currentPassword: { type: string, format: password }, code: { type: string, pattern: "^\\d{6}$" } } } } } }
+      responses:
+        "200": { description: "{ codes: string[10], remaining: 10, low: false } — show once, never retrievable again" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { description: "UNAUTHORIZED (credentials) or SESSION_REVOKED (fifth failure)", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
   /admin/auth/change-password:
     post:
       tags: [Auth]
@@ -566,6 +581,7 @@ paths:
                   generatedAt: { type: string, format: date-time }
                   format: { $ref: "#/components/schemas/CvFormat" }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: "The generated CV option is hidden by the admin (BR-7.5)", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
         "429":
           description: Rate limited
           content:
@@ -1142,19 +1158,45 @@ paths:
   /metrics:
     get: { tags: [Metrics (Public)], summary: List approved public metrics, responses: { "200": { description: Approved metrics } } }
   /cv:
-    get: { tags: [CV], summary: Get the public CV model, responses: { "200": { description: CV model }, "400": { $ref: "#/components/responses/BadRequest" } } }
+    get: { tags: [CV], summary: Get the generated CV as data, description: "The generated CV option's model (BR-7.1). 404 while the admin hides that option (BR-7.5).", responses: { "200": { description: CV model }, "400": { $ref: "#/components/responses/BadRequest" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /cv/documents/{id}:
     get:
       tags: [CV]
       summary: Download a generated CV document
+      description: "404 for an unknown id, or while the admin hides the generated option (BR-7.5)."
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "200": { description: Document bytes }, "404": { $ref: "#/components/responses/NotFound" } }
+      responses: { "200": { description: Document bytes (attachment, nosniff) }, "404": { $ref: "#/components/responses/NotFound" } }
+  /cv/options:
+    get:
+      tags: [CV]
+      summary: List the CV options a visitor can choose (#92)
+      description: >
+        The CV generated from live data and the owner's uploaded CV, each only
+        while the admin shows it, the admin's chosen one first, each clearly
+        labelled (BR-7.1, BR-7.5). The uploaded option lists its current files
+        (one per format) with their upload date.
+      responses:
+        "200":
+          description: Visible options
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  options: { type: array, items: { $ref: "#/components/schemas/CvOption" } }
+  /cv/uploads/{id}:
+    get:
+      tags: [CV]
+      summary: Download the owner's uploaded CV (#92)
+      description: "Only a current file of a visible upload option; a superseded or hidden one is a 404 (BR-7.2, BR-7.5). Always an attachment, never sniffed (BR-7.6). Rate-limited (cv.download.rateLimit.*)."
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: File bytes (application/pdf or Word), attachment }, "404": { $ref: "#/components/responses/NotFound" }, "429": { description: Rate limited, content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } } }
   /systems/{slug}/related:
     get:
       tags: [Systems (Public)]
       summary: List related published systems
       parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 12, default: 3 } }]
-      responses: { "200": { description: Related systems }, "404": { $ref: "#/components/responses/NotFound" } }
+      responses: { "200": { description: Related systems }, "308": { description: "Old slug — permanent redirect to the current one, query kept (#87, BR-1.14)" }, "404": { $ref: "#/components/responses/NotFound" } }
 
   /admin/overview:
     get: { tags: [Overview (Admin)], summary: Get the admin attention dashboard, security: [{ adminSession: [] }], responses: { "200": { description: Dashboard data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
@@ -1168,11 +1210,36 @@ paths:
   /admin/systems/{id}/impacts:
     get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/revisions:
+    get: { tags: [Systems (Admin)], summary: "Every version of a system's case study or description, newest first (#88, BR-1.15)", description: "field = caseStudyBody (default) or description. Each version is attributed (actorType, adminUserId) and dated; current = the newest; backfilled = the text when history began.", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: field, in: query, schema: { type: string, enum: [caseStudyBody, description], default: caseStudyBody } }], responses: { "200": { description: "{ field, revisions: ContentRevision[] }", content: { application/json: { schema: { type: object, properties: { field: { type: string }, revisions: { type: array, items: { $ref: "#/components/schemas/ContentRevision" } } } } } } }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/revisions/{revisionId}/restore:
+    post: { tags: [Systems (Admin)], summary: "Write an earlier version back — recorded as a new version (BR-1.15)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: revisionId, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ field, body, changed } — changed=false when that text is already current (nothing recorded)" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/impacts/{id}:
     patch: { tags: [Systems (Admin)], summary: Update an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
     delete: { tags: [Systems (Admin)], summary: Delete an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "204": { description: Deleted }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/cv/documents:
     get: { tags: [CV (Admin)], summary: List generated CV documents, security: [{ adminSession: [] }], responses: { "200": { description: Document history }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/cv/uploads:
+    get: { tags: [CV (Admin)], summary: List every uploaded CV version (#92), security: [{ adminSession: [] }], responses: { "200": { description: "{ versions: CvUploadVersion[] } — newest first per format", content: { application/json: { schema: { type: object, properties: { versions: { type: array, items: { $ref: "#/components/schemas/CvUploadVersion" } } } } } } }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [CV (Admin)]
+      summary: Upload the owner's CV (PDF or Word) — becomes current for its format (#92)
+      description: >
+        multipart/form-data with one field "file". Accepted only if its content
+        is a PDF or a macro-free Word document, whatever its name (BR-7.6), and
+        within cv.upload.maxMegabytes. The previous current file of that format
+        is superseded, never deleted (BR-7.2). Uploading the current file again
+        changes nothing (200).
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } } } } }
+      responses: { "201": { description: New current version, content: { application/json: { schema: { $ref: "#/components/schemas/CvUploadVersion" } } } }, "200": { description: Already the current file — nothing changed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "413": { description: Larger than the upload limit }, "415": { description: "UNSUPPORTED_FILE — not a PDF or Word document, or a Word file with macros" } }
+  /admin/cv/uploads/{id}:
+    get: { tags: [CV (Admin)], summary: Download any uploaded CV version, current or superseded, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: File bytes (attachment, nosniff) }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/cv/uploads/{id}/restore:
+    post: { tags: [CV (Admin)], summary: Make an earlier uploaded version current again (BR-7.2), security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Restored version, content: { application/json: { schema: { $ref: "#/components/schemas/CvUploadVersion" } } } }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/cv/options:
+    get: { tags: [CV (Admin)], summary: Get which CV options visitors see (#92), security: [{ adminSession: [] }], responses: { "200": { description: CV options, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptions" } } } }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    patch: { tags: [CV (Admin)], summary: "Show or hide each CV option, choose the first, edit labels (BR-7.5)", description: "The database refuses hiding both, a hidden first option, and hiding the generated CV before any upload exists — 400 in the rule's words.", security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptionsUpdateInput" } } } }, responses: { "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptions" } } } }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
   /admin/metrics:
     get: { tags: [Metrics (Admin)], summary: List metrics, current values, proposals and history, security: [{ adminSession: [] }], responses: { "200": { description: Metrics }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Metrics (Admin)], summary: Define a metric, security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MetricInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
@@ -1186,6 +1253,10 @@ paths:
     post: { tags: [Metrics (Admin)], summary: Approve a proposed metric snapshot, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Updated metric }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: Invalid snapshot transition } } }
   /admin/metrics/snapshots/{id}/reject:
     post: { tags: [Metrics (Admin)], summary: Reject a proposed metric snapshot, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Updated metric }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: Invalid snapshot transition } } }
+  /admin/freshness:
+    get: { tags: [Overview (Admin)], summary: "Live content nobody has edited or reviewed for content.freshnessDays, oldest first (#89, BR-1.16)", description: "Systems, roles, education and the profile. Only a real edit to what visitors see, or mark-reviewed, restarts the clock — GitHub sync writes don't.", security: [{ adminSession: [] }], responses: { "200": { description: "{ thresholdDays, items: [{ kind, id, title, reviewedAt, daysSince }] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/freshness/{kind}/{id}/reviewed:
+    post: { tags: [Overview (Admin)], summary: "Mark content reviewed — still accurate; its clock restarts (BR-1.16)", security: [{ adminSession: [] }], parameters: [{ name: kind, in: path, required: true, schema: { type: string, enum: [system, experience, education, profile] } }, { name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ kind, id, reviewedAt }" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/jobs:
     get: { tags: [Jobs (Admin)], summary: List recent job runs, security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: Job runs }, "401": { $ref: "#/components/responses/Unauthorized" } } }
 
@@ -1195,7 +1266,10 @@ components:
       type: apiKey
       in: cookie
       name: admin_session
-      description: HTTP-only session cookie, issued only after 2FA verification (BR-3.1)
+      description: >-
+        HTTP-only, SameSite=Strict session cookie, issued only after 2FA verification (BR-3.1).
+        Every state-changing admin request — and the two login steps — is refused with
+        403 CSRF_REJECTED when its Origin or Sec-Fetch-Site names another site (BR-3.9).
 
   responses:
     BadRequest:
@@ -1259,6 +1333,67 @@ components:
       required: [value]
       properties:
         value: { type: number }
+    ContentRevision:
+      type: object
+      properties:
+        id: { type: string }
+        field: { type: string, enum: [caseStudyBody, description] }
+        body: { type: string, nullable: true }
+        actorType: { type: string, enum: [ADMIN, ANONYMOUS, SYSTEM] }
+        adminUserId: { type: string, nullable: true }
+        backfilled: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        current: { type: boolean }
+        matchesCurrent: { type: boolean }
+    CvOption:
+      type: object
+      description: "One CV option a visitor can choose (#92). generated → call generate; uploaded → download a file."
+      required: [kind, label, note, formats]
+      properties:
+        kind: { type: string, enum: [generated, uploaded] }
+        label: { type: string }
+        note: { type: string }
+        formats: { type: array, items: { type: string, enum: [pdf, docx] } }
+        generate: { type: object, description: "generated only", properties: { method: { type: string, enum: [POST] }, url: { type: string } } }
+        uploadedAt: { type: string, format: date-time, nullable: true, description: "uploaded only — the newest current file" }
+        files:
+          type: array
+          description: uploaded only
+          items: { type: object, properties: { format: { type: string, enum: [pdf, docx] }, byteSize: { type: integer }, uploadedAt: { type: string, format: date-time }, url: { type: string } } }
+    CvUploadVersion:
+      type: object
+      properties:
+        id: { type: string }
+        format: { type: string, enum: [pdf, docx] }
+        fileName: { type: string, description: As uploaded — admin only }
+        byteSize: { type: integer }
+        sha256: { type: string }
+        uploadedAt: { type: string, format: date-time }
+        supersededAt: { type: string, format: date-time, nullable: true }
+        current: { type: boolean }
+    CvOptions:
+      type: object
+      properties:
+        showGenerated: { type: boolean }
+        showUploaded: { type: boolean }
+        firstOption: { type: string, enum: [generated, uploaded] }
+        generatedLabel: { type: string, maxLength: 60 }
+        generatedNote: { type: string, maxLength: 200 }
+        uploadedLabel: { type: string, maxLength: 60 }
+        uploadedNote: { type: string, maxLength: 200 }
+        updatedAt: { type: string, format: date-time }
+    CvOptionsUpdateInput:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        showGenerated: { type: boolean }
+        showUploaded: { type: boolean }
+        firstOption: { type: string, enum: [generated, uploaded] }
+        generatedLabel: { type: string, minLength: 1, maxLength: 60 }
+        generatedNote: { type: string, maxLength: 200 }
+        uploadedLabel: { type: string, minLength: 1, maxLength: 60 }
+        uploadedNote: { type: string, maxLength: 200 }
     ErrorResponse:
       type: object
       required: [error]
@@ -1397,6 +1532,7 @@ components:
         - type: object
           properties:
             contentStatus: { type: string, enum: [draft, published, archived] }
+            publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
             clientVisibility: { type: string, enum: [PUBLIC, REQUIRES_APPROVAL, NDA_RESTRICTED, ANONYMIZED_ONLY] }
             clientApproved: { type: boolean, description: "Authorizes publishing (BR-1.1) — see nameDisclosureApproved for real-name authorization" }
             nameDisclosureApproved: { type: boolean, description: "Separate from clientApproved (BR-1.4) — authorizes revealing the real org name for an ANONYMIZED_ONLY system" }
@@ -1442,7 +1578,9 @@ components:
     SystemUpdateInput:
       type: object
       properties:
+        slug: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$", maxLength: 100, description: "#87 / BR-1.14 — rename the URL; the old slug keeps redirecting permanently. 409 SLUG_TAKEN (another system's current slug) or SLUG_RESERVED (another system's old slug)" }
         contentStatus: { type: string, enum: [draft, published, archived] }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         clientApproved: { type: boolean }
         nameDisclosureApproved: { type: boolean }
         isFlagship: { type: boolean }
@@ -1501,6 +1639,7 @@ components:
         date: { type: string, format: date }
         tags: { type: array, items: { type: string } }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Public reads return published entries only" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         autoDrafted: { type: boolean, description: "Drafted by the database when a system first shipped; awaits the admin's approval" }
         systemId: { type: string, nullable: true }
 
@@ -1515,6 +1654,7 @@ components:
         media: { type: string, nullable: true }
         tags: { type: array, items: { type: string }, default: [] }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged. Publishing an auto-drafted entry approves it." }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
 
     ExperienceEntry:
       type: object
@@ -1528,6 +1668,7 @@ components:
         description: { type: string }
         highlights: { type: array, items: { type: string }, description: "CV achievement bullets, in order" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Only published roles appear on /cv and in the generated CV" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         skills: { type: array, items: { type: string } }
 
     ExperienceInput:
@@ -1542,6 +1683,7 @@ components:
         description: { type: string, minLength: 1 }
         highlights: { type: array, items: { type: string, maxLength: 300 }, maxItems: 15, default: [] }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         skillIds: { type: array, items: { type: string }, default: [] }
 
     EducationEntry:
@@ -1557,6 +1699,7 @@ components:
         description: { type: string, nullable: true }
         certificateUrl: { type: string, nullable: true, description: "https only (database CHECK)" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Only published entries appear on /cv and in the generated CV" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         skills: { type: array, items: { type: string }, description: "Skill names this qualification taught" }
         expectedGraduation: { type: string, format: date, nullable: true, description: "For a degree in progress" }
         coursework: { type: array, items: { type: string }, description: "Relevant modules" }
@@ -1574,6 +1717,7 @@ components:
         description: { type: string, nullable: true }
         certificateUrl: { type: string, nullable: true, pattern: "^https://" }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         skillIds: { type: array, items: { type: string }, default: [], description: "Replaces the entry's skill links" }
         expectedGraduation: { type: string, format: date, nullable: true, description: "Only for a degree in progress (no endDate) — database CHECK" }
         coursework: { type: array, items: { type: string, maxLength: 120 }, maxItems: 30, default: [] }
@@ -1706,6 +1850,7 @@ components:
         url: { type: string, nullable: true }
         systemId: { type: string, nullable: true }
         contentStatus: { type: string, enum: [draft, published, archived] }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
         sortOrder: { type: integer }
 
     AchievementInput:
@@ -1719,6 +1864,7 @@ components:
         url: { type: string, nullable: true, pattern: "^https://" }
         systemId: { type: string, nullable: true }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = draft" }
+        publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — schedule publication: with contentStatus published, the content goes live at this time (checked by every publish gate now). Omitted = unchanged; null = live as soon as published. Refused (400) on unpublished content" }
         sortOrder: { type: integer, minimum: 0, default: 0 }
 
     ActivityLogEntry:

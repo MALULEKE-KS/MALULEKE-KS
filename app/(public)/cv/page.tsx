@@ -1,11 +1,14 @@
 // app/(public)/cv/page.tsx
-// /cv — on-screen view (full design system) + Download PDF (POST /cv/generate,
-// BR-7.1) using the separate ink-only print stylesheet in app/globals.css.
+// /cv — the CV options the admin shows (#92, BR-7.1/7.5): the generated CV
+// (on screen here, and as PDF or Word via POST /cv/generate) and the owner's
+// uploaded CV. The on-screen CV is the generated one, so it's shown only while
+// that option is. Print uses the ink-only stylesheet in app/globals.css.
 // See docs/PAGE-SPECIFICATIONS.md ("/cv").
 
 import { dbPublic as db } from "@/lib/db";
 import { skillWithCategory, toPublicEducationEntry, toPublicExperienceEntry, toSkillEntry } from "@/lib/rules/cv";
 import { DownloadCvButton } from "./_components/DownloadCvButton";
+import { getPublicCvOptions } from "@/lib/cv/options";
 import { Container } from "@/components/shared/Container";
 
 // Reads live, admin-editable content — must not be statically baked in at
@@ -21,14 +24,16 @@ function formatDateRange(startDate: string, endDate: string | null): string {
 }
 
 export default async function CvPage() {
-  const [experienceRows, educationRows, skillRows, profile] = await Promise.all([
+  const [experienceRows, educationRows, skillRows, profile, options] = await Promise.all([
     // Only roles the admin chose to show (#74).
     db.publicExperience.findMany({ orderBy: { startDate: "desc" } }),
     db.publicEducation.findMany({ orderBy: { startDate: "desc" } }),
     db.skill.findMany({ ...skillWithCategory, orderBy: { name: "asc" } }),
     // The owner's name is profile data (#70), not a constant.
     db.publicProfile.findFirst(),
+    getPublicCvOptions(),
   ]);
+  const showGenerated = options.some((o) => o.kind === "generated");
 
   const experience = experienceRows.map(toPublicExperienceEntry);
   const education = educationRows.map(toPublicEducationEntry);
@@ -51,15 +56,17 @@ export default async function CvPage() {
             <p className="text-slate mt-1 font-sans">{roleLine}</p>
           </div>
           <div className="no-print shrink-0">
-            <DownloadCvButton />
+            <DownloadCvButton options={options} />
           </div>
         </div>
 
-        <p className="no-print text-slate mt-4 mb-10 font-mono text-xs">
-          Formatted for print — use Download PDF for the cleanest copy.
-        </p>
+        {showGenerated && (
+          <p className="no-print text-slate mt-4 mb-10 font-mono text-xs">
+            Formatted for print — use Download PDF for the cleanest copy.
+          </p>
+        )}
 
-        {experience.length > 0 && (
+        {showGenerated && experience.length > 0 && (
           <section className="border-slate/20 mb-10 border-t pt-8">
             <h2 className="text-ink mb-4 font-sans text-xl font-semibold">Experience</h2>
             <div className="space-y-6">
@@ -88,7 +95,7 @@ export default async function CvPage() {
           </section>
         )}
 
-        {education.length > 0 && (
+        {showGenerated && education.length > 0 && (
           <section className="border-slate/20 mb-10 border-t pt-8">
             <h2 className="text-ink mb-4 font-sans text-xl font-semibold">Education</h2>
             <div className="space-y-6">
@@ -108,7 +115,7 @@ export default async function CvPage() {
           </section>
         )}
 
-        {skillsByCategory.size > 0 && (
+        {showGenerated && skillsByCategory.size > 0 && (
           <section className="border-slate/20 border-t pt-8">
             <h2 className="text-ink mb-4 font-sans text-xl font-semibold">Skills</h2>
             <div className="space-y-4">

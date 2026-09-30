@@ -8,4 +8,6 @@ import { NextResponse } from "next/server";
 import { getAdminOverview } from "@/lib/queries/admin-overview";
 import { withAdmin } from "@/lib/auth/with-admin";
 
-export const GET = withAdmin(async (request) => NextResponse.json(await getAdminOverview(new URL(request.url).origin)));
+export const GET = withAdmin(async (request, { adminUserId }) =>
+  NextResponse.json(await getAdminOverview(new URL(request.url).origin, adminUserId)),
+);

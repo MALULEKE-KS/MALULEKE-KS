@@ -22,6 +22,17 @@ import { buildCvModel } from "@/lib/cv/model";
 import { generateCvDocument } from "@/lib/cv/generate";
 import { db } from "@/lib/db";
 import { createSessionCookieValue } from "@/lib/auth/session";
+import { holdCvOptionsLock } from "../helpers/cv-options-lock";
+
+// Downloads the generated CV, so it must not overlap a test that hides it (#92).
+let releaseCvOptionsLock: (() => Promise<void>) | undefined;
+beforeAll(async () => {
+  releaseCvOptionsLock = await holdCvOptionsLock("shared");
+}, 10 * 60_000);
+afterAll(async () => {
+  await releaseCvOptionsLock?.();
+});
+
 
 const RUN = `cv${Date.now().toString(36)}`;
 const SITE = "https://portfolio.example";
@@ -201,7 +212,8 @@ describe("everything on the CV is editable in the admin", () => {
     expect(model.phone).toBe("+27 60 000 0000");
     expect(await db.activityLog.count({ where: { action: "profile.update", adminUserId: adminId } })).toBe(1);
     const entry = await db.activityLog.findFirstOrThrow({ where: { action: "profile.update", adminUserId: adminId } });
-    expect(Object.keys(entry.after as object).sort()).toEqual(["phone", "summary"]); // headline didn't change
+    // headline didn't change; the edit also restarted the freshness clock (#89, BR-1.16)
+    expect(Object.keys(entry.after as object).sort()).toEqual(["contentReviewedAt", "phone", "summary"]);
 
     const got = await getProfile(adminRequest(`${SITE}/api/v1/admin/profile`, "GET"));
     expect((await got.json()).links.length).toBeGreaterThanOrEqual(3);

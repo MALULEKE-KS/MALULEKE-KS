@@ -58,6 +58,25 @@ export const SETTINGS = {
     description: "Length of the CV-generation rate-limit window, in minutes.",
     rule: "BR-7.1",
   }),
+  "cv.upload.maxMegabytes": define({
+    // Capped at 4: Vercel refuses request bodies over 4.5 MB before the app sees them.
+    schema: z.number().int().min(1).max(4),
+    default: 4,
+    description: "Largest CV file the admin can upload, in megabytes.",
+    rule: "BR-7.6",
+  }),
+  "cv.download.rateLimit.maxPerWindow": define({
+    schema: z.number().int().min(1).max(500),
+    default: 30,
+    description: "Uploaded-CV downloads one visitor can make per window.",
+    rule: "BR-7.6",
+  }),
+  "cv.download.rateLimit.windowMinutes": define({
+    schema: z.number().int().min(1).max(1440),
+    default: 60,
+    description: "Length of the uploaded-CV download rate-limit window, in minutes.",
+    rule: "BR-7.6",
+  }),
   "search.rateLimit.maxPerWindow": define({
     schema: z.number().int().min(10).max(1000),
     default: 60,
@@ -69,6 +88,12 @@ export const SETTINGS = {
     default: 1,
     description: "Length of the search rate-limit window, in minutes.",
     rule: "F2.2",
+  }),
+  "content.freshnessDays": define({
+    schema: z.number().int().min(7).max(730),
+    default: 90,
+    description: "Content nobody has edited or marked reviewed for this many days is flagged for a look.",
+    rule: "BR-1.16",
   }),
   "data.retentionMonths": define({
     schema: z.number().int().min(1).max(120),

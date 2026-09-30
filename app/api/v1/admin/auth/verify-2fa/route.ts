@@ -10,6 +10,7 @@ import { Verify2FAInputSchema } from "@/lib/schemas";
 import { logActivity } from "@/lib/auth/activity-log";
 import { verifyTotpOnce } from "@/lib/auth/totp";
 import { createSessionCookieValue, SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
+import { crossSiteRefusal } from "@/lib/security/csrf";
 
 const MAX_2FA_ATTEMPTS = 5; // BR-3.6
 
@@ -39,6 +40,10 @@ async function verifyAndConsumeRecoveryCode(adminId: string, hashedCodes: string
 }
 
 export async function POST(request: Request) {
+  // BR-3.9 — login can't be driven from another site either.
+  const refusal = crossSiteRefusal(request);
+  if (refusal) return refusal;
+
   const body = await request.json().catch(() => null);
   const parsed = Verify2FAInputSchema.safeParse(body);
   if (!parsed.success) {

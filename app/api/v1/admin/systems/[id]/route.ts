@@ -12,6 +12,7 @@ import { canPublish, systemWithAdminRelations, toAdminSystem } from "@/lib/rules
 import { getAdminSystemDetail } from "@/lib/queries/admin-systems";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { ruleViolation } from "@/lib/db-errors";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -101,6 +102,9 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         where: { id },
         data: {
           ...(parsed.data.name !== undefined && { name: parsed.data.name }),
+          // #87 — the database records the old slug as a permanent redirect
+          // and refuses another system's old one (BR-1.14).
+          ...(parsed.data.slug !== undefined && { slug: parsed.data.slug }),
           ...(parsed.data.description !== undefined && { description: parsed.data.description }),
           ...(parsed.data.techStack !== undefined && { techStack: parsed.data.techStack }),
           // A status change is recorded in the status history by the database,
@@ -112,6 +116,8 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
           ...(parsed.data.contentStatus !== undefined && {
             contentStatus: CONTENT_STATUS_MAP[parsed.data.contentStatus],
           }),
+          // BR-1.13 — a future time schedules it; the database checks it's published.
+          ...publishAtData(parsed.data.publishAt),
           ...(parsed.data.clientApproved !== undefined && { clientApproved: parsed.data.clientApproved }),
           ...(parsed.data.nameDisclosureApproved !== undefined && {
             nameDisclosureApproved: parsed.data.nameDisclosureApproved,
@@ -164,6 +170,15 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
     }
     if (err instanceof Error && err.message === "UNKNOWN_REPO_RELATIONSHIP") {
       return errorResponse("VALIDATION_ERROR", "Unknown or deprecated repo relationship", 400);
+    }
+    const reservedSlug = ruleViolation(err, "BR-1.14");
+    if (reservedSlug) return errorResponse("SLUG_RESERVED", reservedSlug, 409);
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002" &&
+      JSON.stringify(err.meta?.target ?? "").includes("slug")
+    ) {
+      return errorResponse("SLUG_TAKEN", "Another system already uses that slug.", 409);
     }
     const ownerRule = ruleViolation(err, "BR-1.11");
     if (ownerRule) {

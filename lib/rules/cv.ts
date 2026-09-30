@@ -7,6 +7,7 @@
 
 import { Prisma, type PublicEducation, type PublicExperience } from "@prisma/client";
 import { db } from "@/lib/db";
+import { publishAtWire } from "@/lib/rules/scheduling";
 
 const educationWithSkills = Prisma.validator<Prisma.EducationDefaultArgs>()({
   include: { skills: { include: { skill: true } } },
@@ -41,6 +42,7 @@ export function toExperienceEntry(experience: ExperienceWithSkills) {
     description: experience.description,
     highlights: experience.highlights,
     contentStatus: experience.contentStatus.toLowerCase() as "draft" | "published" | "archived",
+    publishAt: publishAtWire(experience.publishAt),
     skills: experience.skills.map((s) => s.skill.name),
   };
 }
@@ -74,6 +76,7 @@ export function toEducationEntry(education: EducationWithSkills) {
     description: education.description,
     certificateUrl: education.certificateUrl,
     contentStatus: education.contentStatus.toLowerCase() as "draft" | "published" | "archived",
+    publishAt: publishAtWire(education.publishAt),
     skills: education.skills.map((s) => s.skill.name),
     expectedGraduation: education.expectedGraduation ? toDateOnly(education.expectedGraduation) : null,
     coursework: education.coursework,

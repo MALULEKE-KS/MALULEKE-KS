@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
 import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
 import { withAdmin } from "@/lib/auth/with-admin";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -36,6 +37,8 @@ export const POST = withAdmin(async (request, { write }) => {
       media: parsed.data.media ?? null,
       tags: parsed.data.tags,
       contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],
+      // BR-1.13 — a future time schedules it; the database checks it's published.
+      ...publishAtData(parsed.data.publishAt),
     },
     ...timelineWithMilestoneType,
   }));

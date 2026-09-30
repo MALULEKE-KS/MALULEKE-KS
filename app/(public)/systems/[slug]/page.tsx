@@ -5,13 +5,13 @@
 
 import { cache } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemCard } from "@/components/shared/SystemCard";
 import { MarginAnnotations } from "@/components/shared/MarginAnnotations";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
-import { getPublicSystemBySlug, getRelatedSystems } from "@/lib/queries/systems";
+import { getPublicSystemBySlug, getRelatedSystems, publicSlugRedirect } from "@/lib/queries/systems";
 import { Container } from "@/components/shared/Container";
 
 interface SystemDetailPageProps {
@@ -33,7 +33,12 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
   const { slug } = await params;
   const system = await getSystem(slug);
 
-  if (!system) notFound();
+  if (!system) {
+    // A slug the system used before its rename keeps working (#87, BR-1.14).
+    const current = await publicSlugRedirect(slug);
+    if (current) permanentRedirect(`/systems/${current}`);
+    notFound();
+  }
 
   const relatedSystems = await getRelatedSystems(slug);
 

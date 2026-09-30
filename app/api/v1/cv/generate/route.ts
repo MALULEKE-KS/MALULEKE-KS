@@ -10,12 +10,15 @@ import { CvGenerateInputSchema } from "@/lib/schemas";
 import { generateCvDocument } from "@/lib/cv/generate";
 import { hitRateLimit } from "@/lib/auth/rate-limit";
 import { getSetting } from "@/lib/settings";
+import { cvOptionNotOffered, isCvOptionOffered } from "@/lib/cv/options";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
 export async function POST(request: Request) {
+  // BR-7.5 — a hidden option is refused, not just unlisted (#92).
+  if (!(await isCvOptionOffered("generated"))) return cvOptionNotOffered();
   const body = await request.json().catch(() => ({}));
   const parsed = CvGenerateInputSchema.safeParse(body);
   if (!parsed.success) {

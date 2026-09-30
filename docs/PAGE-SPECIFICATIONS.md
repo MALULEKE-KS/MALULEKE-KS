@@ -46,7 +46,11 @@ Single vertical log, not a generic icon-and-card timeline component — visually
 
 ### `/cv`
 
-1. Header — name, role line, **Download PDF** and **Download Word** buttons (`POST /cv/generate` with `format`, #74) — the same ATS-safe CV in both formats.
+1. Header — name, role line, and the **CV options** the admin shows (`GET /cv/options`, #92), in the admin's order, each with its label and note (BR-7.1, BR-7.5):
+   - **Generated CV** — **Download PDF** / **Download Word** (`POST /cv/generate` with `format`, #74), the same ATS-safe CV in both formats, built from live data on click.
+   - **Uploaded CV** — the owner's own file(s), with the upload date; plain download links.
+
+   Sections 2–5 are the generated CV on screen, so they show only while the generated option is visible.
 2. Experience — reverse-chronological.
 3. Education.
 4. Skills — grouped by `SkillCategory`, not one flat tag cloud.

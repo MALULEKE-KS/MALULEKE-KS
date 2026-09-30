@@ -22,24 +22,27 @@ datasource db {
 // ============================================================
 
 model AdminUser {
-  id               String           @id @default(cuid())
+  id               String                  @id @default(cuid())
   metricDecisions  MetricSnapshot[]
-  email            String           @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
+  email            String                  @unique // always stored lowercase — normalized in app layer on write (BR-3.10)
   passwordHash     String
-  role             String           @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
+  role             String                  @default("owner") // headroom field only — single-owner today, no RBAC engine (Constitution §1)
   twoFactorSecret  String? // encrypted at rest with TWO_FACTOR_ENCRYPTION_KEY, not plaintext
-  twoFactorEnabled Boolean          @default(false)
+  twoFactorEnabled Boolean                 @default(false)
   recoveryCodes    String[] // hashed, one-time use — exactly 10 generated at setup (BR-3.11)
-  failedLoginCount Int              @default(0)
-  lockedUntil      DateTime?        @db.Timestamptz(3) // BR-3.2
+  failedLoginCount Int                     @default(0)
+  // BR-3.2: consecutive lockouts since the last successful login; each one doubles the next.
+  lockoutCount     Int                     @default(0)
+  lockedUntil      DateTime?               @db.Timestamptz(3) // BR-3.2
   // Incrementing this invalidates every signed session minted before the
   // change (e.g. password rotation) without retaining server-side sessions.
-  sessionVersion   Int              @default(1)
+  sessionVersion   Int                     @default(1)
   // The last accepted TOTP step — a code for it or an earlier step is refused (BR-3.14).
   lastTotpStep     Int?
-  lastLoginAt      DateTime?        @db.Timestamptz(3)
-  createdAt        DateTime         @default(now()) @db.Timestamptz(3)
-  updatedAt        DateTime         @updatedAt @db.Timestamptz(3)
+  lastLoginAt      DateTime?               @db.Timestamptz(3)
+  contentRevisions SystemContentRevision[]
+  createdAt        DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
   activityLogs     ActivityLog[]
   loginChallenges  LoginChallenge[]
   // No separate @@index([email]): the @unique above already is one.
@@ -213,6 +216,8 @@ model System {
   // requires clientApproved=true to publish anything non-PUBLIC.
   nameDisclosureApproved Boolean          @default(false)
   contentStatus          ContentStatus    @default(DRAFT) // BR-1.6: sync-created rows always start here
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt              DateTime?        @db.Timestamptz(3)
   needsCuration          Boolean          @default(false) // set true by GitHub sync; cleared once an admin opens+saves the record (BR-1.8)
   // No delete endpoint exists for System anywhere in the contract — retirement
   // is always contentStatus = ARCHIVED (BR-1.9). Rows are never hard-deleted.
@@ -221,6 +226,8 @@ model System {
   testimonials           Testimonial[]
   skills                 SkillOnSystem[]
   createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt      DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
   // Hand-picked for the homepage by the admin (#52), shown in homeOrder.
   // Only published systems are ever shown, whatever this says.
@@ -251,10 +258,12 @@ model System {
   githubStars      Int?
   githubSyncedAt   DateTime? @db.Timestamptz(3)
 
-  statusChanges   SystemStatusChange[]
-  activityWeeks   SystemActivityWeek[]
-  timelineEntries Timeline[]
-  achievements    Achievement[]
+  statusChanges    SystemStatusChange[]
+  slugHistory      SystemSlugHistory[]
+  contentRevisions SystemContentRevision[]
+  activityWeeks    SystemActivityWeek[]
+  timelineEntries  Timeline[]
+  achievements     Achievement[]
 
   @@index([contentStatus])
   @@index([organizationId])
@@ -379,6 +388,8 @@ model Timeline {
   // Only PUBLISHED entries are public. Auto-drafted entries start as DRAFT
   // and wait for the admin's approval (#70).
   contentStatus   ContentStatus @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt       DateTime?     @db.Timestamptz(3)
   systemId        String?
   system          System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
   autoDrafted     Boolean       @default(false)
@@ -414,6 +425,8 @@ model Profile {
   buildingSinceYear Int?
   links             ProfileLink[]
   createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
@@ -446,6 +459,8 @@ model Achievement {
   systemId      String?
   system        System?       @relation(fields: [systemId], references: [id], onDelete: Restrict)
   contentStatus ContentStatus @default(DRAFT)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt     DateTime?     @db.Timestamptz(3)
   sortOrder     Int           @default(0)
   createdAt     DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
@@ -455,21 +470,25 @@ model Achievement {
 }
 
 model Experience {
-  id            String              @id @default(cuid())
-  title         String
-  organization  String
-  location      String?
-  startDate     DateTime            @db.Timestamptz(3)
-  endDate       DateTime?           @db.Timestamptz(3)
-  description   String
+  id                String              @id @default(cuid())
+  title             String
+  organization      String
+  location          String?
+  startDate         DateTime            @db.Timestamptz(3)
+  endDate           DateTime?           @db.Timestamptz(3)
+  description       String
   // Achievement bullets for the CV, in order (#74) — what was done and its
   // impact. Tailoring puts the most relevant first.
-  highlights    String[]            @default([])
+  highlights        String[]            @default([])
   // Only PUBLISHED roles appear on /cv and in the generated CV (#74).
-  contentStatus ContentStatus       @default(PUBLISHED)
-  skills        SkillOnExperience[]
-  createdAt     DateTime            @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
+  contentStatus     ContentStatus       @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt         DateTime?           @db.Timestamptz(3)
+  skills            SkillOnExperience[]
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model Education {
@@ -491,8 +510,12 @@ model Education {
   // Only PUBLISHED entries appear on /cv and in the generated CV; the admin
   // decides what's shown.
   contentStatus      ContentStatus      @default(PUBLISHED)
+  // BR-1.13: live from this time on (null = as soon as published). Set only while published.
+  publishAt          DateTime?          @db.Timestamptz(3)
   skills             SkillOnEducation[]
   createdAt          DateTime           @default(now()) @db.Timestamptz(3)
+  // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
+  contentReviewedAt  DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([contentStatus, startDate])
@@ -749,6 +772,72 @@ model MetricSnapshot {
 
 // ============================================================
 // PUBLIC VIEWS (F1.7) — the only shape public pages read
+
+// #88 / BR-1.15 — every version of a system's case study and description,
+// written by a database trigger on each change and attributed like the audit
+// trail. Append-only (trigger + the runtime role's grants). Restoring writes an
+// old text back, which becomes a new version.
+model SystemContentRevision {
+  id          String     @id @default(cuid())
+  systemId    String
+  system      System     @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  field       String // "caseStudyBody" | "description"
+  body        String? // null = the field was cleared
+  actorType   ActorType
+  adminUserId String?
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+  backfilled  Boolean    @default(false) // the text when history began — not a dated edit
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+
+  @@index([systemId, field, createdAt(sort: Desc)], map: "SystemContentRevision_system_field_idx")
+  @@index([adminUserId])
+}
+
+// #87 / BR-1.14 — every slug a system gave up, written by a database trigger on
+// rename (admin or GitHub sync). An old slug redirects permanently to the
+// system's current one and stays reserved for it.
+model SystemSlugHistory {
+  slug      String   @id
+  systemId  String
+  system    System   @relation(fields: [systemId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([systemId])
+}
+
+// #92 — a CV file the owner uploads, offered to visitors beside the generated
+// CV (BR-7.1). Versions are superseded, never deleted or altered (BR-7.2,
+// enforced by a trigger and the runtime role's grants). One current per format.
+model CvUpload {
+  id           String    @id @default(cuid())
+  format       String // "pdf" | "docx" — checked by content on upload (BR-7.6)
+  fileName     String // as uploaded; shown in the admin only
+  byteSize     Int
+  sha256       String
+  fileData     Bytes
+  uploadedAt   DateTime  @default(now()) @db.Timestamptz(3)
+  supersededAt DateTime? @db.Timestamptz(3) // null = current for its format
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([format, uploadedAt(sort: Desc)])
+}
+
+// #92 / BR-7.5 — which CV options visitors see and in what order; labels are
+// data. One row (id 1). The database refuses hiding both, listing a hidden
+// option first, or hiding the generated CV before any upload exists.
+model CvOptions {
+  id             Int      @id @default(1)
+  showGenerated  Boolean  @default(true)
+  showUploaded   Boolean  @default(true)
+  firstOption    String   @default("generated") // "generated" | "uploaded"
+  generatedLabel String   @default("Generated CV")
+  generatedNote  String   @default("Built from this site's live data at the moment you download it.")
+  uploadedLabel  String   @default("Uploaded CV")
+  uploadedNote   String   @default("A CV file uploaded as-is, shown with its upload date.")
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
 // ============================================================
 // Created in SQL (migration 20260919070000_public_views_search_metrics).
 // Every masking and visibility rule is applied inside the view, so a public
@@ -907,4 +996,29 @@ view PublicMetric {
   value       Float
   approvedAt  DateTime
   sortOrder   Int
+}
+
+// #92 — the CV options a visitor can choose, visible ones only (BR-7.5).
+view PublicCvOption {
+  kind       String    @unique // "generated" | "uploaded"
+  label      String
+  note       String
+  isFirst    Boolean
+  formats    String[]
+  uploadedAt DateTime? // uploaded option only
+}
+
+// #92 — current files of a visible upload option; nothing else is reachable.
+view PublicCvUpload {
+  id         String   @unique
+  format     String
+  byteSize   Int
+  uploadedAt DateTime
+  fileData   Bytes
+}
+
+// #87 — old slug → current slug, live systems only (BR-1.14).
+view PublicSlugRedirect {
+  fromSlug String @unique
+  toSlug   String
 }

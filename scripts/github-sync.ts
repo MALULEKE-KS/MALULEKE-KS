@@ -20,6 +20,7 @@
 // counted as a skip rather than crashing the whole run.
 
 import { PrismaClient, Prisma } from "@prisma/client";
+import { isSlugAvailable } from "../lib/rules/slugs";
 
 const prisma = new PrismaClient();
 
@@ -260,9 +261,10 @@ async function resolveSlug(baseSlug: string, currentSystemId: string | null): Pr
   let candidate = baseSlug;
   let suffix = 2;
 
+  // Skips other systems' current slugs and their old ones too: an old slug is
+  // reserved and still redirects to its system (#87, BR-1.14).
   while (true) {
-    const existing = await prisma.system.findUnique({ where: { slug: candidate } });
-    if (!existing || existing.id === currentSystemId) return candidate;
+    if (await isSlugAvailable(prisma, candidate, currentSystemId)) return candidate;
     candidate = `${baseSlug}-${suffix}`;
     suffix += 1;
   }

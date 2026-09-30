@@ -16,7 +16,7 @@
 // is reissued with a new lastActivity on each valid request — a sliding
 // window bounded by the fixed absolute cap.
 
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 
 export const SESSION_COOKIE_NAME = "admin_session";
@@ -28,6 +28,7 @@ interface SessionPayload {
   iat: number; // session creation time, fixed for its lifetime (BR-3.8: re-minted on each new login)
   lastActivity: number;
   version: number; // AdminUser.sessionVersion — invalidates old signed sessions on password rotation.
+  sid?: string; // random per login (BR-3.8): two logins never share a session value, even in the same millisecond
 }
 
 function getSecret(): string {
@@ -66,7 +67,7 @@ function decode(cookieValue: string): SessionPayload | null {
 // pre-2FA identifier (BR-3.8, anti session-fixation).
 export function createSessionCookieValue(adminUserId: string, version: number): string {
   const now = Date.now();
-  return encode({ sub: adminUserId, iat: now, lastActivity: now, version });
+  return encode({ sub: adminUserId, iat: now, lastActivity: now, version, sid: randomBytes(16).toString("base64url") });
 }
 
 export interface SessionCheckResult {

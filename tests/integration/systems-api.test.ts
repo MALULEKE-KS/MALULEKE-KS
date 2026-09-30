@@ -20,12 +20,15 @@ describe("GET /api/v1/systems", () => {
   });
 
   it("masks the organization name for the seeded ANONYMIZED_ONLY system", async () => {
-    const res = await getSystems(new NextRequest("http://localhost/api/v1/systems"));
-    const body = await res.json();
-
-    const sunduza = body.data.find((s: { slug: string }) => s.slug === "sunduza-case-study");
+    // Page through: other test files add published systems of their own.
+    let sunduza: { organization: string } | undefined;
+    for (let page = 1; !sunduza && page <= 20; page++) {
+      const body = await (await getSystems(new NextRequest(`http://localhost/api/v1/systems?page=${page}`))).json();
+      if (body.data.length === 0) break;
+      sunduza = body.data.find((s: { slug: string }) => s.slug === "sunduza-case-study");
+    }
     expect(sunduza).toBeDefined();
-    expect(sunduza.organization).not.toContain("Sunduza");
+    expect(sunduza!.organization).not.toContain("Sunduza");
   });
 
   it("filters by domain", async () => {

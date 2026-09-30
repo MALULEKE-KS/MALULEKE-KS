@@ -3,11 +3,13 @@
 // of everything else. Every number is computed from the database now.
 
 import { db } from "@/lib/db";
+import { getStaleContent } from "@/lib/queries/freshness";
+import { recoveryCodeStatus } from "@/lib/auth/recovery-codes";
 import { getSetting } from "@/lib/settings";
 import { buildCvModel } from "@/lib/cv/model";
 import { checkCv } from "@/lib/cv/check";
 
-export async function getAdminOverview(siteUrl: string) {
+export async function getAdminOverview(siteUrl: string, adminUserId: string) {
   const slaHours = await getSetting("inquiry.reviewSlaHours");
   const dueBefore = new Date(Date.now() - slaHours * 60 * 60 * 1000);
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -25,6 +27,8 @@ export async function getAdminOverview(siteUrl: string) {
     changesThisWeek,
     ledger,
     cv,
+    stale,
+    ownAccount,
   ] = await Promise.all([
     db.inquiry.groupBy({ by: ["status"], _count: { _all: true } }),
     db.inquiry.count({ where: { status: "NEW", createdAt: { lt: dueBefore } } }),
@@ -38,7 +42,10 @@ export async function getAdminOverview(siteUrl: string) {
     db.activityLog.count({ where: { createdAt: { gte: weekAgo } } }),
     db.publicLedger.findFirst(),
     buildCvModel({ siteUrl }).then(checkCv),
+    getStaleContent(),
+    db.adminUser.findUniqueOrThrow({ where: { id: adminUserId }, select: { recoveryCodes: true } }),
   ]);
+  const recoveryCodes = recoveryCodeStatus(ownAccount.recoveryCodes);
 
 
   return {
@@ -50,7 +57,12 @@ export async function getAdminOverview(siteUrl: string) {
       journeyDraftsToApprove: journeyDrafts,
       metricProposalsToDecide: pendingMetrics,
       cvIssues: cv.issues.length,
+      // #89, BR-1.16 — live content untouched for content.freshnessDays.
+      staleContent: stale.items.length,
+      // BR-3.12 — a persistent, non-blocking notice to regenerate.
+      recoveryCodesLow: recoveryCodes.low,
     },
+    security: { recoveryCodesRemaining: recoveryCodes.remaining },
     inquiries: {
       byStatus: Object.fromEntries(inquiriesByStatus.map((r) => [r.status.toLowerCase(), r._count._all])),
       reviewSlaHours: slaHours,

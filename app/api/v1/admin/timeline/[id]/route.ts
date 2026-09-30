@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { TimelineCreateInputSchema } from "@/lib/schemas";
 import { CONTENT_STATUS_FROM_WIRE, timelineWithMilestoneType, toTimelineEntry } from "@/lib/rules/timeline";
 import { withAdmin } from "@/lib/auth/with-admin";
+import { publishAtData } from "@/lib/rules/scheduling";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -32,6 +33,8 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         tags: parsed.data.tags,
         // Approving an auto-drafted entry is publishing it (#70).
         ...(parsed.data.contentStatus && { contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus] }),
+        // BR-1.13 — a future time schedules it; the database checks it's published.
+        ...publishAtData(parsed.data.publishAt),
       },
       ...timelineWithMilestoneType,
     }));

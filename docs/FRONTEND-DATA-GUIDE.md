@@ -102,13 +102,17 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /achievements`
 - systemSlug links an achievement to its case study when present.
 
-**CV — view and download** — On-screen CV, target-role box, Download PDF / Word
+**CV — the options, view and download** — CV options (GET /cv/options), in the order given, each with its label and note; the uploaded one shows its upload date; On-screen CV, target-role box, Download PDF / Word — only while the generated option is listed
 
+- Call `GET /cv/options`
 - Call `GET /cv`
 - Call `POST /cv/generate`
 - Call `GET /cv/documents/{id}`
-- Render GET /cv exactly — it's the same model the files come from.
-- POST /cv/generate returns a fileUrl; navigate to it to download. 429 = rate-limited.
+- Call `GET /cv/uploads/{id}`
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
 ### /journey
 
@@ -143,6 +147,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /systems/{slug}/related`
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
+- An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
 
 **Skills with evidence** — Skills this system proves (match systemSlugs)
 
@@ -158,6 +163,28 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/overview`
 - Each attention count links to its screen, filtered (e.g. /admin/inquiries?overdue=true).
 
+**Freshness nudges** — Attention: stale content count (overview attention.staleContent)
+
+- Call `GET /admin/freshness`
+- Call `POST /admin/freshness/{kind}/{id}/reviewed`
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
+
+### /admin (proposed: /admin/account)
+
+**Admin sign-in (password + 2FA)** — Change password; recovery codes — remaining count, low-count notice, regenerate (show the ten codes once)
+
+- Call `POST /admin/auth/login`
+- Call `POST /admin/auth/verify-2fa`
+- Call `POST /admin/auth/change-password`
+- Call `GET /admin/auth/recovery-codes`
+- Call `POST /admin/auth/recovery-codes`
+- Show neutral copy on expiry ("session ended"), not an error.
+- Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
+- Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
+- Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
+- Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
+
 ### /admin/activity-log
 
 **Audit trail** — Log with filters (entity, action, actor, date range), before/after diff
@@ -167,7 +194,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/cv
 
-**CV content, completeness and history** — Experience, Education, Skills tabs; Completeness panel (score, issues, suggested summary, preview by target role); Generated documents
+**CV content, options, uploads, completeness and history** — Experience, Education, Skills tabs; Completeness panel (score, issues, suggested summary, preview by target role); Generated documents; Uploaded CV: upload (PDF/Word), versions with download and make-current; What visitors can download: show/hide each option, which is first, labels and notes
 
 - Call `GET /admin/cv/experience`
 - Call `POST /admin/cv/experience`
@@ -183,7 +210,25 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `DELETE /admin/cv/skills/{id}`
 - Call `GET /admin/cv/check`
 - Call `GET /admin/cv/documents`
+- Call `GET /admin/cv/uploads`
+- Call `POST /admin/cv/uploads`
+- Call `GET /admin/cv/uploads/{id}`
+- Call `POST /admin/cv/uploads/{id}/restore`
+- Call `GET /admin/cv/options`
+- Call `PATCH /admin/cv/options`
+- Upload is multipart/form-data, field "file". 415 = not a PDF/Word file (or has macros), 413 = over cv.upload.maxMegabytes; show the message.
+- CV options: show the database's BR-7.5 message on a 400 (e.g. hiding the generated CV before any upload).
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+
+### /admin/freshness (proposed)
+
+**Freshness nudges** — Stale items oldest first — open to edit, or Mark reviewed
+
+- Call `GET /admin/freshness`
+- Call `POST /admin/freshness/{kind}/{id}/reviewed`
+- Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
+- The threshold is the setting content.freshnessDays (default 90).
 
 ### /admin/inquiries
 
@@ -206,8 +251,13 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/auth/login`
 - Call `POST /admin/auth/verify-2fa`
 - Call `POST /admin/auth/change-password`
+- Call `GET /admin/auth/recovery-codes`
+- Call `POST /admin/auth/recovery-codes`
 - Show neutral copy on expiry ("session ended"), not an error.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
+- Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
+- Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
+- Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
 
 ### /admin/numbers (proposed)
 
@@ -245,6 +295,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/achievements/{id}`
 - Call `DELETE /admin/achievements/{id}`
 - Achievements start as drafts; publishing puts them on the site and the CV.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ### /admin/settings
 
@@ -280,13 +331,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/systems/{id}/impacts`
 - Call `PATCH /admin/impacts/{id}`
 - Call `DELETE /admin/impacts/{id}`
+- Call `GET /admin/systems/{id}/revisions`
+- Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+- Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
+- Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
 
 ### /admin/systems/[id]
 
-**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart
+**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart; Revision history for the case study and description: versions with who and when, restore
 
 - Call `GET /admin/systems`
 - Call `POST /admin/systems`
@@ -297,9 +353,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/systems/{id}/impacts`
 - Call `PATCH /admin/impacts/{id}`
 - Call `DELETE /admin/impacts/{id}`
+- Call `GET /admin/systems/{id}/revisions`
+- Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
+- Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
+- Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
 
 ### /admin/timeline
 
@@ -310,6 +371,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/timeline/{id}`
 - Call `DELETE /admin/timeline/{id}`
 - Publishing an auto-drafted entry is the approval.
+- Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
 ## Every endpoint
 
@@ -326,9 +388,11 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /skills` | Skills with evidence | public |
 | `GET /achievements` | Certifications and awards | public |
 | `GET /metrics` | Curated numbers | public |
-| `GET /cv` | CV — view and download | public |
-| `POST /cv/generate` | CV — view and download | public |
-| `GET /cv/documents/{id}` | CV — view and download | public |
+| `GET /cv/options` | CV — the options, view and download | public |
+| `GET /cv` | CV — the options, view and download | public |
+| `POST /cv/generate` | CV — the options, view and download | public |
+| `GET /cv/documents/{id}` | CV — the options, view and download | public |
+| `GET /cv/uploads/{id}` | CV — the options, view and download | public |
 | `POST /inquiries` | Contact — send an inquiry | public |
 | `GET /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
 | `POST /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
@@ -337,6 +401,8 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/auth/login` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/verify-2fa` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/change-password` | Admin sign-in (password + 2FA) | admin |
+| `GET /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
+| `POST /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
 | `GET /admin/overview` | Admin dashboard | admin |
 | `GET /admin/systems` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems` | Systems — curate, publish, feature | admin |
@@ -347,6 +413,8 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/systems/{id}/impacts` | Systems — curate, publish, feature | admin |
 | `PATCH /admin/impacts/{id}` | Systems — curate, publish, feature | admin |
 | `DELETE /admin/impacts/{id}` | Systems — curate, publish, feature | admin |
+| `GET /admin/systems/{id}/revisions` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/revisions/{revisionId}/restore` | Systems — curate, publish, feature | admin |
 | `GET /admin/organizations` | Organizations | admin |
 | `POST /admin/organizations` | Organizations | admin |
 | `PATCH /admin/organizations/{id}` | Organizations | admin |
@@ -356,20 +424,26 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/timeline` | Journey — entries and approvals | admin |
 | `PATCH /admin/timeline/{id}` | Journey — entries and approvals | admin |
 | `DELETE /admin/timeline/{id}` | Journey — entries and approvals | admin |
-| `GET /admin/cv/experience` | CV content, completeness and history | admin |
-| `POST /admin/cv/experience` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/experience/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/experience/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/education` | CV content, completeness and history | admin |
-| `POST /admin/cv/education` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/education/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/education/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/skills` | CV content, completeness and history | admin |
-| `POST /admin/cv/skills` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/skills/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/skills/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/check` | CV content, completeness and history | admin |
-| `GET /admin/cv/documents` | CV content, completeness and history | admin |
+| `GET /admin/cv/experience` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/experience` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/experience/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/experience/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/education` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/education` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/education/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/education/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/skills` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/skills` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/skills/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/skills/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/check` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/documents` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/uploads` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/uploads` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/uploads/{id}` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/uploads/{id}/restore` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/options` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/options` | CV content, options, uploads, completeness and history | admin |
 | `GET /admin/profile` | Profile, links and achievements | admin |
 | `PATCH /admin/profile` | Profile, links and achievements | admin |
 | `POST /admin/profile/links` | Profile, links and achievements | admin |
@@ -394,4 +468,6 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/settings/lenses` | Platform settings, feature flags, visitor lenses | admin |
 | `PATCH /admin/settings/lenses/{id}` | Platform settings, feature flags, visitor lenses | admin |
 | `GET /admin/activity-log` | Audit trail | admin |
+| `GET /admin/freshness` | Freshness nudges | admin |
+| `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
 | `GET /admin/jobs` | Job runs | admin |

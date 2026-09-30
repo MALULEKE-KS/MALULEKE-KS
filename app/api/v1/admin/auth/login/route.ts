@@ -8,9 +8,14 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { AdminLoginInputSchema } from "@/lib/schemas";
 import { logActivity } from "@/lib/auth/activity-log";
+import { crossSiteRefusal } from "@/lib/security/csrf";
 
 const MAX_FAILED_ATTEMPTS = 5; // BR-3.2
-const LOCKOUT_MS = 14 * 60 * 1000; // Design System §5's own stated example
+const LOCKOUT_MS = 14 * 60 * 1000; // Design System §5's own stated example — the first lockout
+// BR-3.2 — each consecutive lockout (no successful login in between) doubles
+// the next, up to a day: a flat lockout would hand out fresh guesses forever.
+const MAX_LOCKOUT_MS = 24 * 60 * 60 * 1000;
+const lockoutMs = (previousLockouts: number) => Math.min(LOCKOUT_MS * 2 ** previousLockouts, MAX_LOCKOUT_MS);
 const CHALLENGE_TTL_MS = 5 * 60 * 1000; // BR-3.5
 
 // A bcrypt hash (cost 12, same as real passwords) of random bytes nobody
@@ -29,6 +34,10 @@ function hashToken(rawToken: string): string {
 }
 
 export async function POST(request: Request) {
+  // BR-3.9 — login can't be driven from another site either.
+  const refusal = crossSiteRefusal(request);
+  if (refusal) return refusal;
+
   const body = await request.json().catch(() => null);
   const parsed = AdminLoginInputSchema.safeParse(body);
   if (!parsed.success) {
@@ -61,35 +70,36 @@ export async function POST(request: Request) {
     // Atomic increment (BR-3.2): the database adds 1 in a single statement,
     // so simultaneous wrong guesses can't each read the same count and slip
     // past the lockout, as a read-then-write would allow.
-    const { failedLoginCount } = await db.adminUser.update({
+    const { failedLoginCount, lockoutCount } = await db.adminUser.update({
       where: { id: admin.id },
       data: { failedLoginCount: { increment: 1 } },
-      select: { failedLoginCount: true },
+      select: { failedLoginCount: true, lockoutCount: true },
     });
     const lockingNow = failedLoginCount >= MAX_FAILED_ATTEMPTS;
+    const lockedUntil = new Date(Date.now() + lockoutMs(lockoutCount));
     if (lockingNow) {
       await db.adminUser.update({
         where: { id: admin.id },
-        data: { failedLoginCount: 0, lockedUntil: new Date(Date.now() + LOCKOUT_MS) },
+        data: { failedLoginCount: 0, lockedUntil, lockoutCount: { increment: 1 } },
       });
     }
     await logActivity({ adminUserId: admin.id, action: "auth.login_failed", request });
 
     if (lockingNow) {
       return errorResponse("ACCOUNT_LOCKED", "Too many attempts. Try again later.", 401, {
-        lockedUntil: new Date(Date.now() + LOCKOUT_MS).toISOString(),
+        lockedUntil: lockedUntil.toISOString(),
       });
     }
-    return errorResponse("UNAUTHORIZED", "Email or password is incorrect.", 401, {
-      failedAttempts: failedLoginCount,
-    });
+    // Exactly the unknown-email response: nothing (not even an attempt count)
+    // may reveal that this email is the admin's.
+    return errorResponse("UNAUTHORIZED", "Email or password is incorrect.", 401);
   }
 
   // Credentials correct — reset the failure counter, but do NOT issue a
   // session yet (BR-3.1). Issue a short-lived challenge instead.
   await db.adminUser.update({
     where: { id: admin.id },
-    data: { failedLoginCount: 0, lockedUntil: null },
+    data: { failedLoginCount: 0, lockedUntil: null, lockoutCount: 0 },
   });
 
   const rawToken = randomBytes(32).toString("base64url");
