@@ -759,6 +759,40 @@ model MetricSnapshot {
 
 // ============================================================
 // PUBLIC VIEWS (F1.7) — the only shape public pages read
+
+// #92 — a CV file the owner uploads, offered to visitors beside the generated
+// CV (BR-7.1). Versions are superseded, never deleted or altered (BR-7.2,
+// enforced by a trigger and the runtime role's grants). One current per format.
+model CvUpload {
+  id           String    @id @default(cuid())
+  format       String // "pdf" | "docx" — checked by content on upload (BR-7.6)
+  fileName     String // as uploaded; shown in the admin only
+  byteSize     Int
+  sha256       String
+  fileData     Bytes
+  uploadedAt   DateTime  @default(now()) @db.Timestamptz(3)
+  supersededAt DateTime? @db.Timestamptz(3) // null = current for its format
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([format, uploadedAt(sort: Desc)])
+}
+
+// #92 / BR-7.5 — which CV options visitors see and in what order; labels are
+// data. One row (id 1). The database refuses hiding both, listing a hidden
+// option first, or hiding the generated CV before any upload exists.
+model CvOptions {
+  id             Int      @id @default(1)
+  showGenerated  Boolean  @default(true)
+  showUploaded   Boolean  @default(true)
+  firstOption    String   @default("generated") // "generated" | "uploaded"
+  generatedLabel String   @default("Generated CV")
+  generatedNote  String   @default("Built from this site's live data at the moment you download it.")
+  uploadedLabel  String   @default("Uploaded CV")
+  uploadedNote   String   @default("A CV file uploaded as-is, shown with its upload date.")
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
 // ============================================================
 // Created in SQL (migration 20260919070000_public_views_search_metrics).
 // Every masking and visibility rule is applied inside the view, so a public
@@ -917,4 +951,23 @@ view PublicMetric {
   value       Float
   approvedAt  DateTime
   sortOrder   Int
+}
+
+// #92 — the CV options a visitor can choose, visible ones only (BR-7.5).
+view PublicCvOption {
+  kind       String    @unique // "generated" | "uploaded"
+  label      String
+  note       String
+  isFirst    Boolean
+  formats    String[]
+  uploadedAt DateTime? // uploaded option only
+}
+
+// #92 — current files of a visible upload option; nothing else is reachable.
+view PublicCvUpload {
+  id         String   @unique
+  format     String
+  byteSize   Int
+  uploadedAt DateTime
+  fileData   Bytes
 }

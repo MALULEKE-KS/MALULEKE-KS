@@ -6,8 +6,11 @@
 
 import { NextResponse } from "next/server";
 import { buildCvModel } from "@/lib/cv/model";
+import { cvOptionNotOffered, isCvOptionOffered } from "@/lib/cv/options";
 
 export async function GET(request: Request) {
+  // BR-7.5 — a hidden option is refused, not just unlisted (#92).
+  if (!(await isCvOptionOffered("generated"))) return cvOptionNotOffered();
   const url = new URL(request.url);
   const targetRole = url.searchParams.get("targetRole")?.trim().slice(0, 100) || null;
   const model = await buildCvModel({ targetRole, siteUrl: url.origin });

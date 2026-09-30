@@ -36,7 +36,7 @@ describe("platform_public — public pages see the masked views and nothing else
     for (const view of [
       "PublicSystem", "PublicImpact", "PublicTestimonial", "PublicTimeline", "PublicEducation",
       "PublicExperience", "PublicAchievement", "PublicOrganization", "PublicLedger", "PublicProfile",
-      "PublicProfileLink", "PublicMetric", "SkillEvidence",
+      "PublicProfileLink", "PublicMetric", "SkillEvidence", "PublicCvOption", "PublicCvUpload",
     ]) {
       expect(await asRole("platform_public", `SELECT * FROM "${view}" LIMIT 1`), view).toBe("ok");
     }
@@ -47,7 +47,7 @@ describe("platform_public — public pages see the masked views and nothing else
   });
 
   it("can't read a raw table — not inquiries, admins, systems, the audit log or settings", async () => {
-    for (const table of ["Inquiry", "AdminUser", "System", "ActivityLog", "PlatformSetting", "DocumentGen", "Profile", "SystemPace"]) {
+    for (const table of ["Inquiry", "AdminUser", "System", "ActivityLog", "PlatformSetting", "DocumentGen", "Profile", "SystemPace", "CvUpload", "CvOptions"]) {
       expect(await asRole("platform_public", `SELECT * FROM "${table}" LIMIT 1`), table).toMatch(DENIED);
     }
   });
@@ -90,6 +90,8 @@ describe("platform_runtime — the application changes rows, never structure", (
     expect(await asRole("platform_runtime", `DELETE FROM "System" WHERE false`)).toMatch(DENIED);
     expect(await asRole("platform_runtime", `DELETE FROM "DocumentGen" WHERE false`)).toMatch(DENIED);
     expect(await asRole("platform_runtime", `DELETE FROM "MetricSnapshot" WHERE false`)).toMatch(DENIED);
+    expect(await asRole("platform_runtime", `DELETE FROM "CvUpload" WHERE false`)).toMatch(DENIED); // #92, BR-7.2
+    expect(await asRole("platform_runtime", `DELETE FROM "CvOptions" WHERE false`)).toMatch(DENIED); // #92, one row
     expect(await asRole("platform_runtime", `SELECT * FROM "_prisma_migrations"`)).toMatch(DENIED);
   });
 

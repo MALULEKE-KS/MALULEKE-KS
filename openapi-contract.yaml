@@ -566,6 +566,7 @@ paths:
                   generatedAt: { type: string, format: date-time }
                   format: { $ref: "#/components/schemas/CvFormat" }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: "The generated CV option is hidden by the admin (BR-7.5)", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
         "429":
           description: Rate limited
           content:
@@ -1142,13 +1143,39 @@ paths:
   /metrics:
     get: { tags: [Metrics (Public)], summary: List approved public metrics, responses: { "200": { description: Approved metrics } } }
   /cv:
-    get: { tags: [CV], summary: Get the public CV model, responses: { "200": { description: CV model }, "400": { $ref: "#/components/responses/BadRequest" } } }
+    get: { tags: [CV], summary: Get the generated CV as data, description: "The generated CV option's model (BR-7.1). 404 while the admin hides that option (BR-7.5).", responses: { "200": { description: CV model }, "400": { $ref: "#/components/responses/BadRequest" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /cv/documents/{id}:
     get:
       tags: [CV]
       summary: Download a generated CV document
+      description: "404 for an unknown id, or while the admin hides the generated option (BR-7.5)."
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "200": { description: Document bytes }, "404": { $ref: "#/components/responses/NotFound" } }
+      responses: { "200": { description: Document bytes (attachment, nosniff) }, "404": { $ref: "#/components/responses/NotFound" } }
+  /cv/options:
+    get:
+      tags: [CV]
+      summary: List the CV options a visitor can choose (#92)
+      description: >
+        The CV generated from live data and the owner's uploaded CV, each only
+        while the admin shows it, the admin's chosen one first, each clearly
+        labelled (BR-7.1, BR-7.5). The uploaded option lists its current files
+        (one per format) with their upload date.
+      responses:
+        "200":
+          description: Visible options
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  options: { type: array, items: { $ref: "#/components/schemas/CvOption" } }
+  /cv/uploads/{id}:
+    get:
+      tags: [CV]
+      summary: Download the owner's uploaded CV (#92)
+      description: "Only a current file of a visible upload option; a superseded or hidden one is a 404 (BR-7.2, BR-7.5). Always an attachment, never sniffed (BR-7.6). Rate-limited (cv.download.rateLimit.*)."
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: File bytes (application/pdf or Word), attachment }, "404": { $ref: "#/components/responses/NotFound" }, "429": { description: Rate limited, content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } } }
   /systems/{slug}/related:
     get:
       tags: [Systems (Public)]
@@ -1173,6 +1200,27 @@ paths:
     delete: { tags: [Systems (Admin)], summary: Delete an impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "204": { description: Deleted }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/cv/documents:
     get: { tags: [CV (Admin)], summary: List generated CV documents, security: [{ adminSession: [] }], responses: { "200": { description: Document history }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/cv/uploads:
+    get: { tags: [CV (Admin)], summary: List every uploaded CV version (#92), security: [{ adminSession: [] }], responses: { "200": { description: "{ versions: CvUploadVersion[] } — newest first per format", content: { application/json: { schema: { type: object, properties: { versions: { type: array, items: { $ref: "#/components/schemas/CvUploadVersion" } } } } } } }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [CV (Admin)]
+      summary: Upload the owner's CV (PDF or Word) — becomes current for its format (#92)
+      description: >
+        multipart/form-data with one field "file". Accepted only if its content
+        is a PDF or a macro-free Word document, whatever its name (BR-7.6), and
+        within cv.upload.maxMegabytes. The previous current file of that format
+        is superseded, never deleted (BR-7.2). Uploading the current file again
+        changes nothing (200).
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } } } } }
+      responses: { "201": { description: New current version, content: { application/json: { schema: { $ref: "#/components/schemas/CvUploadVersion" } } } }, "200": { description: Already the current file — nothing changed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "413": { description: Larger than the upload limit }, "415": { description: "UNSUPPORTED_FILE — not a PDF or Word document, or a Word file with macros" } }
+  /admin/cv/uploads/{id}:
+    get: { tags: [CV (Admin)], summary: Download any uploaded CV version, current or superseded, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: File bytes (attachment, nosniff) }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/cv/uploads/{id}/restore:
+    post: { tags: [CV (Admin)], summary: Make an earlier uploaded version current again (BR-7.2), security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Restored version, content: { application/json: { schema: { $ref: "#/components/schemas/CvUploadVersion" } } } }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/cv/options:
+    get: { tags: [CV (Admin)], summary: Get which CV options visitors see (#92), security: [{ adminSession: [] }], responses: { "200": { description: CV options, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptions" } } } }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    patch: { tags: [CV (Admin)], summary: "Show or hide each CV option, choose the first, edit labels (BR-7.5)", description: "The database refuses hiding both, a hidden first option, and hiding the generated CV before any upload exists — 400 in the rule's words.", security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptionsUpdateInput" } } } }, responses: { "200": { description: Updated, content: { application/json: { schema: { $ref: "#/components/schemas/CvOptions" } } } }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
   /admin/metrics:
     get: { tags: [Metrics (Admin)], summary: List metrics, current values, proposals and history, security: [{ adminSession: [] }], responses: { "200": { description: Metrics }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Metrics (Admin)], summary: Define a metric, security: [{ adminSession: [] }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MetricInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
@@ -1259,6 +1307,55 @@ components:
       required: [value]
       properties:
         value: { type: number }
+    CvOption:
+      type: object
+      description: "One CV option a visitor can choose (#92). generated → call generate; uploaded → download a file."
+      required: [kind, label, note, formats]
+      properties:
+        kind: { type: string, enum: [generated, uploaded] }
+        label: { type: string }
+        note: { type: string }
+        formats: { type: array, items: { type: string, enum: [pdf, docx] } }
+        generate: { type: object, description: "generated only", properties: { method: { type: string, enum: [POST] }, url: { type: string } } }
+        uploadedAt: { type: string, format: date-time, nullable: true, description: "uploaded only — the newest current file" }
+        files:
+          type: array
+          description: uploaded only
+          items: { type: object, properties: { format: { type: string, enum: [pdf, docx] }, byteSize: { type: integer }, uploadedAt: { type: string, format: date-time }, url: { type: string } } }
+    CvUploadVersion:
+      type: object
+      properties:
+        id: { type: string }
+        format: { type: string, enum: [pdf, docx] }
+        fileName: { type: string, description: As uploaded — admin only }
+        byteSize: { type: integer }
+        sha256: { type: string }
+        uploadedAt: { type: string, format: date-time }
+        supersededAt: { type: string, format: date-time, nullable: true }
+        current: { type: boolean }
+    CvOptions:
+      type: object
+      properties:
+        showGenerated: { type: boolean }
+        showUploaded: { type: boolean }
+        firstOption: { type: string, enum: [generated, uploaded] }
+        generatedLabel: { type: string, maxLength: 60 }
+        generatedNote: { type: string, maxLength: 200 }
+        uploadedLabel: { type: string, maxLength: 60 }
+        uploadedNote: { type: string, maxLength: 200 }
+        updatedAt: { type: string, format: date-time }
+    CvOptionsUpdateInput:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        showGenerated: { type: boolean }
+        showUploaded: { type: boolean }
+        firstOption: { type: string, enum: [generated, uploaded] }
+        generatedLabel: { type: string, minLength: 1, maxLength: 60 }
+        generatedNote: { type: string, maxLength: 200 }
+        uploadedLabel: { type: string, minLength: 1, maxLength: 60 }
+        uploadedNote: { type: string, maxLength: 200 }
     ErrorResponse:
       type: object
       required: [error]

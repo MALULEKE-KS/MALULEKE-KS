@@ -92,10 +92,12 @@
 
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| BR-7.1 | Generated from live data at generation time | `lib/cv/model.ts` builds from the public views on every request; `POST /cv/generate` (#74) | ✅ | App | — |
-| BR-7.2 | Prior documents superseded, not deleted | `lib/rules/cv.ts` (per format, #74); trigger `DocumentGen_br_7_2_no_delete` — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
+| BR-7.1 | Two labelled CVs: generated from live data at request time, or the owner's uploaded file with its date | Generated: `lib/cv/model.ts` builds from the public views on every request; `POST /cv/generate` (#74). Both: `GET /cv/options` lists each with its label, note and (uploaded) date, from view `PublicCvOption` (#92); tested | ✅ | App + DB view | — |
+| BR-7.2 | Prior documents and uploads superseded, not deleted; an upload can't be altered | Generated: `lib/rules/cv.ts` (per format, #74); trigger `DocumentGen_br_7_2_no_delete` (F1.2, #60). Uploads: trigger `CvUpload_br_7_2` refuses altering, deleting or truncating a version; partial unique index keeps one current per format; the runtime role has no DELETE (#92); tested | ✅ | App + DB triggers + grants | — |
 | BR-7.3 | The CV shows only what the site shows, and never invents | Reads `PublicSystem`/`PublicExperience`/`PublicEducation`/`PublicAchievement`/`PublicProfile*` only; completeness check reports gaps, suggested summary is offered not saved (#74); tested incl. hidden roles, drafts, excluded projects | ✅ | DB views + App | — |
 | BR-7.4 | ATS-safe, identical PDF and Word | Shared model + formatting; PDF: text operators asserted (a blank render fails), hyphenation off; DOCX: real headings and hyperlinks, asserted table-free (#74) | ✅ | App | — |
+| BR-7.5 | Admin chooses which CV options show; never none; a hidden option is refused everywhere | `CvOptions` (one row): CHECKs + trigger `CvOptions_br_7_5` (never both hidden, first is visible, generated hidden only once an upload exists). Views `PublicCvOption`/`PublicCvUpload` expose visible options only; `GET /cv`, `POST /cv/generate` and `GET /cv/documents/{id}` refuse while the generated option is hidden; `withAdmin` answers refusals as 400 (#92); tested | ✅ | DB CHECK + trigger + views + App | — |
+| BR-7.6 | Uploads are real PDF/Word files within the size limit, served only as attachments | `lib/cv/uploads.ts` checks content (PDF header + EOF; DOCX: well-formed ZIP with `word/document.xml`, no `vbaProject.bin`); `cv.upload.maxMegabytes` setting capped at 4 (Vercel's 4.5 MB body limit), checked before the body is read; CHECK on format and size; downloads `attachment` + `nosniff` + rate limit `cv.download.rateLimit.*` (#92); tested | ✅ | App + DB CHECK | — |
 
 ## 8. Extension governance (BR-8.x) & Constitution
 

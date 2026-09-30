@@ -4,11 +4,21 @@
 // Real PDF generation (BR-7.1) and supersede behavior (BR-7.2) against the
 // real database. No admin session needed — this is the public download flow.
 
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { POST as generateCv } from "@/app/api/v1/cv/generate/route";
 import { GET as downloadCv } from "@/app/api/v1/cv/documents/[id]/route";
 import { db } from "@/lib/db";
+import { holdCvOptionsLock } from "../helpers/cv-options-lock";
+
+// Downloads the generated CV, so it must not overlap a test that hides it (#92).
+let releaseCvOptionsLock: (() => Promise<void>) | undefined;
+beforeAll(async () => {
+  releaseCvOptionsLock = await holdCvOptionsLock("shared");
+}, 10 * 60_000);
+afterAll(async () => {
+  await releaseCvOptionsLock?.();
+});
 
 const createdDocumentIds: string[] = [];
 

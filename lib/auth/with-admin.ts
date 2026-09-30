@@ -14,7 +14,7 @@ import { ruleViolation } from "@/lib/db-errors";
 
 // Rules the database enforces the same way for every content type: a refusal
 // is a bad request, answered in the rule's own words wherever it happens.
-const RULES_ANSWERED_AS_400 = ["BR-1.13"];
+const RULES_ANSWERED_AS_400 = ["BR-1.13", "BR-7.5"];
 
 export interface AdminContext {
   adminUserId: string;

@@ -102,13 +102,17 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /achievements`
 - systemSlug links an achievement to its case study when present.
 
-**CV — view and download** — On-screen CV, target-role box, Download PDF / Word
+**CV — the options, view and download** — CV options (GET /cv/options), in the order given, each with its label and note; the uploaded one shows its upload date; On-screen CV, target-role box, Download PDF / Word — only while the generated option is listed
 
+- Call `GET /cv/options`
 - Call `GET /cv`
 - Call `POST /cv/generate`
 - Call `GET /cv/documents/{id}`
-- Render GET /cv exactly — it's the same model the files come from.
-- POST /cv/generate returns a fileUrl; navigate to it to download. 429 = rate-limited.
+- Call `GET /cv/uploads/{id}`
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
 ### /journey
 
@@ -167,7 +171,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/cv
 
-**CV content, completeness and history** — Experience, Education, Skills tabs; Completeness panel (score, issues, suggested summary, preview by target role); Generated documents
+**CV content, options, uploads, completeness and history** — Experience, Education, Skills tabs; Completeness panel (score, issues, suggested summary, preview by target role); Generated documents; Uploaded CV: upload (PDF/Word), versions with download and make-current; What visitors can download: show/hide each option, which is first, labels and notes
 
 - Call `GET /admin/cv/experience`
 - Call `POST /admin/cv/experience`
@@ -183,6 +187,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `DELETE /admin/cv/skills/{id}`
 - Call `GET /admin/cv/check`
 - Call `GET /admin/cv/documents`
+- Call `GET /admin/cv/uploads`
+- Call `POST /admin/cv/uploads`
+- Call `GET /admin/cv/uploads/{id}`
+- Call `POST /admin/cv/uploads/{id}/restore`
+- Call `GET /admin/cv/options`
+- Call `PATCH /admin/cv/options`
+- Upload is multipart/form-data, field "file". 415 = not a PDF/Word file (or has macros), 413 = over cv.upload.maxMegabytes; show the message.
+- CV options: show the database's BR-7.5 message on a 400 (e.g. hiding the generated CV before any upload).
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
@@ -331,9 +343,11 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /skills` | Skills with evidence | public |
 | `GET /achievements` | Certifications and awards | public |
 | `GET /metrics` | Curated numbers | public |
-| `GET /cv` | CV — view and download | public |
-| `POST /cv/generate` | CV — view and download | public |
-| `GET /cv/documents/{id}` | CV — view and download | public |
+| `GET /cv/options` | CV — the options, view and download | public |
+| `GET /cv` | CV — the options, view and download | public |
+| `POST /cv/generate` | CV — the options, view and download | public |
+| `GET /cv/documents/{id}` | CV — the options, view and download | public |
+| `GET /cv/uploads/{id}` | CV — the options, view and download | public |
 | `POST /inquiries` | Contact — send an inquiry | public |
 | `GET /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
 | `POST /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
@@ -361,20 +375,26 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/timeline` | Journey — entries and approvals | admin |
 | `PATCH /admin/timeline/{id}` | Journey — entries and approvals | admin |
 | `DELETE /admin/timeline/{id}` | Journey — entries and approvals | admin |
-| `GET /admin/cv/experience` | CV content, completeness and history | admin |
-| `POST /admin/cv/experience` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/experience/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/experience/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/education` | CV content, completeness and history | admin |
-| `POST /admin/cv/education` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/education/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/education/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/skills` | CV content, completeness and history | admin |
-| `POST /admin/cv/skills` | CV content, completeness and history | admin |
-| `PATCH /admin/cv/skills/{id}` | CV content, completeness and history | admin |
-| `DELETE /admin/cv/skills/{id}` | CV content, completeness and history | admin |
-| `GET /admin/cv/check` | CV content, completeness and history | admin |
-| `GET /admin/cv/documents` | CV content, completeness and history | admin |
+| `GET /admin/cv/experience` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/experience` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/experience/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/experience/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/education` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/education` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/education/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/education/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/skills` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/skills` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/skills/{id}` | CV content, options, uploads, completeness and history | admin |
+| `DELETE /admin/cv/skills/{id}` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/check` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/documents` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/uploads` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/uploads` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/uploads/{id}` | CV content, options, uploads, completeness and history | admin |
+| `POST /admin/cv/uploads/{id}/restore` | CV content, options, uploads, completeness and history | admin |
+| `GET /admin/cv/options` | CV content, options, uploads, completeness and history | admin |
+| `PATCH /admin/cv/options` | CV content, options, uploads, completeness and history | admin |
 | `GET /admin/profile` | Profile, links and achievements | admin |
 | `PATCH /admin/profile` | Profile, links and achievements | admin |
 | `POST /admin/profile/links` | Profile, links and achievements | admin |

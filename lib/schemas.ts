@@ -618,6 +618,24 @@ export const AchievementInputSchema = z.object({
   sortOrder: z.number().int().min(0).default(0),
 });
 
+// #92 / BR-7.5 — which CV options visitors see, in what order, with what
+// labels. The database refuses hiding both, a hidden first option, and hiding
+// the generated CV before any upload exists.
+const CvOptionLabelSchema = z.string().trim().min(1).max(60);
+const CvOptionNoteSchema = z.string().trim().max(200);
+export const CvOptionsUpdateInputSchema = z
+  .object({
+    showGenerated: z.boolean().optional(),
+    showUploaded: z.boolean().optional(),
+    firstOption: z.enum(["generated", "uploaded"]).optional(),
+    generatedLabel: CvOptionLabelSchema.optional(),
+    generatedNote: CvOptionNoteSchema.optional(),
+    uploadedLabel: CvOptionLabelSchema.optional(),
+    uploadedNote: CvOptionNoteSchema.optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, { message: "Nothing to update" });
+
 export const CvCheckQuerySchema = z.object({
   targetRole: z.string().trim().max(100).optional(),
 });

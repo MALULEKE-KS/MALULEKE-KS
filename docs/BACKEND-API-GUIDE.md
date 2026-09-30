@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**24 capabilities · 80 endpoints.**
+**24 capabilities · 88 endpoints.**
 
 ## Public
 
@@ -210,20 +210,24 @@ The admin-approved statistics ("By the numbers"). A computed or entered value is
 
 - Show approvedAt as "as of" — these are point-in-time figures.
 
-### CV — view and download
+### CV — the options, view and download
 
 `cv` · public
 
-The CV as data (for on-screen rendering) and as generated PDF or Word files, identical in content, ATS-safe, optionally tailored to a target role.
+Two clearly labelled CV options (#92): the CV generated from live data — as data for on-screen rendering and as identical ATS-safe PDF or Word files, optionally tailored to a target role — and the owner's uploaded CV file. Each is offered only while the admin shows it.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
+- `GET /cv/options`
 - `GET /cv`
 - `POST /cv/generate`
 - `GET /cv/documents/{id}`
+- `GET /cv/uploads/{id}`
 
 **Database**
 
+- `PublicCvOption`
+- `PublicCvUpload`
 - `PublicExperience`
 - `PublicEducation`
 - `PublicAchievement`
@@ -233,12 +237,14 @@ The CV as data (for on-screen rendering) and as generated PDF or Word files, ide
 - `DocumentGen`
 - `rate_limit_hit`
 
-**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4
+**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-7.5, BR-7.6
 
 **Notes**
 
-- Render GET /cv exactly — it's the same model the files come from.
-- POST /cv/generate returns a fileUrl; navigate to it to download. 429 = rate-limited.
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
 ### Contact — send an inquiry
 
@@ -454,11 +460,11 @@ Write journey entries, and approve the ones the database drafts when a system fi
 - Publishing an auto-drafted entry is the approval.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
-### CV content, completeness and history
+### CV content, options, uploads, completeness and history
 
 `admin.cv` · admin
 
-Roles (with CV bullets, show/hide), education (expected graduation, coursework), skills; the completeness report with a suggested summary; every generated document.
+Roles (with CV bullets, show/hide), education (expected graduation, coursework), skills; the owner's uploaded CV (versions, restore) and which CV options visitors see (#92); the completeness report with a suggested summary; every generated document.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -476,6 +482,12 @@ Roles (with CV bullets, show/hide), education (expected graduation, coursework),
 - `DELETE /admin/cv/skills/{id}`
 - `GET /admin/cv/check`
 - `GET /admin/cv/documents`
+- `GET /admin/cv/uploads`
+- `POST /admin/cv/uploads`
+- `GET /admin/cv/uploads/{id}`
+- `POST /admin/cv/uploads/{id}/restore`
+- `GET /admin/cv/options`
+- `PATCH /admin/cv/options`
 
 **Database**
 
@@ -485,11 +497,15 @@ Roles (with CV bullets, show/hide), education (expected graduation, coursework),
 - `SkillOnExperience`
 - `SkillOnEducation`
 - `DocumentGen`
+- `CvUpload`
+- `CvOptions`
 
-**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-1.13
+**Rules:** BR-7.1, BR-7.2, BR-7.3, BR-7.4, BR-7.5, BR-7.6, BR-1.13
 
 **Notes**
 
+- Upload is multipart/form-data, field "file". 415 = not a PDF/Word file (or has macros), 413 = over cv.upload.maxMegabytes; show the message.
+- CV options: show the database's BR-7.5 message on a 400 (e.g. hiding the generated CV before any upload).
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
@@ -626,6 +642,8 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `ActivityLog` | admin.auth, admin.overview, admin.audit |
 | `AdminUser` | admin.auth |
 | `approve_metric_snapshot` | admin.metrics |
+| `CvOptions` | admin.cv |
+| `CvUpload` | admin.cv |
 | `DocumentGen` | cv, admin.cv |
 | `Domain` | systems.catalog, lookups |
 | `Education` | admin.cv |
@@ -645,6 +663,8 @@ Every scheduled or on-demand job run — status, duration, summary, error.
 | `ProfileLink` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `PublicAchievement` | achievements, cv |
+| `PublicCvOption` | cv |
+| `PublicCvUpload` | cv |
 | `PublicEducation` | cv |
 | `PublicExperience` | cv |
 | `PublicImpact` | systems.caseStudy |

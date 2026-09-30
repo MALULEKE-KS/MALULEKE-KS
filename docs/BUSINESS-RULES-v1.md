@@ -92,10 +92,12 @@
 
 | Rule | Statement |
 |---|---|
-| BR-7.1 | Every `DocumentGen` output reflects the live database state at generation time — never a manually maintained static file drifting out of sync |
-| BR-7.2 | Prior generated documents are superseded, not deleted, when a new one is generated for the same `type`/`targetRole`/`format` (PDF or Word) — consistent with the platform's additive-only philosophy (EXT-1) |
+| BR-7.1 | Visitors are offered up to two CVs, each clearly labelled and never passed off as the other: the **generated CV**, built from the live database at the moment it's requested, never a stale copy; and the **uploaded CV**, the owner's own file exactly as uploaded, always shown with its upload date. *(Replaced 2026-09-30, #92: the rule used to forbid any manually maintained file. The owner wants their own CV offered too, so the rule now keeps each option honest instead of forbidding one.)* |
+| BR-7.2 | Prior documents are superseded, never deleted: a generated document when a new one is generated for the same `type`/`targetRole`/`format` (PDF or Word), and an uploaded CV when a new file of the same format is uploaded. An uploaded version's content can never be altered, and an earlier version can be made current again. Consistent with the platform's additive-only philosophy (EXT-1) |
 | BR-7.3 | The CV carries only what the site itself shows: published roles, education, projects and certifications, with every BR-1.x masking applied, plus the owner's profile. It never invents content — a missing fact is reported by the completeness check for the owner to supply, and a suggested summary is drafted only from facts already on the CV and saved only if the owner accepts it |
 | BR-7.4 | The CV is generated ATS-safe, identically as PDF and Word: one column, standard section headings, real text in reading order (no tables, columns or images carrying content), no hyphenation, and every link written out as text. A target role may reorder projects, bullets and skills by relevance; it never rewrites or drops the owner's words |
+| BR-7.5 | The admin decides which CV options visitors see and which is listed first. At least one option is always visible, the first one is always a visible one, and the generated CV can't be hidden until an uploaded CV exists — a visitor is never left without a CV. A hidden option is refused everywhere (listing, on-screen view, generating, downloading), not merely left out of a list |
+| BR-7.6 | An uploaded CV is accepted only if its content really is a PDF or a macro-free Word (.docx) document — its name and declared type are never trusted — and it is within the admin-set size limit (never above what the platform can receive). It is always served as a download (an attachment, with content sniffing off), never rendered inline, and downloads are rate-limited |
 
 ## 8. Extension Governance
 

@@ -22,6 +22,17 @@ import { buildCvModel } from "@/lib/cv/model";
 import { generateCvDocument } from "@/lib/cv/generate";
 import { db } from "@/lib/db";
 import { createSessionCookieValue } from "@/lib/auth/session";
+import { holdCvOptionsLock } from "../helpers/cv-options-lock";
+
+// Downloads the generated CV, so it must not overlap a test that hides it (#92).
+let releaseCvOptionsLock: (() => Promise<void>) | undefined;
+beforeAll(async () => {
+  releaseCvOptionsLock = await holdCvOptionsLock("shared");
+}, 10 * 60_000);
+afterAll(async () => {
+  await releaseCvOptionsLock?.();
+});
+
 
 const RUN = `cv${Date.now().toString(36)}`;
 const SITE = "https://portfolio.example";
