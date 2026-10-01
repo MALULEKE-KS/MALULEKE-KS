@@ -9,7 +9,6 @@ import { ArrowRight, Clock, Mail, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
-import { SocialLinks } from "@/components/shared/SocialLinks";
 import type { InquiryTypeOption, SiteProfile } from "@/lib/queries/site";
 
 interface ContactBandProps {
@@ -20,7 +19,7 @@ interface ContactBandProps {
 
 export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBandProps) {
   return (
-    <section aria-labelledby="contact-title" className="bg-paper py-20 md:py-28">
+    <section aria-labelledby="contact-title" className="bg-paper overflow-x-clip py-20 md:py-28">
       <Container>
         <Reveal>
           <div className="border-ink/10 bg-night-deep text-paper shadow-lift relative isolate overflow-hidden rounded-3xl border px-6 py-14 md:px-14 md:py-20">
@@ -78,8 +77,7 @@ export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBa
                     </li>
                   ))}
                 </ul>
-                <p className="text-mist mt-10 text-sm">Or find me on</p>
-                <SocialLinks links={profile.links} email={profile.email} className="mt-4" />
+                {/* The social links live in the footer, one screen below — not repeated here (no duplicates). */}
               </div>
             </div>
           </div>

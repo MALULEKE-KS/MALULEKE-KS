@@ -83,7 +83,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           >
             Skip to content
           </a>
-          <SiteHeader />
+          <SiteHeader links={profile.links} email={profile.email} reviewSlaHours={reviewSlaHours} />
           <main id="main" className="flex-1">
             {children}
           </main>

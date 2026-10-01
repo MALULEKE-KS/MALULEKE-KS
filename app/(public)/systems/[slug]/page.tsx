@@ -41,6 +41,26 @@ import { publicSlugRedirect } from "@/lib/queries/systems";
 import { getSiteProfile } from "@/lib/queries/site";
 import { siteUrl } from "@/lib/site-url";
 
+/** The write-up's sections, numbered — in the side panel on desktop, above the article on a phone. */
+function SectionIndex({ sections, className }: { sections: { id: string; title: string }[]; className?: string }) {
+  if (sections.length < 2) return null;
+  return (
+    <nav aria-label="On this page" className={className}>
+      <p className="text-slate font-mono text-xs">On this page</p>
+      <ol className="mt-3 space-y-1">
+        {sections.map((s, i) => (
+          <li key={s.id}>
+            <a href={`#${s.id}`} className="text-ink hover:text-accent group flex min-h-9 items-center gap-2.5 text-sm transition-colors lg:min-h-0">
+              <span className="type-data text-slate group-hover:text-accent text-[11px]">{String(i + 1).padStart(2, "0")}</span>
+              {s.title}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
 interface SystemDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -198,15 +218,16 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
             )}
             {cs.writeUp?.source === "case-study" && (
               <div className={system.screenshotUrl || system.liveUrl ? "mt-12" : undefined}>
+                <SectionIndex sections={sections} className="border-ink/10 bg-sheet mb-8 rounded-2xl border p-5 lg:hidden" />
                 {cs.writeUp.byAi && (
                   // BR-4.5 — AI-written words are always labelled, with where they came from.
-                  <p className="border-ink/10 bg-sheet text-slate mb-8 inline-flex flex-wrap items-center gap-2 rounded-full border px-3 py-1.5 text-xs">
-                    <Sparkles aria-hidden="true" className="text-accent size-3.5" />
+                  <p className="border-ink/10 bg-sheet text-slate mb-8 flex items-start gap-2 rounded-2xl border px-3 py-2 text-xs sm:inline-flex sm:items-center sm:rounded-full sm:py-1.5">
+                    <Sparkles aria-hidden="true" className="text-accent mt-px size-3.5 shrink-0 sm:mt-0" />
                     <span>
                       Written by AI from {repo ? <a href={repo.url} target="_blank" rel="noopener noreferrer" className="text-ink underline-offset-2 hover:underline">the repository</a> : "the repository"}
                       {cs.writeUp.writtenAgo && ` · updated ${cs.writeUp.writtenAgo}`}
                     </span>
-                    <span className="border-ember/30 bg-ember/10 text-accent rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+                    <span className="border-ember/30 bg-ember/10 text-accent shrink-0 rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
                   </p>
                 )}
                 <Prose markdown={cs.writeUp.markdown} />
@@ -233,21 +254,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
           <aside className="lg:col-span-4" aria-labelledby="glance-title">
             <div className="border-ink/10 bg-sheet shadow-soft rounded-3xl border p-6 lg:sticky lg:top-24">
-              {sections.length > 1 && (
-                <nav aria-label="On this page" className="border-ink/10 mb-6 border-b pb-5">
-                  <p className="text-slate font-mono text-xs">On this page</p>
-                  <ol className="mt-3 space-y-1.5">
-                    {sections.map((s, i) => (
-                      <li key={s.id}>
-                        <a href={`#${s.id}`} className="text-ink hover:text-accent group flex items-baseline gap-2.5 text-sm transition-colors">
-                          <span className="type-data text-slate group-hover:text-accent text-[11px]">{String(i + 1).padStart(2, "0")}</span>
-                          {s.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ol>
-                </nav>
-              )}
+              <SectionIndex sections={sections} className="border-ink/10 mb-6 hidden border-b pb-5 lg:block" />
               <h2 id="glance-title" className="text-slate inline-flex items-center gap-2 text-xs font-medium">
                 <Boxes aria-hidden="true" className="text-accent size-4" />
                 At a glance

@@ -3,7 +3,8 @@
 // nav in the middle, instant search (⌘K) and the one contact entry, Let's
 // talk, on the right. HeaderFrame turns it from a full-width bar at the top
 // of the page into a single glass capsule once you scroll. Contact is not a
-// nav item: Let's talk is the way in.
+// nav item: Let's talk is the way in. Below lg the nav becomes MobileMenu, at
+// the far right where a thumb expects it.
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -11,8 +12,10 @@ import { BrandMark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
 import { HeaderFrame } from "@/components/shared/HeaderFrame";
+import { MobileMenu } from "@/components/shared/MobileMenu";
+import type { SiteLink } from "@/lib/queries/site";
 
-export function SiteHeader() {
+export function SiteHeader({ links, email, reviewSlaHours }: { links: SiteLink[]; email: string | null; reviewSlaHours: number }) {
   return (
     <HeaderFrame>
       <Link
@@ -26,7 +29,7 @@ export function SiteHeader() {
 
       <NavLinks />
 
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="ms-auto flex shrink-0 items-center gap-1.5 lg:ms-0">
         <SearchPalette />
         <Link
           href="/contact"
@@ -35,6 +38,7 @@ export function SiteHeader() {
           Let&rsquo;s talk
           <ArrowUpRight aria-hidden="true" className="size-4" />
         </Link>
+        <MobileMenu links={links} email={email} reviewSlaHours={reviewSlaHours} />
       </div>
     </HeaderFrame>
   );

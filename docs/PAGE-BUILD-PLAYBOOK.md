@@ -12,6 +12,7 @@ It sits under the governing documents: DESIGN-SYSTEM.md wins on visuals, BUSINES
 
 | Rule | What it means in practice | Where it came from |
 |---|---|---|
+| **Mobile by default** | Every page is designed for a phone first and widened for desktop — never a desktop page squeezed down. A section is not done until it reads, taps and fits at 360 and 390 px. `tests/e2e/mobile.spec.ts` fails the build if any page is wider than the screen. | Owner, 2026-10-01: *"mobile responsiveness should be default by design"* — the live home page measured 811 px wide on a 390 px phone. |
 | **Evidence, not claims** | Say less and show more. A statement is a fact the page proves (live counts, real systems, commits), never a boast. | Hero brief: *"I don't rush in claiming things but I make a good first impression."* |
 | **No duplicates** | Nothing appears twice in one view or one page — not with the header, the footer or another section. Before adding anything, ask *"is this already on the page?"* | Hero's second Let's talk; floating AI button on home; mission repeated in the footer; "Where the code lives" twice. |
 | **Nothing hardcoded** | Copy is a content block, tunables are settings, growing lists are lookups. UI micro-labels ("Try asking") may live in code; statements about the owner never do. | CLAUDE.md, EXT-1. |
@@ -47,7 +48,8 @@ The page never invents a shape; it reads public views.
 
 ### Stage 2 — Structure
 
-1. List the sections: **purpose → data source → one action**. Example (home): hero → AI guide → selected work → system map → control room → method → let's talk.
+1. **Sketch the phone layout first** (one column, the order a thumb scrolls), then decide what widens into columns at `md`/`lg`. Hover-only ideas need a tap or always-visible equivalent; copy never says "hover".
+2. List the sections: **purpose → data source → one action**. Example (home): hero → AI guide → selected work → system map → control room → method → let's talk.
 2. **Alternate bands** dark (`bg-night-deep` / `hero-field`) and light (`bg-paper`) so each section reads as its own space; a hairline or glow marks special bands (the AI band).
 3. Each section has **one** primary action; the header's Let's talk is the site-wide contact — don't repeat it near the top.
 4. Check the duplicates rule against the header, the footer and the other sections **before** building.
@@ -86,12 +88,14 @@ Order of sources (CLAUDE.md): **this codebase → shadcn/ui → Magic UI → 21s
 - Server component for the page and data; client components only where interaction needs them.
 - Type system (`app/globals.css`): `type-display` (H1), `type-h2`, `type-lede`, `type-eyebrow`, `type-accent`, `type-data`.
 - Layout: `Container`, `SectionHeader` (tone light/dark, one action), `Reveal` / `BlurFade` for entrance.
+- **Mobile-safe grids:** every grid gets `grid-cols-1` before its breakpoint columns, and every grid or flex child that holds text gets `min-w-0` — otherwise a long line stretches the column past the screen (the home page's 811 px bug). Decorative glows sit in a section with `overflow-hidden` or `overflow-x-clip`. Tap targets are at least 40 px; text at least 12 px.
 - One moment of motion per card/section; decorative motion pauses off screen.
 
 ### Stage 6 — Verify (every time, before showing the owner)
 
 1. `npx tsc --noEmit` · `npx eslint <changed files>` · `npx vitest run` for the affected unit and integration tests, plus `capability-coverage` and `db-roles` when data changed · `npm run docs:capabilities`.
 2. Server render check: `curl -s localhost:3000/<page>` and grep for the section titles.
+3. **Phone check:** `npx playwright test tests/e2e/mobile.spec.ts` (every public page at 360 and 390 px, plus the phone menu) — add the page to its list when it's new — and look at full-page phone screenshots section by section (headless, never the owner's Chrome).
 3. Browser review in the owner's **already-open Chrome** (Claude in Chrome): screenshots need the tab in front — open a fresh tab if the owner is on another; measurements and DOM checks work through `javascript_tool` in the background; a mobile check loads the page in a 390 px `iframe` and looks for horizontal overflow.
 4. The **audit checklist** (§7) before calling the page done.
 
@@ -186,8 +190,10 @@ The AI guide is site-wide: every page can hand it a question (`useGuide().ask(..
 - Count running animations (`document.getAnimations().length`) and glass layers; apply §5.
 - Canvases and loops pause off screen.
 
-**Mobile**
-- Load at 390 px: no horizontal overflow; hero no taller than necessary; touch-only fallbacks for hover effects.
+**Mobile (first, not last)**
+- `tests/e2e/mobile.spec.ts` passes for the page at 360 and 390 px — no element wider than the screen.
+- Screenshots at 390 px reviewed section by section: one column reads in order, nothing cramped or cut off, the hero no taller than it needs to be, no copy that says "hover", hover effects have a tap or always-visible equivalent, tap targets ≥ 40 px, text ≥ 12 px.
+- Fixed and floating things (header, phone menu, AI launcher, consent banner) don't cover the content a visitor needs.
 
 **SEO and sharing**
 - Page `title` and a **specific** meta description from its own content (≤160 chars), Open Graph and Twitter description, canonical URL, JSON-LD where it applies.
@@ -210,6 +216,7 @@ The AI guide is site-wide: every page can hand it a question (`useGuide().ask(..
 | 21st.dev MCP quota (2/day) | Use the site's Copy prompt → Claude Code allowance first. |
 | Imported components that animate state every frame | Refs and transforms; loops only while visible. |
 | Showing internals to visitors | Ask "who is this for?" of every label. |
+| Designing on desktop and checking phones at the end | Phone layout first (Stage 2), `mobile.spec.ts` in Stage 6. A grid item without `min-w-0` made the live home page 811 px wide on a phone; a fixed header then centred on that wider page. |
 | Warping a flat drawing to fake a 3D turn | Subtle rigid motion only; real turns are the 3D model (ROADMAP-V2 #1). |
 
 ---
@@ -272,7 +279,7 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 
 | Section | Components | Data |
 |---|---|---|
-| Header | `SiteHeader`, `HeaderFrame`, `NavLinks`, `SearchPalette` | sheets, search |
+| Header | `SiteHeader`, `HeaderFrame`, `NavLinks` (desktop), `MobileMenu` (full-screen phone menu), `SearchPalette` | sheets, search, profile links |
 | Hero | `HomeHero`, `HeroGuide` (rig + Flickering Grid), Number Ticker | `home-intro` block, titles, PublicLedger |
 | AI guide | `AiGuideSection` (Magic Card, Border Beam, Typing, Shiny Text, Blur Fade), `GuidePanel` | `ai-guide` block, lenses, flags, GitHub repo count |
 | Selected work | `WorkShowcase` (Magic Card, Lens, Animated List, Sparkline, Tech chips, Project Showcase) | `lib/queries/work.ts` |

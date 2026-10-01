@@ -60,7 +60,7 @@ function FeaturedCard({ w }: { w: Work }) {
           <SystemPreviewFrame screenshotUrl={w.screenshotUrl} liveUrl={w.liveUrl} name={w.name} />
         </Lens>
 
-        <div className="mt-6 grid flex-1 gap-6 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="mt-6 grid flex-1 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_auto]">
           <div className="min-w-0">
             <h3 className="text-ink text-2xl font-semibold tracking-tight md:text-[1.75rem]">{w.name}</h3>
             <p className="text-slate mt-2 max-w-xl leading-relaxed">{w.description}</p>
@@ -226,11 +226,11 @@ export function WorkShowcase({ work, nowBuilding, totalPublished }: SelectedWork
           />
         </Reveal>
 
-        <div className="grid gap-5 lg:grid-cols-12">
-          <Reveal className="lg:col-span-8">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <Reveal className="min-w-0 lg:col-span-8">
             <FeaturedCard w={featured} />
           </Reveal>
-          <Reveal className="lg:col-span-4" delay={100}>
+          <Reveal className="min-w-0 lg:col-span-4" delay={100}>
             {nowBuilding ? <NowBuildingCard now={nowBuilding} /> : side ? <CompactCard w={side} /> : null}
           </Reveal>
         </div>
