@@ -99,14 +99,20 @@ async function main() {
   // for logins that don't slugify to the same string as the Organization's
   // own slug. github-sync.ts checks this list before falling back to
   // slugify(login) === Organization.slug.
+  // Each organisation's kind (personal / venture / client) is a lookup the
+  // migrations install (OrganizationKind, F5c). It's set when the seed creates
+  // the organisation — on a fresh database the migrations run before any
+  // organisation exists, so they can't assign it themselves. Existing rows are
+  // left as the owner edited them.
+  const kinds = new Map((await prisma.organizationKind.findMany()).map((k) => [k.key, k.id]));
   await Promise.all(
     [
-      { name: "KSDRILL-SA", slug: "ksdrill-sa", role: "Founder & Principal Engineer", isClient: false, githubLogins: ["KSDRILL-SA"] },
-      { name: "GrowthCore Solutions", slug: "growthcore-solutions", role: "Co-founder", isClient: false, githubLogins: ["GrowthCore-Solutions"] },
-      { name: "Sunduza Architectural & Projects (Pty) Ltd", slug: "sunduza", role: null, isClient: true, githubLogins: [] },
-      { name: "MALULEKE-KS", slug: "personal", role: null, isClient: false, githubLogins: ["MALULEKE-KS"] },
-    ].map((o) =>
-      prisma.organization.upsert({ where: { slug: o.slug }, update: {}, create: o })
+      { name: "KSDRILL-SA", slug: "ksdrill-sa", role: "Founder & Principal Engineer", isClient: false, githubLogins: ["KSDRILL-SA"], kind: "venture" },
+      { name: "GrowthCore Solutions", slug: "growthcore-solutions", role: "Co-founder", isClient: false, githubLogins: ["GrowthCore-Solutions"], kind: "venture" },
+      { name: "Sunduza Architectural & Projects (Pty) Ltd", slug: "sunduza", role: null, isClient: true, githubLogins: [], kind: "client" },
+      { name: "MALULEKE-KS", slug: "personal", role: null, isClient: false, githubLogins: ["MALULEKE-KS"], kind: "personal" },
+    ].map(({ kind, ...o }) =>
+      prisma.organization.upsert({ where: { slug: o.slug }, update: {}, create: { ...o, kindId: kinds.get(kind) ?? null } })
     )
   );
 
