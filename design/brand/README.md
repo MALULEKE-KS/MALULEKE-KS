@@ -1,13 +1,14 @@
-# The K-S mark — Stencil, Graphite
+# The K-S mark — Stencil, Graphite; the logo is the K-S Cube
 
-Owner-approved on 2026-10-01 (direction 05 of five, round two). Rules for use: `docs/DESIGN-SYSTEM.md` §6c.
+Owner-approved on 2026-10-01 (direction 05 of five, round two); the cube (round three) is the logo, locked the same day. Rules for use: `docs/DESIGN-SYSTEM.md` §6c.
 
 | File | What it is |
 |---|---|
 | `ks-stencil-3d.html` | The interactive 3D piece and the construction drawing — open it in a browser. One geometry drives the flat mark and the 3D piece. `#bg=rrggbb` in the address sets the ground (used to render stills). |
 | `ks-3d-graphite.png` | The 3D piece, Graphite finish, transparent — matted from renders on black and on white (exact alpha, soft edges). Web copy: `public/brand/ks-3d-graphite.webp` (the 404 page). |
 | `ks-3d-graphite-og.png` | The 3D piece at share-image size, read by `lib/og.tsx` (bundled with the share-image functions via `next.config.ts`). |
-| `ks-icon-512.png` | The browser-tab icon (`app/icon.svg`) at 512 px. |
+| `ks-icon-512.png` | The first browser-tab icon (stencil on graphite) at 512 px — superseded by the cube. |
+| `ks-cube-3d.png` | **The K-S Cube** (the logo, locked 2026-10-01), rendered in 3D and matted transparent: clear glass, light liquid gel 70% full, the solid K-S at its surface. Rendered from `ks-cube-3d.html` (the interactive cube — open it in a browser) with `#shot&solo`. Web copy `public/brand/ks-cube-3d.webp` (404); `ks-cube-3d-og.png` (share images, bundled via `next.config.ts`); `app/apple-icon.png` (home screens). The live logo is `CubeMark` in `components/shared/BrandMark.tsx`. |
 
 ## The geometry (64-unit grid, y down)
 

@@ -83,7 +83,7 @@ All of it renders the final state under `prefers-reduced-motion: reduce`.
 - **shadcn/ui:** `button`, `input`, `card`, `badge`, `tooltip`, `separator` — restyled to these tokens.
 - **Magic UI** (shadcn registry): `number-ticker`, `border-beam`, `dot-pattern` in use; chosen for the redesign — `animated-beam`, `orbiting-circles`, `bento-grid`, `magic-card`, `animated-list`, `flickering-grid`, `noise-texture`, `blur-fade`, `safari` / `iphone` mockups, `shimmer-button` (the one primary CTA). Adapted: real server values, reduced motion, content visible without JavaScript.
 - **21st.dev**: *Dithered Footer* (the footer's wordmark band) and *Message Thread* (the AI guide's chat) — converted to these tokens and fonts (never their bundled fonts or colours). The header follows the floating-pill navbar pattern. Full list and reasons: PUBLIC-REDESIGN-PLAN §7a.
-- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `BrandMark` + `Wordmark` (§6c), `HeaderFrame` + `NavLinks` (floating header), `DitheredWordmark`, and the admin kit (`components/admin/ui.tsx`).
+- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `CubeMark`, `BrandMark` + `Wordmark` (§6c), `HeaderFrame` + `NavLinks` (floating header), `DitheredWordmark`, and the admin kit (`components/admin/ui.tsx`).
 
 ### 6a. Header and footer (F5c, amended 2026-09-30)
 
@@ -94,12 +94,13 @@ All of it renders the final state under `prefers-reduced-motion: reduce`.
 
 Engineered letters with the joints showing: the K's arms stand apart from its stem by a stencil gap, the S is two geometric bowls cut at the spine (a stencil bridge), and the hyphen is one **International Orange block** — the only colour in the mark. Drawn on a 64-unit grid (letters 34 units tall); the source, the 3D piece and the construction drawing are in `design/brand/`.
 
-- **Flat mark** (`BrandMark`, letters in `currentColor`): header, phone menu, footer, admin, sign-in. `cut="heavy"` (wider gaps, a larger block) at 24 px and below so the stencil still reads.
-- **Wordmark:** MALULEKE-KS in Plex Mono with the hyphen in ember (`Wordmark`).
-- **Icons:** `app/icon.svg` (heavy cut on a graphite tile) and `app/apple-icon.png` (full-bleed for home screens).
-- **3D piece** (Graphite: satin graphite letters, bevelled edges, the orange block): only where it can be the moment — the share image (`lib/og.tsx`) and the 404 page. Never in running UI.
-- **Motion:** the header mark assembles once on first paint (the pieces slide together by a hair, the block lands last); the 404 piece drifts slowly. Nothing else moves; reduced motion shows the mark at rest.
-- Don't recolour the letters other than graphite or bone, don't outline it, don't put anything between the K, the block and the S.
+- **The logo — the K-S Cube** (`CubeMark`; owner-approved and locked 2026-10-01): the heavy-cut K-S as a solid (CSS 3D slices, shaded through their depth) floating in a rounded graphite glass tile, 70% full of a light liquid gel with a far and a near surface. **Shown alone — no name beside it**, in the header and the phone menu, at every screen size. It works at any size (container units).
+  - **Motion, one 10 s cycle:** the K-S rests facing you, then makes one turn through the gel and settles with a small overshoot; the gel tilts against the turn and a ripple spreads as it settles. Hover, focus or tap: it turns to greet you. The surface drifts, the letters bob, a few bubbles rise. Reduced motion: all still, facing you. CSS only — no WebGL in running UI.
+- **Flat mark** (`BrandMark`, letters in `currentColor`): footer, admin, sign-in. `cut="heavy"` (wider gaps, a larger block) at 24 px and below so the stencil still reads.
+- **Wordmark:** MALULEKE-KS in Plex Mono with the hyphen in ember (`Wordmark`) — footer and share images; never beside the logo in the header.
+- **Icons:** `app/icon.svg` is the cube **drawn for 16–32 px** (the gel as one flat band, the stencil large) — at tab size the glass and gel would smudge; `app/apple-icon.png` is the rendered 3D cube on graphite (home screens).
+- **The rendered cube** (`design/brand/ks-cube-3d.png`, from the interactive 3D file): the share image (`lib/og.tsx`), the 404 page and the home-screen icon.
+- Don't recolour the letters other than bone (graphite on light grounds), don't outline it, don't put anything between the K, the block and the S, and don't put orange anywhere in the cube but the block.
 
 ### 6b. The AI guide (F5c)
 

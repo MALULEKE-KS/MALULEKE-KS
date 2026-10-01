@@ -1,0 +1,342 @@
+<title>K-S Cube</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital@1&display=swap">
+<style>
+/* Layout: a dark specimen sheet for one object — the cube as the opening plate, then its two forms side by side, then where each is used. */
+:root {
+  --night-deep: #0b0c0e;
+  --paper: #f4f2ee;
+  --ink: #121417;
+  --ember: #ff5b1f;
+  --bg: #0d0f12;
+  --surface: #15181c;
+  --fg: #f4f2ee;
+  --muted: #a3a9b1;
+  --rule: rgb(255 255 255 / 0.08);
+  --accent-text: #ff7a45;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --serif: "IBM Plex Serif", Georgia, serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { --bg: #f4f2ee; --surface: #fcfbf9; --fg: #121417; --muted: #4b5159; --rule: rgb(18 20 23 / 0.1); --accent-text: #c2410c; color-scheme: light; }
+}
+:root[data-theme="light"] { --bg: #f4f2ee; --surface: #fcfbf9; --fg: #121417; --muted: #4b5159; --rule: rgb(18 20 23 / 0.1); --accent-text: #c2410c; color-scheme: light; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.6; margin: 0; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.top { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; }
+.top h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1; font-weight: 600; margin-top: 8px; }
+.top h1 em { font-family: var(--serif); font-weight: 400; color: var(--ember); }
+.top .lede { max-width: 54ch; color: var(--muted); }
+
+.plate { margin-top: 28px; position: relative; border-radius: 28px; overflow: hidden; background: #0c0d10; aspect-ratio: 16 / 10; max-height: 680px; width: 100%; }
+.plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.plate canvas:active { cursor: grabbing; }
+.plate .hint { position: absolute; left: 18px; bottom: 14px; z-index: 2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: #a3a9b1; }
+.plate .fallback[hidden] { display: none; }
+.plate .fallback { position: absolute; inset: 0; display: grid; place-items: center; color: #a3a9b1; font-size: 14px; }
+.controls { position: absolute; right: 14px; top: 14px; z-index: 2; display: flex; gap: 6px; flex-wrap: wrap; justify-content: end; }
+.controls button { font: 500 12px var(--sans); color: #f4f2ee; background: rgb(255 255 255 / 0.06); border: 1px solid rgb(255 255 255 / 0.12); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.controls button[aria-pressed="true"] { background: #f4f2ee; color: #121417; border-color: #f4f2ee; }
+
+section.block { margin-top: 60px; }
+.block-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.block-head h2 { font-size: clamp(24px, 3.6vw, 34px); font-weight: 600; }
+.block-head .tag { font-family: var(--serif); font-style: italic; color: var(--muted); font-size: 17px; }
+.block p.idea { max-width: 66ch; color: var(--muted); margin-top: 10px; }
+.block p.idea b { color: var(--fg); font-weight: 600; }
+
+.forms { margin-top: 22px; display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.form { border-radius: 22px; background: var(--surface); border: 1px solid var(--rule); padding: 22px; display: grid; gap: 16px; align-content: start; }
+.form h3 { font-size: 18px; font-weight: 600; }
+.form p { color: var(--muted); font-size: 14px; }
+.row { display: flex; align-items: end; gap: 18px; flex-wrap: wrap; }
+.row figure { margin: 0; display: grid; justify-items: center; gap: 6px; }
+.row figcaption { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.bar { border-radius: 16px; background: var(--night-deep); color: var(--paper); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lock { display: flex; align-items: center; gap: 10px; }
+.lock svg { height: 22px; width: auto; }
+.word { font-family: var(--mono); font-weight: 500; font-size: 13px; white-space: nowrap; }
+.word i { font-style: normal; color: var(--ember); }
+.pill { font-size: 12px; border-radius: 999px; padding: 5px 11px; background: var(--ember); color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+.where { margin-top: 22px; display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.where div { border-top: 2px solid var(--rule); padding-top: 10px; font-size: 14px; }
+.where h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+.next { margin-top: 60px; border-radius: 24px; background: var(--surface); border: 1px solid var(--rule); padding: 26px; display: grid; gap: 10px; }
+.next h2 { font-size: 24px; font-weight: 600; }
+.next ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--muted); }
+.next ol b { color: var(--fg); }
+:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .forms, .where { grid-template-columns: minmax(0, 1fr); }
+  .plate { aspect-ratio: 4 / 5; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">MALULEKE-KS · brand mark · round three</p>
+      <h1>K-S <em>Cube.</em></h1>
+    </div>
+    <p class="lede">The stencil K-S floating in a clear glass cube, 70% full of a light liquid gel whose surface never quite stops moving — a system that's sealed, exact and running. Turn it: the letters turn with the glass.</p>
+  </header>
+
+  <div class="plate" id="plate">
+    <div class="fallback" id="fallback">The 3D cube needs WebGL — the flat forms below show the same mark.</div>
+    <canvas id="stage" role="img" aria-label="The K-S mark as a 3D object: a clear rounded glass cube, 70% full of a light liquid gel; the stencil K and S float at its surface and turn with the cube. It turns slowly; drag to turn it."></canvas>
+    <div class="controls" role="group" aria-label="Options">
+      <button type="button" data-opt="block" aria-pressed="true">Orange hyphen</button>
+      <button type="button" data-opt="still" aria-pressed="false">Still</button>
+    </div>
+    <p class="hint">DRAG TO TURN · 3D</p>
+  </div>
+
+  <section class="block" aria-labelledby="h-forms">
+    <div class="block-head"><h2 id="h-forms">Two forms of one mark</h2><span class="tag">rich where it's seen, crisp where it's small</span></div>
+    <p class="idea">Glass and liquid can't survive 16 pixels. So the cube is the <b>full form</b> — share images, the 404, the home-screen icon — and the stencil stays the <b>flat form</b> in the header and the tab, sitting in the cube's rounded square so the two are plainly one mark.</p>
+    <div class="forms">
+      <div class="form">
+        <h3>The cube — full form</h3>
+        <p>As an app icon: the cube's face, the light gel filling it to 70%, the K-S at its surface.</p>
+        <div class="row" id="icons"></div>
+      </div>
+      <div class="form">
+        <h3>The stencil — flat form</h3>
+        <p>In the header and the browser tab: the stencil in the cube's rounded square, heavy cut for small sizes.</p>
+        <div class="row" id="flat"></div>
+        <div class="bar"><div class="lock" id="lock"></div><span class="pill">Let's talk ↗</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="h-where">
+    <div class="block-head"><h2 id="h-where">Where each lives</h2></div>
+    <div class="where">
+      <div><h3>The cube</h3>The image shown when a link is shared, the 404 page, the phone's home-screen icon — and, if it earns it, a still on the about page.</div>
+      <div><h3>The flat mark</h3>Header, phone menu, footer, admin, browser tab — everywhere the mark is small or repeated.</div>
+      <div><h3>Motion</h3>The gel's surface swells softly and the letters bob on it — calm, never sloshing. Reduced motion: it holds still.</div>
+    </div>
+  </section>
+
+  <section class="next" aria-labelledby="h-next">
+    <h2 id="h-next">Your call</h2>
+    <ol>
+      <li><b>Approve the cube</b>, or tune it: the glass, the gel's tint, how high the letters ride, how much it moves.</li>
+      <li><b>The orange hyphen:</b> keep it between the K and S, or leave the letters bone-white only (toggle above).</li>
+      <li>Then it ships in one release: renders for the share image, 404 and home-screen icon; the flat mark everywhere else.</li>
+    </ol>
+  </section>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module">
+// ─── The approved stencil geometry (64-unit grid, y down) — the same numbers as the site's mark ───
+const EMBER = "#ff5b1f";
+const D = Math.PI / 180;
+const arcPts = (cx, cy, r, a0, a1, n = 40) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * (i / n)) * D; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; });
+const bowl = (cx, cy, ro, ri, a0, a1) => [...arcPts(cx, cy, ro, a0, a1), ...arcPts(cx, cy, ri, a1, a0)];
+function pieces(heavy = false) {
+  const g = heavy ? 3.4 : 2.6, cut = heavy ? 13 : 8, b = heavy ? 6.4 : 5.2, sw = 6.6, x0 = 6 + sw + g;
+  return {
+    stem: [[6, 15], [6 + sw, 15], [6 + sw, 49], [6, 49]],
+    arm: [[x0, 30.3], [x0 + 7.8, 15], [x0 + 15, 15], [x0 + 7.2, 30.3]],
+    leg: [[x0, 33.7], [x0 + 7.2, 33.7], [x0 + 15, 49], [x0 + 7.8, 49]],
+    block: [[35 - b / 2, 32 - b / 2], [35 + b / 2, 32 - b / 2], [35 + b / 2, 32 + b / 2], [35 - b / 2, 32 + b / 2]],
+    sTop: bowl(50.4, 25.1, 10.1, 3.7, -40, -270 + cut),
+    sBottom: bowl(50.4, 38.9, 10.1, 3.7, -90 + cut, 140),
+  };
+}
+const toPath = (pts) => "M" + pts.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join("L") + "Z";
+const letters = (p) => ["stem", "arm", "leg", "sTop", "sBottom"].map((k) => `<path d="${toPath(p[k])}"/>`).join("");
+
+// ─── Flat forms ───
+function stencil(color, heavy, size, viewBox = "4 13 58.5 38") {
+  const p = pieces(heavy);
+  return `<svg viewBox="${viewBox}" ${size ? `height="${size}"` : ""} aria-hidden="true"><g fill="${color}">${letters(p)}</g><path d="${toPath(p.block)}" fill="${EMBER}"/></svg>`;
+}
+// The cube's face: a rounded graphite square, a light gel filling it to 70%, the K-S at the surface.
+function cubeIcon(size, label) {
+  const p = pieces(true);
+  const id = "c" + size;
+  return `<svg viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="${label}">
+    <defs>
+      <linearGradient id="glass${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f37"/><stop offset="1" stop-color="#121418"/></linearGradient>
+      <linearGradient id="gel${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe8f2" stop-opacity="0.34"/><stop offset="1" stop-color="#9fb3c8" stop-opacity="0.12"/></linearGradient>
+      <linearGradient id="rim${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.3"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.12"/></linearGradient>
+      <clipPath id="clip${id}"><rect width="64" height="64" rx="15"/></clipPath>
+    </defs>
+    <rect width="64" height="64" rx="15" fill="url(#glass${id})"/>
+    <g clip-path="url(#clip${id})">
+      <path d="M0 21.5 C 14 18.6, 26 24.2, 40 21.2 S 58 19.4, 64 20.6 V64 H0Z" fill="url(#gel${id})"/>
+      <path d="M0 21.5 C 14 18.6, 26 24.2, 40 21.2 S 58 19.4, 64 20.6" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="0.9"/>
+    </g>
+    <g transform="translate(7.2 13.6) scale(0.86) translate(-4 -13)"><g fill="#f4f2ee">${letters(p)}</g><path d="${toPath(p.block)}" fill="${EMBER}"/></g>
+    <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="14.3" fill="none" stroke="url(#rim${id})" stroke-width="1.5"/>
+  </svg>`;
+}
+function framedStencil(size) {
+  const p = pieces(true);
+  return `<svg viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true"><rect x="1.5" y="1.5" width="61" height="61" rx="15" fill="#121417" stroke="#3a3f47" stroke-width="2"/><g transform="translate(7.2 15.6) scale(0.86) translate(-4 -13)"><g fill="#f4f2ee">${letters(p)}</g><path d="${toPath(p.block)}" fill="${EMBER}"/></g></svg>`;
+}
+document.getElementById("icons").innerHTML = [120, 64, 32].map((s) => `<figure>${cubeIcon(s, `The cube icon at ${s} pixels`)}<figcaption>${s}px</figcaption></figure>`).join("");
+document.getElementById("flat").innerHTML = [48, 24, 16].map((s) => `<figure>${framedStencil(s)}<figcaption>${s}px</figcaption></figure>`).join("") + `<figure>${stencil("#f4f2ee", false, 28)}<figcaption>stencil alone</figcaption></figure>`;
+document.getElementById("lock").innerHTML = framedStencil(26) + `<span class="word">MALULEKE<i>-</i>KS</span>`;
+
+// ─── The cube in 3D: a clear glass shell, 70% full of a light liquid gel, the K-S floating at its surface ───
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const canvas = document.getElementById("stage");
+const plate = document.getElementById("plate");
+const bg = (location.hash.match(/bg=([0-9a-f]{6})/i) || [])[1] || "0c0d10";
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+document.getElementById("fallback").hidden = true;
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+renderer.setClearColor(new THREE.Color("#" + bg), 1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(30, 1, 1, 2000);
+camera.position.set(0, 0, 262);
+scene.add(new THREE.HemisphereLight(0xe8eef6, 0x0b0c0e, 0.5));
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-60, 110, 140); scene.add(key);
+const rim = new THREE.DirectionalLight(0xbcd2ff, 0.7); rim.position.set(90, 20, -100); scene.add(rim);
+
+// A soft backdrop far behind, so the glass and the liquid have something to bend.
+const tex = (() => {
+  const c = document.createElement("canvas"); c.width = c.height = 512;
+  const g = c.getContext("2d");
+  const grad = g.createRadialGradient(256, 220, 10, 256, 256, 300);
+  grad.addColorStop(0, "#2b3038"); grad.addColorStop(0.5, "#171a1f"); grad.addColorStop(1, "#0c0d10");
+  g.fillStyle = grad; g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = "rgba(255,255,255,0.045)";
+  for (let i = 0; i <= 512; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(512, i); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshBasicMaterial({ map: tex }));
+backdrop.position.z = -260;
+scene.add(backdrop);
+// #solo: the cube alone (asset renders) — no backdrop, held still.
+const solo = location.hash.includes("solo");
+if (solo) backdrop.visible = false;
+
+// Everything lives in one group, so glass, liquid and letters turn together.
+const group = new THREE.Group();
+scene.add(group);
+
+// The glass: a clear, reflective shell (back and front faces), so the liquid inside can refract.
+const SIZE = 84;
+const shellGeo = new RoundedBoxGeometry(SIZE, SIZE, SIZE, 10, 16);
+const shellMat = (side, opacity) => new THREE.MeshPhysicalMaterial({ color: 0xdfe6ee, metalness: 0, roughness: 0.03, transparent: true, opacity, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.1, side, depthWrite: false });
+group.add(new THREE.Mesh(shellGeo, shellMat(THREE.BackSide, 0.1)));
+const front = new THREE.Mesh(shellGeo, shellMat(THREE.FrontSide, 0.16));
+front.renderOrder = 2;
+group.add(front);
+
+// The liquid gel: 70% full, light and clear, its surface always moving a little.
+const INNER = SIZE - 6, FILL = 0.7, LH = INNER * FILL;
+const liquidGeo = new RoundedBoxGeometry(INNER, LH, INNER, 12, 12);
+liquidGeo.translate(0, -INNER / 2 + LH / 2, 0);
+const top = -INNER / 2 + LH;
+const lbase = liquidGeo.attributes.position.array.slice();
+const liquidMat = new THREE.MeshPhysicalMaterial({
+  color: 0xf4f8fc, roughness: 0, transmission: 1, thickness: 18, ior: 1.33,
+  attenuationColor: new THREE.Color("#9fb3c8"), attenuationDistance: 260,
+  emissive: new THREE.Color("#2a3a4c"), emissiveIntensity: 0.55,
+  iridescence: 0.35, iridescenceIOR: 1.3, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 0.7, specularIntensity: 0.6,
+});
+group.add(new THREE.Mesh(liquidGeo, liquidMat));
+function ripple(t, calm) {
+  const a = liquidGeo.attributes.position.array;
+  for (let i = 0; i < a.length; i += 3) {
+    const x = lbase[i], y = lbase[i + 1], z = lbase[i + 2];
+    // Only the upper skin moves: a soft swell rolling across the surface.
+    const w = Math.max(0, (y - (top - 10)) / 10);
+    a[i + 1] = y + (calm ? 0 : w * (1.6 * Math.sin(x * 0.09 + t * 1.2) + 1.1 * Math.cos(z * 0.11 - t * 0.9)));
+  }
+  liquidGeo.attributes.position.needsUpdate = true;
+  liquidGeo.computeVertexNormals();
+}
+
+// The K-S, bright and floating at the surface: riding high, its lower part seen through the gel.
+const p = pieces();
+const kMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color("#f6f2ea"), roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.2, emissive: new THREE.Color("#6b6258"), emissiveIntensity: 0.4 });
+const blockMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(EMBER), roughness: 0.3, clearcoat: 0.6, emissive: new THREE.Color("#c2410c"), emissiveIntensity: 0.3 });
+const ks = new THREE.Group();
+const SCALE = 0.85;
+let block;
+for (const k of ["stem", "arm", "leg", "sTop", "sBottom", "block"]) {
+  const shape = new THREE.Shape(p[k].map(([x, y]) => new THREE.Vector2((x - 33.2) * SCALE, (32 - y) * SCALE)));
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: k === "block" ? 15 : 14, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 0.7, bevelSegments: 6, curveSegments: 24 });
+  geo.translate(0, 0, k === "block" ? -7.5 : -7);
+  const m = new THREE.Mesh(geo, k === "block" ? blockMat : kMat);
+  if (k === "block") block = m;
+  ks.add(m);
+}
+const FLOAT = top + 6;
+ks.position.y = FLOAT;
+group.add(ks);
+
+// Drag to turn the whole cube: glass, liquid and letters together.
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let still = reduced || solo, dragging = false, lx = 0, ly = 0, rotX = -0.12, rotY = 0.32;
+canvas.addEventListener("pointerdown", (e) => { dragging = true; lx = e.clientX; ly = e.clientY; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener("pointermove", (e) => {
+  if (!dragging) return;
+  rotY += ((e.clientX - lx) / canvas.clientWidth) * 3.2;
+  rotX = Math.max(-0.8, Math.min(0.8, rotX + ((e.clientY - ly) / canvas.clientHeight) * 2.4));
+  lx = e.clientX; ly = e.clientY;
+});
+const up = () => { dragging = false; };
+canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", up);
+document.querySelectorAll("[data-opt]").forEach((btn) => btn.addEventListener("click", () => {
+  const on = btn.getAttribute("aria-pressed") !== "true";
+  btn.setAttribute("aria-pressed", String(on));
+  if (btn.dataset.opt === "block") block.visible = on;
+  if (btn.dataset.opt === "still") still = on || reduced;
+}));
+
+function resize() {
+  const w = plate.clientWidth, h = plate.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.position.z = w / h < 1 ? 360 : 262;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(plate);
+resize();
+let visible = true;
+new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(plate);
+
+const clock = new THREE.Clock();
+let t = 0, frames = 0;
+// #shot: a render check renders a few frames, then stops.
+const shot = location.hash.includes("shot");
+renderer.setAnimationLoop(() => {
+  if (!visible) return;
+  if (shot && ++frames > 8) { renderer.setAnimationLoop(null); document.body.dataset.ready = "1"; return; }
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (!still) t += dt;
+  ripple(t, still);
+  // Floating: a slow bob and a slight rock, riding the swell.
+  ks.position.y = FLOAT + (still ? 0 : Math.sin(t * 0.9) * 1.4);
+  ks.rotation.z = still ? 0 : Math.sin(t * 0.7) * 0.025;
+  ks.rotation.x = still ? 0 : Math.cos(t * 0.6) * 0.03;
+  if (!dragging && !still) rotY += dt * 0.12;
+  group.rotation.set(rotX, rotY, 0);
+  renderer.render(scene, camera);
+});
+</script>

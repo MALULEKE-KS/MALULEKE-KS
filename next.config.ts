@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   // The share images draw the 3D K-S piece, read from disk at request time
   // (lib/og.tsx) — so it must travel with those functions on Vercel.
   outputFileTracingIncludes: {
-    "/opengraph-image": ["./design/brand/ks-3d-graphite-og.png"],
-    "/systems/[slug]/opengraph-image": ["./design/brand/ks-3d-graphite-og.png"],
+    "/opengraph-image": ["./design/brand/ks-cube-3d-og.png"],
+    "/systems/[slug]/opengraph-image": ["./design/brand/ks-cube-3d-og.png"],
   },
   // Renamed pages keep their old addresses working (F5c, D10).
   async redirects() {

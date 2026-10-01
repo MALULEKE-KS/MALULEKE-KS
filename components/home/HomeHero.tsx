@@ -10,8 +10,10 @@
 // computed per request from PublicLedger. Nothing invented, nothing in code.
 
 import Link from "next/link";
-import { ArrowRight, FileText, Workflow } from "lucide-react";
+import { ArrowRight, Building2, CalendarRange, FileText, Hammer, Hourglass, Rocket, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { MagicCard } from "@/components/ui/magic-card";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { Container } from "@/components/shared/Container";
 import { HeroGuide } from "@/components/home/HeroGuide";
@@ -44,11 +46,11 @@ export function HomeHero({ stats, profile, titles, intro, hasCv }: HomeHeroProps
   const headline = intro?.headline ?? profile.headline ?? profile.role;
 
   const ledger = [
-    { value: stats.yearsBuilding, label: stats.yearsBuilding === 1 ? "year building" : "years building" },
-    { value: stats.organizationsFounded, label: stats.organizationsFounded === 1 ? "organisation founded" : "organisations founded" },
-    { value: stats.systemsShipped, label: "systems shipped" },
-    ...(stats.systemsBuilding > 0 ? [{ value: stats.systemsBuilding, label: "in progress" }] : []),
-    ...(stats.systemsQueued > 0 ? [{ value: stats.systemsQueued, label: "queued" }] : []),
+    { value: stats.yearsBuilding, label: stats.yearsBuilding === 1 ? "year building" : "years building", icon: CalendarRange, live: false },
+    { value: stats.organizationsFounded, label: stats.organizationsFounded === 1 ? "organisation founded" : "organisations founded", icon: Building2, live: false },
+    { value: stats.systemsShipped, label: "systems shipped", icon: Rocket, live: false },
+    ...(stats.systemsBuilding > 0 ? [{ value: stats.systemsBuilding, label: "in progress", icon: Hammer, live: true }] : []),
+    ...(stats.systemsQueued > 0 ? [{ value: stats.systemsQueued, label: "queued", icon: Hourglass, live: false }] : []),
   ];
 
   return (
@@ -107,17 +109,42 @@ export function HomeHero({ stats, profile, titles, intro, hasCv }: HomeHeroProps
             </Button>
           </div>
 
-          {/* The proof strip: live counts, never typed-in copy (PublicLedger). */}
-          <dl className={cn("mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 lg:max-w-2xl", LEDGER_COLS[ledger.length])}>
-            {ledger.map((item) => (
-              <div key={item.label} className="bg-night-deep/85 flex flex-col-reverse px-4 py-4 backdrop-blur sm:px-5 [&:last-child:nth-child(odd)]:col-span-2 sm:[&:last-child:nth-child(odd)]:col-span-1">
-                <dt className="text-mist mt-1 text-xs">{item.label}</dt>
-                <dd className="type-data text-paper text-3xl font-medium">
-                  <NumberTicker value={item.value} />
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {/* The proof strip: live counts, never typed-in copy (PublicLedger). A glass
+              panel with a slow light running its edge; each count is its own card,
+              lit in ember where the pointer is, counting up as it comes into view. */}
+          <div className="bg-night-deep/60 shadow-lift relative mt-12 rounded-3xl border border-white/10 p-1.5 backdrop-blur lg:max-w-2xl">
+            <BorderBeam size={110} duration={10} colorFrom="var(--color-ember)" colorTo="#ffb547" />
+            <ul aria-label="The record, live" className={cn("grid grid-cols-2 gap-1.5", LEDGER_COLS[ledger.length])}>
+              {ledger.map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.label} className="min-w-0 [&:last-child:nth-child(odd)]:col-span-2 sm:[&:last-child:nth-child(odd)]:col-span-1">
+                    <MagicCard className="h-full rounded-[1.1rem]" gradientSize={180}>
+                      <div className="flex h-full flex-col gap-5 p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-ember grid size-8 place-items-center rounded-xl border border-white/10 bg-white/[0.04] transition-colors group-hover:border-ember/40 group-hover:bg-ember/10">
+                            <Icon aria-hidden="true" className="size-4" />
+                          </span>
+                          {item.live && (
+                            <span className="relative flex size-2" aria-hidden="true">
+                              <span className="live-ping bg-ember absolute inset-0 rounded-full" />
+                              <span className="bg-ember relative size-2 rounded-full" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="flex flex-col">
+                          <span className="type-data bg-[linear-gradient(180deg,var(--color-paper),rgb(244_242_238/0.55))] bg-clip-text text-4xl font-semibold tracking-tight text-transparent">
+                            <NumberTicker value={item.value} delay={i * 0.12} />
+                          </span>
+                          <span className="text-mist mt-1 text-xs">{item.label}</span>
+                        </p>
+                      </div>
+                    </MagicCard>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
         <div className="lg:col-span-5">
