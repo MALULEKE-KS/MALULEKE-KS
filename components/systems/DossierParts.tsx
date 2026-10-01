@@ -6,21 +6,37 @@
 
 import { cn } from "@/lib/utils";
 
-/** 26 weeks of commits, oldest first; the current week drawn in ember. */
-export function ActivityBars({ weeks, className }: { weeks: number[]; className?: string }) {
+/**
+ * Weeks of commits, oldest first; the current week drawn in ember. Every bar
+ * keeps a readable width, so a long history never squeezes or overflows: on a
+ * narrow screen the strip scrolls sideways inside its own box (opening at the
+ * newest week), and the page itself never widens.
+ */
+export function ActivityBars({ weeks, className, startLabel, endLabel }: { weeks: number[]; className?: string; startLabel?: string; endLabel?: string }) {
   const max = Math.max(1, ...weeks);
   return (
-    <div aria-hidden="true" className={cn("flex h-28 items-end gap-[3px]", className)}>
-      {weeks.map((n, i) => (
-        <span
-          key={i}
-          className={cn(
-            "min-h-[3px] flex-1 rounded-t-[3px]",
-            n === 0 ? "bg-white/[0.07]" : i === weeks.length - 1 ? "bg-ember" : "bg-ember/55",
-          )}
-          style={{ height: `${n === 0 ? 3 : Math.max(8, (n / max) * 100)}%` }}
-        />
-      ))}
+    <div className={cn("max-w-full overflow-x-auto overscroll-x-contain pb-1 [direction:rtl] [scrollbar-width:thin]", className)}>
+      {/* rtl on the scroller opens it at the newest week; ltr inside keeps the order oldest → newest. */}
+      <div className="[direction:ltr]" style={{ minWidth: `${weeks.length * 10}px` }}>
+        <div aria-hidden="true" className="flex h-28 items-end gap-[3px]">
+          {weeks.map((n, i) => (
+            <span
+              key={i}
+              className={cn(
+                "min-h-[3px] min-w-[7px] flex-1 rounded-t-[3px]",
+                n === 0 ? "bg-white/[0.07]" : i === weeks.length - 1 ? "bg-ember" : "bg-ember/55",
+              )}
+              style={{ height: `${n === 0 ? 3 : Math.max(8, (n / max) * 100)}%` }}
+            />
+          ))}
+        </div>
+        {(startLabel || endLabel) && (
+          <div className="text-mist mt-3 flex justify-between font-mono text-[11px]">
+            <span>{startLabel}</span>
+            <span>{endLabel}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

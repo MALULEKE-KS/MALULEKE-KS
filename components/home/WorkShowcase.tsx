@@ -26,8 +26,9 @@ import { AnimatedList } from "@/components/ui/animated-list";
 import { ProjectShowcase } from "@/components/ui/project-showcase";
 import type { SelectedWork } from "@/lib/queries/work";
 import { Accent } from "@/components/shared/Accent";
+import { cn } from "@/lib/utils";
 
-type Work = SelectedWork["work"][number];
+type Work = SelectedWork["featured"][number];
 
 function activityLine(w: Work) {
   const parts = [w.commitsLast4Weeks > 0 ? `${w.commitsLast4Weeks} commit${w.commitsLast4Weeks === 1 ? "" : "s"} in 4 weeks` : "Quiet this month", w.lastPush && `last push ${w.lastPush}`];
@@ -124,11 +125,18 @@ function FeaturedCard({ w }: { w: Work }) {
   );
 }
 
-function NowBuildingCard({ now }: { now: NonNullable<SelectedWork["nowBuilding"]> }) {
+function NowBuildingCard({ now, strip = false }: { now: NonNullable<SelectedWork["nowBuilding"]>; strip?: boolean }) {
   const external = !now.onSite;
   return (
-    <div className="bg-night text-paper shadow-lift relative h-full overflow-hidden rounded-3xl border border-white/10 p-5 md:p-6">
+    <div
+      className={cn(
+        "bg-night text-paper shadow-lift relative h-full overflow-hidden rounded-3xl border border-white/10 p-5 md:p-6",
+        // Under two or more featured systems it runs full width: what's moving on the left, its commits on the right.
+        strip && "lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-x-10",
+      )}
+    >
       <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.22),transparent)]" />
+      <div className={cn(strip && "lg:col-start-1 lg:row-start-1")}>
       <p className="text-mist relative flex items-center gap-2 text-xs font-medium">
         <span className="relative flex size-2" aria-hidden="true">
           <span className="live-ping absolute inset-0 rounded-full bg-ember" />
@@ -143,8 +151,10 @@ function NowBuildingCard({ now }: { now: NonNullable<SelectedWork["nowBuilding"]
         {now.commitsLast4Weeks > 0 && ` · ${now.commitsLast4Weeks} commits in 4 weeks`}
       </p>
 
+      </div>
+
       {now.commits.length > 0 && (
-        <AnimatedList className="relative mt-5">
+        <AnimatedList className={cn("relative mt-5", strip && "lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:mt-0")}>
           {now.commits.map((c) => (
             <div key={c.key} className="flex items-start gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3 py-2.5">
               <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
@@ -160,7 +170,7 @@ function NowBuildingCard({ now }: { now: NonNullable<SelectedWork["nowBuilding"]
       <a
         href={now.url}
         {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-        className="text-paper hover:text-ember relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+        className={cn("text-paper hover:text-ember relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors", strip && "lg:col-start-1 lg:row-start-2 lg:self-start")}
       >
         {external ? (
           <>
@@ -206,11 +216,17 @@ function CompactCard({ w }: { w: Work }) {
   );
 }
 
-export function WorkShowcase({ work, nowBuilding, totalPublished }: SelectedWork & { totalPublished: number }) {
-  const [featured, ...rest] = work;
-  if (!featured) return null;
-  // Now building sits beside the featured system; if there's no recent activity, the next pick takes its place.
-  const side = nowBuilding ? null : rest.shift() ?? null;
+/**
+ * Selected work on the home page. The systems the owner features (admin:
+ * "Featured on home") lead as large cards — one beside "Now building", or two
+ * and more side by side with "Now building" as a strip beneath. Then more work.
+ */
+export function WorkShowcase({ featured, more, nowBuilding, totalPublished }: SelectedWork & { totalPublished: number }) {
+  if (featured.length === 0) return null;
+  const rest = [...more];
+  const single = featured.length === 1;
+  // Beside a single featured system: Now building, or the next pick when nothing moved recently.
+  const side = single && !nowBuilding ? rest.shift() ?? null : null;
 
   return (
     <section aria-labelledby="work-title" className="bg-paper py-20 md:py-28">
@@ -226,14 +242,31 @@ export function WorkShowcase({ work, nowBuilding, totalPublished }: SelectedWork
           />
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-          <Reveal className="min-w-0 lg:col-span-8">
-            <FeaturedCard w={featured} />
-          </Reveal>
-          <Reveal className="min-w-0 lg:col-span-4" delay={100}>
-            {nowBuilding ? <NowBuildingCard now={nowBuilding} /> : side ? <CompactCard w={side} /> : null}
-          </Reveal>
-        </div>
+        {single ? (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+            <Reveal className="min-w-0 lg:col-span-8">
+              <FeaturedCard w={featured[0]!} />
+            </Reveal>
+            <Reveal className="min-w-0 lg:col-span-4" delay={100}>
+              {nowBuilding ? <NowBuildingCard now={nowBuilding} /> : side ? <CompactCard w={side} /> : null}
+            </Reveal>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+              {featured.map((w, i) => (
+                <Reveal key={w.slug} className="min-w-0" delay={i * 100}>
+                  <FeaturedCard w={w} />
+                </Reveal>
+              ))}
+            </div>
+            {nowBuilding && (
+              <Reveal className="mt-5" delay={150}>
+                <NowBuildingCard now={nowBuilding} strip />
+              </Reveal>
+            )}
+          </>
+        )}
 
         {rest.length > 0 && (
           <Reveal className="mt-14" delay={150}>

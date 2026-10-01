@@ -65,6 +65,25 @@ export async function getPrioritySystems(limit = 4) {
   return withScreenshots(rows.map(toPublicSystem));
 }
 
+/**
+ * The home page's Selected work, chosen by the owner: every system switched on
+ * as "Featured on home" (in its home order) is a featured card; with none
+ * switched on, the flagship leads. "More work" is the next systems in catalog
+ * order, `more` of them. Data, not code — featuring another system is a switch
+ * in the admin.
+ */
+export async function getHomeSelection(more = 3) {
+  const [curated, pool] = await Promise.all([
+    db.publicSystem.findMany({ where: { featuredOnHome: true }, orderBy: [{ homeOrder: "asc" }, { sortOrder: "asc" }, { name: "asc" }] }),
+    db.publicSystem.findMany({ orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }, { name: "asc" }, { id: "asc" }], take: more + 8 }),
+  ]);
+  const featured = curated.length > 0 ? curated : pool.slice(0, 1);
+  const chosen = new Set(featured.map((s) => s.id));
+  const rest = pool.filter((s) => !chosen.has(s.id)).slice(0, more);
+  const [f, r] = await Promise.all([withScreenshots(featured.map(toPublicSystem)), withScreenshots(rest.map(toPublicSystem))]);
+  return { featured: f, more: r };
+}
+
 // The "All systems (n)" link on the home page — labels real, visible content.
 export async function countPublishedSystems() {
   return db.publicSystem.count();

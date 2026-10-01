@@ -28,6 +28,10 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — Phones, for real; featured work chosen by the owner (2026-10-01)
+- **Case studies overflowed on phones** (604–834 px on a 360 px screen) once a system had commits: the activity grid's columns grew to the longest commit message. The phone tests missed it — the test databases had no commits. Fixed for good: every grid item may shrink and any text wraps rather than overflow (two global rules in `globals.css`); the weekly chart scrolls inside its own box. The e2e suite now seeds a hostile "stress" system before it runs (long commits and words, a year of activity, a wide table and code, on the CV too) — it immediately found the same overflow on `/cv` — and can run against production after a release (`PLAYWRIGHT_BASE_URL`).
+- **Featured systems are the owner's choice:** every system switched on as "Featured on home" leads Selected work — two or more side by side, with Now building as a strip beneath; one keeps the old layout. Xkimi Xa Mali and Sunduza Architectural are featured.
+
 ### F5c — The AI guide is live on a free model (2026-10-01)
 - `concierge.model` → `inclusionai/ling-3.1-flash-free` (Vercel AI Gateway, free tier; the only free general model with reasoning and tool use); `concierge.enabled` on. Tested live: refuses to reveal its instructions, refuses private details, answers grounded with links, third person; the per-visitor cap (6 a day) held. Claude is V2 #14.
 - **Fix:** a reasoning model streams its reasoning and the chat sends it back with the history; the request whitelist refused that, so every follow-up question failed. Reasoning is now accepted and dropped before the model sees anything (`lib/guide/request.ts`) — the model never reads reasoning a browser could have rewritten.
