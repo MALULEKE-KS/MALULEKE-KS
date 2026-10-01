@@ -1,5 +1,6 @@
 // components/shared/SiteHeader.tsx
-// The public header (F5c, D10): one bar — the mark and name on the left, the
+// The public header (F5c, D10): one bar — the mark alone on the left (the
+// owner's call, 2026-10-01: no name beside it, on every screen size), the
 // nav in the middle, instant search (⌘K) and the one contact entry, Let's
 // talk, on the right. HeaderFrame turns it from a full-width bar at the top
 // of the page into a single glass capsule once you scroll. Contact is not a
@@ -8,7 +9,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { BrandMark, Wordmark } from "@/components/shared/BrandMark";
+import { CubeMark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
 import { HeaderFrame } from "@/components/shared/HeaderFrame";
@@ -23,8 +24,7 @@ export function SiteHeader({ links, email, reviewSlaHours }: { links: SiteLink[]
         aria-label="MALULEKE-KS — home"
         className="group flex h-10 shrink-0 items-center gap-2.5 rounded-full pe-2 ps-1.5 focus-visible:outline-2 focus-visible:outline-ember"
       >
-        <BrandMark cut="heavy" assemble className="h-5 text-paper" />
-        <Wordmark className="hidden font-mono text-sm font-medium tracking-tight text-paper sm:inline" />
+        <CubeMark className="size-9" />
       </Link>
 
       <NavLinks />

@@ -7,8 +7,8 @@
 // PAGE-SPECIFICATIONS.md "/systems/[slug]" behavior).
 //
 // Copy follows Design System §4.5: what happened, what to do next, no apology.
-// Beside it, the K-S mark as its 3D piece (design/brand/, Graphite) — one of the
-// two places the 3D piece appears (the other is the share image).
+// Beside it, the K-S Cube rendered in 3D (design/brand/) — one of the places
+// the rendered cube appears (with the share image and the home-screen icon).
 
 import Image from "next/image";
 import Link from "next/link";
@@ -53,10 +53,10 @@ export function NotFoundContent() {
         <div aria-hidden="true" className="relative mx-auto w-full max-w-[26rem] lg:max-w-none">
           <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.16),transparent)] blur-2xl" />
           <Image
-            src="/brand/ks-3d-graphite.webp"
+            src="/brand/ks-cube-3d.webp"
             alt=""
-            width={907}
-            height={654}
+            width={820}
+            height={789}
             priority
             sizes="(min-width: 1024px) 40vw, 26rem"
             className="relative h-auto w-full motion-safe:animate-[ks-float_7s_ease-in-out_infinite]"

@@ -394,6 +394,78 @@ html {
   to { opacity: 1; transform: none; }
 }
 
+/* The K-S Cube logo (CubeMark). Sized by its own box (container units), so the
+   same mark works at 36 px in the header and large anywhere else.
+   One 10 s cycle, all parts in step: the K-S rests facing you, then makes one
+   turn through the gel and settles with a small overshoot; the gel's surface
+   tilts against the turn and a ripple spreads as it settles. Hover or focus
+   (or a tap): the K-S turns to greet you. The surface always drifts, the
+   letters bob, bubbles rise. Reduced motion: all still, the letters facing you. */
+.ks-cube { container-type: size; }
+.ks-cube .ks-stage { perspective: 330cqw; }
+.ks-rotor, .ks-rotor > * { transform-style: preserve-3d; }
+.ks-cube .ks-bubble, .ks-cube .ks-ripple { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .ks-rotor-spin { animation: ks-turn 10s infinite; }
+  .ks-cube .ks-slosh { animation: ks-slosh 10s ease-in-out infinite; }
+  .ks-cube .ks-ripple { animation: ks-ripple 10s ease-out infinite; }
+  .ks-cube .ks-bob { animation: ks-bob 3.4s ease-in-out infinite; }
+  .ks-cube .ks-gel { animation: ks-gel 5s linear infinite; }
+  .ks-cube .ks-gel-far { animation: ks-gel 8s linear infinite reverse; }
+  .ks-cube .ks-bubble { animation: ks-bubble 4.6s ease-in infinite; }
+  .group:is(:hover, :focus-visible) .ks-rotor-spin { animation: ks-greet 1.3s both; }
+  .group:is(:hover, :focus-visible) .ks-slosh { animation: ks-slosh-once 1.3s ease-in-out both; }
+  .group:is(:hover, :focus-visible) .ks-ripple { animation: ks-ripple-once 1.3s ease-out both; }
+}
+@keyframes ks-turn {
+  0%, 58% { transform: rotateY(0deg); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  86% { transform: rotateY(372deg); animation-timing-function: ease-in-out; }
+  93% { transform: rotateY(355deg); animation-timing-function: ease-in-out; }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes ks-greet {
+  0% { transform: rotateY(0deg); animation-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1); }
+  65% { transform: rotateY(374deg); animation-timing-function: ease-in-out; }
+  84% { transform: rotateY(356deg); animation-timing-function: ease-in-out; }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes ks-slosh {
+  0%, 58%, 100% { transform: skewY(0deg); }
+  72% { transform: skewY(-4deg); }
+  86% { transform: skewY(3deg); }
+  94% { transform: skewY(-1.2deg); }
+}
+@keyframes ks-slosh-once {
+  0%, 100% { transform: skewY(0deg); }
+  35% { transform: skewY(-4deg); }
+  65% { transform: skewY(3deg); }
+  85% { transform: skewY(-1deg); }
+}
+@keyframes ks-ripple {
+  0%, 84% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  87% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.35); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+@keyframes ks-ripple-once {
+  0%, 45% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  55% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.35); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+@keyframes ks-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.8cqw); }
+}
+@keyframes ks-bubble {
+  0% { opacity: 0; transform: translateY(0); }
+  15% { opacity: 1; }
+  70% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-39cqw); }
+}
+@keyframes ks-gel {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* The 3D K-S piece on the 404 page: a slow, small drift — an object at rest, not a spinner. */
 @keyframes ks-float {
   0%, 100% { transform: translateY(0) rotate(0deg); }

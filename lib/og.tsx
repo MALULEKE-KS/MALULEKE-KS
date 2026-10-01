@@ -1,8 +1,8 @@
 // lib/og.tsx — the Open Graph card (#101), shared by the site default and each
 // case study: the graphite field, the K-S mark and wordmark, an eyebrow, a
 // title and a line of description, in the design system's colours — and the
-// mark as a 3D piece (design/brand/, the owner-approved Graphite finish), the
-// one place besides the 404 page where the 3D piece appears. Rendered by
+// K-S Cube rendered in 3D (design/brand/), as on the 404 page and the
+// home-screen icon. Rendered by
 // next/og (Satori), so layout uses flexbox only.
 
 import { readFile } from "node:fs/promises";
@@ -32,7 +32,7 @@ const BLOCK = "M32.4 29.4L37.6 29.4L37.6 34.6L32.4 34.6Z";
 // Read once per server instance; a missing file just leaves the piece out.
 let piece: Promise<string | null> | null = null;
 function threeDPiece() {
-  piece ??= readFile(join(process.cwd(), "design/brand/ks-3d-graphite-og.png"), "base64")
+  piece ??= readFile(join(process.cwd(), "design/brand/ks-cube-3d-og.png"), "base64")
     .then((b64) => `data:image/png;base64,${b64}`)
     .catch(() => null);
   return piece;
