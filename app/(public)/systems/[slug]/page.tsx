@@ -211,7 +211,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       </section>
 
       <section aria-label="The system" className="bg-paper py-16 md:py-24">
-        <Container className="grid gap-12 lg:grid-cols-12">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
             {(system.screenshotUrl || system.liveUrl) && (
               <SystemPreviewFrame screenshotUrl={system.screenshotUrl} liveUrl={system.liveUrl} name={system.name} />
@@ -252,7 +252,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
             )}
           </div>
 
-          <aside className="lg:col-span-4" aria-labelledby="glance-title">
+          <aside className="min-w-0 lg:col-span-4" aria-labelledby="glance-title">
             <div className="border-ink/10 bg-sheet shadow-soft rounded-3xl border p-6 lg:sticky lg:top-24">
               <SectionIndex sections={sections} className="border-ink/10 mb-6 hidden border-b pb-5 lg:block" />
               <h2 id="glance-title" className="text-slate inline-flex items-center gap-2 text-xs font-medium">
@@ -331,14 +331,10 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-16 md:py-24">
           <Container>
             <SectionHeader icon={Activity} eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
-            <div className="grid gap-10 lg:grid-cols-12">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
               {moving && (
-                <div className="lg:col-span-7">
-                  <ActivityBars weeks={cs.weeks} />
-                  <div className="text-mist mt-3 flex justify-between font-mono text-[11px]">
-                    <span>26 weeks ago</span>
-                    <span>this week</span>
-                  </div>
+                <div className="min-w-0 lg:col-span-7">
+                  <ActivityBars weeks={cs.weeks} startLabel={`${cs.weeks.length} weeks ago`} endLabel="this week" />
                   <p className="text-mist mt-6 text-sm">
                     <span className="type-data text-paper font-semibold">{commitsIn26}</span> commits in the last 26 weeks
                     {cs.commitsLast4Weeks > 0 && (
@@ -351,7 +347,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                 </div>
               )}
               {cs.commits.length > 0 && (
-                <div className={moving ? "lg:col-span-5" : "lg:col-span-12"}>
+                <div className={moving ? "min-w-0 lg:col-span-5" : "min-w-0 lg:col-span-12"}>
                   <h3 className="type-eyebrow text-mist">Latest commits</h3>
                   <ol className="mt-4 space-y-3">
                     {cs.commits.map((c) => (

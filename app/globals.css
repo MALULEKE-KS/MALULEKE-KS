@@ -399,3 +399,15 @@ html {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-10px) rotate(-1deg); }
 }
+
+/* Mobile by default (PAGE-BUILD-PLAYBOOK §1). A grid item's minimum width is
+   its content's longest unbreakable line unless told otherwise — one long
+   commit message or URL then stretches the column past a phone's screen (the
+   home page and the case studies both hit this). Every grid item may shrink;
+   content that truly can't wrap scrolls in its own box. In the base layer, so
+   an explicit min-w-* utility on an element still wins. */
+@layer base {
+  .grid > * {
+    min-width: 0;
+  }
+}
