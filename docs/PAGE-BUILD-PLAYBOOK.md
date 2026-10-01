@@ -20,7 +20,10 @@ It sits under the governing documents: DESIGN-SYSTEM.md wins on visuals, BUSINES
 | **Private stays private** | No model ids, no internal defences advertised, no private repo content, no client names without approval. | Model id shown on the console (removed); "Guard-railed" tile (removed). |
 | **Unique, not template** | Don't reach for the obvious AI-generated look. Pick one idea that fits the page's story and execute it well. | *"It should be unique and not obvious."* |
 | **Highest level, then clean** | Build rich, then audit and remove what doesn't earn its place (§7). | The home audit. |
-| **Deploys are the owner's call** | Build and verify locally; never push, PR or merge until the owner says the batch is ready. | memory: deploy-budget. |
+| **Make it exist first** | Ship the working version, then polish from what using it shows — but unfinished never means unsafe: every rule the page relies on is enforced from day one. | Owner, 2026-10-01: *"make it exist first … then you will make it beautiful later"* — principle 01. |
+| **Claims carry evidence** | A meaningful claim on a page leads to inspectable evidence or carries no evidence affordance at all; never a claim wider than its proof (`docs/EVIDENCE-SPEC.md`, EV-1…EV-8). | Owner's Evidence Density spec, 2026-10-01. |
+| **One family, each page unique** | Every page keeps the system environment — graphite and bone, the one ember accent, glass, Plex, the header and footer, the same motion vocabulary — and has its own signature idea that fits its story. No page is a copy of home. | Owner, 2026-10-02: *"carry that vibe but each page should be unique but the system environment should be preserved."* |
+| **Deploys are batched** | Build and verify locally on one release branch; release in sensible batches against the Vercel budget (the agent plans timing since 2026-10-01). | memory: deploy-budget. |
 
 ---
 
@@ -251,18 +254,19 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 
 ### `/method`
 - **Story:** how the work is governed — principles as enforced rules.
-- **Data:** `how-i-build` block, business rules and where they're enforced (register), the pulse.
-- **Candidates:** principles as a numbered sequence with the rule that enforces each; the terminal pattern.
+- **Data:** `how-i-build` block (five principles, *Make It Exist First* leads), the `evidence` block (EVIDENCE-SPEC), the pulse.
+- **Candidates:** principles as a numbered sequence, each opening its evidence (EvidenceDrawer); the terminal pattern.
 
 ### `/about`
 - **Story:** the person behind the work.
 - **Data:** profile, titles, photo (`PublicProfilePhoto` — the approved graphite portrait), affiliations, links.
 - **Candidates:** portrait with a restrained treatment; titles as data; "by the numbers" figures when approved.
 
-### `/contact`
-- **Story:** the one way in, with the review promise.
-- **Data:** inquiry types, the review SLA setting, the guide's draft (when enabled).
-- **Candidates:** a calm form with the promise visible; the AI draft banner.
+### `/contact` — Let's Talk
+- **Story:** the one way in — "What brings you here?" — then a form shaped to the answer, ending in a reference.
+- **Spec:** `docs/LETS-TALK-SPEC.md` (LT-1…LT-14): categories and subtypes as lookups, per-category server-validated fields, explicit compensation, meetings as events, PDF-only documents, reference ≠ credential, email via an outbox.
+- **Data:** inquiry types and subtypes, the review SLA setting, the guide's draft (when enabled).
+- **Candidates:** a choice step of large glass tiles, then a stepped form; the promise and privacy notice visible; the AI draft banner.
 
 ### `/now` (new)
 - **Story:** what's moving this week.

@@ -5,7 +5,8 @@
 // from the database the moment the page was loaded (PublicPlatformPulse);
 // beside it, the same facts as tiles and the owner's approved figures
 // (PublicMetric, BR-5.3 — none approved, none shown). With the AI guide on,
-// a visitor can ask it how these rules are enforced.
+// a visitor can ask it how these rules are enforced. Each live tile carries
+// its evidence — how the number is counted (docs/EVIDENCE-SPEC.md).
 
 import { Activity, BarChart3, GitBranch, ScrollText, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
@@ -16,6 +17,8 @@ import { Terminal, type TerminalLine } from "@/components/ui/terminal";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { ago } from "@/lib/queries/work";
 import { Accent } from "@/components/shared/Accent";
+import { Evidence } from "@/components/shared/Evidence";
+import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
 
 /** An owner-approved figure (PublicMetric — BR-5.3). */
 export interface CuratedNumber {
@@ -35,7 +38,15 @@ interface Pulse {
   deployment: { commit: string; environment: string | null } | null;
 }
 
-export function ControlRoom({ pulse, numbers }: { pulse: Pulse; numbers: CuratedNumber[] }) {
+export function ControlRoom({
+  pulse,
+  numbers,
+  evidence,
+}: {
+  pulse: Pulse;
+  numbers: CuratedNumber[];
+  evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
+}) {
   const synced = ago(pulse.lastGithubSyncAt ? new Date(pulse.lastGithubSyncAt) : null);
   const job = ago(pulse.lastSuccessfulJobAt ? new Date(pulse.lastSuccessfulJobAt) : null);
   const build = pulse.deployment ? `build ${pulse.deployment.commit}${pulse.deployment.environment ? ` · ${pulse.deployment.environment}` : ""}` : "running a local development build";
@@ -51,8 +62,8 @@ export function ControlRoom({ pulse, numbers }: { pulse: Pulse; numbers: Curated
   ];
 
   const tiles = [
-    { icon: ShieldCheck, value: pulse.rulesEnforcedByDatabase, label: "rules the database enforces" },
-    { icon: ScrollText, value: pulse.auditEventsLast7Days, label: "changes audited this week" },
+    { key: "rulesEnforcedByDatabase", icon: ShieldCheck, value: pulse.rulesEnforcedByDatabase, label: "rules the database enforces" },
+    { key: "auditEventsLast7Days", icon: ScrollText, value: pulse.auditEventsLast7Days, label: "changes audited this week" },
   ];
 
   return (
@@ -72,13 +83,18 @@ export function ControlRoom({ pulse, numbers }: { pulse: Pulse; numbers: Curated
             </Reveal>
             <Reveal delay={80}>
               <dl className="grid grid-cols-2 gap-3">
-                {tiles.map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
+                {tiles.map(({ key, icon: Icon, value, label }) => (
+                  <div key={key} className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
                     <Icon aria-hidden="true" className="text-accent size-4" />
                     <dd className="type-data text-ink mt-3 text-4xl font-semibold">
                       <NumberTicker value={value} />
                     </dd>
                     <dt className="text-slate mt-1 text-sm">{label}</dt>
+                    {claimsFor(evidence.claims, `pulse:${key}`).length > 0 && (
+                      <dd className="mt-3">
+                        <Evidence claims={claimsFor(evidence.claims, `pulse:${key}`)} label={`${value} ${label}`} commit={evidence.source.commit} tone="light" />
+                      </dd>
+                    )}
                   </div>
                 ))}
                 {synced && (

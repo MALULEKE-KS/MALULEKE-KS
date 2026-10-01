@@ -165,6 +165,19 @@
 | Home stack card | "Type-checked end to end", "Tested in CI on every change", "Deployed on Vercel from main" | `tsc --noEmit` in CI; CI on every PR; Vercel Git integration | ✅ |
 | Home pipeline | "N shipped / N in progress / N queued" | Counted by each status's pipeline stage, archived excluded (#52) | ✅ |
 
+
+## 8b. Evidence (EV-x — docs/EVIDENCE-SPEC.md)
+
+| Claim | Enforced today | Status |
+|---|---|---|
+| EV-1 A claim with no evidence shows no evidence affordance | `Evidence` / `EvidenceList` render nothing for zero claims; the schema needs 1–6 links per claim — `lib/evidence/schema.ts`, `components/shared/Evidence.tsx`. Tested: `tests/unit/evidence.test.ts` | ✅ |
+| EV-2 Evidence links open the running commit | `resolveHref` pins `repo:` links to `VERCEL_GIT_COMMIT_SHA` (main, labelled, when unknown); repository from Vercel's git env or the `evidence.repository` setting — `lib/evidence/index.ts`. Tested: `tests/unit/evidence.test.ts` | ✅ |
+| EV-3 No broken evidence link ships | Every published link resolved against the checkout (repo paths exist, routes are real pages, workflows exist) — `tests/integration/evidence.test.ts`, in CI on every release. Admin edits made in production are schema-checked but not path-checked until the next CI run | ✅ (CI) / ⚠ admin edits |
+| EV-4 "Verified" lapses to "Review due" on its own | `publicStatus` against `evidence.reviewDays` (setting); a future review date is refused — `lib/evidence`. Tested: `tests/unit/evidence.test.ts` | ✅ |
+| EV-5 Both scopes stated — what it proves and what it doesn't | Required fields in the schema — `lib/evidence/schema.ts`. Tested | ✅ |
+| EV-6 Evidence is public by construction | Links limited to `repo:` paths (no `.env`, `.vercel`, `..`), public routes (no `/admin`, `/api/v1/admin`) and `actions:` workflows — `lib/evidence/schema.ts`. Tested with hostile inputs | ✅ |
+| EV-7 Status never by colour alone, never hover-only | Status is a word + icon; the sheet opens on click/tap/Enter (Radix dialog) — `components/shared/Evidence.tsx` | ✅ (by construction) |
+
 ---
 
 *A claim moves to ✅ only with a test that would fail if the enforcement were removed.*

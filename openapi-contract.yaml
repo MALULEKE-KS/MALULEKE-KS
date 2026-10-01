@@ -1155,7 +1155,7 @@ paths:
     get:
       tags: [Content (Public)]
       summary: Get a page content block (#106)
-      description: "Owner-edited site copy by key, e.g. how-i-build — { mission, principles[{ name, summary, body }] }. 404 for an unknown key or a block not yet written."
+      description: "Owner-edited site copy by key, e.g. how-i-build — { mission, principles[{ name, summary, body }] }. Also evidence — { claims[{ id, claim, where, status, proves, doesNotProve, evidence[{ label, kind, href }], reviewedAt }] } (docs/EVIDENCE-SPEC.md). 404 for an unknown key or a block not yet written."
       parameters: [{ name: key, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$" } }]
       responses: { "200": { description: "{ key, body }" }, "404": { $ref: "#/components/responses/NotFound" } }
   /admin/content:

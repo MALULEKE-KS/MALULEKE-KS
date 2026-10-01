@@ -20,6 +20,7 @@ import {
 } from "@/lib/queries/site";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { getContentBlock } from "@/lib/content/blocks";
+import { getEvidence } from "@/lib/evidence";
 import { siteUrl } from "@/lib/site-url";
 import { getPlatformPulse, getPublicTitles } from "@/lib/queries/profile";
 import { FLAGS, getFlags } from "@/lib/flags";
@@ -70,7 +71,7 @@ export async function HomeContent() {
     getPlatformPulse(),
   ]);
   const guideEnabled = flags[FLAGS.concierge] === true;
-  const howIBuild = await getContentBlock("how-i-build");
+  const [howIBuild, evidence] = await Promise.all([getContentBlock("how-i-build"), getEvidence()]);
 
 
   const base = siteUrl();
@@ -126,8 +127,8 @@ export async function HomeContent() {
       )}
       <WorkShowcase {...selectedWork} totalPublished={totalPublished} />
       <SystemMap data={systemMap} />
-      <ControlRoom pulse={pulse} numbers={numbers} />
-      <PrinciplesBand content={howIBuild} />
+      <ControlRoom pulse={pulse} numbers={numbers} evidence={evidence} />
+      <PrinciplesBand content={howIBuild} evidence={evidence} />
       <ContactBand profile={profile} inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
     </>
   );

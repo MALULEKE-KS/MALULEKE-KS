@@ -21,12 +21,14 @@ import { cache } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { Activity, ArrowLeft, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, Sparkles, Star, Tag } from "lucide-react";
+import { Activity, ArrowLeft, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, ShieldCheck, Sparkles, Star, Tag } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { Container } from "@/components/shared/Container";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { EvidenceList } from "@/components/shared/Evidence";
+import { claimsFor, getEvidence } from "@/lib/evidence";
 import { markdownSections, Prose } from "@/components/shared/Prose";
 import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
@@ -102,7 +104,8 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
   }
 
   const { system, repo, home } = cs;
-  const profile = await getSiteProfile();
+  const [profile, evidence] = await Promise.all([getSiteProfile(), getEvidence()]);
+  const evidenceClaims = claimsFor(evidence.claims, `system:${system.slug}`);
   const firstName = profile.name.split(" ")[0] ?? profile.name;
   const sections = cs.writeUp?.source === "case-study" ? markdownSections(cs.writeUp.markdown) : [];
   const what = summary(cs);
@@ -326,6 +329,27 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
           </aside>
         </Container>
       </section>
+      {/* The claims this system makes, each with its proof (docs/EVIDENCE-SPEC.md) —
+          for MALULEKE-KS, the portfolio as its own case study. */}
+      {evidenceClaims.length > 0 && (
+        <section id="evidence" aria-labelledby="evidence-title" className="bg-night-deep text-paper scroll-mt-20 py-16 md:py-24">
+          <Container>
+            <p className="type-eyebrow text-mist inline-flex items-center gap-2">
+              <ShieldCheck aria-hidden="true" className="text-ember size-3.5" />
+              Evidence
+            </p>
+            <h2 id="evidence-title" className="type-h2 mt-3 max-w-3xl">
+              What {system.name} claims, <span className="type-accent text-ember-gradient pr-[0.06em]">and the proof.</span>
+            </h2>
+            <p className="type-lede text-mist mt-4 max-w-2xl">
+              Each claim says what it proves and what it doesn&rsquo;t, and opens {evidence.source.commit ? "the exact code serving this page" : "the source"}. Planned work is labelled as planned.
+            </p>
+            <div className="mt-10">
+              <EvidenceList claims={evidenceClaims} />
+            </div>
+          </Container>
+        </section>
+      )}
 
       {(moving || cs.commits.length > 0) && (
         <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-16 md:py-24">
