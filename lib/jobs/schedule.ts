@@ -15,4 +15,4 @@ export const DAILY_CRON_SCHEDULE = "0 3 * * *";
 export const DAILY_CRON_PATH = "/api/cron/daily";
 
 // The write-ups follow the sync, so they read the repos as they are today.
-export const DAILY_JOBS = ["maintenance.daily", "metrics.compute", "github.sync", "systems.writeups", "systems.screenshots"] as const;
+export const DAILY_JOBS = ["maintenance.daily", "metrics.compute", "github.sync", "systems.writeups", "systems.screenshots", "notifications.send"] as const;

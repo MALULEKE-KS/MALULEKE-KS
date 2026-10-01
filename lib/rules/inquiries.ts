@@ -34,32 +34,63 @@ export function sourceFromReferer(referer: string | null): string {
 // ADMIN-SIDE RULES (BR-2.1)
 // ============================================================
 
-export type ApiInquiryStatus = "new" | "reviewed" | "responded" | "closed";
+export type ApiInquiryStatus = "new" | "reviewed" | "responded" | "closed" | "needs_info" | "accepted" | "declined" | "on_hold" | "withdrawn";
 
 export const STATUS_TO_API: Record<InquiryStatus, ApiInquiryStatus> = {
   NEW: "new",
   REVIEWED: "reviewed",
   RESPONDED: "responded",
   CLOSED: "closed",
+  NEEDS_INFO: "needs_info",
+  ACCEPTED: "accepted",
+  DECLINED: "declined",
+  ON_HOLD: "on_hold",
+  WITHDRAWN: "withdrawn",
 };
 
 export const STATUS_FROM_API: Record<Exclude<ApiInquiryStatus, "new">, InquiryStatus> = {
   reviewed: "REVIEWED",
   responded: "RESPONDED",
   closed: "CLOSED",
+  needs_info: "NEEDS_INFO",
+  accepted: "ACCEPTED",
+  declined: "DECLINED",
+  on_hold: "ON_HOLD",
+  withdrawn: "WITHDRAWN",
 };
 
-// BR-2.1 — new->reviewed is always mandatory first; from reviewed, either
-// responded or closed is valid (closed covers spam/irrelevant without a
-// fake reply); from responded, only closed. Never a skip-ahead option, and
-// closed is terminal. Declared as an explicit map, not a numeric ordering,
-// so "reviewed can go to two different next states" stays representable.
+/** How each status reads to a person (LT-6) — the enum keeps its original names. */
+export const STATUS_LABEL: Record<InquiryStatus, string> = {
+  NEW: "New",
+  REVIEWED: "Reviewing",
+  RESPONDED: "In discussion",
+  CLOSED: "Closed",
+  NEEDS_INFO: "Needs information",
+  ACCEPTED: "Accepted",
+  DECLINED: "Declined",
+  ON_HOLD: "On hold",
+  WITHDRAWN: "Withdrawn",
+};
+
+// LT-6 — mirrors the database trigger (enforce_br_2_1_inquiry_workflow), which
+// is the authority; this copy gives the admin a clear message and the right
+// buttons. NEW → REVIEWED is still the only way out of NEW (BR-2.1: triage
+// first); decisions can be reopened to REVIEWED, history kept.
 const VALID_TRANSITIONS: Record<InquiryStatus, InquiryStatus[]> = {
   NEW: ["REVIEWED"],
-  REVIEWED: ["RESPONDED", "CLOSED"],
-  RESPONDED: ["CLOSED"],
-  CLOSED: [],
+  REVIEWED: ["NEEDS_INFO", "RESPONDED", "ACCEPTED", "DECLINED", "ON_HOLD", "CLOSED", "WITHDRAWN"],
+  NEEDS_INFO: ["REVIEWED", "RESPONDED", "DECLINED", "ON_HOLD", "CLOSED", "WITHDRAWN"],
+  RESPONDED: ["NEEDS_INFO", "ACCEPTED", "DECLINED", "ON_HOLD", "CLOSED", "WITHDRAWN"],
+  ON_HOLD: ["REVIEWED", "DECLINED", "CLOSED", "WITHDRAWN"],
+  ACCEPTED: ["CLOSED", "REVIEWED"],
+  DECLINED: ["CLOSED", "REVIEWED"],
+  WITHDRAWN: ["CLOSED", "REVIEWED"],
+  CLOSED: ["REVIEWED"],
 };
+
+export function nextStatuses(current: InquiryStatus): InquiryStatus[] {
+  return VALID_TRANSITIONS[current];
+}
 
 export function isValidStatusTransition(current: InquiryStatus, next: InquiryStatus): boolean {
   return VALID_TRANSITIONS[current].includes(next);

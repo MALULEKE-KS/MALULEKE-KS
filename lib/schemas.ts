@@ -306,7 +306,8 @@ export const InquiryTypeKeySchema = z
   .max(60)
   .regex(/^[a-z0-9]+([_-][a-z0-9]+)*$/, "Choose what this is about");
 
-export const InquiryStatusEnum = z.enum(["new", "reviewed", "responded", "closed"]);
+// LT-6 (docs/LETS-TALK-SPEC.md): reviewed reads "Reviewing", responded "In discussion".
+export const InquiryStatusEnum = z.enum(["new", "reviewed", "responded", "closed", "needs_info", "accepted", "declined", "on_hold", "withdrawn"]);
 
 export const InquiryCreateInputSchema = z.object({
   // Plain messages: they are shown to the visitor as written (#99).
@@ -323,12 +324,31 @@ export const InquiryCreateInputSchema = z.object({
   // schema's happy path at all — they short-circuit to a look-alike 201
   // before validation runs (BR-2.7).
   idempotencyKey: z.string().uuid().optional(),
+  // Let's Talk (LETS-TALK-SPEC): all optional, so the plain four-field form and
+  // the AI guide's draft still work. The category's own fields are checked by
+  // lib/inquiries/forms.ts on the server; the subtype against the lookup.
+  subtype: z.string().trim().max(60).regex(/^[a-z0-9]+([_-][a-z0-9]+)*$/).optional(),
+  subtypeOther: z.string().trim().max(200).optional(),
+  phone: z.string().optional(),
+  organization: z.string().optional(),
+  role: z.string().optional(),
+  website: z.string().optional(),
+  profileUrl: z.string().optional(),
+  preferredChannel: z.string().optional(),
+  preferredChannelOther: z.string().optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
+  // A signed token from GET /api/v1/inquiries/form — proves the form was
+  // shown to someone before it was sent (fill-time check, LT spec §2.4).
+  formToken: z.string().max(200).optional(),
   // source is intentionally NOT in this schema — captured server-side from
   // the referrer (falling back to "direct" when absent), never client-supplied (BR-2.5).
 });
 
 export const InquiryConfirmationSchema = z.object({
+  // Kept for v1 compatibility; it authorises nothing (admin needs a 2FA session).
   id: z.string(),
+  // LT-3: the reference to quote — identifies, never authorises.
+  reference: z.string(),
   status: z.literal("new"),
   submittedAt: z.string().datetime(),
 });
@@ -343,11 +363,14 @@ export const InquiryAdminSchema = InquiryConfirmationSchema.extend({
 });
 
 export const InquiryStatusUpdateInputSchema = z.object({
-  // BR-2.1 — new -> reviewed is mandatory; from reviewed, either responded
-  // or closed is valid (closed covers spam/irrelevant without a fake reply).
-  // The actual current-state check happens in the route handler against the
-  // DB row, not here — this schema only bounds the shape of the *target* value.
-  status: z.enum(["reviewed", "responded", "closed"]),
+  // LT-6 — the allowed transitions are a database trigger; the route checks
+  // the current state first for a clear message. This bounds the target only.
+  status: z.enum(["reviewed", "responded", "closed", "needs_info", "accepted", "declined", "on_hold", "withdrawn"]),
+  // The version the admin saw: a change made from a stale screen is refused (LT-6).
+  expectedVersion: z.number().int().min(0).optional(),
+  // LT-7: private reason and what the applicant is told — never the same field.
+  internalReason: z.string().trim().max(2000).optional(),
+  applicantMessage: z.string().trim().max(5000).optional(),
 });
 
 // ============================================================

@@ -14,6 +14,8 @@ export const FLAGS = {
   searchSystems: "agent.search_systems",
   tailorCv: "agent.tailor_cv",
   writeups: "writeups.enabled",
+  // LT-9: confirmations to applicants — off until a sending domain is verified (Resend only delivers to the owner without one).
+  applicantEmails: "notifications.applicant_emails",
 } as const;
 
 export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];

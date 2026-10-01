@@ -190,6 +190,56 @@ export const SETTINGS = {
     rule: "Constitution §6",
   }),
   // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
+  "inquiry.minFillSeconds": define({
+    schema: z.number().int().min(0).max(60),
+    default: 3,
+    description: "Seconds a form must have been open before it can be sent — faster is treated as a bot (shown the same thank-you, nothing stored).",
+    rule: "LT spec §2",
+  }),
+  "inquiry.rateLimit.perEmailPerDay": define({
+    schema: z.number().int().min(1).max(50),
+    default: 3,
+    description: "Messages one email address can send in 24 hours, whatever connection it uses.",
+    rule: "LT spec §2",
+  }),
+  "inquiry.documents.maxFiles": define({
+    schema: z.number().int().min(0).max(5),
+    default: 3,
+    description: "PDFs a visitor can attach to one message (0 turns attachments off).",
+    rule: "LT-8",
+  }),
+  "inquiry.documents.maxMegabytes": define({
+    // The platform refuses requests over 4.5 MB, so 4 is the ceiling.
+    schema: z.number().int().min(1).max(4),
+    default: 4,
+    description: "Megabytes all of one message's attachments can total.",
+    rule: "LT-8",
+  }),
+  "inquiry.duplicateWindowDays": define({
+    schema: z.number().int().min(1).max(365),
+    default: 30,
+    description: "A message from the same email in the same category within this many days is flagged as a possible duplicate — never removed.",
+    rule: "LT-12",
+  }),
+  "notifications.fromAddress": define({
+    // Resend's shared sender works without a domain, but only delivers to the account owner.
+    schema: z.string().trim().min(3).max(200),
+    default: "MALULEKE-KS <onboarding@resend.dev>",
+    description: "The sender on the site's emails. Use an address on a domain verified in Resend before turning on applicant emails.",
+    rule: "LT-10",
+  }),
+  "notifications.ownerAddress": define({
+    schema: z.union([z.literal(""), z.string().trim().email()]),
+    default: "",
+    description: "Where new-message alerts go. Empty: the profile's contact email.",
+    rule: "LT-10",
+  }),
+  "notifications.recipientDailyCap": define({
+    schema: z.number().int().min(1).max(10),
+    default: 2,
+    description: "Automatic emails one address can receive in 24 hours — so a stranger's address typed into the form can't be flooded.",
+    rule: "LT-9",
+  }),
   "evidence.reviewDays": define({
     schema: z.number().int().min(7).max(365),
     default: 90,

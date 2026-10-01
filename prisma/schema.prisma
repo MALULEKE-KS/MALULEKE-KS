@@ -639,41 +639,215 @@ model DocumentGen {
 // VISITOR INTAKE
 // ============================================================
 
+// The categories behind "What brings you here?" (LETS-TALK-SPEC LT-1). A
+// category's form is chosen by its key (lib/inquiries/forms.ts); a key with no
+// form of its own gets the general one, so a new category is a row (EXT-1).
 model InquiryType {
-  id        String    @id @default(cuid())
-  key       String    @unique // hire | partnership | service | contribution | recruitment | collaboration
-  label     String
-  active    Boolean   @default(true)
-  inquiries Inquiry[]
-  createdAt DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  id          String           @id @default(cuid())
+  key         String           @unique // recruitment | service | collaboration | growth | general (+ retired: hire, partnership, contribution)
+  label       String
+  description String? // the line under the choice tile
+  sortOrder   Int              @default(0)
+  active      Boolean          @default(true)
+  inquiries   Inquiry[]
+  subtypes    InquirySubtype[]
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// The kind within a category — "Full-time", "MVP / prototype", "Research" —
+// always with an "other" escape (LT-1). A lookup: added in the admin.
+model InquirySubtype {
+  id            String      @id @default(cuid())
+  inquiryTypeId String
+  inquiryType   InquiryType @relation(fields: [inquiryTypeId], references: [id])
+  key           String
+  label         String
+  sortOrder     Int         @default(0)
+  active        Boolean     @default(true)
+  inquiries     Inquiry[]
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime    @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@unique([inquiryTypeId, key])
 }
 
 enum InquiryStatus {
   NEW
-  REVIEWED
-  RESPONDED
+  REVIEWED // shown as "Reviewing"
+  RESPONDED // shown as "In discussion"
   CLOSED
-  // Fixed workflow state machine — sequential transitions enforced in app logic (BR-2.1)
+  NEEDS_INFO
+  ACCEPTED
+  DECLINED
+  ON_HOLD
+  WITHDRAWN
+  // A guarded state machine: allowed transitions are a database trigger, and
+  // every change is appended to InquiryStatusChange (LT-6).
+}
+
+enum InquiryPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }
 
 model Inquiry {
-  id             String        @id @default(cuid())
-  inquiryTypeId  String
-  inquiryType    InquiryType   @relation(fields: [inquiryTypeId], references: [id])
-  name           String
-  email          String
-  message        String // BR-2.3: 20-5000 chars, enforced in lib/schemas.ts
-  source         String? // captured server-side only; "direct" when no Referer (BR-2.5)
-  status         InquiryStatus @default(NEW)
-  idempotencyKey String?       @unique // BR-2.6 — dedupes a resubmit within the client-held window
+  id                    String                @id @default(cuid())
+  // LT-3: the human-readable reference — identifies, never authorises. Made by the database.
+  reference             String                @unique @default(dbgenerated("new_inquiry_reference()"))
+  inquiryTypeId         String
+  inquiryType           InquiryType           @relation(fields: [inquiryTypeId], references: [id])
+  subtypeId             String?
+  subtype               InquirySubtype?       @relation(fields: [subtypeId], references: [id])
+  subtypeOther          String? // "Other — describe" (LT-1)
+  name                  String
+  email                 String
+  phone                 String?
+  organization          String?
+  role                  String?
+  website               String?
+  profileUrl            String?
+  preferredChannel      String                @default("email") // email | phone | whatsapp | sms | other (LT spec §13)
+  preferredChannelOther String?
+  message               String // BR-2.3: 20-5000 chars, enforced in lib/schemas.ts
+  // The category's own fields, validated on the server by its form schema (LT-1).
+  details               Json?
+  detailsVersion        Int                   @default(1)
+  source                String? // captured server-side only; "direct" when no Referer (BR-2.5)
+  status                InquiryStatus         @default(NEW)
+  priority              InquiryPriority       @default(NORMAL)
+  // Optimistic lock: a status change names the version it saw (LT-6).
+  version               Int                   @default(0)
+  idempotencyKey        String?               @unique // BR-2.6 — dedupes a resubmit within the client-held window
+  payloadHash           String? // BR-2.6 hardened: a reused key with a different payload is refused
+  // LT-12: flagged for review, never removed.
+  possibleDuplicateOfId String?
   // BR-5.2: set when personal data was stripped after the retention period; one-way (database trigger).
-  anonymizedAt   DateTime?     @db.Timestamptz(3)
-  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+  anonymizedAt          DateTime?             @db.Timestamptz(3)
+  createdAt             DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime              @default(now()) @updatedAt @db.Timestamptz(3)
+  statusChanges         InquiryStatusChange[]
+  notes                 InquiryNote[]
+  messages              InquiryMessage[]
+  meetings              InquiryMeeting[]
+  documents             InquiryDocument[]
+  notifications         Notification[]
 
   @@index([status, createdAt])
   @@index([inquiryTypeId])
+  @@index([email])
+}
+
+// LT-6: every status change, written by the database itself — append-only.
+model InquiryStatusChange {
+  id               String         @id @default(cuid())
+  inquiryId        String
+  inquiry          Inquiry        @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  fromStatus       InquiryStatus?
+  toStatus         InquiryStatus
+  internalReason   String? // private (LT-7)
+  applicantMessage String? // what the applicant was told, if anything
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([inquiryId, createdAt])
+}
+
+// LT-7: private notes. Never selected by anything an applicant can reach.
+model InquiryNote {
+  id        String   @id @default(cuid())
+  inquiryId String
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([inquiryId, createdAt])
+}
+
+// LT-7: what the applicant is told — the only table an applicant-facing view reads.
+model InquiryMessage {
+  id             String    @id @default(cuid())
+  inquiryId      String
+  inquiry        Inquiry   @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  kind           String // message | info-request | acceptance | decline | hold
+  body           String
+  requestedItems String[] // info-request: what's asked for
+  dueAt          DateTime? @db.Timestamptz(3)
+  channel        String    @default("email")
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([inquiryId, createdAt])
+}
+
+enum MeetingState {
+  SCHEDULED
+  RESCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// LT-5: interviews and meetings are events with their own lifecycle, never a status.
+model InquiryMeeting {
+  id            String       @id @default(cuid())
+  inquiryId     String
+  inquiry       Inquiry      @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  kind          String // hr | technical | manager | panel | discovery | client | general | other
+  startsAt      DateTime     @db.Timestamptz(3)
+  endsAt        DateTime?    @db.Timestamptz(3)
+  timeZone      String // IANA, as the applicant gave it — never assumed
+  location      String?
+  link          String?
+  contactPerson String?
+  instructions  String?
+  state         MeetingState @default(SCHEDULED)
+  createdAt     DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([inquiryId, startsAt])
+}
+
+// LT-8: an applicant's document — PDF only, checked by its bytes, never public.
+model InquiryDocument {
+  id        String   @id @default(cuid())
+  inquiryId String
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  fileName  String // sanitised display name only — never a path
+  byteSize  Int
+  sha256    String
+  fileData  Bytes
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([inquiryId, sha256])
+}
+
+enum NotificationState {
+  PENDING
+  SENT
+  FAILED
+}
+
+// LT-10: the email outbox. The inquiry is saved first; a send that fails is
+// retried by the scheduler and visible in the admin — it never undoes state.
+model Notification {
+  id            String            @id @default(cuid())
+  kind          String // inquiry-received | owner-alert | …
+  recipient     String
+  subject       String
+  body          String // plain text, rendered once when queued — a retry resends exactly this
+  inquiryId     String?
+  inquiry       Inquiry?          @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  state         NotificationState @default(PENDING)
+  attempts      Int               @default(0)
+  lastError     String?
+  providerId    String?
+  nextAttemptAt DateTime          @default(now()) @db.Timestamptz(3)
+  sentAt        DateTime?         @db.Timestamptz(3)
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([state, nextAttemptAt])
 }
 
 // ============================================================
