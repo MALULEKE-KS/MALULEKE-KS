@@ -62,7 +62,7 @@ describe("cron routes (#94)", () => {
     process.env.CRON_SECRET = SECRET;
     const res = await cron(cronRequest("daily", `Bearer ${SECRET}`), params("daily"));
     const { results } = await res.json();
-    expect(results.map((r: { job: string }) => r.job)).toEqual(["maintenance.daily", "metrics.compute", "github.sync"]);
+    expect(results.map((r: { job: string }) => r.job)).toEqual(["maintenance.daily", "metrics.compute", "github.sync", "systems.writeups"]);
     const sync = results.find((r: { job: string }) => r.job === "github.sync");
     if (sync.status === "failed") {
       expect(sync.error).toMatch(/GITHUB_SYNC_TOKEN is not set/);
@@ -115,7 +115,7 @@ describe("admin: run now, and the list of jobs (#94)", () => {
   it("lists every job with its schedule, and each run's trigger", async () => {
     const res = await listJobs(new NextRequest("http://localhost/api/v1/admin/jobs", { headers: { cookie: `admin_session=${cookie}` } }));
     const body = await res.json();
-    expect(body.jobs.map((j: { name: string }) => j.name).sort()).toEqual(["github.sync", "maintenance.daily", "metrics.compute"]);
+    expect(body.jobs.map((j: { name: string }) => j.name).sort()).toEqual(["github.sync", "maintenance.daily", "metrics.compute", "systems.writeups"]);
     expect(body.jobs.every((j: { schedule: string | null }) => j.schedule === "0 3 * * *")).toBe(true);
     expect(body.data[0]).toHaveProperty("trigger");
   });

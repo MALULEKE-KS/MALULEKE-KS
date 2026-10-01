@@ -229,6 +229,12 @@ model System {
   // No delete endpoint exists for System anywhere in the contract — retirement
   // is always contentStatus = ARCHIVED (BR-1.9). Rows are never hard-deleted.
   caseStudyBody          String? // MDX
+  // BR-4.5: who wrote the description (sync | generated | owner) and the case study
+  // (none | generated | owner). The database refuses a generated write over the owner's words.
+  descriptionSource      String           @default("sync")
+  caseStudySource        String           @default("none")
+  writeupGeneratedAt     DateTime?        @db.Timestamptz(3)
+  writeupFromPushedAt    DateTime?        @db.Timestamptz(3) // the repo push the write-up was generated from
   impacts                Impact[]
   testimonials           Testimonial[]
   skills                 SkillOnSystem[]
@@ -256,16 +262,16 @@ model System {
   ownerPermissionNote String?
 
   // --- GitHub metadata (#70): sourced facts, refreshed by the sync (F4) ---
-  githubFullName   String?   @unique // "owner/repo"
-  githubOwnerLogin String?
-  repoPrivate      Boolean   @default(false) // BR-1.7: shown as private publicly, never linked
-  githubPushedAt   DateTime? @db.Timestamptz(3)
-  githubLanguages  Json? // { "TypeScript": 120345, ... } bytes per language
-  githubTopics     String[]  @default([])
-  githubStars      Int?
-  githubSyncedAt   DateTime? @db.Timestamptz(3)
+  githubFullName      String?      @unique // "owner/repo"
+  githubOwnerLogin    String?
+  repoPrivate         Boolean      @default(false) // BR-1.7: shown as private publicly, never linked
+  githubPushedAt      DateTime?    @db.Timestamptz(3)
+  githubLanguages     Json? // { "TypeScript": 120345, ... } bytes per language
+  githubTopics        String[]     @default([])
+  githubStars         Int?
+  githubSyncedAt      DateTime?    @db.Timestamptz(3)
   // F5c — the AI guide's GitHub knowledge; public repos only (the sync never stores a private repo's README or commits)
-  githubCreatedAt     DateTime? @db.Timestamptz(3)
+  githubCreatedAt     DateTime?    @db.Timestamptz(3)
   githubReadmeExcerpt String?
   commits             RepoCommit[]
 
@@ -888,32 +894,35 @@ model CvOptions {
 // Read-only; F1.8 limits the public site's database role to these views.
 
 view PublicSystem {
-  id               String    @unique
-  name             String
-  slug             String    @unique
-  organization     String // masked for ANONYMIZED_ONLY without disclosure (BR-1.4)
-  organizationSlug String? // null when the name is masked, so filters can't correlate
-  statusKey        String
-  status           String
-  statusColorToken String
-  stage            String // shipped | building | queued
-  domainKey        String?
-  domain           String?
-  description      String
-  repoUrl          String? // null for NDA_RESTRICTED (BR-1.3) or a private repo (BR-1.7)
-  liveUrl          String?
-  screenshotUrl    String?
-  techStack        String[]
-  isFlagship       Boolean
-  repoPrivate      Boolean
-  sortOrder        Int
-  featuredOnHome   Boolean
-  homeOrder        Int
-  caseStudyBody    String
-  githubPushedAt   DateTime?
-  updatedAt        DateTime
-  onCv             Boolean
-  cvOrder          Int
+  id                 String    @unique
+  name               String
+  slug               String    @unique
+  organization       String // masked for ANONYMIZED_ONLY without disclosure (BR-1.4)
+  organizationSlug   String? // null when the name is masked, so filters can't correlate
+  statusKey          String
+  status             String
+  statusColorToken   String
+  stage              String // shipped | building | queued
+  domainKey          String?
+  domain             String?
+  description        String
+  repoUrl            String? // null for NDA_RESTRICTED (BR-1.3) or a private repo (BR-1.7)
+  liveUrl            String?
+  screenshotUrl      String?
+  techStack          String[]
+  isFlagship         Boolean
+  repoPrivate        Boolean
+  sortOrder          Int
+  featuredOnHome     Boolean
+  homeOrder          Int
+  caseStudyBody      String
+  githubPushedAt     DateTime?
+  updatedAt          DateTime
+  onCv               Boolean
+  cvOrder            Int
+  descriptionSource  String
+  caseStudySource    String
+  writeupGeneratedAt DateTime?
 }
 
 view PublicImpact {

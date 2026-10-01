@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { proposeComputedMetrics } from "@/lib/metrics";
 import { runGithubSync } from "@/lib/jobs/github-sync";
 import { runDailyMaintenance } from "@/lib/jobs/maintenance";
+import { runSystemWriteups } from "@/lib/jobs/system-writeups";
 import { runJob, type JobTrigger, type RunJobResult } from "@/lib/jobs/run-job";
 import { DAILY_JOBS } from "@/lib/jobs/schedule";
 
@@ -34,6 +35,11 @@ export const JOBS = {
     description: "Sync every repo the owner's GitHub token can see into the curation queue, with metadata and weekly activity.",
     rules: ["BR-1.6", "BR-1.7", "BR-1.11", "BR-1.14", "BR-8.2"],
     run: runGithubSync,
+  },
+  "systems.writeups": {
+    description: "Write each live system's description and case study with AI from its public repo, when the repo has changed — never over the owner's own words (off until writeups.enabled).",
+    rules: ["BR-4.5", "BR-4.4", "BR-1.7"],
+    run: () => runSystemWriteups(),
   },
 } satisfies Record<string, JobDefinition>;
 

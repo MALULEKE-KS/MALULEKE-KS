@@ -112,6 +112,24 @@ export interface GithubSyncSummary {
   accountErrors: { account: string; error: string }[];
 }
 
+/**
+ * A repo's homepage, if it is a live site: an http(s) address that isn't
+ * GitHub itself — a homepage pointing back at a repo would make "View it live"
+ * open source code.
+ */
+export function liveSite(homepage: string | null): string | null {
+  const url = homepage?.trim();
+  if (!url) return null;
+  try {
+    const { protocol, hostname } = new URL(url);
+    if (protocol !== "https:" && protocol !== "http:") return null;
+    if (hostname === "github.com" || hostname.endsWith(".github.com")) return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+
 /** GitHub's own reason for a failed call, from its JSON body — it names the policy or permission at fault. */
 async function githubError(path: string, res: Response): Promise<Error> {
   let reason = "";
@@ -124,17 +142,17 @@ async function githubError(path: string, res: Response): Promise<Error> {
   return new Error(`GitHub ${path}: ${res.status} ${res.statusText}${reason ? ` — ${reason}` : ""}`.trim());
 }
 
-class GithubClient {
+export class GithubClient {
   constructor(
     private token: string,
     private fetchImpl: FetchLike,
   ) {}
 
-  async request(path: string): Promise<Response> {
+  async request(path: string, accept = "application/vnd.github+json"): Promise<Response> {
     const res = await this.fetchImpl(`${GITHUB_API}${path}`, {
       headers: {
         Authorization: `Bearer ${this.token}`,
-        Accept: "application/vnd.github+json",
+        Accept: accept,
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
@@ -407,7 +425,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
             // BR-8.2 — fill, never overwrite, what the admin curates. A name
             // still equal to the raw repo name was never curated.
             ...(existing.name === repo.name && { name: displayNameFromRepo(repo.name) }),
-            ...(existing.liveUrl === null && repo.homepage && { liveUrl: repo.homepage }),
+            ...(existing.liveUrl === null && liveSite(repo.homepage) && { liveUrl: liveSite(repo.homepage) }),
             ...(existing.repoRelationshipId === null && { repoRelationshipId: relationshipId(relationship) }),
           },
         });
@@ -421,7 +439,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
               name: displayNameFromRepo(repo.name),
               slug: await resolveSlug(slugify(repo.name), null),
               description: repo.description?.trim() || repo.name,
-              liveUrl: repo.homepage || null,
+              liveUrl: liveSite(repo.homepage),
               techStack: repo.language ? [repo.language] : [],
               organizationId: organization.id,
               statusId: defaultStatus.id,

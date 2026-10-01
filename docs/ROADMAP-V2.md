@@ -27,6 +27,13 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — Systems pages, generated write-ups (2026-10-01, local)
+- **Catalog** (`/systems`): grouped by GitHub home with the owner's role; zero counts no longer shown; a description that only repeats the repo name gives way to the README's opening or nothing; a live marker on systems that moved this month.
+- **Case study** (`/systems/[slug]`) rebuilt as an engineering dossier: proof strip (started, shipped, last push, commits this year), the write-up with an "On this page" index, at-a-glance panel with a language bar and topics, 26 weeks of activity and the latest commits, skills it proves, related work by domain, home and shared stack, "Ask the AI guide about it".
+- **Generated write-ups — BR-4.5 replaced** (owner: "every system description and case study should be generated automatically … using their repo"): the daily `systems.writeups` job writes each live public system's description, case study and stack from its repository; labelled as AI on the page and in the API; the owner's own words are never replaced (database trigger); "Regenerate from repo" in Admin → Systems; off until `writeups.enabled`. Settings `writeups.model`, `writeups.maxPerRun`, `writeups.refreshDays`. The first eleven write-ups were written the same way, from each repo, and marked generated.
+- **GitHub sync:** one account refusing the token no longer fails the run (`accountErrors`, with GitHub's own reason); a repo homepage pointing back at GitHub is no longer taken for a live site.
+- **AI guide:** counts a Vercel deployment as connected (its OIDC token arrives per request); the hero character uses its poses on its own, each held 5 s unless the visitor clicks or types.
+
 ### Page Build Playbook (2026-10-01)
 - `docs/PAGE-BUILD-PLAYBOOK.md`: the home page walkthrough turned into the reusable process for every page — the owner's rules, nine stages from brief to review, the toolkit it produced, the motion budget, the audit checklist, the pitfalls already paid for, and a sheet of unique resources per page. Added to CLAUDE.md's governing documents.
 

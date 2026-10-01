@@ -77,6 +77,9 @@ export async function getPublicSystemBySlug(slug: string) {
   return {
     ...toPublicSystem(row),
     caseStudyBody: row.caseStudyBody,
+    // BR-4.5: an AI-written case study is labelled as such, wherever it's shown.
+    caseStudyAuthor: !row.caseStudyBody.trim() ? null : row.caseStudySource === "generated" ? ("ai" as const) : ("owner" as const),
+    caseStudyWrittenAt: row.caseStudySource === "generated" ? (row.writeupGeneratedAt?.toISOString() ?? null) : null,
     impacts: impacts.map((i) => ({ label: i.label, value: i.value })),
     testimonials: testimonials.map((t) => ({
       authorName: t.authorName,

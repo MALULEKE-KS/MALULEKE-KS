@@ -5,15 +5,41 @@
 // admin-entered body can't inject markup or scripts. Links leaving the site
 // open in a new tab with no opener.
 
+import { Children, isValidElement, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+/** A heading's anchor: "How it works" → "how-it-works". */
+export function headingSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** The body's section headings (## lines), for an "On this page" index. */
+export function markdownSections(markdown: string): { id: string; title: string }[] {
+  return markdown
+    .split("\n")
+    .filter((l) => /^##\s+\S/.test(l))
+    .map((l) => l.replace(/^##\s+/, "").replace(/[*_`]/g, "").trim())
+    .map((title) => ({ id: headingSlug(title), title }));
+}
+
+function textOf(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((c) => (typeof c === "string" || typeof c === "number" ? String(c) : isValidElement<{ children?: ReactNode }>(c) ? textOf(c.props.children) : ""))
+    .join("");
+}
 
 const components: Components = {
   h1: ({ children }) => (
     <h2 className="text-ink mt-12 font-sans text-3xl font-semibold tracking-tight">{children}</h2>
   ),
   h2: ({ children }) => (
-    <h2 className="text-ink mt-12 font-sans text-2xl font-semibold tracking-tight">{children}</h2>
+    <h2 id={headingSlug(textOf(children))} className="text-ink mt-12 scroll-mt-28 font-sans text-2xl font-semibold tracking-tight first:mt-0">
+      {children}
+    </h2>
   ),
   h3: ({ children }) => (
     <h3 className="text-ink mt-10 font-sans text-xl font-semibold">{children}</h3>
