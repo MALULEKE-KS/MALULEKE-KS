@@ -14,6 +14,15 @@ import { SiteHeader } from "@/components/shared/SiteHeader";
 import { SiteFooter } from "@/components/shared/SiteFooter";
 import { ConsentProvider } from "@/components/shared/Consent";
 import { getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
+import { getPlatformPulse, getPublicHomes } from "@/lib/queries/profile";
+import { getContentBlock } from "@/lib/content/blocks";
+import { getPublicLenses } from "@/lib/queries/lenses";
+import { FLAGS, isFlagOn } from "@/lib/flags";
+import { getSetting } from "@/lib/settings";
+import { GuideProvider } from "@/components/guide/GuideProvider";
+import { guideProviderConfigured } from "@/lib/guide/model";
+import { GuideLauncher } from "@/components/guide/GuideLauncher";
+import { GuidePanel } from "@/components/guide/GuidePanel";
 
 export async function PublicShell({ children }: { children: React.ReactNode }) {
   // The chrome reads live data, so it renders per request — never prerendered
@@ -22,23 +31,72 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
   await connection();
   // The owner's details for the footer, from the admin-editable profile (#99).
   // The review promise is the admin setting, never typed-in copy (BR-2.2).
-  const [profile, reviewSlaHours] = await Promise.all([getSiteProfile(), getReviewSlaHours()]);
+  // The footer's homes and status line are data too (F5c, D11).
+  // The AI guide is on only when its flag is (BR-4.4); its lenses and limits are data.
+  const [
+    profile,
+    reviewSlaHours,
+    homes,
+    pulse,
+    guideEnabled,
+    lenses,
+    maxQuestionCharacters,
+    aiGuide,
+  ] = await Promise.all([
+    getSiteProfile(),
+    getReviewSlaHours(),
+    getPublicHomes(),
+    getPlatformPulse(),
+    isFlagOn(FLAGS.concierge),
+    getPublicLenses(),
+    getSetting("concierge.maxQuestionCharacters"),
+    getContentBlock("ai-guide"),
+  ]);
+  // Where the guide's answers may link out: GitHub and the owner's own public profiles.
+  const linkHosts = [
+    ...new Set([
+      "github.com",
+      ...profile.links.flatMap((l) => {
+        try {
+          const u = new URL(l.url);
+          return u.protocol === "https:" && !u.hostname.endsWith("wa.me") ? [u.hostname.toLowerCase().replace(/^www\./, "")] : [];
+        } catch {
+          return [];
+        }
+      }),
+    ]),
+  ];
   return (
     // Analytics consent (BR-5.1/5.4) wraps the public site only — never the admin.
     <ConsentProvider>
-      <div className="flex min-h-screen flex-col">
-        <a
-          href="#main"
-          className="focus:bg-ember focus:text-ink sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:text-sm"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <SiteFooter profile={profile} reviewSlaHours={reviewSlaHours} />
-      </div>
+      <GuideProvider
+        enabled={guideEnabled}
+        ready={guideProviderConfigured()}
+        ownerFirstName={profile.name.split(/\s+/)[0] ?? profile.name}
+        lenses={lenses}
+        linkHosts={linkHosts}
+      >
+        <div className="flex min-h-screen flex-col">
+          <a
+            href="#main"
+            className="focus:bg-ember focus:text-ink sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:text-sm"
+          >
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <SiteFooter
+            profile={profile}
+            reviewSlaHours={reviewSlaHours}
+            homes={homes}
+            pulse={pulse}
+          />
+        </div>
+        <GuideLauncher />
+        <GuidePanel maxQuestionCharacters={maxQuestionCharacters} suggestions={aiGuide?.suggestions ?? []} />
+      </GuideProvider>
     </ConsentProvider>
   );
 }

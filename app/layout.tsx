@@ -27,6 +27,8 @@ const ibmPlexSans = IBM_Plex_Sans({
 const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  // Italic for the editorial accent words in headlines ("Plex, elevated", owner's choice 2026-09-30).
+  style: ["normal", "italic"],
   variable: "--font-ibm-plex-serif",
   display: "swap",
 });

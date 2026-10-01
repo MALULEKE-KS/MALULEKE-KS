@@ -25,6 +25,7 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         label: parsed.data.label,
         priorityContent: parsed.data.priorityContent as Prisma.InputJsonValue,
         aiFramingPrompt: parsed.data.aiFramingPrompt,
+        sortOrder: parsed.data.sortOrder,
       },
     }));
 

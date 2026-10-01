@@ -29,3 +29,10 @@ npm-debug.log*
 
 # Local Claude Code session state (ephemeral, machine-specific)
 .claude/
+
+# Personal files that stay on this machine, never in the public repo:
+# the CV document (it holds the home address and placeholder referees) and the
+# owner's real photos (the About photo is uploaded in Admin → Profile → Photos).
+/*.docx
+/design/character/source-portrait.png
+/design/character/about-portrait-graphite.png

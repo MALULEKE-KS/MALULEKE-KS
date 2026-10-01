@@ -308,3 +308,70 @@ html {
     background-image: none !important;
   }
 }
+
+/* ---- Type scale: "Plex, elevated" (owner's choice, 2026-09-30) ----
+   Fluid sizes that step smoothly from phone to desktop, tracking tightened as
+   size grows, and one editorial device: accent words in a headline set in
+   Plex Serif italic (written *like this* in the content, rendered by
+   components/shared/Accent.tsx). Numbers are tabular wherever they're data. */
+.type-display {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  font-size: clamp(2.35rem, 1.6rem + 3.2vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.032em;
+  font-weight: 600;
+  text-wrap: balance;
+  font-feature-settings: "ss01" 1, "kern" 1;
+}
+.type-h2 {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  font-size: clamp(1.85rem, 1.4rem + 1.8vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.026em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+.type-lede {
+  font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.2rem);
+  line-height: 1.65;
+  letter-spacing: -0.003em;
+  text-wrap: pretty;
+}
+.type-eyebrow {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.type-accent {
+  font-family: var(--font-ibm-plex-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.type-data {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-variant-numeric: tabular-nums slashed-zero;
+  letter-spacing: -0.02em;
+}
+
+/* Magic UI AnimatedShinyText: a glare that pans across the text. */
+@keyframes shiny-text {
+  0%, 90%, 100% { background-position: calc(-100% - var(--shiny-width)) 0; }
+  30%, 60% { background-position: calc(100% + var(--shiny-width)) 0; }
+}
+.animate-shiny-text {
+  animation: shiny-text 8s infinite;
+}
+
+/* The AI guide's panel gliding in when it opens. */
+@keyframes guide-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The system map's beams: a short light travelling along each connection. */
+@keyframes beam-travel {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}

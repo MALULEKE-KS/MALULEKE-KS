@@ -34,6 +34,7 @@ const EXEMPT = new Set([
   "LoginChallenge", // auth internals — auth events are logged explicitly
   "Event", // analytics
   "SystemActivityWeek", // GitHub sync data, recorded by JobRun
+  "RepoCommit", // mirror of GitHub commits for the AI guide, refreshed and pruned by the sync (JobRun)
   "ContentChunk", // AI index (V1.1)
 ]);
 

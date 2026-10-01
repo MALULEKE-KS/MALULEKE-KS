@@ -39,13 +39,10 @@ export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBa
                   <MessageSquareText aria-hidden="true" className="text-ember size-3.5" />
                   Contact
                 </span>
-                <h2
-                  id="contact-title"
-                  className="mt-6 font-sans text-4xl leading-[1.05] font-semibold tracking-tight md:text-6xl"
-                >
-                  Have something to <span className="text-ember-gradient">build</span>?
+                <h2 id="contact-title" className="type-display mt-6">
+                  Have something to <em className="type-accent text-ember-gradient pr-[0.06em]">build</em>?
                 </h2>
-                <p className="text-mist mt-6 max-w-xl text-lg leading-relaxed">
+                <p className="type-lede text-mist mt-6 max-w-xl">
                   Tell me what it is. Every inquiry goes through one form, and I review each one.
                 </p>
                 <p className="text-paper mt-4 inline-flex items-center gap-2 text-sm">

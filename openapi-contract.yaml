@@ -24,6 +24,8 @@ tags:
   - name: Profile (Admin)
   - name: Settings (Admin)
   - name: Activity Log (Admin)
+  - name: Content (Public)
+  - name: Content (Admin)
 
 security:
   - {}
@@ -322,7 +324,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [status, domain, inquiry-type, milestone-type, skill-category, repo-relationship]
+            enum: [status, domain, inquiry-type, milestone-type, skill-category, repo-relationship, title-kind, organization-kind]
         - name: includeInactive
           in: query
           schema: { type: boolean, default: false }
@@ -502,6 +504,16 @@ paths:
         "200": { description: "{ codes: string[10], remaining: 10, low: false } — show once, never retrievable again" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { description: "UNAUTHORIZED (credentials) or SESSION_REVOKED (fifth failure)", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  /admin/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Sign out — ends every session of the admin, not just this one (#104)
+      description: "Increments the session generation (like a password change) and clears the cookie. Logged as auth.logout."
+      security: [{ adminSession: [] }]
+      responses:
+        "200": { description: "{ signedOut: true }" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
   /admin/auth/change-password:
     post:
@@ -1139,6 +1151,111 @@ paths:
   # of the supported public and admin surface.
   /profile:
     get: { tags: [Profile (Public)], summary: Get the public owner profile and links, description: "Admin-edited profile data, its links, and affiliations (organizations founded or co-founded, #99).", responses: { "200": { description: "Profile (with links[] and affiliations[] — name, slug, role)" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /content/{key}:
+    get:
+      tags: [Content (Public)]
+      summary: Get a page content block (#106)
+      description: "Owner-edited site copy by key, e.g. how-i-build — { mission, principles[{ name, summary, body }] }. 404 for an unknown key or a block not yet written."
+      parameters: [{ name: key, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$" } }]
+      responses: { "200": { description: "{ key, body }" }, "404": { $ref: "#/components/responses/NotFound" } }
+  /admin/content:
+    get: { tags: [Content (Admin)], summary: "Every editable content block — key, title, description, updatedAt (#106)", security: [{ adminSession: [] }], responses: { "200": { description: "{ blocks: [...] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/content/{key}:
+    get:
+      tags: [Content (Admin)]
+      summary: Get one content block with its current body (null until written)
+      security: [{ adminSession: [] }]
+      parameters: [{ name: key, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: "{ key, title, description, body, updatedAt }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
+    put:
+      tags: [Content (Admin)]
+      summary: Replace a content block — the body must match the block's schema (lib/content/blocks.ts)
+      security: [{ adminSession: [] }]
+      parameters: [{ name: key, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, description: "The block body, e.g. how-i-build: { mission: string (≤400), principles: [{ name (≤80), summary (≤160), body (≤800) }] (1–8) }" } } } }
+      responses: { "200": { description: "{ key, body, updatedAt }" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
+  /homes:
+    get: { tags: [Profile (Public)], summary: "The GitHub homes — the owner's account and ventures — with role, GitHub accounts and published system counts (F5c)", responses: { "200": { description: "{ data: [{ name, slug, role, kind, publishedSystems, systems: [slug], github: [{ login, url }] }] }" } } }
+  /activity:
+    get: { tags: [Home (Public)], summary: "Commits per week for each published system over the last 26 weeks — counts only (F5c)", responses: { "200": { description: "{ data: [{ slug, weeks: [{ weekStart, commits }] }] }" } } }
+  /github/repos:
+    get: { tags: [Home (Public)], summary: "The owner's public repos in his own homes — languages, topics, stars, dates, activity, README excerpt; never private, archived or client-restricted (F5c)", responses: { "200": { description: "{ data: [{ fullName, name, home, homeSlug, url, systemPath, description, languages, topics, stars, createdAt, pushedAt, readmeExcerpt, commitsLast4Weeks, commitsLastYear }] }" } } }
+  /github/commits:
+    get:
+      tags: [Home (Public)]
+      summary: "Recent commits (last 90 days) in the owner's public repos, newest first (F5c)"
+      parameters: [{ name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 400, default: 100 } }]
+      responses: { "200": { description: "{ data: [{ repo, message, committedAt }] }" } }
+  /guide:
+    post:
+      tags: [Home (Public)]
+      summary: "Ask the AI guide — streams an answer grounded in the site's public data (UI message stream). Off unless the concierge flag is on; rate-limited per visitor and per day (concierge.* settings)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                messages: { type: array, maxItems: 220, description: "The conversation so far: user messages (one text part) and the guide's answers (text and its own tool parts only)" }
+                lens: { type: string, maxLength: 60, nullable: true, description: "The visitor's lens key (GET /lenses)" }
+      responses:
+        "200": { description: "text/event-stream — the AI SDK UI message stream" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: "GUIDE_OFF — the guide is switched off" }
+        "429": { description: "RATE_LIMITED, CONVERSATION_LIMIT or GUIDE_RESTING (the daily cap)" }
+        "503": { description: "GUIDE_UNAVAILABLE — no model provider configured" }
+  /lenses:
+    get: { tags: [Home (Public)], summary: "The visitor lenses the home page and the AI guide open with, in the owner's order — key and label only (Constitution §4)", responses: { "200": { description: "{ data: [{ key, label }] }" } } }
+  /platform/pulse:
+    get: { tags: [Home (Public)], summary: "The platform reporting on itself — rules the database enforces, audit events, last job and sync, the running build (F5c)", responses: { "200": { description: "{ rulesEnforcedByDatabase, auditEventsLast7Days, auditEventsTotal, lastSuccessfulJobAt, lastGithubSyncAt, deployment }" } } }
+  /profile/photo/{purpose}:
+    get:
+      tags: [Profile (Public)]
+      summary: "The owner's current photo for a place on the site, e.g. about — the image itself (WebP), cached by content hash (BR-1.17)"
+      parameters: [{ name: purpose, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the photo's hash — makes the link immutable" }]
+      responses: { "200": { description: image/webp }, "304": { description: Not modified }, "404": { $ref: "#/components/responses/NotFound" } }
+  /admin/profile/photos:
+    get: { tags: [Profile (Admin)], summary: "Every photo version, newest first per purpose (no bytes)", security: [{ adminSession: [] }], responses: { "200": { description: "{ versions: [...] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [Profile (Admin)]
+      summary: "Upload a photo — multipart fields file, purpose, altText; re-encoded to WebP without metadata; becomes current for its purpose (BR-1.17)"
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file, purpose, altText], properties: { file: { type: string, format: binary }, purpose: { type: string }, altText: { type: string, maxLength: 300 } } } } } }
+      responses: { "201": { description: The new current version }, "200": { description: Same photo as the current one — nothing changed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "413": { description: Larger than profile.photo.maxMegabytes }, "415": { description: Not a readable image } }
+  /admin/profile/photos/{id}:
+    get: { tags: [Profile (Admin)], summary: "Preview any version — the image itself", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: image/webp }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+    patch:
+      tags: [Profile (Admin)]
+      summary: "Change a version's alt text — the only thing about a photo that can change (BR-1.17)"
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [altText], properties: { altText: { type: string, maxLength: 300 } } } } } }
+      responses: { "200": { description: The version }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
+  /admin/profile/photos/{id}/restore:
+    post: { tags: [Profile (Admin)], summary: "Make an earlier version current again (BR-1.17)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: The version }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/profile/titles:
+    get: { tags: [Profile (Admin)], summary: "The owner's titles and qualifications, current and past (F5c, D13)", security: [{ adminSession: [] }], responses: { "200": { description: "{ data: [{ id, kind, kindLabel, label, detail, educationId, sortOrder, startsOn, endsOn, current }] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post:
+      tags: [Profile (Admin)]
+      summary: Add a title or qualification — kind is a TitleKind key
+      security: [{ adminSession: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [kind, label], properties: { kind: { type: string }, label: { type: string, maxLength: 120 }, detail: { type: string, nullable: true, maxLength: 160 }, educationId: { type: string, nullable: true }, sortOrder: { type: integer, minimum: 0 }, startsOn: { type: string, format: date, nullable: true }, endsOn: { type: string, format: date, nullable: true } } } } } }
+      responses: { "201": { description: The title }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } }
+  /admin/profile/titles/{id}:
+    patch:
+      tags: [Profile (Admin)]
+      summary: Replace a title (same body as POST) — give it an end date to retire it while keeping the record
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: The title }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
+    delete:
+      tags: [Profile (Admin)]
+      summary: Remove a title
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: Removed }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
   /home:
     get:
       tags: [Home (Public)]
@@ -1297,8 +1414,10 @@ components:
       properties:
         name: { type: string, minLength: 1 }
         slug: { type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
-        isClient: { type: boolean, default: false }
-        githubLogin: { type: string, nullable: true }
+        role: { type: string, nullable: true, maxLength: 80, description: "The owner's role, e.g. Founder — set makes it an affiliation" }
+        isClient: { type: boolean, default: false, description: "BR-1.2 — the default for systems created afterwards only" }
+        githubLogins: { type: array, items: { type: string }, maxItems: 20, description: "GitHub accounts whose repos the sync files here" }
+        kind: { type: string, nullable: true, description: "An OrganizationKind key — personal, venture, client, … (F5c)" }
     ImpactInput:
       type: object
       required: [label, value]
@@ -1757,6 +1876,7 @@ components:
         label: { type: string }
         priorityContent: { type: object }
         aiFramingPrompt: { type: string }
+        sortOrder: { type: integer }
 
     VisitorLensInput:
       type: object
@@ -1766,6 +1886,7 @@ components:
         label: { type: string, minLength: 1 }
         priorityContent: { type: object }
         aiFramingPrompt: { type: string, minLength: 1 }
+        sortOrder: { type: integer, minimum: 0, maximum: 1000, default: 0 }
 
     CvFormat:
       type: string

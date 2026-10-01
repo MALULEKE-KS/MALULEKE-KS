@@ -73,7 +73,8 @@ describe("what restarts the clock (BR-1.16)", () => {
   it("a stamp can't be set in the future", async () => {
     const system = await createSystem();
     await db.system.update({ where: { id: system.id }, data: { contentReviewedAt: new Date(Date.now() + 30 * DAY) } });
-    expect(await reviewedAt(system.id)).toBeLessThanOrEqual(Date.now());
+    // Clamped to the database's "now" — within a second of ours (the two clocks can differ by milliseconds), not 30 days ahead.
+    expect(await reviewedAt(system.id)).toBeLessThan(Date.now() + 1000);
   });
 });
 

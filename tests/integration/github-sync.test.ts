@@ -89,14 +89,14 @@ describe("the sync (#95)", () => {
     repo(5, STRANGER, `${RUN}-unknown-work`),
   ];
 
-  it("creates drafts for owned (public and private) and collaborated repos; skips forks; reports unmapped owners", async () => {
+  it("shows the owner's public repos by default, keeps private (setting), client and collaborated work hidden; skips forks; reports unmapped owners", async () => {
     const summary = await sync(repos, { pendingStats: [`${OWNER}/${RUN}-private-app`] });
     expect(summary).toMatchObject({ created: 3, skippedForks: 1, unmappedOwners: [STRANGER], activityPending: [`${OWNER}/${RUN}-private-app`], errors: [] });
 
     const pub = await byRepo(1);
     expect(pub).toMatchObject({
-      contentStatus: "DRAFT", // BR-1.6
-      needsCuration: true,
+      contentStatus: "PUBLISHED", // BR-1.6 — shown by default
+      needsCuration: true, // …and flagged as new for the admin
       repoPrivate: false,
       githubFullName: `${OWNER}/${RUN}-public-app`,
       githubOwnerLogin: OWNER,
@@ -108,12 +108,13 @@ describe("the sync (#95)", () => {
     expect(pub!.githubLanguages).toEqual({ TypeScript: 1200, CSS: 300 });
     expect(pub!.repoRelationship?.key).toBe("owner");
 
-    expect(await byRepo(2)).toMatchObject({ repoPrivate: true, contentStatus: "DRAFT" }); // BR-1.7
+    expect(pub!.statusId).toBe((await db.status.findUniqueOrThrow({ where: { key: "on_github" } })).id); // honest status, not "Planned"
+    expect(await byRepo(2)).toMatchObject({ repoPrivate: true, contentStatus: "DRAFT", needsCuration: true }); // BR-1.6 default public-only: private waits for review
     expect(await byRepo(3)).toBeNull();
     expect(await byRepo(5)).toBeNull();
 
     const client = await byRepo(4);
-    expect(client).toMatchObject({ organizationId: clientOrgId, clientVisibility: "REQUIRES_APPROVAL" }); // BR-1.2
+    expect(client).toMatchObject({ organizationId: clientOrgId, clientVisibility: "REQUIRES_APPROVAL", contentStatus: "DRAFT" }); // BR-1.2 — waits for approval
     expect(client!.repoRelationship?.key).toBe("collaborator"); // BR-1.11 — publishing waits for permission
     expect(client!.ownerPermission).not.toBe("NOT_REQUIRED");
   });

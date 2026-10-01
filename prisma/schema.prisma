@@ -119,19 +119,25 @@ model ActivityLog {
 // ============================================================
 
 model Organization {
-  id           String   @id @default(cuid())
+  id           String            @id @default(cuid())
   name         String
-  slug         String   @unique
+  slug         String            @unique
   role         String? // "Founder" | "Co-founder"
-  isClient     Boolean  @default(false) // drives BR-1.2 default at System creation time only — never retroactive
+  isClient     Boolean           @default(false) // drives BR-1.2 default at System creation time only — never retroactive
   // Optional override for GitHub org/user login names that don't slugify to
   // this Organization's slug (e.g. GitHub login "MALULEKE-KS" -> this row's
   // slug "personal"). github-sync.ts checks this before falling back to
   // slugify(githubLogin) == slug.
-  githubLogins String[] @default([])
+  githubLogins String[]          @default([])
+  // personal / venture / client … — a lookup (EXT-1, F5c). The owner's own
+  // account and ventures are the GitHub "homes" (PublicHome).
+  kindId       String?
+  kind         OrganizationKind? @relation(fields: [kindId], references: [id], onDelete: Restrict)
   systems      System[]
-  createdAt    DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([kindId])
 }
 
 // Which pipeline count a Status belongs to. A fixed control dimension (EXT-1
@@ -258,6 +264,10 @@ model System {
   githubTopics     String[]  @default([])
   githubStars      Int?
   githubSyncedAt   DateTime? @db.Timestamptz(3)
+  // F5c — the AI guide's GitHub knowledge; public repos only (the sync never stores a private repo's README or commits)
+  githubCreatedAt     DateTime? @db.Timestamptz(3)
+  githubReadmeExcerpt String?
+  commits             RepoCommit[]
 
   statusChanges    SystemStatusChange[]
   slugHistory      SystemSlugHistory[]
@@ -350,6 +360,23 @@ model SystemStatusChange {
 
 // Commits per ISO week (weekStart is a Monday), per system: "Now building"
 // and pace (#70). Filled by the GitHub sync (F4).
+// F5c — recent commits of the owner's public repos, mirrored by the GitHub
+// sync for the AI guide (first line of the message, date). Pruned by the sync;
+// never stored for a private repo.
+model RepoCommit {
+  id          String   @id @default(cuid())
+  systemId    String
+  system      System   @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  sha         String
+  message     String
+  committedAt DateTime @db.Timestamptz(3)
+  authorLogin String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([systemId, sha])
+  @@index([systemId, committedAt(sort: Desc)])
+}
+
 model SystemActivityWeek {
   systemId  String
   system    System   @relation(fields: [systemId], references: [id], onDelete: Restrict)
@@ -408,7 +435,7 @@ model Timeline {
 // here is admin-editable data, never copy in code. Fields the owner hasn't
 // provided stay empty; nothing is invented.
 model Profile {
-  id                Int           @id @default(1)
+  id                Int            @id @default(1)
   displayName       String
   initials          String?
   // The CV/profile headline, e.g. "Software & AI Engineer" (#74). role keeps
@@ -425,10 +452,12 @@ model Profile {
   availability      String?
   buildingSinceYear Int?
   links             ProfileLink[]
-  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  // Titles and qualifications, many and dated (F5c, D13).
+  titles            ProfileTitle[]
+  createdAt         DateTime       @default(now()) @db.Timestamptz(3)
   // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
-  contentReviewedAt DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt         DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+  contentReviewedAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime       @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 // Social and contact links: a growing set, so rows, not columns (EXT-1).
@@ -514,6 +543,7 @@ model Education {
   // BR-1.13: live from this time on (null = as soon as published). Set only while published.
   publishAt          DateTime?          @db.Timestamptz(3)
   skills             SkillOnEducation[]
+  titles             ProfileTitle[]
   createdAt          DateTime           @default(now()) @db.Timestamptz(3)
   // BR-1.16: last real edit to what visitors see, or an explicit "mark reviewed" (database-stamped).
   contentReviewedAt  DateTime           @default(now()) @db.Timestamptz(3)
@@ -649,6 +679,7 @@ model VisitorLens {
   label           String
   priorityContent Json
   aiFramingPrompt String
+  sortOrder       Int      @default(0)
   createdAt       DateTime @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
@@ -1039,4 +1070,181 @@ view PublicAffiliation {
   name String
   slug String
   role String
+}
+
+// #106 — page content blocks the owner edits in the admin (e.g. the
+// how-i-build mission and principles). One row per key; each key's body shape
+// is validated by lib/content/blocks.ts.
+model SiteContent {
+  key       String   @id
+  body      Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// #106 — the public read of page content blocks.
+// F5c — kinds of organisation (EXT-1): personal, venture, client, …
+model OrganizationKind {
+  id            String         @id @default(cuid())
+  key           String         @unique
+  label         String
+  active        Boolean        @default(true)
+  organizations Organization[]
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// F5c (D13) — kinds of title: role, qualification, … (EXT-1).
+model TitleKind {
+  id        String         @id @default(cuid())
+  key       String         @unique
+  label     String
+  active    Boolean        @default(true)
+  titles    ProfileTitle[]
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime       @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+// F5c (D13) — the owner's titles and qualifications: several at once, each
+// dated so a finished one leaves the public view (PublicProfileTitle) while
+// staying on record. CHECKs: label/detail length, dates ordered.
+model ProfileTitle {
+  id          String     @id @default(cuid())
+  profileId   Int        @default(1)
+  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  kindId      String
+  kind        TitleKind  @relation(fields: [kindId], references: [id], onDelete: Restrict)
+  label       String
+  detail      String?
+  educationId String?
+  education   Education? @relation(fields: [educationId], references: [id], onDelete: SetNull)
+  sortOrder   Int        @default(0)
+  startsOn    DateTime?  @db.Date
+  endsOn      DateTime?  @db.Date
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime   @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([profileId, sortOrder])
+}
+
+// F5c (D6) — the owner's photos, one current per purpose ("about", …).
+// BR-1.17: versions are superseded, never altered or deleted (trigger + the
+// runtime role's grants); uploads are re-encoded to WebP without metadata.
+model ProfilePhoto {
+  id           String    @id @default(cuid())
+  purpose      String
+  altText      String
+  mimeType     String
+  width        Int
+  height       Int
+  byteSize     Int
+  sha256       String
+  fileData     Bytes
+  uploadedAt   DateTime  @default(now()) @db.Timestamptz(3)
+  supersededAt DateTime? @db.Timestamptz(3)
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@index([purpose, uploadedAt(sort: Desc)])
+}
+
+view PublicProfilePhoto {
+  purpose    String   @unique
+  altText    String
+  mimeType   String
+  width      Int
+  height     Int
+  byteSize   Int
+  sha256     String
+  uploadedAt DateTime
+  fileData   Bytes
+}
+
+view PublicProfileTitle {
+  id        String    @unique
+  kind      String
+  kindLabel String
+  label     String
+  detail    String?
+  sortOrder Int
+  startsOn  DateTime? @db.Date
+}
+
+view PublicHome {
+  id               String   @unique
+  name             String
+  slug             String
+  role             String?
+  kind             String?
+  githubLogins     String[]
+  publishedSystems Int
+}
+
+view PublicPlatformPulse {
+  id                      Int       @unique
+  rulesEnforcedByDatabase Int
+  auditEventsLast7Days    Int
+  auditEventsTotal        Int
+  lastSuccessfulJobAt     DateTime?
+  lastGithubSyncAt        DateTime?
+}
+
+// F5c — which switches are on (keys and on/off only), for public pages (BR-4.4).
+view PublicFlag {
+  key     String  @unique
+  enabled Boolean
+}
+
+// F5c — public repos in the owner's own homes, for the AI guide and /now.
+view PublicGithubRepo {
+  fullName          String    @unique
+  name              String
+  home              String
+  homeSlug          String
+  published         Boolean
+  slug              String?
+  description       String
+  languages         Json?
+  topics            String[]
+  stars             Int
+  createdAt         DateTime?
+  pushedAt          DateTime?
+  readmeExcerpt     String?
+  commitsLast4Weeks Int
+  commitsLastYear   Int
+}
+
+// F5c — which GitHub home each published system belongs to (the system map).
+view PublicSystemHome {
+  slug     String @unique
+  homeSlug String
+}
+
+// F5c — weekly commit counts of published systems, last 26 weeks (sparklines, /now).
+view PublicSystemActivity {
+  slug      String
+  weekStart DateTime @db.Date
+  commits   Int
+
+  @@unique([slug, weekStart])
+}
+
+// F5c — the last 90 days of commits in those repos.
+view PublicRepoCommit {
+  fullName    String
+  message     String
+  committedAt DateTime
+
+  @@unique([fullName, committedAt, message])
+}
+
+view PublicVisitorLens {
+  key       String @unique
+  label     String
+  sortOrder Int
+}
+
+view PublicSiteContent {
+  key       String   @unique
+  body      Json
+  updatedAt DateTime
 }

@@ -43,7 +43,7 @@ Over-abstracting the parts that were never going to change is the same failure a
 Buy the commodity, build the differentiated. Example applied throughout: raw pageview/referrer tracking is bought (Vercel Analytics); attribution that joins visitor behavior to `System` and `Inquiry` data is built (first-party `Event` table), because only the second part needs to talk to this system's own data.
 
 ### Principle — Controlled Imperfection Engineering / Closed-Loop Learning
-Reused from Kurhula's own doctrine (as applied on Xkimm Xa Mali): failures are predictable and traceable, not chased into perfection. Every admin action writes to `ActivityLog`. The concierge's most-asked-unanswered questions feed directly into what content gets prioritized next — the platform learns from its own usage the same way an incident produces a runbook.
+Reused from Kurhula's own doctrine (as applied on Xkimi Xa Mali): failures are predictable and traceable, not chased into perfection. Every admin action writes to `ActivityLog`. The concierge's most-asked-unanswered questions feed directly into what content gets prioritized next — the platform learns from its own usage the same way an incident produces a runbook.
 
 ### Principle — Permission Boundaries
 No AI acts autonomously on anything critical. Applied concretely in Section 6.
@@ -60,12 +60,12 @@ The existing Angular portfolio is **not rebuilt or merged.** It stays live at it
 |---|---|
 | Language | TypeScript, strict mode |
 | Frontend | Next.js App Router, React, Tailwind, shadcn/ui |
-| State | TanStack Query (server), Zustand (client), React Hook Form + Zod |
-| Backend | Next.js API Routes, NextAuth.js |
+| State | Server components read the database directly; client state is local React state; forms are controlled inputs validated by Zod on the server. *(TanStack Query, Zustand and React Hook Form were planned; the build didn't need them, and they were removed 2026-09-30.)* |
+| Backend | Next.js route handlers (`app/api/v1`); admin auth hand-rolled — HMAC-signed session cookies with a per-admin session version, TOTP 2FA (`otpauth`), bcrypt — *not NextAuth.js* (amended 2026-09-30 to match what was built) |
 | Database | PostgreSQL via Prisma; pgvector extension for AI retrieval |
-| AI | Vercel AI SDK, kept inside the Next.js app — not a separate FastAPI/LangChain microservice. Revisit only if the AI layer itself later earns flagship status on its own |
+| AI | Vercel AI SDK with a Claude model (the Vercel AI Gateway in production), kept inside the Next.js app — not a separate FastAPI/LangChain microservice. Revisit only if the AI layer itself later earns flagship status on its own |
 | Infra | Vercel (app), GitHub Actions (CI, incl. AI evals) |
-| Monitoring | Sentry, Better Stack, Prometheus |
+| Monitoring | Sentry, Better Stack, Prometheus — *planned, not wired yet* (Vercel logs and the platform's own audit trail and job history today) |
 | Testing | Jest/Vitest/Playwright, 70/20/10 unit/integration/E2E, plus a fourth category — AI evals (Section 6) |
 
 ---
@@ -74,7 +74,7 @@ The existing Angular portfolio is **not rebuilt or merged.** It stays live at it
 
 ### Core entities
 
-- **Organization** — KSDRILL-SA, GrowthCore Solutions, Personal. `isClient` flag for entities like Sunduza.
+- **Organization** — KSDRILL-SA, GrowthCore Solutions, MALULEKE-KS (the owner's own GitHub account). `isClient` flag for entities like Sunduza; its **kind** (personal / venture / client, a lookup) marks the owner's three GitHub homes (amended 2026-09-30).
 - **System** — every project across every org. GitHub-synced where public, curated where private. Linked to `Status` and `Domain` (both lookup tables), carries `clientVisibility`, `clientApproved`, `contentStatus`, `isFlagship`, `sortOrder`.
 - **Timeline** — unified life/career/academic milestones, typed via `MilestoneType` lookup table.
 - **Experience** / **Education** — CV backbone.
@@ -364,7 +364,7 @@ One adaptive lens, not per-persona pages. A short intent signal (2-tap picker or
 |---|---|
 | Technical recruiter / hiring manager | Skills matrix backed by shipped systems |
 | Non-technical HR / hiring panel | Plain-language career story, credibility signals |
-| Fintech client prospect | Xkimm Xa Mali, FundsLink-Academy |
+| Fintech client prospect | Xkimi Xa Mali, FundsLink Academy |
 | GovTech client prospect | Governova |
 | Architecture/construction client prospect | Sunduza |
 | Grad school / academic reviewer | Coursework, algorithmic projects, research framing |
@@ -389,6 +389,8 @@ One adaptive lens, not per-persona pages. A short intent signal (2-tap picker or
 
 **Tier 1 — Concierge (visitor-facing).** A top-tier current model, grounded via retrieval over `ContentChunk` (spanning System, Timeline, Skill, DocumentGen), free to draw on its own general CS/mathematics knowledge otherwise. Framed per active `VisitorLens`.
 
+> **Refined 2026-09-30 (owner-approved, PUBLIC-REDESIGN-PLAN §3a):** while the public corpus fits a token budget (setting `concierge.contextBudgetTokens`), the concierge reads the whole of it — serialised from the public views — instead of retrieving chunks: more accurate, and cheap with prompt caching. `ContentChunk` retrieval takes over past the budget (ROADMAP-V2 §3). It appears as the owner's animated **AI guide**, labelled as AI and speaking about him in the third person. It **drafts** an inquiry for the visitor to review and send through the normal form (stricter than `submit_inquiry`: the agent never submits).
+
 **Tier 2 — Agentic, on a short leash.** A tool registry, not a hardcoded allow-list — each tool self-declares name, scope, and risk tier, and can be enabled/disabled via `Flag`.
 
 | Tool | Type |
@@ -410,7 +412,7 @@ Everything else — editing `System`, `Timeline`, `Skill`, or any content — st
 
 - `System.clientVisibility` defaults to `REQUIRES_APPROVAL` for any system linked to a client `Organization`.
 - The `contentStatus` transition `draft → published` is blocked at the API level unless `clientApproved = true`.
-- Applies immediately to Sunduza, and to FundsLink-Academy/Governova if either has a client relationship behind it.
+- Applies immediately to Sunduza, and to FundsLink Academy/Governova if either has a client relationship behind it.
 
 ---
 
@@ -462,9 +464,11 @@ The direct index of every deliberate seam — read this instead of rediscovering
 | **2 — Quality & Reliability** | Sentry/Better Stack/Prometheus, 70/20/10 + AI evals, rate limiting, backup drill |
 | **3 — Product** | Concierge, agent tools, admin copilot, testimonials, impact fields, public API, full analytics, "How I Build" page |
 
-**V1 = Phase 0 + Phase 1.** Systems catalog, CV, unified inquiry, admin curation, hardened auth. A genuine, launchable platform on its own.
+**V1 = Phase 0 + Phase 1.** Systems catalog, CV, unified inquiry, admin curation, hardened auth. A genuine, launchable platform on its own. **Status: live in production.**
 
 **V1.1 = Phase 2 + Phase 3.** Concierge, agent tools, testimonials, public API, full analytics. Nothing here blocks first launch.
+
+> **Status (2026-09-30):** done — rate limiting, backup drill (runbook), impact fields, the "How I Build" page (now `/method`), the full admin panel. In progress — the public-site redesign and the concierge as the animated **AI guide** (`docs/PUBLIC-REDESIGN-PLAN.md`). Deferred with triggers — testimonials, public API, full analytics, observability wiring, and the rest of `docs/ROADMAP-V2.md`.
 
 ---
 
@@ -476,10 +480,12 @@ The direct index of every deliberate seam — read this instead of rediscovering
 /systems                 catalog — filter by org, domain, status
 /systems/[slug]          case study
 /journey                 timeline
-/cv                      view + generated download
-/how-i-build             methodology & principles
-/about
-/contact                 unified inquiry form
+/cv                      view + downloads (generated and uploaded CV, BR-7.1)
+/method                  methodology & principles (was /how-i-build — permanent redirect)
+/about                   story, photo, titles & qualifications
+/contact                 unified inquiry form — reached through "Let's talk", not a nav item
+/now                     what is being built right now (F5c, planned)
+/organizations/[slug]    one page per GitHub home (F5c, planned)
 /api/v1/systems          public read API
 /api/v1/systems/[slug]
 ```
@@ -490,19 +496,26 @@ The direct index of every deliberate seam — read this instead of rediscovering
 /admin                   dashboard overview
 /admin/systems
 /admin/systems/[id]
+/admin/organizations
 /admin/inquiries         triage inbox
 /admin/timeline
 /admin/cv                Experience / Education / Skill management
-/admin/testimonials
-/admin/analytics
-/admin/settings          flags, lenses, lookup-table management
+/admin/profile           profile, links, achievements
+/admin/content           page content blocks
+/admin/numbers           curated numbers (BR-5.3)
+/admin/freshness         stale content (BR-1.16)
+/admin/jobs              scheduled jobs and runs
+/admin/account           password, recovery codes
+/admin/testimonials      (V2 — ROADMAP-V2)
+/admin/analytics         (V2 — ROADMAP-V2)
+/admin/settings          platform tunables, flags, lenses, lookup-table management
 /admin/activity-log
 ```
 
 **V1.1 additions**
 ```
-concierge widget         embedded component, all public pages
-/api/v1/agent/*           scoped tool endpoints
+AI guide                 the concierge — animated character in the home hero, docked launcher on every page (F5c)
+/api/v1/guide            the guide's chat endpoint; its tools run through the existing read APIs (PUBLIC-REDESIGN-PLAN §3a)
 ```
 
 ---
@@ -510,6 +523,8 @@ concierge widget         embedded component, all public pages
 ## 13. Deferred to V1.1 — Explicitly, Not Forgotten
 
 Concierge and agent tools, testimonials, impact fields, public API exposure, full analytics dashboard, "How I Build" page, i18n (structure left open, not built), self-serve visitor data-deletion endpoint (BR-5.5 — the *right* is honored manually from launch, the automated path is deferred). Every item here is a locked decision to defer, not an open question.
+
+> **Since then (2026-09-30):** impact fields and the "How I Build" page (`/method`) shipped; the concierge is being built as the AI guide. Everything still deferred — and every later idea — is tracked with its trigger in `docs/ROADMAP-V2.md`.
 
 ---
 

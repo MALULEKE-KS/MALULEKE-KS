@@ -36,11 +36,11 @@ describe("platform_public — public pages see the masked views and nothing else
     for (const view of [
       "PublicSystem", "PublicImpact", "PublicTestimonial", "PublicTimeline", "PublicEducation",
       "PublicExperience", "PublicAchievement", "PublicOrganization", "PublicLedger", "PublicProfile",
-      "PublicProfileLink", "PublicMetric", "SkillEvidence", "PublicCvOption", "PublicCvUpload", "PublicAffiliation", "PublicSlugRedirect",
+      "PublicProfileLink", "PublicMetric", "SkillEvidence", "PublicCvOption", "PublicCvUpload", "PublicAffiliation", "PublicSlugRedirect", "PublicSiteContent", "PublicProfileTitle", "PublicHome", "PublicPlatformPulse", "PublicProfilePhoto", "PublicFlag", "PublicVisitorLens", "PublicGithubRepo", "PublicRepoCommit", "PublicSystemActivity", "PublicSystemHome",
     ]) {
       expect(await asRole("platform_public", `SELECT * FROM "${view}" LIMIT 1`), view).toBe("ok");
     }
-    for (const lookup of ["Status", "Domain", "MilestoneType", "SkillCategory", "RepoRelationship", "Skill"]) {
+    for (const lookup of ["Status", "Domain", "MilestoneType", "SkillCategory", "RepoRelationship", "Skill", "TitleKind", "OrganizationKind"]) {
       expect(await asRole("platform_public", `SELECT * FROM "${lookup}" LIMIT 1`), lookup).toBe("ok");
     }
     expect(await asRole("platform_public", `SELECT * FROM search_public('systems')`)).toBe("ok");

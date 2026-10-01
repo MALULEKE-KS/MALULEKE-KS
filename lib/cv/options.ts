@@ -13,6 +13,11 @@ export async function isCvOptionOffered(kind: CvOptionKind): Promise<boolean> {
   return (await dbPublic.publicCvOption.count({ where: { kind } })) > 0;
 }
 
+/** Whether any CV is offered at all — so a link to /cv never leads to an empty page. */
+export async function isAnyCvOffered(): Promise<boolean> {
+  return (await dbPublic.publicCvOption.count()) > 0;
+}
+
 /** The same 404 for a hidden option as for anything that doesn't exist. */
 export function cvOptionNotOffered() {
   return NextResponse.json(

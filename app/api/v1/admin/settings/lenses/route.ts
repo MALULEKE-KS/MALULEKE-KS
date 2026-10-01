@@ -11,7 +11,7 @@ function errorResponse(code: string, message: string, status: number, details?: 
 }
 
 export const GET = withAdmin(async (request, _admin) => {
-  const lenses = await db.visitorLens.findMany({ orderBy: { label: "asc" } });
+  const lenses = await db.visitorLens.findMany({ orderBy: [{ sortOrder: "asc" }, { label: "asc" }] });
   return NextResponse.json({ data: lenses });
 });
 
@@ -28,6 +28,7 @@ export const POST = withAdmin(async (request, { write }) => {
       label: parsed.data.label,
       priorityContent: parsed.data.priorityContent as Prisma.InputJsonValue,
       aiFramingPrompt: parsed.data.aiFramingPrompt,
+      sortOrder: parsed.data.sortOrder,
     },
   }));
 

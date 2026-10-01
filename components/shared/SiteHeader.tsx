@@ -1,39 +1,41 @@
 // components/shared/SiteHeader.tsx
-// Sticky glass bar (DESIGN-SYSTEM.md v3 §6): translucent graphite with
-// backdrop blur and a hairline edge, so the hero glows through as you scroll.
-// Brand on the left, pill nav in the middle-right, instant search (⌘K, #100),
-// one ember CTA.
+// The public header (F5c, D10): one bar — the mark and name on the left, the
+// nav in the middle, instant search (⌘K) and the one contact entry, Let's
+// talk, on the right. HeaderFrame turns it from a full-width bar at the top
+// of the page into a single glass capsule once you scroll. Contact is not a
+// nav item: Let's talk is the way in.
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/shared/BrandMark";
-import { Container } from "@/components/shared/Container";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
+import { HeaderFrame } from "@/components/shared/HeaderFrame";
 
 export function SiteHeader() {
   return (
-    <header className="bg-night-deep/95 text-paper supports-[backdrop-filter]:bg-night-deep/90 sticky top-0 z-40 border-b border-white/10 backdrop-blur-xl">
-      <Container className="relative flex h-16 items-center justify-between gap-6">
+    <HeaderFrame>
+      <Link
+        href="/"
+        aria-label="MALULEKE-KS — home"
+        className="group flex h-10 shrink-0 items-center gap-2.5 rounded-full pe-2 ps-1.5 focus-visible:outline-2 focus-visible:outline-ember"
+      >
+        <BrandMark className="size-6 text-paper transition-transform duration-500 group-hover:rotate-90 motion-reduce:transition-none" />
+        <span className="hidden font-mono text-sm font-medium tracking-tight text-paper sm:inline">MALULEKE-KS</span>
+      </Link>
+
+      <NavLinks />
+
+      <div className="flex shrink-0 items-center gap-1.5">
+        <SearchPalette />
         <Link
-          href="/"
-          className="group focus-visible:outline-ember flex items-center gap-3 rounded-md focus-visible:outline-2"
+          href="/contact"
+          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink shadow-glow-ember transition-[filter,transform] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
         >
-          <BrandMark className="text-paper size-7 transition-transform duration-500 group-hover:rotate-90" />
-          <span className="font-mono text-sm font-medium tracking-tight">MALULEKE-KS</span>
+          Let&rsquo;s talk
+          <ArrowUpRight aria-hidden="true" className="size-4" />
         </Link>
-        <div className="flex items-center gap-3">
-          <NavLinks />
-          <SearchPalette />
-          <Button asChild variant="accent" size="sm" className="hidden lg:inline-flex">
-            <Link href="/contact">
-              Let&rsquo;s talk
-              <ArrowUpRight />
-            </Link>
-          </Button>
-        </div>
-      </Container>
-    </header>
+      </div>
+    </HeaderFrame>
   );
 }
