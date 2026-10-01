@@ -13,6 +13,7 @@ export const FLAGS = {
   draftInquiry: "agent.draft_inquiry",
   searchSystems: "agent.search_systems",
   tailorCv: "agent.tailor_cv",
+  writeups: "writeups.enabled",
 } as const;
 
 export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];

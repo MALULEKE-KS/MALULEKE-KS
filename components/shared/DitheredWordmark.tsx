@@ -71,7 +71,7 @@ export function DitheredWordmark({ text }: { text: string }) {
         <div className="dw-dots" />
       </div>
       {/* The name is the gap in the dots: drawn in the footer's own background colour. */}
-      <p className="dw-mark pointer-events-none absolute -bottom-[0.06em] left-2 select-none whitespace-nowrap font-sans text-[clamp(3.5rem,15.5vw,12.5rem)] font-bold leading-[0.8] tracking-[-0.05em] text-night-deep sm:left-4">
+      <p className="dw-mark pointer-events-none absolute -bottom-[0.06em] left-2 select-none whitespace-nowrap font-sans text-[clamp(3rem,14vw,12.5rem)] font-bold leading-[0.8] tracking-[-0.05em] text-night-deep sm:left-4">
         {text}
       </p>
     </div>

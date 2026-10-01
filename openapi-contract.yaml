@@ -1324,6 +1324,8 @@ paths:
     patch: { tags: [Organizations (Admin)], summary: Update an organization, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/OrganizationInput" } } } }, responses: { "200": { description: Updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/systems/{id}/skills:
     put: { tags: [Systems (Admin)], summary: Replace a system's skill links, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SystemSkillsInput" } } } }, responses: { "200": { description: Updated skill links }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/writeup:
+    post: { tags: [Systems (Admin)], summary: "Regenerate from repo — hand the summary and case study back to the AI and rewrite them now from the public repo (BR-4.5)", description: "Only for a published system with a public repo (and client approval for client work). The previous text stays in the revision history (BR-1.15). Off while the writeups.enabled flag is off.", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: The rewritten system, content: { application/json: { schema: { $ref: "#/components/schemas/SystemAdmin" } } } }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "WRITEUPS_OFF (flag off) or NOT_ELIGIBLE (unpublished, private repo, or client work without approval)" }, "502": { description: "WRITEUP_FAILED — GitHub or the model failed; nothing was written" }, "503": { description: "WRITEUPS_UNAVAILABLE — no AI provider or GitHub token" } } }
   /admin/systems/{id}/impacts:
     get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
@@ -1627,6 +1629,8 @@ components:
         - type: object
           properties:
             caseStudyBody: { type: string }
+            caseStudyAuthor: { type: string, enum: [ai, owner], nullable: true, description: "BR-4.5 — 'ai' when the case study was written by AI from the public repo (label it as such), 'owner' when the owner wrote it; null when there is none" }
+            caseStudyWrittenAt: { type: string, format: date-time, nullable: true, description: "When the AI last wrote it; null for the owner's own" }
             impacts:
               type: array
               items:
@@ -1679,6 +1683,13 @@ components:
                 topics: { type: array, items: { type: string } }
                 stars: { type: integer, nullable: true }
                 syncedAt: { type: string, format: date-time, nullable: true }
+            writeup:
+              type: object
+              description: "BR-4.5 — who wrote the summary and the case study; the database refuses a generated write over the owner's words"
+              properties:
+                descriptionSource: { type: string, enum: [sync, generated, owner] }
+                caseStudySource: { type: string, enum: [none, generated, owner] }
+                generatedAt: { type: string, format: date-time, nullable: true }
 
     SystemCreateInput:
       type: object

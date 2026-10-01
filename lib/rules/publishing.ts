@@ -89,6 +89,12 @@ export function toAdminSystem(system: SystemWithAdminRelations) {
     },
     repoPrivate: system.repoPrivate,
     caseStudyBody: system.caseStudyBody ?? "",
+    // BR-4.5: who wrote the words — the owner's are never replaced by generated ones.
+    writeup: {
+      descriptionSource: system.descriptionSource,
+      caseStudySource: system.caseStudySource,
+      generatedAt: system.writeupGeneratedAt?.toISOString() ?? null,
+    },
     impacts: system.impacts.map((i) => ({ label: i.label, value: i.value })),
     testimonials: system.testimonials.map((t) => ({
       id: t.id,

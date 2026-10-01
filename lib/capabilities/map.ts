@@ -89,6 +89,8 @@ export const CAPABILITIES: Capability[] = [
     rules: ["BR-1.3", "BR-1.4", "BR-1.7"],
     frontend: [
       { page: "(every page)", section: "AI guide: its GitHub knowledge" },
+      { page: "/systems", section: "Each card: languages and last push" },
+      { page: "/systems/[slug]", section: "At a glance: languages and topics; proof strip: started, last push, commits this year; latest commits" },
       { page: "/now (proposed)", section: "What's changing: recent commits and active repos" },
     ],
     notes: ["The sync stores a README and commits for public repos only, and wipes them if a repo turns private."],
@@ -103,6 +105,8 @@ export const CAPABILITIES: Capability[] = [
     rules: ["BR-1.1", "BR-1.13"],
     frontend: [
       { page: "/", section: "Selected work: a sparkline on each system" },
+      { page: "/systems", section: "Each card: a 26-week sparkline and a live marker when it moved this month" },
+      { page: "/systems/[slug]", section: "Activity: 26 weeks of commits as bars" },
       { page: "/now (proposed)", section: "What's moving this week" },
     ],
     notes: ["Only systems that are live on the site; no commit content, no authors."],
@@ -190,14 +194,15 @@ export const CAPABILITIES: Capability[] = [
     summary: "One published system in full — case study body, measured impacts, permitted testimonials — and related systems in the same domain.",
     db: ["PublicSystem", "PublicImpact", "PublicTestimonial", "PublicSlugRedirect"],
     endpoints: ["GET /systems/{slug}", "GET /systems/{slug}/related"],
-    rules: ["BR-1.1", "BR-1.3", "BR-1.4", "BR-1.7", "BR-6.1", "BR-6.2", "BR-1.14"],
+    rules: ["BR-1.1", "BR-1.3", "BR-1.4", "BR-1.7", "BR-6.1", "BR-6.2", "BR-1.14", "BR-4.5"],
     frontend: [
       { page: "/systems/[slug]", section: "Header, case study body, impacts, testimonials" },
+      { page: "/systems/[slug]", section: "Who wrote the case study: an \"AI\" label when it was written from the repo" },
       { page: "/systems/[slug]", section: "Related systems" },
     ],
     notes: [
       "An unknown or unpublished slug is a plain 404 — never a \"private\" message (BR-1.3/1.4).",
-      "liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.", "An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14)."],
+      "liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.", "An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).", "caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt."],
   },
   {
     id: "search",
@@ -383,16 +388,16 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/systems/{id}/impacts",
       "POST /admin/systems/{id}/impacts",
       "PATCH /admin/impacts/{id}",
-      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore"],
-    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14", "BR-1.15"],
+      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore", "POST /admin/systems/{id}/writeup"],
+    rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14", "BR-1.15", "BR-4.5"],
     frontend: [
       { page: "/admin/systems", section: "List with curation queue, filters" },
       { page: "/admin/systems/[id]", section: "Editor, publish controls, homepage + CV placement, repo ownership" },
-      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" }, { page: "/admin/systems/[id]", section: "Revision history for the case study and description: versions with who and when, restore" }],
+      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" }, { page: "/admin/systems/[id]", section: "Revision history for the case study and description: versions with who and when, restore" }, { page: "/admin/systems/[id]", section: "Who wrote the summary and case study (you / AI from the repo), Regenerate from repo" }],
     notes: [
       "409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.",
       "Systems are never deleted — offer Archive (BR-1.9).",
-      "Testimonials are read-only here until V1.1.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.", "Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.", "Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten."],
+      "Testimonials are read-only here until V1.1.", "Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.", "Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.", "Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.", "writeup.descriptionSource / caseStudySource (BR-4.5): sync, generated (AI from the repo) or owner. Saving an edit makes a field the owner's, and the database then refuses any generated write over it. POST …/writeup hands both back to the AI and rewrites them now — 409 WRITEUPS_OFF / NOT_ELIGIBLE, 502 WRITEUP_FAILED, 503 WRITEUPS_UNAVAILABLE: show the message."],
   },
   {
     id: "admin.organizations",
@@ -595,7 +600,7 @@ export const CAPABILITIES: Capability[] = [
     ],
     notes: [
       "Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.",
-      "github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).",
+      "github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).",
     ],
   },
 ];

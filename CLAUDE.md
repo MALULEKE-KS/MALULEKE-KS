@@ -85,6 +85,7 @@ The test database needs migrations too: `npx dotenv -e .env.test.local -- npx pr
 
 ## Non-negotiables when implementing
 
+- **Mobile by default** (owner's rule, 2026-10-01). Every public page is designed for a phone first, then widened — never a desktop layout squeezed down. `tests/e2e/mobile.spec.ts` (every public page at 360 and 390 px, and the phone menu) must pass; see PAGE-BUILD-PLAYBOOK §1 and §7.
 - **Nothing hardcoded unless hardcoding is the recommended practice** (owner's rule). Tunables — limits, windows, durations, SLAs, copy, owner details, titles, photos — are data (admin-editable settings/profile/lookup tables) or env config. Business *laws* (an inquiry starts NEW, systems are never deleted) are database constraints, which is the recommended practice, not hardcoding; if a law contains a tunable number, the constraint reads it from settings.
 - **Every database capability is callable and shown.** A table, view or function without an endpoint fails `capability-coverage.test.ts` unless exempted in `NOT_EXPOSED` with a reason; every public capability names the page that shows it (PUBLIC-REDESIGN-PLAN D2). Update `lib/capabilities/map.ts`, the contract and the generated guides in the same PR.
 - Every claim the platform makes is enforced somewhere real — see `/docs/ENFORCEMENT-REGISTER.md`, and update its row in the same PR.

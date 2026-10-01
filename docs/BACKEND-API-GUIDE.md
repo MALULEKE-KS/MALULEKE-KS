@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**33 capabilities · 117 endpoints.**
+**33 capabilities · 118 endpoints.**
 
 ## Public
 
@@ -253,13 +253,14 @@ One published system in full — case study body, measured impacts, permitted te
 - `PublicTestimonial`
 - `PublicSlugRedirect`
 
-**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2, BR-1.14
+**Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2, BR-1.14, BR-4.5
 
 **Notes**
 
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
 - An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
+- caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
 
 ### Instant search
 
@@ -540,6 +541,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `DELETE /admin/impacts/{id}`
 - `GET /admin/systems/{id}/revisions`
 - `POST /admin/systems/{id}/revisions/{revisionId}/restore`
+- `POST /admin/systems/{id}/writeup`
 
 **Database**
 
@@ -554,7 +556,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `SystemSlugHistory`
 - `SystemContentRevision`
 
-**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14, BR-1.15
+**Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14, BR-1.15, BR-4.5
 
 **Notes**
 
@@ -564,6 +566,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 - Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
 - Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
+- writeup.descriptionSource / caseStudySource (BR-4.5): sync, generated (AI from the repo) or owner. Saving an edit makes a field the owner's, and the database then refuses any generated write over it. POST …/writeup hands both back to the AI and rewrites them now — 409 WRITEUPS_OFF / NOT_ELIGIBLE, 502 WRITEUP_FAILED, 503 WRITEUPS_UNAVAILABLE: show the message.
 
 ### Organizations
 
@@ -878,7 +881,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 **Notes**
 
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
-- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
 ## Database objects → capabilities
 

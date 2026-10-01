@@ -162,6 +162,10 @@ export const TestimonialPublicSchema = z.object({
 
 export const SystemPublicDetailedSchema = SystemPublicSchema.extend({
   caseStudyBody: z.string(),
+  // BR-4.5 — who wrote the case study: "ai" (from the repo) or "owner"; null when there is none.
+  // In public responses only; the admin record carries the fuller `writeup`.
+  caseStudyAuthor: z.enum(["ai", "owner"]).nullable().optional(),
+  caseStudyWrittenAt: z.string().datetime().nullable().optional(),
   impacts: z.array(
     z.object({
       label: z.string(),
@@ -206,6 +210,12 @@ export const SystemAdminSchema = SystemPublicDetailedSchema.extend({
     topics: z.array(z.string()),
     stars: z.number().int().nullable(),
     syncedAt: z.string().datetime().nullable(),
+  }),
+  // BR-4.5 — who wrote the summary and the case study; the owner's words are never replaced by generated ones.
+  writeup: z.object({
+    descriptionSource: z.enum(["sync", "generated", "owner"]),
+    caseStudySource: z.enum(["none", "generated", "owner"]),
+    generatedAt: z.string().datetime().nullable(),
   }),
 });
 

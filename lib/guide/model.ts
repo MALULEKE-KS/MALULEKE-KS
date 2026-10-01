@@ -16,12 +16,16 @@ function jwtExpiresAt(token: string): number | null {
 }
 
 /**
- * The AI Gateway authenticates with an API key, or with Vercel OIDC. On Vercel
- * the OIDC token is fresh on every request; a copy pulled into a local env
- * file expires after hours — then the guide rests instead of failing.
+ * The AI Gateway authenticates with an API key, or with Vercel OIDC. On a
+ * Vercel deployment the platform hands every request a fresh OIDC token (the
+ * x-vercel-oidc-token header, which the gateway reads from the request
+ * context) — it is never in process.env there, so VERCEL=1 is the signal.
+ * Locally, a copy pulled into an env file expires after hours — then the
+ * guide rests instead of failing.
  */
 export function guideProviderConfigured(now = Date.now()): boolean {
   if (process.env.AI_GATEWAY_API_KEY) return true;
+  if (process.env.VERCEL === "1") return true;
   const oidc = process.env.VERCEL_OIDC_TOKEN;
   if (!oidc) return false;
   const exp = jwtExpiresAt(oidc);

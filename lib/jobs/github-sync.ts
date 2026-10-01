@@ -108,19 +108,51 @@ export interface GithubSyncSummary {
   activityPending: string[];
   knowledgeUpdated: number;
   errors: { repo: string; error: string }[];
+  /** Accounts whose listing GitHub refused (an organisation's token policy, say); the rest of the run carried on. */
+  accountErrors: { account: string; error: string }[];
 }
 
-class GithubClient {
+/**
+ * A repo's homepage, if it is a live site: an http(s) address that isn't
+ * GitHub itself — a homepage pointing back at a repo would make "View it live"
+ * open source code.
+ */
+export function liveSite(homepage: string | null): string | null {
+  const url = homepage?.trim();
+  if (!url) return null;
+  try {
+    const { protocol, hostname } = new URL(url);
+    if (protocol !== "https:" && protocol !== "http:") return null;
+    if (hostname === "github.com" || hostname.endsWith(".github.com")) return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+/** GitHub's own reason for a failed call, from its JSON body — it names the policy or permission at fault. */
+async function githubError(path: string, res: Response): Promise<Error> {
+  let reason = "";
+  try {
+    const body = (await res.json()) as { message?: unknown };
+    if (typeof body?.message === "string") reason = body.message.slice(0, 200);
+  } catch {
+    // no JSON body — the status says it all
+  }
+  return new Error(`GitHub ${path}: ${res.status} ${res.statusText}${reason ? ` — ${reason}` : ""}`.trim());
+}
+
+export class GithubClient {
   constructor(
     private token: string,
     private fetchImpl: FetchLike,
   ) {}
 
-  async request(path: string): Promise<Response> {
+  async request(path: string, accept = "application/vnd.github+json"): Promise<Response> {
     const res = await this.fetchImpl(`${GITHUB_API}${path}`, {
       headers: {
         Authorization: `Bearer ${this.token}`,
-        Accept: "application/vnd.github+json",
+        Accept: accept,
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
@@ -133,7 +165,7 @@ class GithubClient {
 
   async json<T>(path: string): Promise<T> {
     const res = await this.request(path);
-    if (!res.ok) throw new Error(`GitHub ${path}: ${res.status} ${res.statusText}`.trim());
+    if (!res.ok) throw await githubError(path, res);
     return (await res.json()) as T;
   }
 
@@ -144,7 +176,7 @@ class GithubClient {
       const sep = path.includes("?") ? "&" : "?";
       const res = await this.request(`${path}${sep}per_page=${PER_PAGE}&page=${page}`);
       if (res.status === 404) return page === 1 ? null : repos;
-      if (!res.ok) throw new Error(`GitHub ${path}: ${res.status} ${res.statusText}`.trim());
+      if (!res.ok) throw await githubError(path, res);
       const batch = (await res.json()) as GitHubRepo[];
       repos.push(...batch);
       if (batch.length < PER_PAGE) break;
@@ -297,14 +329,23 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
       if (!clientFor.has(r.id) || r.private) clientFor.set(r.id, client);
     }
   };
+  // One account refusing a token (an organisation's token policy, say) is recorded
+  // and skipped, not fatal: the other accounts still sync. A rate limit, or the
+  // token's own listing failing (a revoked token), still stops the run.
+  const accountErrors = new Map<string, string>();
   for (const client of clients) {
     add(await client.listRepos("/user/repos?affiliation=owner,collaborator,organization_member&visibility=all"), client);
     for (const login of config.ownedLogins) {
-      add(
-        (await client.listRepos(`/orgs/${encodeURIComponent(login)}/repos?type=all`)) ??
-          (await client.listRepos(`/users/${encodeURIComponent(login)}/repos?type=owner`)),
-        client,
-      );
+      try {
+        add(
+          (await client.listRepos(`/orgs/${encodeURIComponent(login)}/repos?type=all`)) ??
+            (await client.listRepos(`/users/${encodeURIComponent(login)}/repos?type=owner`)),
+          client,
+        );
+      } catch (err) {
+        if (err instanceof GithubRateLimitError) throw err;
+        accountErrors.set(login, err instanceof Error ? err.message.slice(0, 300) : String(err));
+      }
     }
   }
 
@@ -328,6 +369,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     activityPending: [],
     knowledgeUpdated: 0,
     errors: [],
+    accountErrors: [...accountErrors].map(([account, error]) => ({ account, error })),
   };
   const unmapped = new Set<string>();
 
@@ -383,7 +425,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
             // BR-8.2 — fill, never overwrite, what the admin curates. A name
             // still equal to the raw repo name was never curated.
             ...(existing.name === repo.name && { name: displayNameFromRepo(repo.name) }),
-            ...(existing.liveUrl === null && repo.homepage && { liveUrl: repo.homepage }),
+            ...(existing.liveUrl === null && liveSite(repo.homepage) && { liveUrl: liveSite(repo.homepage) }),
             ...(existing.repoRelationshipId === null && { repoRelationshipId: relationshipId(relationship) }),
           },
         });
@@ -397,7 +439,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
               name: displayNameFromRepo(repo.name),
               slug: await resolveSlug(slugify(repo.name), null),
               description: repo.description?.trim() || repo.name,
-              liveUrl: repo.homepage || null,
+              liveUrl: liveSite(repo.homepage),
               techStack: repo.language ? [repo.language] : [],
               organizationId: organization.id,
               statusId: defaultStatus.id,

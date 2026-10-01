@@ -226,6 +226,17 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /systems
 
+**Public GitHub work** — Each card: languages and last push
+
+- Call `GET /github/repos`
+- Call `GET /github/commits`
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
+
+**Weekly build activity** — Each card: a 26-week sparkline and a live marker when it moved this month
+
+- Call `GET /activity`
+- Only systems that are live on the site; no commit content, no authors.
+
 **Systems catalog** — Grid, filters, pagination
 
 - Call `GET /systems`
@@ -244,13 +255,25 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /systems/[slug]
 
-**Case study** — Header, case study body, impacts, testimonials; Related systems
+**Public GitHub work** — At a glance: languages and topics; proof strip: started, last push, commits this year; latest commits
+
+- Call `GET /github/repos`
+- Call `GET /github/commits`
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
+
+**Weekly build activity** — Activity: 26 weeks of commits as bars
+
+- Call `GET /activity`
+- Only systems that are live on the site; no commit content, no authors.
+
+**Case study** — Header, case study body, impacts, testimonials; Who wrote the case study: an "AI" label when it was written from the repo; Related systems
 
 - Call `GET /systems/{slug}`
 - Call `GET /systems/{slug}/related`
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
 - An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
+- caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
 
 **Skills with evidence** — Skills this system proves (match systemSlugs)
 
@@ -278,7 +301,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/jobs`
 - Call `POST /admin/jobs/{job}/run`
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
-- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
 ### /admin/account
 
@@ -367,7 +390,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/jobs`
 - Call `POST /admin/jobs/{job}/run`
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
-- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
 ### /admin/login
 
@@ -469,16 +492,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `DELETE /admin/impacts/{id}`
 - Call `GET /admin/systems/{id}/revisions`
 - Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
+- Call `POST /admin/systems/{id}/writeup`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 - Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
 - Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
+- writeup.descriptionSource / caseStudySource (BR-4.5): sync, generated (AI from the repo) or owner. Saving an edit makes a field the owner's, and the database then refuses any generated write over it. POST …/writeup hands both back to the AI and rewrites them now — 409 WRITEUPS_OFF / NOT_ELIGIBLE, 502 WRITEUP_FAILED, 503 WRITEUPS_UNAVAILABLE: show the message.
 
 ### /admin/systems/[id]
 
-**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart; Revision history for the case study and description: versions with who and when, restore
+**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart; Revision history for the case study and description: versions with who and when, restore; Who wrote the summary and case study (you / AI from the repo), Regenerate from repo
 
 - Call `GET /admin/systems`
 - Call `POST /admin/systems`
@@ -491,12 +516,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `DELETE /admin/impacts/{id}`
 - Call `GET /admin/systems/{id}/revisions`
 - Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
+- Call `POST /admin/systems/{id}/writeup`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 - Renaming (PATCH slug) keeps the old URL as a permanent redirect; the detail lists previousSlugs. 409 SLUG_TAKEN / SLUG_RESERVED — show the message.
 - Every case-study and description edit is kept (BR-1.15); restoring records a new version — nothing is ever overwritten.
+- writeup.descriptionSource / caseStudySource (BR-4.5): sync, generated (AI from the repo) or owner. Saving an edit makes a field the owner's, and the database then refuses any generated write over it. POST …/writeup hands both back to the AI and rewrites them now — 409 WRITEUPS_OFF / NOT_ELIGIBLE, 502 WRITEUP_FAILED, 503 WRITEUPS_UNAVAILABLE: show the message.
 
 ### /admin/timeline
 
@@ -561,6 +588,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `DELETE /admin/impacts/{id}` | Systems — curate, publish, feature | admin |
 | `GET /admin/systems/{id}/revisions` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems/{id}/revisions/{revisionId}/restore` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/writeup` | Systems — curate, publish, feature | admin |
 | `GET /admin/organizations` | Organizations | admin |
 | `POST /admin/organizations` | Organizations | admin |
 | `PATCH /admin/organizations/{id}` | Organizations | admin |

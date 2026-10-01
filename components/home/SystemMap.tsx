@@ -29,7 +29,7 @@ export function SystemMap({ data }: { data: SystemMapData | null }) {
             eyebrow="The map"
             id="map-title"
             title={<Accent text="How it all *connects.*" className="type-accent text-ember-gradient pr-[0.06em]" />}
-            description="Three GitHub homes, the work in each, and what it's built with — drawn live from GitHub and this site's data. Hover anything to trace it."
+            description="Three GitHub homes, the work in each, and what it's built with — drawn live from GitHub and this site's data."
           />
         </Reveal>
         <Reveal delay={100}>

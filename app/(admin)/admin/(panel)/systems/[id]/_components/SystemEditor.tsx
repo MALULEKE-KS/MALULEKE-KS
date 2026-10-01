@@ -49,6 +49,7 @@ interface EditorSystem {
   liveUrl: string | null;
   screenshotUrl: string | null;
   repoPrivate: boolean;
+  writeup: { descriptionSource: string; caseStudySource: string; generatedAt: string | null };
   github: {
     fullName: string | null;
     ownerLogin: string | null;
@@ -169,6 +170,60 @@ function Toggle({ checked, onChange, label, hint, disabled }: { checked: boolean
         {hint && <span className="block text-xs text-slate">{hint}</span>}
       </span>
     </label>
+  );
+}
+
+const SOURCE_LABEL: Record<string, string> = {
+  owner: "written by you — never replaced by AI",
+  generated: "written by AI from the repo",
+  sync: "copied from GitHub",
+  none: "empty",
+};
+
+/**
+ * Who wrote the summary and the case study (BR-4.5), and "Regenerate from repo":
+ * hands both back to the AI and rewrites them now from the public repo. Editing
+ * either field and saving makes it yours again; old versions stay in History.
+ */
+function WriteupStatus({ system }: { system: EditorSystem }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<{ tone: "good" | "critical"; text: string } | null>(null);
+  const { descriptionSource, caseStudySource, generatedAt } = system.writeup;
+  const eligible = Boolean(system.github.fullName) && !system.repoPrivate;
+
+  async function regenerate() {
+    const yours = descriptionSource === "owner" || caseStudySource === "owner";
+    if (yours && !window.confirm("Replace your summary and case study with new ones written from the repo? Your current versions stay in History.")) return;
+    setNote(null);
+    setBusy(true);
+    const res = await adminRequest(`/systems/${system.id}/writeup`, { method: "POST" });
+    setBusy(false);
+    if (!res.ok) {
+      setNote({ tone: "critical", text: res.message });
+      return;
+    }
+    setNote({ tone: "good", text: "Rewritten from the repo." });
+    router.refresh();
+  }
+
+  return (
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink/10 bg-paper px-4 py-3">
+      <p className={adminHint}>
+        Summary: {SOURCE_LABEL[descriptionSource] ?? descriptionSource} · Case study: {SOURCE_LABEL[caseStudySource] ?? caseStudySource}
+        {generatedAt && <> · AI last wrote {formatWhen(generatedAt)}</>}
+      </p>
+      {eligible && (
+        <div className="flex items-center gap-3">
+          <p role="status" aria-live="polite" className={cn("text-sm", note?.tone === "critical" ? "text-critical" : "text-signal-finished")}>
+            {note?.text ?? ""}
+          </p>
+          <button type="button" disabled={busy} onClick={regenerate} className={adminButton.secondary}>
+            <RotateCcw aria-hidden="true" /> {busy ? "Writing…" : "Regenerate from repo"}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -380,6 +435,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         </Panel>
 
         <Panel title="Case study" description="Markdown. Every saved version is kept — see History.">
+          <WriteupStatus system={system} />
           <label htmlFor="caseStudyBody" className="sr-only">Case study</label>
           <textarea id="caseStudyBody" rows={16} className={cn(adminInput, "font-mono text-[0.8125rem] leading-relaxed")} value={f.caseStudyBody} onChange={(e) => set("caseStudyBody", e.target.value)} />
         </Panel>

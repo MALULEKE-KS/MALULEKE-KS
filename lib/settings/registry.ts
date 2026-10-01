@@ -189,6 +189,27 @@ export const SETTINGS = {
     description: "The site's content is given to the guide whole up to this many tokens; past it, the guide searches it instead.",
     rule: "Constitution §6",
   }),
+  // Generated write-ups (BR-4.5): each system's description and case study, written
+  // by AI from its public repo, kept current as the repo changes.
+  "writeups.model": define({
+    schema: z.string().trim().regex(/^[a-z0-9-]+\/[a-z0-9.-]+$/),
+    default: "anthropic/claude-haiku-4.5",
+    description: "The model that writes each system's description and case study from its repo (an AI Gateway id, provider/model).",
+    rule: "BR-4.5",
+  }),
+  "writeups.maxPerRun": define({
+    // A few per day keeps the job short and inside the AI Gateway's free credit.
+    schema: z.number().int().min(1).max(25),
+    default: 4,
+    description: "Systems whose write-up the daily job (re)writes at most, per run.",
+    rule: "BR-4.5",
+  }),
+  "writeups.refreshDays": define({
+    schema: z.number().int().min(1).max(365),
+    default: 14,
+    description: "A generated write-up is rewritten after its repo changes, but no more often than every this many days.",
+    rule: "BR-4.5",
+  }),
 } as const;
 
 export type SettingKey = keyof typeof SETTINGS;

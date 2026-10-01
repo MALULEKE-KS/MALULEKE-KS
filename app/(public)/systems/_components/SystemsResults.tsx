@@ -8,7 +8,7 @@ import { ArrowLeft, ArrowRight, SearchX } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 import { CatalogCard } from "@/components/systems/CatalogCard";
 import { CatalogFilters } from "@/components/systems/CatalogFilters";
-import { getCatalog, type Catalog } from "@/lib/queries/catalog";
+import { getCatalog, type Catalog, type CatalogSystem } from "@/lib/queries/catalog";
 import { PaginationQuerySchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
@@ -31,10 +31,56 @@ export async function loadCatalog(params: Params): Promise<Catalog> {
   });
 }
 
+function Grid({ systems, showHome = true }: { systems: CatalogSystem[]; showHome?: boolean }) {
+  return (
+    <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {systems.map((s, i) => (
+        <li key={s.slug}>
+          <Reveal delay={Math.min(i, 5) * 60} className="h-full">
+            <CatalogCard s={s} showHome={showHome} />
+          </Reveal>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * The unfiltered catalog, grouped by GitHub home (PUBLIC-REDESIGN-PLAN §2, D12):
+ * each home a heading with the owner's role there and its count, then
+ * its systems. Only when the whole catalog fits on one page — a group split
+ * across pages would say less than the flat grid.
+ */
+function ByHome({ systems, homes }: { systems: CatalogSystem[]; homes: Catalog["homes"] }) {
+  const groups = homes.map((h) => ({ ...h, systems: systems.filter((s) => s.homeSlug === h.slug) })).filter((g) => g.systems.length > 0);
+  const homeless = systems.filter((s) => !homes.some((h) => h.slug === s.homeSlug));
+  return (
+    <div className="space-y-14">
+      {groups.map((g) => (
+        <section key={g.slug} aria-labelledby={`home-${g.slug}`}>
+          {/* The homes' GitHub links live in the footer ("Where the code lives") — not repeated here. */}
+          <div className="border-ink/10 mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-3">
+            <h2 id={`home-${g.slug}`} className="text-ink text-xl font-semibold tracking-tight md:text-2xl">
+              {g.name}
+            </h2>
+            <p className="text-slate text-sm">
+              {g.role && <span>{g.role} · </span>}
+              <span className="type-data">{g.systems.length}</span> {g.systems.length === 1 ? "system" : "systems"}
+            </p>
+          </div>
+          <Grid systems={g.systems} showHome={false} />
+        </section>
+      ))}
+      {homeless.length > 0 && <Grid systems={homeless} />}
+    </div>
+  );
+}
+
 export async function SystemsResults({ searchParams: params }: { searchParams: Params }) {
   const catalog = await loadCatalog(params);
-  const { systems, total, page, totalPages, facets } = catalog;
+  const { systems, total, page, totalPages, facets, homes } = catalog;
   const filtered = Boolean(params.home || params.status || params.tech || params.domain);
+  const grouped = !filtered && params.sort !== "active" && totalPages === 1 && homes.length > 1;
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams(Object.entries(params).filter((e): e is [string, string] => Boolean(e[1])));
@@ -59,15 +105,7 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
         </div>
       ) : (
         <>
-          <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {systems.map((s, i) => (
-              <li key={s.slug}>
-                <Reveal delay={Math.min(i, 5) * 60} className="h-full">
-                  <CatalogCard s={s} />
-                </Reveal>
-              </li>
-            ))}
-          </ul>
+          {grouped ? <ByHome systems={systems} homes={homes} /> : <Grid systems={systems} />}
 
           {totalPages > 1 && (
             <nav aria-label="Pages" className="mt-12 flex items-center justify-center gap-4">

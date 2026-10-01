@@ -15,9 +15,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { GuideMood, Rig } from "@/components/guide/rig";
 import type { PublicLens } from "@/lib/queries/lenses";
 
-export type GuidePose = "none" | "wave" | "point";
+export type GuidePose = "none" | "wave" | "point" | "thinking";
 
 const LENS_KEY = "mks.lens";
+/** How long a pose holds before the character returns to its rig. */
+export const POSE_MS = 5000;
 
 /** The visitor's lens as saved for this session — read at send time by the chat. */
 export function readSessionLens(): string | null {
@@ -112,11 +114,27 @@ export function GuideProvider({
     rigs.current.forEach((r) => r.setMood(next));
   }, []);
 
-  const flashPose = useCallback((next: Exclude<GuidePose, "none">, ms = 1800) => {
+  // A pose holds for POSE_MS (owner, 2026-10-01: "at least 5 sec") — unless the
+  // visitor clicks or presses a key, which hands the character back to the rig.
+  const flashPose = useCallback((next: Exclude<GuidePose, "none">, ms = POSE_MS) => {
     if (poseTimer.current) clearTimeout(poseTimer.current);
     setPose(next);
     poseTimer.current = setTimeout(() => setPose("none"), ms);
   }, []);
+
+  useEffect(() => {
+    if (pose === "none") return;
+    const end = () => {
+      if (poseTimer.current) clearTimeout(poseTimer.current);
+      setPose("none");
+    };
+    window.addEventListener("pointerdown", end);
+    window.addEventListener("keydown", end);
+    return () => {
+      window.removeEventListener("pointerdown", end);
+      window.removeEventListener("keydown", end);
+    };
+  }, [pose]);
 
   const speak = useCallback((text: string) => rigs.current.forEach((r) => r.speak(text)), []);
 

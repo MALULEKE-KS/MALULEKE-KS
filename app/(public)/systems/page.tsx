@@ -36,7 +36,8 @@ async function HeroStats() {
     { value: stats.homes, label: stats.homes === 1 ? "GitHub home" : "GitHub homes" },
     { value: stats.caseStudies, label: stats.caseStudies === 1 ? "case study" : "case studies" },
     { value: stats.activeThisMonth, label: "active this month" },
-  ];
+  ].filter((i) => i.value > 0); // a zero is an absence, not a figure — it isn't shown
+  if (items.length === 0) return null;
   return (
     <dl className="flex flex-wrap gap-x-8 gap-y-3">
       {items.map((i) => (
