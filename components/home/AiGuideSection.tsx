@@ -62,7 +62,7 @@ export function AiGuideSection(props: AiGuideProps) {
 
       <Container className="relative py-14 md:py-16">
         <MagicCard className="rounded-3xl shadow-[0_40px_100px_-50px_rgb(0_0_0/0.95)]" surface="rgb(16 18 22 / 0.94)">
-          <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:items-center lg:gap-8">
+          <div className="flex flex-col p-4 sm:p-6">
             <h2 id="ai-guide-title" className="min-w-0 flex-1">
               <button
                 type="button"
@@ -98,15 +98,15 @@ export function AiGuideSection(props: AiGuideProps) {
               </button>
             </h2>
 
-            {/* Three questions, one tap from an answer. On phones they scroll sideways. */}
+            {/* Three questions, one tap from an answer — beneath, on one line; on phones they scroll sideways. */}
             {content.suggestions.length > 0 && (
-              <ul aria-label="Ask a question" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 lg:max-w-[46%] lg:flex-wrap lg:justify-end lg:overflow-visible">
+              <ul aria-label="Ask a question" className="-mx-4 mt-4 flex gap-2 overflow-x-auto border-t border-white/[0.07] px-4 pt-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 md:flex-wrap md:overflow-visible">
                 {content.suggestions.slice(0, 3).map((q) => (
                   <li key={q} className="shrink-0">
                     <button
                       type="button"
                       onClick={() => ask(q)}
-                      className="group/q hover:border-ember/40 text-mist hover:text-paper inline-flex max-w-[16rem] items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-left text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
+                      className="group/q hover:border-ember/40 text-mist hover:text-paper inline-flex max-w-[20rem] items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-left text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
                     >
                       <span className="truncate">{q}</span>
                       <ArrowUpRight aria-hidden="true" className="group-hover/q:text-ember size-3.5 shrink-0" />

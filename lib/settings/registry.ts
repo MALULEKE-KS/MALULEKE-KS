@@ -190,6 +190,19 @@ export const SETTINGS = {
     rule: "Constitution §6",
   }),
   // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
+  "evidence.reviewDays": define({
+    schema: z.number().int().min(7).max(365),
+    default: 90,
+    description: "Days a claim's evidence stays \"Verified\" after its last review; after that the site shows \"Review due\" on its own.",
+    rule: "EV-4",
+  }),
+  "evidence.repository": define({
+    // Vercel's own VERCEL_GIT_REPO_OWNER/SLUG win when present; this is the fallback (local, previews without git).
+    schema: z.string().trim().regex(/^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/),
+    default: "MALULEKE-KS/MALULEKE-KS",
+    description: "The public GitHub repository evidence links point into (owner/name).",
+    rule: "EV-2",
+  }),
   "screenshots.maxPerRun": define({
     // The screenshot service's free tier allows a few captures a day.
     schema: z.number().int().min(1).max(10),

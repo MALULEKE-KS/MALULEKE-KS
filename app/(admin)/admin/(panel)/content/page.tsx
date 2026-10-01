@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { CONTENT_BLOCKS, type ContentKey } from "@/lib/content/blocks";
 import { HowIBuildEditor } from "./_components/HowIBuildEditor";
 import { FieldsBlockEditor, type BlockField } from "./_components/FieldsBlockEditor";
+import { EvidenceEditor } from "./_components/EvidenceEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function AdminContentPage() {
   const byKey = new Map(rows.map((r) => [r.key, r]));
   const howIBuild = byKey.get("how-i-build");
   const parsed = CONTENT_BLOCKS["how-i-build"].schema.safeParse(howIBuild?.body);
+  const evidence = byKey.get("evidence");
 
   return (
     <>
@@ -59,6 +61,9 @@ export default async function AdminContentPage() {
           description={`${CONTENT_BLOCKS["how-i-build"].description} Last changed ${formatWhen(howIBuild?.updatedAt)}.`}
         >
           <HowIBuildEditor key={howIBuild?.updatedAt.toISOString() ?? "new"} initial={parsed.success ? parsed.data : null} />
+        </Panel>
+        <Panel title={CONTENT_BLOCKS.evidence.title} description={`${CONTENT_BLOCKS.evidence.description} Last changed ${formatWhen(evidence?.updatedAt)}.`}>
+          <EvidenceEditor key={evidence?.updatedAt.toISOString() ?? "new"} initial={evidence?.body ?? null} />
         </Panel>
       </div>
     </>

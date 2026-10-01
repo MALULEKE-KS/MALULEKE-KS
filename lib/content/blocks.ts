@@ -8,6 +8,7 @@
 import { cache } from "react";
 import { z } from "zod";
 import { dbPublic } from "@/lib/db";
+import { EvidenceBlock } from "@/lib/evidence/schema";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 
@@ -48,6 +49,11 @@ export const CONTENT_BLOCKS = {
       lede: Text(500),
       suggestions: z.array(Text(140)).min(1).max(6),
     }),
+  },
+  evidence: {
+    title: "Evidence — claims and their proof",
+    description: "The claims the site makes and the evidence a visitor can open for each (docs/EVIDENCE-SPEC.md). Links: repo:<path>, /public-route or actions:<workflow>.yml.",
+    schema: EvidenceBlock,
   },
 } as const;
 
