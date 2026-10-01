@@ -15,7 +15,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { GuideMood, Rig } from "@/components/guide/rig";
 import type { PublicLens } from "@/lib/queries/lenses";
 
-export type GuidePose = "none" | "wave" | "point";
+export type GuidePose = "none" | "wave" | "point" | "thinking";
 
 const LENS_KEY = "mks.lens";
 
