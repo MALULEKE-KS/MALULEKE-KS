@@ -7,6 +7,7 @@
 
 import { dbPublic } from "@/lib/db";
 import { getHomeSelection } from "@/lib/queries/homepage";
+import { withScreenshots } from "@/lib/queries/systems";
 
 const WEEKS = 26;
 const DAY = 86_400_000;
@@ -79,7 +80,12 @@ export async function getSelectedWork(more = 3) {
 
   let nowBuilding = null;
   if (active) {
-    const commits = await dbPublic.publicRepoCommit.findMany({ where: { fullName: active.fullName }, orderBy: { committedAt: "desc" }, take: 5 });
+    const [commits, system] = await Promise.all([
+      dbPublic.publicRepoCommit.findMany({ where: { fullName: active.fullName }, orderBy: { committedAt: "desc" }, take: 5 }),
+      // Its site, when it's a system on the site with a screenshot (BR-1.18).
+      active.published && active.slug ? dbPublic.publicSystem.findUnique({ where: { slug: active.slug }, select: { slug: true, liveUrl: true, screenshotUrl: true } }) : null,
+    ]);
+    const [shot] = system ? await withScreenshots([system]) : [];
     nowBuilding = {
       name: active.name,
       fullName: active.fullName,
@@ -89,6 +95,8 @@ export async function getSelectedWork(more = 3) {
       lastPush: ago(active.pushedAt, now),
       commitsLast4Weeks: active.commitsLast4Weeks,
       commits: commits.map((c) => ({ message: c.message, when: ago(c.committedAt, now), key: `${c.committedAt.toISOString()}:${c.message.slice(0, 24)}` })),
+      screenshotUrl: shot?.screenshotUrl ?? null,
+      liveUrl: shot?.liveUrl ?? null,
     };
   }
 

@@ -417,3 +417,9 @@ html {
     overflow-wrap: anywhere;
   }
 }
+
+/* The system map on a phone: a light running down each home's trunk. */
+@keyframes trunk-light {
+  from { transform: translateY(-4rem); }
+  to { transform: translateY(100vh); }
+}
