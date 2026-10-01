@@ -144,35 +144,120 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
         </Column>
       </div>
 
-      {/* Below lg: grouped by home. */}
-      <div className="grid gap-4 lg:hidden">
+      {/* Below lg: the same map, drawn for a phone (owner, 2026-10-01: "the map doesn't show on mobile as it shows on a PC"). */}
+      <PhoneMap data={data} />
+    </>
+  );
+}
+
+/**
+ * The map on a phone — a vertical tree, not a list: each GitHub home is a trunk
+ * with a light running down it, each system branches off it carrying the
+ * technologies it's built with. Tapping a technology (the phone's hover)
+ * traces every system and home that uses it while the rest dims; tap it again,
+ * or another, to change. System names stay links into their case studies, so
+ * tracing never fights navigation. The light pauses off screen and stands
+ * still under reduced motion.
+ */
+function PhoneMap({ data }: { data: SystemMapData }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [onScreen, setOnScreen] = useState(false);
+  const [tech, setTech] = useState<string | null>(null);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(!!e?.isIntersecting), { rootMargin: "80px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const techOf = useMemo(() => {
+    const m = new Map<string, MapNode[]>();
+    const byId = new Map(data.tech.map((t) => [t.id, t]));
+    for (const [a, b] of data.edges) {
+      const t = byId.get(b);
+      if (t) m.set(a, [...(m.get(a) ?? []), t]);
+    }
+    return m;
+  }, [data.edges, data.tech]);
+  const uses = (workId: string) => !tech || (techOf.get(workId) ?? []).some((t) => t.id === tech);
+
+  return (
+    <div ref={box} className="lg:hidden">
+      {data.tech.length > 0 && (
+        <div className="mb-6">
+          <p className="text-mist mb-2 font-mono text-[11px] tracking-[0.14em] uppercase">Built with — tap to trace</p>
+          <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+            {data.tech.map((t) => {
+              const on = tech === t.id;
+              const mark = techMark(t.label);
+              return (
+                <li key={t.id} className="shrink-0">
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setTech(on ? null : t.id)}
+                    className={cn(
+                      "focus-visible:outline-ember inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] whitespace-nowrap transition-colors focus-visible:outline-2",
+                      on ? "border-ember bg-ember/15 text-paper" : "text-mist border-white/12 bg-white/[0.04]",
+                    )}
+                  >
+                    {mark}
+                    {t.label}
+                    <span className={cn("type-data text-[11px]", on ? "text-ember" : "text-line")}>{t.sub?.split(" ")[0]}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <div className="grid gap-5">
         {data.homes.map((h) => {
           const ids = new Set(data.edges.filter(([a]) => a === h.id).map(([, b]) => b));
           const work = data.work.filter((w) => ids.has(w.id));
+          const homeLit = work.some((w) => uses(w.id));
           return (
-            <div key={h.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div key={h.id} className={cn("rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-opacity duration-300", !homeLit && "opacity-35")}>
               <NodeCard node={h} />
-              <ul className="mt-3 grid gap-2 border-l border-white/10 pl-4">
-                {work.map((w) => (
-                  <li key={w.id}>
-                    <NodeCard node={w} compact />
-                  </li>
-                ))}
+              {/* The trunk: a hairline with a light running down it. */}
+              <ul className="relative mt-3 ml-[11px] grid gap-3 pl-6">
+                <span aria-hidden="true" className="absolute top-0 bottom-3 left-0 w-px overflow-hidden bg-white/12">
+                  <span
+                    className={cn(
+                      "absolute inset-x-0 h-16 bg-[linear-gradient(180deg,transparent,#ff5b1f,#ffb547,transparent)] motion-safe:animate-[trunk-light_3.6s_linear_infinite] motion-reduce:hidden",
+                      !onScreen && "[animation-play-state:paused]",
+                    )}
+                  />
+                </span>
+                {work.map((w) => {
+                  const lit = uses(w.id);
+                  const techs = techOf.get(w.id) ?? [];
+                  return (
+                    <li key={w.id} className={cn("relative transition-opacity duration-300", !lit && "opacity-30")}>
+                      {/* The branch from the trunk to this system. */}
+                      <span aria-hidden="true" className={cn("absolute top-5 -left-6 h-px w-5", lit && tech ? "bg-ember" : "bg-white/15")} />
+                      <NodeCard node={w} compact />
+                      {techs.length > 0 && (
+                        <ul className="mt-2 flex flex-wrap gap-1.5 pl-1">
+                          {techs.map((t) => (
+                            <li key={t.id} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]", tech === t.id ? "border-ember/60 text-paper" : "text-mist border-white/10")}>
+                              {techMark(t.label)}
+                              {t.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           );
         })}
-        {data.tech.length > 0 && (
-          <ul className="flex flex-wrap gap-2">
-            {data.tech.map((t) => (
-              <li key={t.id}>
-                <NodeCard node={t} compact />
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
-    </>
+    </div>
   );
 }
 

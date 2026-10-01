@@ -127,16 +127,8 @@ function FeaturedCard({ w }: { w: Work }) {
 
 function NowBuildingCard({ now, strip = false }: { now: NonNullable<SelectedWork["nowBuilding"]>; strip?: boolean }) {
   const external = !now.onSite;
-  return (
-    <div
-      className={cn(
-        "bg-night text-paper shadow-lift relative h-full overflow-hidden rounded-3xl border border-white/10 p-5 md:p-6",
-        // Under two or more featured systems it runs full width: what's moving on the left, its commits on the right.
-        strip && "lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-x-10",
-      )}
-    >
-      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.22),transparent)]" />
-      <div className={cn(strip && "lg:col-start-1 lg:row-start-1")}>
+  const text = (
+    <>
       <p className="text-mist relative flex items-center gap-2 text-xs font-medium">
         <span className="relative flex size-2" aria-hidden="true">
           <span className="live-ping absolute inset-0 rounded-full bg-ember" />
@@ -150,37 +142,66 @@ function NowBuildingCard({ now, strip = false }: { now: NonNullable<SelectedWork
         {now.home} · last push {now.lastPush}
         {now.commitsLast4Weeks > 0 && ` · ${now.commitsLast4Weeks} commits in 4 weeks`}
       </p>
-
-      </div>
-
-      {now.commits.length > 0 && (
-        <AnimatedList className={cn("relative mt-5", strip && "lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:mt-0")}>
-          {now.commits.map((c) => (
-            <div key={c.key} className="flex items-start gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3 py-2.5">
-              <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px]">{c.message}</span>
-                <span className="text-line block text-[11px]">{c.when}</span>
-              </span>
-            </div>
-          ))}
-        </AnimatedList>
+    </>
+  );
+  // Its live site, as the featured cards show theirs (BR-1.18), when it has one.
+  const site = now.screenshotUrl ? (
+    <div className="relative">
+      <SystemPreviewFrame screenshotUrl={now.screenshotUrl} liveUrl={now.liveUrl} name={now.name} />
+    </div>
+  ) : null;
+  const commits =
+    now.commits.length > 0 ? (
+      <AnimatedList className="relative mt-5">
+        {now.commits.map((c) => (
+          <div key={c.key} className="flex items-start gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3 py-2.5">
+            <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13px]">{c.message}</span>
+              <span className="text-line block text-[11px]">{c.when}</span>
+            </span>
+          </div>
+        ))}
+      </AnimatedList>
+    ) : null;
+  const link = (
+    <a
+      href={now.url}
+      {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+      className="text-paper hover:text-ember relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+    >
+      {external ? (
+        <>
+          <Github aria-hidden="true" className="size-4" /> {now.fullName}
+        </>
+      ) : (
+        "See the system"
       )}
+      <ArrowUpRight aria-hidden="true" className="size-3.5" />
+    </a>
+  );
 
-      <a
-        href={now.url}
-        {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-        className={cn("text-paper hover:text-ember relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors", strip && "lg:col-start-1 lg:row-start-2 lg:self-start")}
-      >
-        {external ? (
-          <>
-            <Github aria-hidden="true" className="size-4" /> {now.fullName}
-          </>
-        ) : (
-          "See the system"
-        )}
-        <ArrowUpRight aria-hidden="true" className="size-3.5" />
-      </a>
+  return (
+    <div className="bg-night text-paper shadow-lift relative h-full overflow-hidden rounded-3xl border border-white/10 p-5 md:p-6">
+      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.22),transparent)]" />
+      {strip ? (
+        // Full width under two or more featured systems: what's moving and its commits, beside its live site.
+        <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-10">
+          <div>
+            {text}
+            {commits}
+            {link}
+          </div>
+          {site}
+        </div>
+      ) : (
+        <>
+          {text}
+          {site && <div className="mt-5">{site}</div>}
+          {commits}
+          {link}
+        </>
+      )}
     </div>
   );
 }
