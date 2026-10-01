@@ -38,12 +38,15 @@ function repo(n: number, owner: string, name: string, extra: Repo = {}): Repo {
 // Sunday 2026-09-20 00:00 UTC: GitHub's week. Sunday belongs to the ISO week of Monday 09-14.
 const SUNDAY = Date.UTC(2026, 8, 20) / 1000;
 
-function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimited?: boolean } = {}): FetchLike {
+function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string } = {}): FetchLike {
   return async (url) => {
     const path = new URL(url).pathname + new URL(url).search;
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
     if (options.rateLimited) {
       return new Response("{}", { status: 403, headers: { "x-ratelimit-remaining": "0", "x-ratelimit-reset": String(SUNDAY + 3600) } });
+    }
+    if (options.refusingOrg && path.startsWith(`/orgs/${options.refusingOrg}/`)) {
+      return json({ message: `The '${options.refusingOrg}' organization forbids access via a personal access token (classic) whose lifetime is too long.` }, 403);
     }
     if (path.startsWith("/user/repos")) return json(new URL(url).searchParams.get("page") === "1" ? repos : []);
     if (path.startsWith("/orgs/")) return json({ message: "Not Found" }, 404);
@@ -91,7 +94,7 @@ describe("the sync (#95)", () => {
 
   it("shows the owner's public repos by default, keeps private (setting), client and collaborated work hidden; skips forks; reports unmapped owners", async () => {
     const summary = await sync(repos, { pendingStats: [`${OWNER}/${RUN}-private-app`] });
-    expect(summary).toMatchObject({ created: 3, skippedForks: 1, unmappedOwners: [STRANGER], activityPending: [`${OWNER}/${RUN}-private-app`], errors: [] });
+    expect(summary).toMatchObject({ created: 3, skippedForks: 1, unmappedOwners: [STRANGER], activityPending: [`${OWNER}/${RUN}-private-app`], errors: [], accountErrors: [] });
 
     const pub = await byRepo(1);
     expect(pub).toMatchObject({
@@ -160,6 +163,20 @@ describe("the sync (#95)", () => {
 
   it("stops the whole run on a GitHub rate limit, so the job fails with the reset time", async () => {
     await expect(sync(repos, { rateLimited: true })).rejects.toBeInstanceOf(GithubRateLimitError);
+  });
+
+  it("an account that refuses the token is reported with GitHub's reason; the rest still syncs", async () => {
+    const REFUSING = `${RUN}-refusing`;
+    const summary = await syncGithub({
+      tokens: ["test-token"],
+      ownedLogins: [REFUSING, OWNER],
+      fetch: fakeGithub([repo(30, OWNER, `${RUN}-still-synced`)], { refusingOrg: REFUSING }),
+    });
+    expect(summary.accountErrors).toHaveLength(1);
+    expect(summary.accountErrors[0]!.account).toBe(REFUSING);
+    expect(summary.accountErrors[0]!.error).toMatch(/403 .*forbids access via a personal access token \(classic\)/);
+    expect(summary).toMatchObject({ created: 1, errors: [] });
+    expect(await byRepo(30)).toMatchObject({ contentStatus: "PUBLISHED" });
   });
 
   it("reads each repo with a token that can see it — one token per GitHub owner", async () => {
