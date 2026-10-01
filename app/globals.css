@@ -410,4 +410,10 @@ html {
   .grid > * {
     min-width: 0;
   }
+  /* Any text: a word breaks only when it would otherwise run off the screen
+     (a long link, an identifier, a commit message). "anywhere", not
+     "break-word", so it also stops a long word widening a flex or grid column. */
+  body {
+    overflow-wrap: anywhere;
+  }
 }

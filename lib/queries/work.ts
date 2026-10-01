@@ -6,7 +6,7 @@
 // through the public role (F1.8): published systems, public repos, counts.
 
 import { dbPublic } from "@/lib/db";
-import { getPrioritySystems } from "@/lib/queries/homepage";
+import { getHomeSelection } from "@/lib/queries/homepage";
 
 const WEEKS = 26;
 const DAY = 86_400_000;
@@ -41,9 +41,11 @@ function series(rows: { weekStart: Date; commits: number }[], now: Date): number
   });
 }
 
-export async function getSelectedWork(limit = 4) {
+/** Selected work on the home page: the owner's featured systems, then `more` others (getHomeSelection). */
+export async function getSelectedWork(more = 3) {
   const now = new Date();
-  const systems = await getPrioritySystems(limit);
+  const selection = await getHomeSelection(more);
+  const systems = [...selection.featured, ...selection.more];
   const ids = systems.map((s) => s.id);
   const slugs = systems.map((s) => s.slug);
 
@@ -90,7 +92,8 @@ export async function getSelectedWork(limit = 4) {
     };
   }
 
-  return { work, nowBuilding };
+  const featuredIds = new Set(selection.featured.map((s) => s.id));
+  return { featured: work.filter((w) => featuredIds.has(w.id)), more: work.filter((w) => !featuredIds.has(w.id)), nowBuilding };
 }
 
 export type SelectedWork = Awaited<ReturnType<typeof getSelectedWork>>;

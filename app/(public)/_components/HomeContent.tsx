@@ -53,7 +53,7 @@ export async function HomeContent() {
     pulse,
   ] = await Promise.all([
     getHomepageStats(),
-    getSelectedWork(5),
+    getSelectedWork(3),
     countPublishedSystems(),
     getPublicMetrics(), // approved values only (BR-5.3)
     getSiteProfile(),

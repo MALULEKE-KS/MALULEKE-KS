@@ -68,9 +68,10 @@ export default async function globalSetup() {
           githubLanguages: { TypeScript: 60000, PLpgSQL: 20000, Python: 9000, Shell: 3000, Dockerfile: 800 },
           techStack: ["Next.js", "React", "TypeScript", "PostgreSQL", "Prisma", "Tailwind CSS", "Redis", "Vercel", "Docker", "GitHub Actions"],
           caseStudyBody: body,
+          onCv: true,
         },
       }));
-    if (system.contentStatus !== "PUBLISHED") await db.system.update({ where: { id: system.id }, data: { contentStatus: "PUBLISHED" } });
+    if (system.contentStatus !== "PUBLISHED" || !system.onCv) await db.system.update({ where: { id: system.id }, data: { contentStatus: "PUBLISHED", onCv: true } });
 
     // A full year of activity, every week busy.
     const monday = new Date();
