@@ -142,7 +142,7 @@ Verifies the new hash, clears the failed-attempt counter and any lock, and write
 
 ## Deploy budget (Vercel Hobby caps deployments per day and per month)
 
-- **The owner decides when a batch ships** (2026-09-30): work accumulates on one local release branch, fully verified; nothing is pushed, PR'd or merged until the owner says it's ready.
+- **Batches, planned against the budget** (owner, 2026-10-01, replacing "the owner decides each push"): work accumulates on one local release branch, fully verified; a release goes out when a coherent batch has real value for visitors — a finished page, or a fix to something broken live — not only when everything is done, and roughly one production deploy per batch.
 
 - `vercel.ts` `ignoreCommand` → `scripts/vercel-ignore.mjs` **skips builds** whose changes touch only docs, tests, CI or Markdown, and **skips previews** unless UI paths changed (CI already builds and tests every PR). Anything it can't diff, it builds.
 - Ship related issues in **one PR** (several `Closes #N`) → one production deploy.
@@ -201,22 +201,16 @@ Neon keeps a history of the database (the restore window depends on the Neon pla
 
 Drill log: see "Known gaps" until a production drill is recorded here.
 
-## Pending release (built locally, not yet pushed)
+## Pending release
 
-Branch `release/f5b-admin` — F5b (admin panel) and F5c so far (see the update log in ROADMAP-V2.md). New migrations, applied automatically by the build, all additive:
+None — the last batch (`release/f5c-pages`, issues #114–#118: mobile by default, the systems pages, generated write-ups, the sync and guide fixes) shipped on 2026-10-01. Its migrations, applied by the build, all additive:
 
 | Migration | What it does in production |
 |---|---|
-| `20260930130000_site_content_blocks` | `SiteContent` + `PublicSiteContent`; the method's mission and principles as data |
-| `20260930140000_reconcile_seeded_systems` | Xkimi Xa Mali renamed (old address redirects), FundsLink Academy → KSDRILL-SA + private, Sunduza linked to its repo, personal home named MALULEKE-KS — only rows still in their seeded state |
-| `20260930150000_sunduza_named` | Sunduza Architectural, client disclosure approved (owner, 2026-09-30) |
-| `20260930160000_titles_homes_pulse` | `ProfileTitle` / `TitleKind` (seeded with the owner's two titles), `OrganizationKind` + `PublicHome`, `PublicPlatformPulse` |
-| `20260930170000_profile_photos` | `ProfilePhoto` + `PublicProfilePhoto` (BR-1.17) |
+| `20261001090000_generated_writeups` | Who wrote each system's description and case study (`descriptionSource`, `caseStudySource`), the trigger that refuses a generated write over the owner's words (BR-4.5), the label in `PublicSystem`, the `writeups.enabled` flag (off) |
+| `20261001100000_system_case_studies` | The first write-up for each system, from its repo — only where the case study is still empty and never over the owner's text; stacks where only the synced language was set; a GitHub link taken for a live site cleared |
 
-After that deploy, the owner:
-1. Uploads the About portrait in **Admin → Profile → Photos** (`design/character/about-portrait-graphite.png`) — photos are data, so the local copy doesn't travel with the code.
-2. Sets `GITHUB_SYNC_TOKEN` (read-only fine-grained tokens, one per GitHub owner) if not done, then **Admin → Jobs → github.sync → Run now**, and curates which synced systems to publish.
-3. Sets `CRON_SECRET` (fresh value) if not done.
+After it: switch on `concierge.enabled` (the guide now counts a Vercel deployment as connected) and `writeups.enabled` in Admin → Settings → Flags. `CRON_SECRET` is active from this deploy.
 
 ## Known gaps
 
