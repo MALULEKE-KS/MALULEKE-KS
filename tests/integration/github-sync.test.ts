@@ -38,10 +38,11 @@ function repo(n: number, owner: string, name: string, extra: Repo = {}): Repo {
 // Sunday 2026-09-20 00:00 UTC: GitHub's week. Sunday belongs to the ISO week of Monday 09-14.
 const SUNDAY = Date.UTC(2026, 8, 20) / 1000;
 
-function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string } = {}): FetchLike {
+function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string; gone?: string[] } = {}): FetchLike {
   return async (url) => {
     const path = new URL(url).pathname + new URL(url).search;
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+    if (options.gone?.some((full) => path === `/repos/${full}`)) return json({ message: "Not Found" }, 404);
     if (options.rateLimited) {
       return new Response("{}", { status: 403, headers: { "x-ratelimit-remaining": "0", "x-ratelimit-reset": String(SUNDAY + 3600) } });
     }
@@ -177,6 +178,23 @@ describe("the sync (#95)", () => {
     expect(summary.accountErrors[0]!.error).toMatch(/403 .*forbids access via a personal access token \(classic\)/);
     expect(summary).toMatchObject({ created: 1, errors: [] });
     expect(await byRepo(30)).toMatchObject({ contentStatus: "PUBLISHED" });
+  });
+
+  it("a live system whose repo is gone from GitHub leaves the site — hidden and flagged, never deleted; nothing else is touched", async () => {
+    const goneRepo = repo(40, OWNER, `${RUN}-deleted-later`);
+    const stillThere = repo(41, OWNER, `${RUN}-not-listed-but-exists`);
+    await sync([goneRepo, stillThere]);
+    expect(await byRepo(40)).toMatchObject({ contentStatus: "PUBLISHED" });
+
+    // Next run: neither is listed; GitHub says one is gone, the other answers otherwise.
+    const summary = await syncGithub({
+      tokens: ["test-token"],
+      ownedLogins: [OWNER],
+      fetch: fakeGithub([], { gone: [`${OWNER}/${RUN}-deleted-later`] }),
+    });
+    expect(summary.removedFromGithub).toEqual([`${RUN}-deleted-later`]);
+    expect(await byRepo(40)).toMatchObject({ contentStatus: "DRAFT", needsCuration: true });
+    expect(await byRepo(41)).toMatchObject({ contentStatus: "PUBLISHED" });
   });
 
   it("reads each repo with a token that can see it — one token per GitHub owner", async () => {

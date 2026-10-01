@@ -110,6 +110,8 @@ export interface GithubSyncSummary {
   errors: { repo: string; error: string }[];
   /** Accounts whose listing GitHub refused (an organisation's token policy, say); the rest of the run carried on. */
   accountErrors: { account: string; error: string }[];
+  /** Live systems whose public repo is gone from GitHub — hidden this run, flagged for the owner. */
+  removedFromGithub: string[];
 }
 
 /**
@@ -370,6 +372,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     knowledgeUpdated: 0,
     errors: [],
     accountErrors: [...accountErrors].map(([account, error]) => ({ account, error })),
+    removedFromGithub: [],
   };
   const unmapped = new Set<string>();
 
@@ -483,6 +486,30 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
       summary.errors.push({ repo: repo.full_name, error: err instanceof Error ? err.message.slice(0, 300) : String(err) });
     }
   });
+
+  // A live system whose public repo in the owner's own homes has gone from
+  // GitHub (deleted, or no longer the owner's) leaves the site: hidden as a
+  // draft and flagged for the owner — never deleted (BR-1.9), never guessed.
+  // Only when that account was listed in full this run, and only on GitHub's
+  // own "not found" for the repo; a private repo the token can't see is never
+  // touched (it was never public on the site to begin with).
+  const listedAccounts = config.ownedLogins.map((l) => l.toLowerCase()).filter((l) => !accountErrors.has(l) && ![...accountErrors.keys()].some((k) => k.toLowerCase() === l));
+  const gone = await db.system.findMany({
+    where: {
+      githubRepoId: { not: null, notIn: [...found.keys()] },
+      githubFullName: { not: null },
+      repoPrivate: false,
+      contentStatus: "PUBLISHED",
+    },
+    select: { id: true, slug: true, githubFullName: true, githubOwnerLogin: true },
+  });
+  for (const s of gone) {
+    if (!s.githubOwnerLogin || !listedAccounts.includes(s.githubOwnerLogin.toLowerCase())) continue;
+    const res = await clients[0]!.request(`/repos/${s.githubFullName}`);
+    if (res.status !== 404) continue;
+    await db.system.update({ where: { id: s.id }, data: { contentStatus: "DRAFT", publishAt: null, needsCuration: true } });
+    summary.removedFromGithub.push(s.slug);
+  }
 
   summary.unmappedOwners = [...unmapped].sort();
   summary.activityPending.sort();

@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarClock, History, Plus, RotateCcw, Save } from "lucide-react";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { ScreenshotPanel, type ScreenshotInfo } from "@/components/admin/ScreenshotPanel";
 import { adminButton, adminHint, adminInput, adminLabel, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest, changedFields, fromLocalInput, toLocalInput } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,7 @@ interface EditorSystem {
   screenshotUrl: string | null;
   repoPrivate: boolean;
   writeup: { descriptionSource: string; caseStudySource: string; generatedAt: string | null };
+  screenshot: ScreenshotInfo | null;
   github: {
     fullName: string | null;
     ownerLogin: string | null;
@@ -427,9 +429,9 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
               {system.repoPrivate && <p className={adminHint}>Private repo — shown as private, never linked (BR-1.7).</p>}
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="screenshotUrl" className={adminLabel}>Screenshot</label>
+              <label htmlFor="screenshotUrl" className={adminLabel}>Screenshot address (fallback)</label>
               <input id="screenshotUrl" type="url" className={adminInput} value={f.screenshotUrl} onChange={(e) => set("screenshotUrl", e.target.value)} placeholder="https://…/screenshot.png" />
-              <p className={adminHint}>Left empty, the case study shows a drawn placeholder instead.</p>
+              <p className={adminHint}>Only used while no screenshot is stored — see the Screenshot panel to capture or upload one.</p>
             </div>
           </div>
         </Panel>
@@ -456,6 +458,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
       </form>
 
       <aside className="min-w-0 space-y-6">
+        <ScreenshotPanel systemId={system.id} liveUrl={system.liveUrl} screenshot={system.screenshot} />
         <ImpactsPanel systemId={system.id} initial={system.impacts} />
         <SkillsPanel systemId={system.id} skills={options.skills} initial={system.skillIds} />
         <RevisionsPanel systemId={system.id} />

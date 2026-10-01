@@ -36,7 +36,7 @@ describe("platform_public — public pages see the masked views and nothing else
     for (const view of [
       "PublicSystem", "PublicImpact", "PublicTestimonial", "PublicTimeline", "PublicEducation",
       "PublicExperience", "PublicAchievement", "PublicOrganization", "PublicLedger", "PublicProfile",
-      "PublicProfileLink", "PublicMetric", "SkillEvidence", "PublicCvOption", "PublicCvUpload", "PublicAffiliation", "PublicSlugRedirect", "PublicSiteContent", "PublicProfileTitle", "PublicHome", "PublicPlatformPulse", "PublicProfilePhoto", "PublicFlag", "PublicVisitorLens", "PublicGithubRepo", "PublicRepoCommit", "PublicSystemActivity", "PublicSystemHome",
+      "PublicProfileLink", "PublicMetric", "SkillEvidence", "PublicCvOption", "PublicCvUpload", "PublicAffiliation", "PublicSlugRedirect", "PublicSiteContent", "PublicProfileTitle", "PublicHome", "PublicPlatformPulse", "PublicProfilePhoto", "PublicFlag", "PublicVisitorLens", "PublicGithubRepo", "PublicRepoCommit", "PublicSystemActivity", "PublicSystemHome", "PublicSystemScreenshot",
     ]) {
       expect(await asRole("platform_public", `SELECT * FROM "${view}" LIMIT 1`), view).toBe("ok");
     }

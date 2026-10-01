@@ -4,6 +4,10 @@
 // Safe by construction: react-markdown never renders raw HTML, so an
 // admin-entered body can't inject markup or scripts. Links leaving the site
 // open in a new tab with no opener.
+//
+// Phone-safe by design, whatever a body contains (written or generated): code
+// blocks and tables scroll inside their own box, long words, links and inline
+// code wrap instead of widening the page, images never exceed the column.
 
 import { Children, isValidElement, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -62,12 +66,12 @@ const components: Components = {
     </blockquote>
   ),
   code: ({ children }) => (
-    <code className="bg-ink/[0.06] text-ink rounded-md px-1.5 py-0.5 font-mono text-[0.9em]">
+    <code className="bg-ink/[0.06] text-ink rounded-md px-1.5 py-0.5 font-mono text-[0.9em] [overflow-wrap:anywhere]">
       {children}
     </code>
   ),
   pre: ({ children }) => (
-    <pre className="bg-night text-paper [&_code]:text-paper mt-6 overflow-x-auto rounded-2xl p-5 font-mono text-sm leading-relaxed [&_code]:bg-transparent [&_code]:p-0">
+    <pre className="bg-night text-paper [&_code]:text-paper mt-6 max-w-full overflow-x-auto rounded-2xl p-4 font-mono text-[13px] leading-relaxed sm:p-5 sm:text-sm [&_code]:bg-transparent [&_code]:p-0 [&_code]:[overflow-wrap:normal]">
       {children}
     </pre>
   ),
@@ -77,7 +81,7 @@ const components: Components = {
       <a
         href={href}
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        className="text-accent decoration-accent/40 hover:decoration-accent font-medium underline underline-offset-4 transition-colors"
+        className="text-accent decoration-accent/40 hover:decoration-accent font-medium underline underline-offset-4 transition-colors [overflow-wrap:anywhere]"
       >
         {children}
       </a>
@@ -85,14 +89,14 @@ const components: Components = {
   },
   hr: () => <hr className="border-ink/10 my-10" />,
   table: ({ children }) => (
-    <div className="mt-6 overflow-x-auto">
-      <table className="w-full border-collapse font-sans text-sm">{children}</table>
+    <div className="mt-6 max-w-full overflow-x-auto">
+      <table className="w-full min-w-[28rem] border-collapse font-sans text-sm">{children}</table>
     </div>
   ),
   th: ({ children }) => (
     <th className="border-ink/15 text-ink border-b px-3 py-2 text-left font-medium">{children}</th>
   ),
-  td: ({ children }) => <td className="border-ink/10 text-slate border-b px-3 py-2">{children}</td>,
+  td: ({ children }) => <td className="border-ink/10 text-slate border-b px-3 py-2 align-top">{children}</td>,
   // Images in a body are admin-supplied URLs with no fixed host to allow-list
   // for next/image (next.config remotePatterns); shown plainly, lazily loaded.
   img: ({ src, alt }) =>
@@ -101,7 +105,7 @@ const components: Components = {
       <img
         src={src}
         alt={alt ?? ""}
-        className="border-ink/10 mt-6 rounded-2xl border"
+        className="border-ink/10 mt-6 h-auto max-w-full rounded-2xl border"
         loading="lazy"
       />
     ) : null,
@@ -109,7 +113,7 @@ const components: Components = {
 
 export function Prose({ markdown }: { markdown: string }) {
   return (
-    <div className="text-ink max-w-prose font-serif text-lg [&>*:first-child]:mt-0">
+    <div className="text-ink max-w-prose min-w-0 font-serif text-[1.0625rem] break-words sm:text-lg [&>*:first-child]:mt-0">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {markdown}
       </ReactMarkdown>

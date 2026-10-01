@@ -30,6 +30,22 @@ const CATALOG_ORDER = [
   { id: "asc" },
 ] satisfies Prisma.PublicSystemOrderByWithRelationInput[];
 
+/**
+ * BR-1.18: a system's stored screenshot — captured from its live site or
+ * uploaded by the owner — is the one shown, ahead of a typed screenshot
+ * address. Served by /api/v1/systems/{slug}/screenshot, linked by its content
+ * hash so caches never show a stale one. Never for NDA work (the view excludes it).
+ */
+export async function withScreenshots<T extends { slug: string; screenshotUrl: string | null }>(systems: T[]): Promise<T[]> {
+  if (systems.length === 0) return systems;
+  const shots = await db.publicSystemScreenshot.findMany({ where: { slug: { in: systems.map((s) => s.slug) } }, select: { slug: true, sha256: true } });
+  const bySlug = new Map(shots.map((s) => [s.slug, s.sha256]));
+  return systems.map((s) => {
+    const sha = bySlug.get(s.slug);
+    return sha ? { ...s, screenshotUrl: `/api/v1/systems/${s.slug}/screenshot?v=${sha.slice(0, 12)}` } : s;
+  });
+}
+
 export async function getPublicSystems({
   organizationSlug,
   domainKey,
@@ -52,7 +68,7 @@ export async function getPublicSystems({
     db.publicSystem.count({ where }),
   ]);
 
-  return { data: rows.map(toPublicSystem), meta: { page, pageSize, total } };
+  return { data: await withScreenshots(rows.map(toPublicSystem)), meta: { page, pageSize, total } };
 }
 
 export async function isPublicSystemSlug(slug: string): Promise<boolean> {
@@ -74,8 +90,9 @@ export async function getPublicSystemBySlug(slug: string) {
     db.publicTestimonial.findMany({ where: { systemId: row.id }, orderBy: { createdAt: "desc" } }),
   ]);
 
+  const [base] = await withScreenshots([toPublicSystem(row)]);
   return {
-    ...toPublicSystem(row),
+    ...base!,
     caseStudyBody: row.caseStudyBody,
     // BR-4.5: an AI-written case study is labelled as such, wherever it's shown.
     caseStudyAuthor: !row.caseStudyBody.trim() ? null : row.caseStudySource === "generated" ? ("ai" as const) : ("owner" as const),
@@ -100,7 +117,7 @@ export async function getRelatedSystems(slug: string, limit = 3) {
     orderBy: CATALOG_ORDER,
     take: limit,
   });
-  return rows.map(toPublicSystem);
+  return withScreenshots(rows.map(toPublicSystem));
 }
 
 /** Organizations for the catalog filter — only ones whose name is disclosed (BR-1.4). */

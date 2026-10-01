@@ -13,6 +13,7 @@ import { AdminPageHeader, adminButton, Pill } from "@/components/admin/ui";
 import { db } from "@/lib/db";
 import { systemWithAdminRelations, toAdminSystem } from "@/lib/rules/publishing";
 import { SystemEditor } from "./_components/SystemEditor";
+import { currentScreenshot } from "@/lib/systems/screenshots";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,13 @@ export default async function AdminSystemDetailPage({ params }: { params: Promis
   });
   if (!system) notFound();
 
-  const [statuses, domains, organizations, relationships, skills] = await Promise.all([
+  const [statuses, domains, organizations, relationships, skills, screenshot] = await Promise.all([
     db.status.findMany({ where: { OR: [{ active: true }, { id: system.statusId }] }, orderBy: { label: "asc" } }),
     db.domain.findMany({ where: { OR: [{ active: true }, ...(system.domainId ? [{ id: system.domainId }] : [])] }, orderBy: { label: "asc" } }),
     db.organization.findMany({ orderBy: { name: "asc" } }),
     db.repoRelationship.findMany({ where: { OR: [{ active: true }, ...(system.repoRelationshipId ? [{ id: system.repoRelationshipId }] : [])] }, orderBy: { label: "asc" } }),
     db.skill.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    currentScreenshot(system.id),
   ]);
 
   const admin = toAdminSystem(system);
@@ -75,6 +77,7 @@ export default async function AdminSystemDetailPage({ params }: { params: Promis
           contentStatus: admin.contentStatus.toLowerCase() as "draft" | "published" | "archived",
           impacts: system.impacts.map((i) => ({ id: i.id, label: i.label, value: i.value, sortOrder: i.sortOrder })),
           skillIds: system.skills.map((s) => s.skillId),
+          screenshot,
         }}
         options={{
           statuses: statuses.map((s) => ({ key: s.key, label: s.active ? s.label : `${s.label} (deprecated)` })),

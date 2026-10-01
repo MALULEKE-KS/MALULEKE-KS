@@ -101,6 +101,17 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /content/{key}`
 - 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
 
+**Case study** — Selected work: each system's screenshot
+
+- Call `GET /systems/{slug}`
+- Call `GET /systems/{slug}/related`
+- Call `GET /systems/{slug}/screenshot`
+- An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
+- liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
+- An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
+- caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
+- screenshotUrl points at /systems/{slug}/screenshot?v=… when a screenshot is stored (captured or uploaded, BR-1.18) — the link is immutable; never present for NDA work.
+
 **Curated numbers** — Control room: approved figures
 
 - Call `GET /metrics`
@@ -266,14 +277,16 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /activity`
 - Only systems that are live on the site; no commit content, no authors.
 
-**Case study** — Header, case study body, impacts, testimonials; Who wrote the case study: an "AI" label when it was written from the repo; Related systems
+**Case study** — Header, case study body, impacts, testimonials; Who wrote the case study: an "AI" label when it was written from the repo; The screenshot of the live site, in a browser frame; Related systems
 
 - Call `GET /systems/{slug}`
 - Call `GET /systems/{slug}/related`
+- Call `GET /systems/{slug}/screenshot`
 - An unknown or unpublished slug is a plain 404 — never a "private" message (BR-1.3/1.4).
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
 - An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
 - caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
+- screenshotUrl points at /systems/{slug}/screenshot?v=… when a screenshot is stored (captured or uploaded, BR-1.18) — the link is immutable; never present for NDA work.
 
 **Skills with evidence** — Skills this system proves (match systemSlugs)
 
@@ -493,6 +506,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/systems/{id}/revisions`
 - Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 - Call `POST /admin/systems/{id}/writeup`
+- Call `GET /admin/systems/{id}/screenshot`
+- Call `POST /admin/systems/{id}/screenshot`
+- Call `POST /admin/systems/{id}/screenshot/capture`
+- Call `POST /admin/systems/{id}/screenshot/automatic`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
@@ -503,7 +520,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/systems/[id]
 
-**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart; Revision history for the case study and description: versions with who and when, restore; Who wrote the summary and case study (you / AI from the repo), Regenerate from repo
+**Systems — curate, publish, feature** — Editor, publish controls, homepage + CV placement, repo ownership; Skills, impacts, status history, pace, activity chart; Revision history for the case study and description: versions with who and when, restore; Who wrote the summary and case study (you / AI from the repo), Regenerate from repo; Screenshot: the current one and where it came from; Upload, Capture now, Back to automatic
 
 - Call `GET /admin/systems`
 - Call `POST /admin/systems`
@@ -517,6 +534,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/systems/{id}/revisions`
 - Call `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 - Call `POST /admin/systems/{id}/writeup`
+- Call `GET /admin/systems/{id}/screenshot`
+- Call `POST /admin/systems/{id}/screenshot`
+- Call `POST /admin/systems/{id}/screenshot/capture`
+- Call `POST /admin/systems/{id}/screenshot/automatic`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
@@ -555,6 +576,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /organizations` | Systems catalog | public |
 | `GET /systems/{slug}` | Case study | public |
 | `GET /systems/{slug}/related` | Case study | public |
+| `GET /systems/{slug}/screenshot` | Case study | public |
 | `GET /search` | Instant search | public |
 | `GET /timeline` | Journey | public |
 | `GET /skills` | Skills with evidence | public |
@@ -589,6 +611,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /admin/systems/{id}/revisions` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems/{id}/revisions/{revisionId}/restore` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems/{id}/writeup` | Systems — curate, publish, feature | admin |
+| `GET /admin/systems/{id}/screenshot` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/screenshot` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/screenshot/capture` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/screenshot/automatic` | Systems — curate, publish, feature | admin |
 | `GET /admin/organizations` | Organizations | admin |
 | `POST /admin/organizations` | Organizations | admin |
 | `PATCH /admin/organizations/{id}` | Organizations | admin |
