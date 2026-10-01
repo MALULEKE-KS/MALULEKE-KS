@@ -14,18 +14,23 @@
 | 3 | **Retrieval at scale** | Grounding switches from "read the whole public corpus" to retrieval over `ContentChunk` (pgvector) — chunked, embedded, re-indexed when content changes. | The corpus is small today; reading all of it is more accurate and cheap with prompt caching. | Corpus exceeds `concierge.contextBudgetTokens`. |
 | 4 | **Availability tool** | `check_availability()` for the guide — real free slots from a connected calendar (Constitution §6). | Needs a calendar integration and the owner's consent to expose free/busy. | Owner connects a calendar. |
 | 5 | **Returning-visitor memory** | The guide remembers a returning visitor's lens and last topic in their own browser (no account, no server profile) — Constitution §4 "returning visitor". | Privacy design first; consent-gated like analytics. | After the guide's learning loop proves useful. |
-| 6 | **Admin copilot** | Drafts case studies from README and commit history, flags skills with no evidence, drafts inquiry replies — never publishes (BR-4.5). | The visitor-facing guide comes first. | Guide stable. |
+| 6 | **Admin copilot** | ~~Drafts case studies from README and commit history~~ (✅ delivered 2026-10-01 as generated write-ups, BR-4.5), flags skills with no evidence, drafts inquiry replies — never publishes (BR-4.5). | The visitor-facing guide comes first. | Guide stable. |
 | 7 | **Testimonials** | Client quotes, shown only with permission (BR-6.x); table exists. | Needs real, permitted testimonials. | Owner has the first permitted quote. |
 | 8 | **Full analytics dashboard** | Traffic sources, per-system views, view → guide → inquiry funnel, guide question trends (Constitution §9). | Consent-gated collection must run for a while first. | A month of consented analytics. |
 | 9 | **Public API beyond `/systems`** | Documented read API for third parties. | No consumer yet. | A real consumer asks. |
-| 10 | **Automated system screenshots** | A job captures each live system's homepage on deploy/sync, uploaded as its screenshot. | Screenshots are first captured by hand in the redesign. | After the redesign ships. |
+| 10 | ~~**Automated system screenshots**~~ | ✅ **Delivered 2026-10-01** (BR-1.18): the daily `systems.screenshots` job captures each live site; the admin can upload, capture now or go back to automatic. | — | — |
 | 11 | **Self-serve data deletion** | A visitor removes their own inquiry data (BR-5.5); today honoured by email. | Low volume. | Volume warrants it. |
 | 12 | **Internationalisation** | Other languages (structure left open by the Constitution). | English first. | Audience demands it. |
 | 13 | **Map repos from outside accounts** | Repos the owner collaborates on in other people's accounts (e.g. `miltonthefirst`, `smangelemapss`, seen by the sync) filed under an organisation. | Needs the owner's say on which belong on the site. | Owner asks. |
+| 14 | **Claude for the AI guide and write-ups** | Switch `concierge.model` and `writeups.model` from the free gateway model (`inclusionai/ling-3.1-flash-free`) to Claude (Haiku 4.5, ≈ $0.0135 a question; about half with prompt caching, to build then), on prepaid AI Gateway credit with auto top-up off and the daily caps kept. | Cost — the owner's call (2026-10-01: "Claude will be integrated in V2 due to cost; one step at a time"). Vercel's free credit serves only `free`-tagged models. | The owner buys AI Gateway credit for it. |
 
 ---
 
 ## Part 2 — Update log (newest first)
+
+### F5c — The AI guide is live on a free model (2026-10-01)
+- `concierge.model` → `inclusionai/ling-3.1-flash-free` (Vercel AI Gateway, free tier; the only free general model with reasoning and tool use); `concierge.enabled` on. Tested live: refuses to reveal its instructions, refuses private details, answers grounded with links, third person; the per-visitor cap (6 a day) held. Claude is V2 #14.
+- **Fix:** a reasoning model streams its reasoning and the chat sends it back with the history; the request whitelist refused that, so every follow-up question failed. Reasoning is now accepted and dropped before the model sees anything (`lib/guide/request.ts`) — the model never reads reasoning a browser could have rewritten.
 
 ### F5c — Systems pages finished: screenshots, phone-safe by design (2026-10-01, local)
 - **Screenshots (BR-1.18):** each live system's site is captured automatically by the daily `systems.screenshots` job (a screenshot service renders it — Vercel functions have no browser), stored in the database as WebP, and shown on the case study and the home page. In the admin, every system has a Screenshot panel: **Upload** your own (it always wins), **Capture now**, **Back to automatic**. Settings `screenshots.*`. Tests never call the real service (`SCREENSHOT_SERVICE_URL=off`).

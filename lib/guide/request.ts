@@ -34,9 +34,21 @@ const ToolPart = z
   })
   .strip();
 
+// A reasoning model streams its reasoning, and the chat sends it back with the
+// history. It is accepted (or every follow-up question would fail) and then
+// dropped: the model never sees reasoning the browser could have rewritten.
+const ReasoningPart = z.object({ type: z.literal("reasoning"), text: z.string().max(MAX_TEXT) }).strip();
+
 const UserMessage = z.object({ id: z.string().max(100), role: z.literal("user"), parts: z.array(TextPart).min(1).max(1) }).strip();
 const AssistantMessage = z
-  .object({ id: z.string().max(100), role: z.literal("assistant"), parts: z.array(z.union([TextPart, StepStart, ToolPart])).max(40) })
+  .object({
+    id: z.string().max(100),
+    role: z.literal("assistant"),
+    parts: z
+      .array(z.union([TextPart, StepStart, ToolPart, ReasoningPart]))
+      .max(40)
+      .transform((parts) => parts.filter((p) => p.type !== "reasoning")),
+  })
   .strip();
 
 export const GuideRequestSchema = z
