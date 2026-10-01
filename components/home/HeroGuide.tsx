@@ -21,9 +21,9 @@ import { useGuide } from "@/components/guide/GuideProvider";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
 const GREETED_KEY = "mks.greeted";
-/** Idle poses, in turn, with a pause between them (ms). */
+/** Idle poses, in turn; a pose holds POSE_MS, then the rig for the rest of the gap (ms, start to start). */
 const IDLE_POSES: Exclude<GuidePose, "none">[] = ["thinking", "point", "wave"];
-const IDLE_MIN = 9000;
+const IDLE_MIN = 14000;
 const IDLE_JITTER = 6000;
 /** Away from the hero at least this long before coming back earns a wave. */
 const WELCOME_BACK_AFTER = 15000;
@@ -39,7 +39,7 @@ export function HeroGuide() {
     let timer: ReturnType<typeof setTimeout>;
     const next = () => {
       timer = setTimeout(() => {
-        if (document.visibilityState === "visible") flashPose(IDLE_POSES[turn++ % IDLE_POSES.length]!, 2200);
+        if (document.visibilityState === "visible") flashPose(IDLE_POSES[turn++ % IDLE_POSES.length]!);
         next();
       }, IDLE_MIN + Math.random() * IDLE_JITTER);
     };
@@ -53,7 +53,7 @@ export function HeroGuide() {
       leftAt.current = Date.now();
       return;
     }
-    if (leftAt.current !== null && Date.now() - leftAt.current > WELCOME_BACK_AFTER) flashPose("wave", 2200);
+    if (leftAt.current !== null && Date.now() - leftAt.current > WELCOME_BACK_AFTER) flashPose("wave");
     leftAt.current = null;
   }, [heroInView, flashPose]);
 
@@ -67,7 +67,7 @@ export function HeroGuide() {
       // Storage blocked: skip the greeting rather than wave on every page view.
     }
     if (greeted) return;
-    const t = setTimeout(() => flashPose("wave", 2600), 900);
+    const t = setTimeout(() => flashPose("wave"), 900);
     return () => clearTimeout(t);
   }, [flashPose]);
 
@@ -87,8 +87,8 @@ export function HeroGuide() {
       {enabled && (
         <a
           href="#ai-guide"
-          onMouseEnter={() => flashPose("point", 1800)}
-          onFocus={() => flashPose("point", 1800)}
+          onMouseEnter={() => flashPose("point")}
+          onFocus={() => flashPose("point")}
           className="group border-white/12 bg-night/70 text-paper absolute bottom-[9%] left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-2.5 text-xs whitespace-nowrap shadow-[0_12px_40px_-12px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-colors hover:border-ember/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
         >
           <Sparkles aria-hidden="true" className="text-ember size-3.5" />

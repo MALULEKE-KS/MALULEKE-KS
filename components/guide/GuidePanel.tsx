@@ -85,7 +85,7 @@ export function GuidePanel({
           return;
         }
         const hash = section ? `#${section.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}` : "";
-        flashPose("point", 1600);
+        flashPose("point");
         router.push(`${path}${hash}`);
         addToolOutput({ tool: "open_page", toolCallId: toolCall.toolCallId, output: { opened: path } });
       }
