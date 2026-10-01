@@ -375,3 +375,27 @@ html {
   from { stroke-dashoffset: 1000; }
   to { stroke-dashoffset: 0; }
 }
+
+/* The K-S mark assembles once (BrandMark assemble): each stencil piece slides
+   in by a hair from where it was cut, and the block lands last. Played on the
+   first paint of the header only — client navigation keeps the header mounted,
+   so it doesn't replay. Reduced motion: the mark is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .ks-assemble [data-piece] { animation: ks-piece 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-box: fill-box; }
+  .ks-assemble [data-piece="stem"] { --ks-from: translate(-3px, 0); }
+  .ks-assemble [data-piece="arm"] { --ks-from: translate(3px, -3px); animation-delay: 60ms; }
+  .ks-assemble [data-piece="leg"] { --ks-from: translate(3px, 3px); animation-delay: 60ms; }
+  .ks-assemble [data-piece="s-top"] { --ks-from: translate(0, -3px); animation-delay: 120ms; }
+  .ks-assemble [data-piece="s-bottom"] { --ks-from: translate(0, 3px); animation-delay: 120ms; }
+  .ks-assemble [data-piece="block"] { --ks-from: scale(0.2); animation-delay: 300ms; transform-origin: center; }
+}
+@keyframes ks-piece {
+  from { opacity: 0; transform: var(--ks-from); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The 3D K-S piece on the 404 page: a slow, small drift — an object at rest, not a spinner. */
+@keyframes ks-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(-1deg); }
+}

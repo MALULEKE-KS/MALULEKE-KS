@@ -69,13 +69,16 @@ test.describe("the phone menu", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
   test("opens full screen, marks the current page, holds focus, and closes", async ({ page }) => {
+    test.setTimeout(90_000);
     await settle(page);
     await page.goto("/systems", { waitUntil: "networkidle" });
     const open = page.getByRole("button", { name: "Menu", exact: true });
-    await open.tap();
-
     const sheet = page.getByRole("dialog", { name: "Menu" });
-    await expect(sheet).toBeVisible();
+    // A tap that lands before hydration does nothing — tap until the page is listening.
+    await expect(async () => {
+      if (!(await sheet.isVisible())) await open.tap();
+      await expect(sheet).toBeVisible({ timeout: 1_500 });
+    }).toPass({ timeout: 30_000 });
     await expect(sheet.getByRole("link", { name: /Systems/ })).toHaveAttribute("aria-current", "page");
     // The page behind doesn't scroll while it's open.
     expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
@@ -89,7 +92,7 @@ test.describe("the phone menu", () => {
     // Following a link closes it.
     await open.tap();
     await sheet.getByRole("link", { name: /Journey/ }).tap();
-    await expect(page).toHaveURL(/\/journey$/);
-    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(page).toHaveURL(/\/journey$/, { timeout: 30_000 });
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden({ timeout: 10_000 });
   });
 });

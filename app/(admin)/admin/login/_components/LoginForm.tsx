@@ -141,7 +141,7 @@ export function LoginForm({ notice }: { notice: string | null }) {
       <div aria-hidden="true" className="pointer-events-none absolute -top-40 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-ember/15 blur-3xl" />
       <div className="relative w-full max-w-sm">
         <div className="mb-8 flex items-center gap-3 text-paper">
-          <BrandMark className="size-9 text-paper" />
+          <BrandMark className="h-8 text-paper" />
           <div>
             <p className="font-mono text-sm">MALULEKE-KS</p>
             <p className="text-xs text-mist">Admin</p>

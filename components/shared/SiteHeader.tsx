@@ -8,7 +8,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { BrandMark } from "@/components/shared/BrandMark";
+import { BrandMark, Wordmark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
 import { HeaderFrame } from "@/components/shared/HeaderFrame";
@@ -23,8 +23,8 @@ export function SiteHeader({ links, email, reviewSlaHours }: { links: SiteLink[]
         aria-label="MALULEKE-KS — home"
         className="group flex h-10 shrink-0 items-center gap-2.5 rounded-full pe-2 ps-1.5 focus-visible:outline-2 focus-visible:outline-ember"
       >
-        <BrandMark className="size-6 text-paper transition-transform duration-500 group-hover:rotate-90 motion-reduce:transition-none" />
-        <span className="hidden font-mono text-sm font-medium tracking-tight text-paper sm:inline">MALULEKE-KS</span>
+        <BrandMark cut="heavy" assemble className="h-5 text-paper" />
+        <Wordmark className="hidden font-mono text-sm font-medium tracking-tight text-paper sm:inline" />
       </Link>
 
       <NavLinks />

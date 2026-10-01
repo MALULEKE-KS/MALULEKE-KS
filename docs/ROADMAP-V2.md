@@ -27,6 +27,11 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — The K-S mark (2026-10-01, local)
+- **New brand mark, owner-approved:** "Stencil" in the Graphite finish, chosen from five first-round directions; a 3D version designed with it. Flat mark in the header (assembles once), phone menu, footer, admin and sign-in; the wordmark's hyphen in ember; new browser-tab and home-screen icons; the 3D piece on every share image and on the 404 page. Source, renders and the interactive 3D file in `design/brand/`; rules in DESIGN-SYSTEM §6c.
+- **Hydration fixes:** `TypingAnimation` and `BlurFade` decided reduced motion during their first render, which the server can't know — React then rebuilt part of the page in the browser (and warned about the structured-data script). Both now render like the server first.
+- **AI guide spend limits** (owner: "there gotta be limited things per day"): 15 questions a day site-wide, 6 per visitor, 6 per conversation, 500-token answers; write-ups at most 2 a day and every 30 days. The guide stays off: Vercel's free AI credit serves only "free" models, and Claude needs paid credit — the owner's call.
+
 ### F5c — Mobile by default (2026-10-01, local)
 - **The live home page was 811 px wide on a 390 px phone:** the Selected work grid's items had no `min-w-0`, so a long line stretched them, and the fixed header then centred on the wider page. Fixed (`grid-cols-1` + `min-w-0`), the contact glow clipped, the footer wordmark sized to fit, the map's "hover" copy removed, long descriptions clamped on phones, the contact card's social icons dropped (the footer shows them one screen below).
 - **Phone menu rebuilt** (`MobileMenu`): a full-screen sheet — the mark and close, every page as a large numbered line with what it holds and the current one marked, then Let's talk, the review promise and the owner's links; page frozen behind, focus held inside, Escape/close/any link closes it; the Menu button moved to the right edge.
