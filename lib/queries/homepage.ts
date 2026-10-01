@@ -10,6 +10,7 @@
 // Public reads only — the platform_public role (F1.8).
 import { dbPublic as db } from "@/lib/db";
 import { toPublicSystem } from "@/lib/rules/publishing";
+import { withScreenshots } from "@/lib/queries/systems";
 
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
@@ -61,7 +62,7 @@ export async function getPrioritySystems(limit = 4) {
         orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }],
         take: limit,
       });
-  return rows.map(toPublicSystem);
+  return withScreenshots(rows.map(toPublicSystem));
 }
 
 // The "All systems (n)" link on the home page — labels real, visible content.

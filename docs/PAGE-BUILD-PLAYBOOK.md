@@ -236,7 +236,8 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 - **Story:** one system, from problem to proof.
 - **Data:** the system, impacts, skills proven (`SkillEvidence`), pace (`SystemPace`), weekly activity, recent commits (public repos), timeline entries, testimonials (when approved).
 - **Candidates:** a dossier layout — sticky side facts, sparkline and commits feed, impact figures as Number Tickers, "Ask the AI guide about this system".
-- **Owner inputs:** case study body, impacts, screenshots.
+- **Owner inputs:** case study body (or generated from the repo, BR-4.5), impacts, screenshots (captured automatically from the live site, or uploaded — BR-1.18).
+- **Built (2026-10-01):** one template for every case study — phone-safe whatever the write-up holds, and every system page tested at phone widths automatically.
 
 ### `/journey` — the timeline
 - **Story:** from zero to here, dated and sourced.

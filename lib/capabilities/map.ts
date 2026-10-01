@@ -192,17 +192,19 @@ export const CAPABILITIES: Capability[] = [
     title: "Case study",
     audience: "public",
     summary: "One published system in full — case study body, measured impacts, permitted testimonials — and related systems in the same domain.",
-    db: ["PublicSystem", "PublicImpact", "PublicTestimonial", "PublicSlugRedirect"],
-    endpoints: ["GET /systems/{slug}", "GET /systems/{slug}/related"],
+    db: ["PublicSystem", "PublicImpact", "PublicTestimonial", "PublicSlugRedirect", "PublicSystemScreenshot"],
+    endpoints: ["GET /systems/{slug}", "GET /systems/{slug}/related", "GET /systems/{slug}/screenshot"],
     rules: ["BR-1.1", "BR-1.3", "BR-1.4", "BR-1.7", "BR-6.1", "BR-6.2", "BR-1.14", "BR-4.5"],
     frontend: [
       { page: "/systems/[slug]", section: "Header, case study body, impacts, testimonials" },
       { page: "/systems/[slug]", section: "Who wrote the case study: an \"AI\" label when it was written from the repo" },
+      { page: "/systems/[slug]", section: "The screenshot of the live site, in a browser frame" },
+      { page: "/", section: "Selected work: each system's screenshot" },
       { page: "/systems/[slug]", section: "Related systems" },
     ],
     notes: [
       "An unknown or unpublished slug is a plain 404 — never a \"private\" message (BR-1.3/1.4).",
-      "liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.", "An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).", "caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt."],
+      "liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.", "An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).", "caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.", "screenshotUrl points at /systems/{slug}/screenshot?v=… when a screenshot is stored (captured or uploaded, BR-1.18) — the link is immutable; never present for NDA work."],
   },
   {
     id: "search",
@@ -378,7 +380,7 @@ export const CAPABILITIES: Capability[] = [
     title: "Systems — curate, publish, feature",
     audience: "admin",
     summary: "Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, feature on the homepage, include on the CV, set skills and impacts; see status history, pace and weekly GitHub activity.",
-    db: ["System", "Impact", "SkillOnSystem", "SystemStatusChange", "SystemPace", "SystemActivityWeek", "RepoRelationship", "Testimonial", "SystemSlugHistory", "SystemContentRevision"],
+    db: ["System", "Impact", "SkillOnSystem", "SystemStatusChange", "SystemPace", "SystemActivityWeek", "RepoRelationship", "Testimonial", "SystemSlugHistory", "SystemContentRevision", "SystemScreenshot"],
     endpoints: [
       "GET /admin/systems",
       "POST /admin/systems",
@@ -388,12 +390,12 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/systems/{id}/impacts",
       "POST /admin/systems/{id}/impacts",
       "PATCH /admin/impacts/{id}",
-      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore", "POST /admin/systems/{id}/writeup"],
+      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore", "POST /admin/systems/{id}/writeup", "GET /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot/capture", "POST /admin/systems/{id}/screenshot/automatic"],
     rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14", "BR-1.15", "BR-4.5"],
     frontend: [
       { page: "/admin/systems", section: "List with curation queue, filters" },
       { page: "/admin/systems/[id]", section: "Editor, publish controls, homepage + CV placement, repo ownership" },
-      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" }, { page: "/admin/systems/[id]", section: "Revision history for the case study and description: versions with who and when, restore" }, { page: "/admin/systems/[id]", section: "Who wrote the summary and case study (you / AI from the repo), Regenerate from repo" }],
+      { page: "/admin/systems/[id]", section: "Skills, impacts, status history, pace, activity chart" }, { page: "/admin/systems/[id]", section: "Revision history for the case study and description: versions with who and when, restore" }, { page: "/admin/systems/[id]", section: "Who wrote the summary and case study (you / AI from the repo), Regenerate from repo" }, { page: "/admin/systems/[id]", section: "Screenshot: the current one and where it came from; Upload, Capture now, Back to automatic" }],
     notes: [
       "409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.",
       "Systems are never deleted — offer Archive (BR-1.9).",

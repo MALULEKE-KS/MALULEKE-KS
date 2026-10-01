@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**33 capabilities · 118 endpoints.**
+**33 capabilities · 123 endpoints.**
 
 ## Public
 
@@ -245,6 +245,7 @@ One published system in full — case study body, measured impacts, permitted te
 
 - `GET /systems/{slug}`
 - `GET /systems/{slug}/related`
+- `GET /systems/{slug}/screenshot`
 
 **Database**
 
@@ -252,6 +253,7 @@ One published system in full — case study body, measured impacts, permitted te
 - `PublicImpact`
 - `PublicTestimonial`
 - `PublicSlugRedirect`
+- `PublicSystemScreenshot`
 
 **Rules:** BR-1.1, BR-1.3, BR-1.4, BR-1.7, BR-6.1, BR-6.2, BR-1.14, BR-4.5
 
@@ -261,6 +263,7 @@ One published system in full — case study body, measured impacts, permitted te
 - liveUrl/screenshotUrl are null for NDA work: render a neutral placeholder.
 - An old slug answers with a permanent redirect (308) to the current one — follow it; links from before a rename keep working (BR-1.14).
 - caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
+- screenshotUrl points at /systems/{slug}/screenshot?v=… when a screenshot is stored (captured or uploaded, BR-1.18) — the link is immutable; never present for NDA work.
 
 ### Instant search
 
@@ -542,6 +545,10 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `GET /admin/systems/{id}/revisions`
 - `POST /admin/systems/{id}/revisions/{revisionId}/restore`
 - `POST /admin/systems/{id}/writeup`
+- `GET /admin/systems/{id}/screenshot`
+- `POST /admin/systems/{id}/screenshot`
+- `POST /admin/systems/{id}/screenshot/capture`
+- `POST /admin/systems/{id}/screenshot/automatic`
 
 **Database**
 
@@ -555,6 +562,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `Testimonial`
 - `SystemSlugHistory`
 - `SystemContentRevision`
+- `SystemScreenshot`
 
 **Rules:** BR-1.1, BR-1.2, BR-1.8, BR-1.9, BR-1.10, BR-1.11, BR-1.12, BR-1.13, BR-1.14, BR-1.15, BR-4.5
 
@@ -940,6 +948,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `PublicSystem` | home, systems.catalog, systems.caseStudy |
 | `PublicSystemActivity` | activity |
 | `PublicSystemHome` | homes |
+| `PublicSystemScreenshot` | systems.caseStudy |
 | `PublicTestimonial` | systems.caseStudy |
 | `PublicTimeline` | journey |
 | `PublicVisitorLens` | lenses |
@@ -961,6 +970,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `SystemActivityWeek` | admin.systems, admin.jobs |
 | `SystemContentRevision` | admin.systems |
 | `SystemPace` | admin.systems |
+| `SystemScreenshot` | admin.systems |
 | `SystemSlugHistory` | admin.systems |
 | `SystemStatusChange` | admin.systems |
 | `Testimonial` | admin.systems |

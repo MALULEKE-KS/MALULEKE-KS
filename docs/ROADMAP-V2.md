@@ -27,6 +27,11 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — Systems pages finished: screenshots, phone-safe by design (2026-10-01, local)
+- **Screenshots (BR-1.18):** each live system's site is captured automatically by the daily `systems.screenshots` job (a screenshot service renders it — Vercel functions have no browser), stored in the database as WebP, and shown on the case study and the home page. In the admin, every system has a Screenshot panel: **Upload** your own (it always wins), **Capture now**, **Back to automatic**. Settings `screenshots.*`. Tests never call the real service (`SCREENSHOT_SERVICE_URL=off`).
+- **Repos removed from GitHub leave the site:** the sync hides a live system whose public repo is gone and flags it — never deleted. The owner deleted the old Angular and Next.js portfolio repos; their systems are hidden (and the Next.js one's dead live link cleared — its address had been taken by someone else's site).
+- **Phone-safe by design:** the case-study renderer keeps any content inside the screen (code and tables scroll in their box, long links and inline code wrap, images fit); `tests/e2e/mobile.spec.ts` now checks **every published system page**, read from the site's own list each run — a new case study is tested the day it appears.
+
 ### F5c — The K-S mark (2026-10-01, local)
 - **New brand mark, owner-approved:** "Stencil" in the Graphite finish, chosen from five first-round directions; a 3D version designed with it. Flat mark in the header (assembles once), phone menu, footer, admin and sign-in; the wordmark's hyphen in ember; new browser-tab and home-screen icons; the 3D piece on every share image and on the 404 page. Source, renders and the interactive 3D file in `design/brand/`; rules in DESIGN-SYSTEM §6c.
 - **Hydration fixes:** `TypingAnimation` and `BlurFade` decided reduced motion during their first render, which the server can't know — React then rebuilt part of the page in the browser (and warned about the structured-data script). Both now render like the server first.

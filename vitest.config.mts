@@ -40,6 +40,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: [],
+    // Never call the real screenshot service from a test run (lib/systems/screenshots.ts).
+    env: { SCREENSHOT_SERVICE_URL: "off" },
     exclude: ["node_modules/**", "tests/e2e/**", ".next/**"],
   },
   resolve: {

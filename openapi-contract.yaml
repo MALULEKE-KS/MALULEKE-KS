@@ -1216,6 +1216,12 @@ paths:
       summary: "The owner's current photo for a place on the site, e.g. about — the image itself (WebP), cached by content hash (BR-1.17)"
       parameters: [{ name: purpose, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the photo's hash — makes the link immutable" }]
       responses: { "200": { description: image/webp }, "304": { description: Not modified }, "404": { $ref: "#/components/responses/NotFound" } }
+  /systems/{slug}/screenshot:
+    get:
+      tags: [Systems (Public)]
+      summary: "A live system's current screenshot — captured from its live site or uploaded by the owner — the image itself (WebP), cached by content hash (BR-1.18). Never for an unpublished or NDA system."
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the image's hash — makes the link immutable" }]
+      responses: { "200": { description: image/webp }, "304": { description: Not modified }, "404": { $ref: "#/components/responses/NotFound" } }
   /admin/profile/photos:
     get: { tags: [Profile (Admin)], summary: "Every photo version, newest first per purpose (no bytes)", security: [{ adminSession: [] }], responses: { "200": { description: "{ versions: [...] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post:
@@ -1326,6 +1332,19 @@ paths:
     put: { tags: [Systems (Admin)], summary: Replace a system's skill links, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SystemSkillsInput" } } } }, responses: { "200": { description: Updated skill links }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/systems/{id}/writeup:
     post: { tags: [Systems (Admin)], summary: "Regenerate from repo — hand the summary and case study back to the AI and rewrite them now from the public repo (BR-4.5)", description: "Only for a published system with a public repo (and client approval for client work). The previous text stays in the revision history (BR-1.15). Off while the writeups.enabled flag is off.", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: The rewritten system, content: { application/json: { schema: { $ref: "#/components/schemas/SystemAdmin" } } } }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "WRITEUPS_OFF (flag off) or NOT_ELIGIBLE (unpublished, private repo, or client work without approval)" }, "502": { description: "WRITEUP_FAILED — GitHub or the model failed; nothing was written" }, "503": { description: "WRITEUPS_UNAVAILABLE — no AI provider or GitHub token" } } }
+  /admin/systems/{id}/screenshot:
+    get: { tags: [Systems (Admin)], summary: "The current screenshot's image, whatever the system's state — the admin's preview (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: image/webp }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+    post:
+      tags: [Systems (Admin)]
+      summary: "Upload the owner's screenshot — multipart field file; re-encoded to WebP without metadata; becomes current and wins over automatic captures (BR-1.18)"
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } } } } }
+      responses: { "201": { description: "{ screenshot } — the new current one" }, "200": { description: Same image as the current one — nothing changed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "413": { description: Larger than screenshots.upload.maxMegabytes }, "415": { description: Not a readable image } }
+  /admin/systems/{id}/screenshot/capture:
+    post: { tags: [Systems (Admin)], summary: "Capture now — take the screenshot from the system's live site right away; retires an uploaded one (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ screenshot }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "NO_LIVE_SITE — the system has no live address" }, "502": { description: "CAPTURE_FAILED — the site or the screenshot service failed; nothing changed" } } }
+  /admin/systems/{id}/screenshot/automatic:
+    post: { tags: [Systems (Admin)], summary: "Back to automatic — retire the owner's uploaded screenshot so the daily job captures the live site again (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ retired, screenshot }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/systems/{id}/impacts:
     get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }

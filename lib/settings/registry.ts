@@ -189,6 +189,32 @@ export const SETTINGS = {
     description: "The site's content is given to the guide whole up to this many tokens; past it, the guide searches it instead.",
     rule: "Constitution §6",
   }),
+  // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
+  "screenshots.maxPerRun": define({
+    // The screenshot service's free tier allows a few captures a day.
+    schema: z.number().int().min(1).max(10),
+    default: 3,
+    description: "Live sites the daily job captures at most, per run.",
+    rule: "BR-1.18",
+  }),
+  "screenshots.refreshDays": define({
+    schema: z.number().int().min(1).max(365),
+    default: 30,
+    description: "An automatic screenshot is retaken after this many days (and whenever the system's live address changes).",
+    rule: "BR-1.18",
+  }),
+  "screenshots.maxEdgePixels": define({
+    schema: z.number().int().min(640).max(2880),
+    default: 1600,
+    description: "Longest side a stored screenshot is resized to, in pixels.",
+    rule: "BR-1.18",
+  }),
+  "screenshots.upload.maxMegabytes": define({
+    schema: z.number().int().min(1).max(15),
+    default: 6,
+    description: "Largest screenshot the admin can upload, in megabytes (it is re-encoded smaller).",
+    rule: "BR-1.18",
+  }),
   // Generated write-ups (BR-4.5): each system's description and case study, written
   // by AI from its public repo, kept current as the repo changes.
   "writeups.model": define({

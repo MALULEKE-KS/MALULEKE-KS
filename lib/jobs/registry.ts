@@ -11,6 +11,7 @@ import { proposeComputedMetrics } from "@/lib/metrics";
 import { runGithubSync } from "@/lib/jobs/github-sync";
 import { runDailyMaintenance } from "@/lib/jobs/maintenance";
 import { runSystemWriteups } from "@/lib/jobs/system-writeups";
+import { runSystemScreenshots } from "@/lib/systems/screenshots";
 import { runJob, type JobTrigger, type RunJobResult } from "@/lib/jobs/run-job";
 import { DAILY_JOBS } from "@/lib/jobs/schedule";
 
@@ -40,6 +41,11 @@ export const JOBS = {
     description: "Write each live system's description and case study with AI from its public repo, when the repo has changed — never over the owner's own words (off until writeups.enabled).",
     rules: ["BR-4.5", "BR-4.4", "BR-1.7"],
     run: () => runSystemWriteups(),
+  },
+  "systems.screenshots": {
+    description: "Capture each live system's site as its screenshot — new sites, changed addresses, and captures older than screenshots.refreshDays — never over one the owner uploaded.",
+    rules: ["BR-1.18", "BR-1.3"],
+    run: () => runSystemScreenshots(),
   },
 } satisfies Record<string, JobDefinition>;
 

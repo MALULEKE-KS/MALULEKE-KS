@@ -65,6 +65,27 @@ for (const phone of PHONES) {
   });
 }
 
+// Every case study — whatever its write-up holds — read from the site's own
+// list each run, so a new system is checked the day it appears.
+for (const phone of PHONES) {
+  test(`every system page fits a ${phone.name} (${phone.width}px)`, async ({ browser, request }) => {
+    test.setTimeout(300_000);
+    const res = await request.get("/api/v1/systems?pageSize=50");
+    expect(res.ok()).toBe(true);
+    const { data } = (await res.json()) as { data: { slug: string }[] };
+    const context = await browser.newContext({ viewport: { width: phone.width, height: phone.height }, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await settle(page);
+    for (const { slug } of data) {
+      await page.goto(`/systems/${slug}`, { waitUntil: "networkidle" });
+      const { scrollWidth, width, offenders } = await overflow(page);
+      expect(offenders, `elements wider than the screen on /systems/${slug}`).toEqual([]);
+      expect(scrollWidth, `/systems/${slug} is wider than the screen`).toBeLessThanOrEqual(width);
+    }
+    await context.close();
+  });
+}
+
 test.describe("the phone menu", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
