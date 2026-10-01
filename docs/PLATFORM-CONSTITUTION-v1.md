@@ -17,6 +17,9 @@ Not a portfolio site. A full-stack, database-backed personal platform: every sys
 
 ## 1. Governing Principles
 
+### Principle — Make It Exist First
+*Make it exist now; make it beautiful later.* (Owner, 2026-10-01.) It comes before every other principle: nothing can be extended, bought or made safe until it exists. A working version in front of real people beats a perfect one that never ships — V1 went live first, then the public site was redesigned page by page from what using it showed. Polish is earned by existing, never a reason to wait. It does not excuse skipping the laws below — what exists still enforces its rules; it is unfinished, never unsafe.
+
 ### Rule EXT-1 — Extension Over Modification
 *Any dimension of this system expected to grow must grow through data or configuration, not through a code change and a redeploy.*
 

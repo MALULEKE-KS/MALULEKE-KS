@@ -23,10 +23,18 @@
 | 12 | **Internationalisation** | Other languages (structure left open by the Constitution). | English first. | Audience demands it. |
 | 13 | **Map repos from outside accounts** | Repos the owner collaborates on in other people's accounts (e.g. `miltonthefirst`, `smangelemapss`, seen by the sync) filed under an organisation. | Needs the owner's say on which belong on the site. | Owner asks. |
 | 14 | **Claude for the AI guide and write-ups** | Switch `concierge.model` and `writeups.model` from the free gateway model (`inclusionai/ling-3.1-flash-free`) to Claude (Haiku 4.5, ≈ $0.0135 a question; about half with prompt caching, to build then), on prepaid AI Gateway credit with auto top-up off and the daily caps kept. | Cost — the owner's call (2026-10-01: "Claude will be integrated in V2 due to cost; one step at a time"). Vercel's free credit serves only `free`-tagged models. | The owner buys AI Gateway credit for it. |
+| 15 | **Let's Talk — accountless tracking** | An applicant follows their inquiry through a private link: a separate 256-bit token (stored hashed, expires, revocable, replaceable), showing only applicant-facing status, messages, requests and meetings — never internal notes (LETS-TALK-SPEC §7, LT-7). | V1 intake and admin workflow come first; the data split (LT-7) already makes leakage structurally impossible. | Let's Talk V1 live and used. |
+| 16 | **Unanswered-question loop** | The guide records questions it couldn't answer from the site's data (no PII), and the admin sees the most frequent — what to write next (Constitution §1, Controlled Imperfection). | Claimed in the Constitution but never built (EVIDENCE-SPEC §7). | Guide traffic worth learning from. |
 
 ---
 
 ## Part 2 — Update log (newest first)
+
+### F5c — Owner adjustments locked (2026-10-02, local)
+- **Principle 01, Make It Exist First** (owner: *"make it exist first … then you will make it beautiful later"*): leads the five principles (content migration, Constitution §1), with its guardrail — unfinished, never unsafe.
+- **Two specs, audited against the code and tightened:** `docs/EVIDENCE-SPEC.md` (every claim leads to inspectable evidence, links pinned to the running commit and checked in CI, status capped by review date; a content block, no new table) and `docs/LETS-TALK-SPEC.md` (opportunity intake on `Inquiry`: categories + subtypes, server-validated per-category fields, explicit compensation, meetings as events, PDF-only documents, reference ≠ credential, email outbox via Resend; four loopholes in today's intake fixed; noise cut). Owner decisions recorded in each.
+- **The home AI guide closes by default:** an inviting bar (portrait, status, three questions that ask straight away); it opens the full guide beneath, whose code loads on first open.
+- **Playbook rules added:** make it exist first; claims carry evidence; one family, each page unique.
 
 ### F5c — Phones, for real; featured work chosen by the owner (2026-10-01)
 - **Case studies overflowed on phones** (604–834 px on a 360 px screen) once a system had commits: the activity grid's columns grew to the longest commit message. The phone tests missed it — the test databases had no commits. Fixed for good: every grid item may shrink and any text wraps rather than overflow (two global rules in `globals.css`); the weekly chart scrolls inside its own box. The e2e suite now seeds a hostile "stress" system before it runs (long commits and words, a year of activity, a wide table and code, on the CV too) — it immediately found the same overflow on `/cv` — and can run against production after a release (`PLAYWRIGHT_BASE_URL`).

@@ -18,6 +18,8 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/docs/PAGE-SPECIFICATIONS.md` | What's on each route, section by section |
 | `/docs/PUBLIC-REDESIGN-PLAN.md` | The approved public-site redesign (F5c) — decisions D1–D15, the AI guide (§3a), component choices (§7a) |
 | `/docs/PAGE-BUILD-PLAYBOOK.md` | **How every public page is built** — the owner's rules, the stages (brief → data → structure → components → copy → build → verify → document → review), the reusable toolkit, the audit checklist, pitfalls, and a sheet per page. Follow it for every page; the home page is the reference build |
+| `/docs/EVIDENCE-SPEC.md` | Evidence Density & Proof — every claim leads to honest, inspectable evidence (EV-1…EV-8) |
+| `/docs/LETS-TALK-SPEC.md` | Let's Talk — opportunity intake & management on `Inquiry` (LT-1…LT-14), V2 accountless tracking |
 | `/docs/ROADMAP-V2.md` | Every feature agreed for later (V2), with its trigger, and the update log — add to both in the same PR as the change |
 | `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, migration pipeline, local dev/test databases |
 | `/docs/ENFORCEMENT-REGISTER.md` | Where every claim is actually enforced — update the row in the same PR that adds, changes or enforces a claim |
@@ -93,7 +95,7 @@ The test database needs migrations too: `npx dotenv -e .env.test.local -- npx pr
 - BR-3.1: no write action succeeds without verified 2FA on the admin session.
 - BR-4.1/4.2/4.3: the AI guide is read-only; it may **draft** an inquiry for the visitor to review and send through the normal form (same validation and rate limit) but never submits one itself. It states nothing about the owner that isn't in the site's data, is always labelled as AI, and speaks about the owner in the third person. Every tool ships disabled behind a `Flag` (BR-4.4).
 - Every admin mutation writes to `ActivityLog` — database audit triggers plus `withAdmin`, never opt-in per route.
-- **Deploys are the owner's call.** Build and verify on one local release branch; never push, open a PR or merge until the owner says the batch is ready (Vercel daily and monthly deploy limits). No AI attribution in commits, PRs or issues. `README.md` is the owner's GitHub profile README — never touch it.
+- **Deploys are batched.** Build and verify on one local release branch; release in sensible batches against the Vercel daily and monthly deploy limits — the agent plans the timing (owner, 2026-10-01). No AI attribution in commits, PRs or issues. `README.md` is the owner's GitHub profile README — never touch it.
 
 ## File layout
 
