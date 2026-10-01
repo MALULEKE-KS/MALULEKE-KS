@@ -28,6 +28,20 @@ export interface CatalogParams {
   pageSize?: number;
 }
 
+const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/**
+ * What the card says the system is. A synced repo's description is often just
+ * its own name ("my-angular-portfolio") — that says nothing, so the start of
+ * the README (public repos only) stands in, or nothing at all: never filler.
+ */
+export function describe(description: string | null, name: string, slug: string, readme: string | null): string | null {
+  const d = description?.trim() ?? "";
+  if (d && squash(d) !== squash(name) && squash(d) !== squash(slug)) return d;
+  const r = readme?.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
+  return r.length >= 20 ? r : null;
+}
+
 function monday(d: Date) {
   const m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   m.setUTCDate(m.getUTCDate() - ((m.getUTCDay() + 6) % 7));
@@ -61,7 +75,7 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
     return {
       slug: s.slug,
       name: s.name,
-      description: s.description,
+      description: describe(s.description, s.name, s.slug, repo?.readmeExcerpt ?? null),
       organization: s.organization,
       domain: s.domain,
       domainKey: s.domainKey,
@@ -123,7 +137,12 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
     activeThisMonth: rows.filter((r) => r.commitsLast4Weeks > 0).length,
   };
 
-  return { systems: pageRows, total, page: current, totalPages, facets, stats };
+  // The homes, in the site's order (personal first), with what the page says about each.
+  const homeList = homes
+    .filter((h) => homeCounts.has(h.slug))
+    .map((h) => ({ slug: h.slug, name: h.name, role: h.role, github: h.github, count: homeCounts.get(h.slug)! }));
+
+  return { systems: pageRows, total, page: current, totalPages, facets, stats, homes: homeList };
 }
 
 export type Catalog = Awaited<ReturnType<typeof getCatalog>>;

@@ -13,7 +13,8 @@ import { Sparkline } from "@/components/shared/Sparkline";
 import { TechChip } from "@/components/shared/TechChip";
 import type { CatalogSystem } from "@/lib/queries/catalog";
 
-export function CatalogCard({ s }: { s: CatalogSystem }) {
+/** `showHome` is off when the card sits under its home's heading — said once, not twice. */
+export function CatalogCard({ s, showHome = true }: { s: CatalogSystem; showHome?: boolean }) {
   const moving = s.weeks.some((n) => n > 0);
   return (
     <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" spotlight="rgb(255 91 31 / 0.05)">
@@ -38,17 +39,24 @@ export function CatalogCard({ s }: { s: CatalogSystem }) {
           <span className="min-w-0 truncate">{s.name}</span>
           <ArrowUpRight aria-hidden="true" className="text-slate group-hover/c:text-accent size-4 shrink-0 transition-all group-hover/c:translate-x-0.5 group-hover/c:-translate-y-0.5" />
         </span>
-        <span className="text-slate mt-1.5 line-clamp-2 text-sm leading-relaxed">{s.description}</span>
+        {s.description && <span className="text-slate mt-1.5 line-clamp-2 text-sm leading-relaxed">{s.description}</span>}
 
-        <span className="text-slate/80 mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px]">
-          {s.home && <span>{s.home}</span>}
-          {s.domain && <span>· {s.domain}</span>}
-          {s.repoPrivate && (
-            <span className="inline-flex items-center gap-1">
-              · <Lock aria-hidden="true" className="size-3" /> Private repo
+        {(() => {
+          const facts = [
+            showHome && s.home ? <span key="home">{s.home}</span> : null,
+            s.domain ? <span key="domain">{s.domain}</span> : null,
+            s.repoPrivate ? (
+              <span key="private" className="inline-flex items-center gap-1">
+                <Lock aria-hidden="true" className="size-3" /> Private repo
+              </span>
+            ) : null,
+          ].filter(Boolean);
+          return facts.length > 0 ? (
+            <span className="text-slate/80 mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] [&>*+*]:before:mr-2 [&>*+*]:before:content-['·']">
+              {facts}
             </span>
-          )}
-        </span>
+          ) : null;
+        })()}
 
         {s.tech.length > 0 && (
           <span className="mt-4 flex flex-wrap gap-1.5">
@@ -62,7 +70,14 @@ export function CatalogCard({ s }: { s: CatalogSystem }) {
           {moving ? (
             <>
               <Sparkline values={s.weeks} className="w-24" />
-              <span className="text-slate text-[11px]">
+              <span className="text-slate flex items-center gap-1.5 text-[11px]">
+                {s.commitsLast4Weeks > 0 && (
+                  // The card's one live indicator (PAGE-BUILD-PLAYBOOK §5): commits in the last four weeks.
+                  <span aria-hidden="true" className="relative flex size-1.5">
+                    <span className="bg-ember absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:animate-none" />
+                    <span className="bg-ember relative inline-flex size-1.5 rounded-full" />
+                  </span>
+                )}
                 {s.commitsLast4Weeks > 0 ? `${s.commitsLast4Weeks} commits in 4 weeks` : "Quiet this month"}
                 {s.lastPush && ` · ${s.lastPush}`}
               </span>
