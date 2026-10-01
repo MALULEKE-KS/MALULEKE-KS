@@ -3,10 +3,16 @@
 // System — public or private (BR-1.7), owned or collaborated on (BR-1.11) —
 // and GitHub's facts about it stay current: full name, owner, privacy, last
 // push, languages, topics, stars, and weekly commit activity (approved
-// feature 3, "Now building").
+// feature 3, "Now building"). For PUBLIC repos it also keeps what the AI guide
+// needs to know the work day to day (F5c): when the repo began, the start of
+// its README and its recent commits — never for a private repo, and wiped if
+// a repo turns private.
 //
-// It never decides what visitors see:
-//   BR-1.6  a new system lands as a DRAFT flagged needsCuration
+// What visitors see (BR-1.6, replaced 2026-10-01 at the owner's direction):
+//   BR-1.6  a new repo in the owner's own homes is SHOWN by default (status
+//           "On GitHub"), per the setting github.sync.newRepoVisibility, and
+//           flagged needsCuration so the admin can hide or curate it; anything
+//           else lands as a DRAFT
 //   BR-1.2  a client organization's system starts REQUIRES_APPROVAL
 //   BR-1.11 a collaborated repo gets the "collaborator" relationship, so the
 //           database blocks publishing until the repo owner's permission is
@@ -26,6 +32,7 @@
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { isSlugAvailable } from "@/lib/rules/slugs";
+import { getSetting } from "@/lib/settings";
 
 const GITHUB_API = "https://api.github.com";
 const PER_PAGE = 100;
@@ -33,6 +40,8 @@ const MAX_PAGES = 50; // 5,000 repos per listing — a runaway-pagination backst
 const CONCURRENCY = 4;
 
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
+
+export type NewRepoVisibility = "public-and-private" | "public-only" | "hidden";
 
 export interface GithubSyncConfig {
   /**
@@ -44,6 +53,8 @@ export interface GithubSyncConfig {
   tokens: string[];
   /** Accounts and organizations the owner owns (GITHUB_SYNC_ORGS). */
   ownedLogins: string[];
+  /** Which new repos are shown by default (BR-1.6 — the github.sync.newRepoVisibility setting). */
+  newRepoVisibility?: NewRepoVisibility;
   fetch?: FetchLike;
 }
 
@@ -62,7 +73,19 @@ interface GitHubRepo {
   topics?: string[];
   stargazers_count: number;
   pushed_at: string | null;
+  created_at?: string | null;
 }
+
+interface GitHubCommit {
+  sha: string;
+  commit: { message: string; author?: { date?: string } | null; committer?: { date?: string } | null };
+  author?: { login?: string } | null;
+}
+
+/** Commits kept per repo for the AI guide (the view shows the last 90 days of them). */
+const COMMITS_KEPT = 30;
+/** README characters kept — the start says what a repo is. */
+const README_CHARS = 3000;
 
 interface CommitWeek {
   week: number; // unix seconds, Sunday 00:00 UTC
@@ -83,6 +106,7 @@ export interface GithubSyncSummary {
   skippedForks: number;
   unmappedOwners: string[];
   activityPending: string[];
+  knowledgeUpdated: number;
   errors: { repo: string; error: string }[];
 }
 
@@ -129,6 +153,19 @@ class GithubClient {
   }
 }
 
+/**
+ * A readable name suggested from a repository name (F5c): "graph-search-engine"
+ * → "Graph Search Engine", "machine_learning_project" → "Machine Learning
+ * Project". An all-caps name (an account, an acronym) is kept as it is. Only a
+ * suggestion — the admin curates the name, and a curated one is never touched.
+ */
+export function displayNameFromRepo(repoName: string): string {
+  if (repoName === repoName.toUpperCase()) return repoName;
+  const words = repoName.split(/[-_\s]+/).filter(Boolean);
+  if (words.length === 0) return repoName;
+  return words.map((w) => (w === w.toUpperCase() ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
+}
+
 export function slugify(name: string): string {
   return name
     .toLowerCase()
@@ -144,6 +181,63 @@ async function resolveSlug(base: string, systemId: string | null): Promise<strin
     const candidate = n === 1 ? base : `${base}-${n}`;
     if (await isSlugAvailable(db, candidate, systemId)) return candidate;
   }
+}
+
+/**
+ * A README as plain prose for the AI guide: badges, images, HTML, code blocks
+ * and link targets removed, headings and emphasis flattened, whitespace
+ * collapsed, cut at a word boundary.
+ */
+export function readmeToText(markdown: string, max = README_CHARS): string {
+  const text = markdown
+    .replace(/\r\n/g, "\n")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g, " ") // linked badges
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // images
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // links keep their text
+    .replace(/^\s{0,3}#{1,6}\s*/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "- ")
+    .replace(/[*_`~]{1,3}([^*_`~\n]+)[*_`~]{1,3}/g, "$1")
+    .replace(/^\s*\|.*\|\s*$/gm, " ") // tables
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n\s*\n(\s*\n)+/g, "\n\n")
+    .trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), max - 40)).trimEnd()}…`;
+}
+
+/**
+ * A public repo's README and recent commits (F5c, the AI guide). Best-effort:
+ * a missing README (404) or an empty repo (409) simply leaves nothing.
+ */
+async function saveRepoKnowledge(gh: GithubClient, repo: GitHubRepo, systemId: string) {
+  const readmeRes = await gh.request(`/repos/${repo.full_name}/readme`);
+  let readme: string | null = null;
+  if (readmeRes.ok) {
+    const body = (await readmeRes.json()) as { content?: string; encoding?: string };
+    if (body.content && body.encoding === "base64") readme = readmeToText(Buffer.from(body.content, "base64").toString("utf8")) || null;
+  }
+  await db.system.update({ where: { id: systemId }, data: { githubReadmeExcerpt: readme } });
+
+  const commitsRes = await gh.request(`/repos/${repo.full_name}/commits?per_page=${COMMITS_KEPT}`);
+  if (!commitsRes.ok) return;
+  const commits = ((await commitsRes.json()) as GitHubCommit[]).filter((c) => /^[0-9a-f]{7,64}$/.test(c.sha));
+  const rows = commits
+    .map((c) => ({
+      systemId,
+      sha: c.sha,
+      message: (c.commit.message.split("\n")[0] ?? "").trim().slice(0, 500),
+      committedAt: new Date(c.commit.committer?.date ?? c.commit.author?.date ?? Date.now()),
+      authorLogin: c.author?.login ?? null,
+    }))
+    .filter((r) => r.message.length > 0 && !Number.isNaN(r.committedAt.getTime()));
+  if (rows.length) await db.repoCommit.createMany({ data: rows, skipDuplicates: true });
+  // Keep only the newest COMMITS_KEPT per repo.
+  const keep = await db.repoCommit.findMany({ where: { systemId }, orderBy: { committedAt: "desc" }, take: COMMITS_KEPT, select: { id: true } });
+  await db.repoCommit.deleteMany({ where: { systemId, id: { notIn: keep.map((k) => k.id) } } });
 }
 
 /** The Monday (UTC, date only) of the ISO week containing `date`. */
@@ -189,6 +283,7 @@ async function mapConcurrent<T>(items: T[], limit: number, fn: (item: T) => Prom
 
 export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSummary> {
   const clients = config.tokens.map((t) => new GithubClient(t, config.fetch ?? fetch));
+  const visibility = config.newRepoVisibility ?? "public-only";
   const owned = new Set(config.ownedLogins.map((l) => l.toLowerCase()));
 
   // Discover: everything each token can reach (owned, collaborator, org
@@ -214,7 +309,8 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   }
 
   const [defaultStatus, relationships, organizations] = await Promise.all([
-    db.status.findUniqueOrThrow({ where: { key: "planned" } }),
+    // An uncurated repo's honest status; "planned" only if the lookup value is missing.
+    db.status.findUnique({ where: { key: "on_github" } }).then((s) => s ?? db.status.findUniqueOrThrow({ where: { key: "planned" } })),
     db.repoRelationship.findMany({ where: { key: { in: ["owner", "collaborator"] }, active: true } }),
     db.organization.findMany({ select: { id: true, slug: true, isClient: true, githubLogins: true } }),
   ]);
@@ -230,6 +326,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     skippedForks: 0,
     unmappedOwners: [],
     activityPending: [],
+    knowledgeUpdated: 0,
     errors: [],
   };
   const unmapped = new Set<string>();
@@ -258,6 +355,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         githubOwnerLogin: repo.owner.login,
         repoPrivate: repo.private, // BR-1.7 — the public view never links a private repo
         githubPushedAt: repo.pushed_at ? new Date(repo.pushed_at) : null,
+        githubCreatedAt: repo.created_at ? new Date(repo.created_at) : null,
         githubLanguages: languages ?? undefined,
         githubTopics: repo.topics ?? [],
         githubStars: Math.max(0, repo.stargazers_count ?? 0),
@@ -282,7 +380,9 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
           data: {
             ...facts,
             ...(renamed && { slug: await resolveSlug(slugify(repo.name), existing.id) }),
-            // BR-8.2 — fill, never overwrite, what the admin curates.
+            // BR-8.2 — fill, never overwrite, what the admin curates. A name
+            // still equal to the raw repo name was never curated.
+            ...(existing.name === repo.name && { name: displayNameFromRepo(repo.name) }),
             ...(existing.liveUrl === null && repo.homepage && { liveUrl: repo.homepage }),
             ...(existing.repoRelationshipId === null && { repoRelationshipId: relationshipId(relationship) }),
           },
@@ -294,7 +394,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
           const created = await db.system.create({
             data: {
               ...facts,
-              name: repo.name,
+              name: displayNameFromRepo(repo.name),
               slug: await resolveSlug(slugify(repo.name), null),
               description: repo.description?.trim() || repo.name,
               liveUrl: repo.homepage || null,
@@ -304,8 +404,10 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
               repoRelationshipId: relationshipId(relationship),
               // BR-1.2 — client organizations start restricted.
               clientVisibility: organization.isClient ? "REQUIRES_APPROVAL" : "PUBLIC",
+              // BR-1.6 — the owner's own repos are shown by default (the setting decides
+              // which); client and collaborated work stays hidden until approved.
               // BR-1.6 — nothing is ever auto-published.
-              contentStatus: "DRAFT",
+              contentStatus: showByDefault(visibility, repo.private, organization.isClient, relationship) ? "PUBLISHED" : "DRAFT",
               needsCuration: true,
             },
           });
@@ -325,6 +427,15 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         const weeks = (await stats.json()) as CommitWeek[];
         if (Array.isArray(weeks)) await saveActivity(systemId, toIsoWeeks(weeks));
       }
+
+      // The AI guide's knowledge — public repos only; a repo that turned private loses what was kept.
+      if (repo.private) {
+        await db.repoCommit.deleteMany({ where: { systemId } });
+        await db.system.update({ where: { id: systemId }, data: { githubReadmeExcerpt: null } });
+      } else {
+        await saveRepoKnowledge(gh, repo, systemId);
+        summary.knowledgeUpdated++;
+      }
     } catch (err) {
       if (err instanceof GithubRateLimitError) throw err; // the whole run stops; the next one resumes
       summary.errors.push({ repo: repo.full_name, error: err instanceof Error ? err.message.slice(0, 300) : String(err) });
@@ -336,6 +447,13 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   return summary;
 }
 
+/** BR-1.6: whether a newly synced repo is shown by default. */
+export function showByDefault(visibility: NewRepoVisibility, isPrivate: boolean, isClient: boolean, relationship: string): boolean {
+  if (isClient || relationship !== "owner") return false; // BR-1.2 / BR-1.11: needs approval first
+  if (visibility === "hidden") return false;
+  return visibility === "public-and-private" || !isPrivate;
+}
+
 /** The job: configuration from the environment; a missing piece fails the run with the reason. */
 export async function runGithubSync(fetchImpl?: FetchLike): Promise<GithubSyncSummary> {
   // Comma-separated: one read-only token per GitHub owner (docs/DEPLOYMENT.md).
@@ -343,5 +461,6 @@ export async function runGithubSync(fetchImpl?: FetchLike): Promise<GithubSyncSu
   const ownedLogins = (process.env.GITHUB_SYNC_ORGS ?? "").split(",").map((l) => l.trim()).filter(Boolean);
   if (tokens.length === 0) throw new Error("GITHUB_SYNC_TOKEN is not set — add read-only GitHub token(s) to the environment (docs/DEPLOYMENT.md).");
   if (ownedLogins.length === 0) throw new Error("GITHUB_SYNC_ORGS is not set — list the owner's GitHub accounts and organizations.");
-  return syncGithub({ tokens, ownedLogins, fetch: fetchImpl });
+  const newRepoVisibility = await getSetting("github.sync.newRepoVisibility");
+  return syncGithub({ tokens, ownedLogins, newRepoVisibility, fetch: fetchImpl });
 }

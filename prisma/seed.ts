@@ -104,7 +104,7 @@ async function main() {
       { name: "KSDRILL-SA", slug: "ksdrill-sa", role: "Founder & Principal Engineer", isClient: false, githubLogins: ["KSDRILL-SA"] },
       { name: "GrowthCore Solutions", slug: "growthcore-solutions", role: "Co-founder", isClient: false, githubLogins: ["GrowthCore-Solutions"] },
       { name: "Sunduza Architectural & Projects (Pty) Ltd", slug: "sunduza", role: null, isClient: true, githubLogins: [] },
-      { name: "Personal", slug: "personal", role: null, isClient: false, githubLogins: ["MALULEKE-KS"] },
+      { name: "MALULEKE-KS", slug: "personal", role: null, isClient: false, githubLogins: ["MALULEKE-KS"] },
     ].map((o) =>
       prisma.organization.upsert({ where: { slug: o.slug }, update: {}, create: o })
     )
@@ -112,13 +112,12 @@ async function main() {
 
   // --- Systems ---
   // A small, real set for local dev/testing until the GitHub sync job has a
-  // real token to run against. Deliberately covers three BR-1.x states:
-  // plain public, ANONYMIZED_ONLY+approved (exercises the org-name masking
-  // in lib/rules/publishing.ts), and an unpublished draft (exercises the
-  // published-only filter / generic-404 behavior).
+  // real token to run against: a public system, a client system the client
+  // agreed to be named in, and an unpublished draft (exercises the
+  // published-only filter / generic-404 behavior). Masking of an unnamed
+  // client (BR-1.4) is tested with its own fixtures.
   const ksdrillSa = await prisma.organization.findUniqueOrThrow({ where: { slug: "ksdrill-sa" } });
   const sunduza = await prisma.organization.findUniqueOrThrow({ where: { slug: "sunduza" } });
-  const growthcore = await prisma.organization.findUniqueOrThrow({ where: { slug: "growthcore-solutions" } });
   const finishedStatus = await prisma.status.findUniqueOrThrow({ where: { key: "finished" } });
   const inProgressStatus = await prisma.status.findUniqueOrThrow({ where: { key: "in_progress" } });
   const fintechDomain = await prisma.domain.findUniqueOrThrow({ where: { key: "fintech" } });
@@ -126,11 +125,14 @@ async function main() {
   const edtechDomain = await prisma.domain.findUniqueOrThrow({ where: { key: "edtech" } });
 
   await prisma.system.upsert({
-    where: { slug: "xkimm-xa-mali" },
+    where: { slug: "xkimi-xa-mali" },
     update: {},
     create: {
-      name: "Xkimm Xa Mali",
-      slug: "xkimm-xa-mali",
+      // Names and repositories as on GitHub (F5c): the sync attaches these by githubFullName.
+      name: "Xkimi Xa Mali",
+      slug: "xkimi-xa-mali",
+      githubFullName: "KSDRILL-SA/Xkimi-Xa-Mali",
+      liveUrl: "https://xkimixamali.co.za",
       organizationId: ksdrillSa.id,
       statusId: finishedStatus.id,
       domainId: fintechDomain.id,
@@ -142,23 +144,24 @@ async function main() {
   });
 
   await prisma.system.upsert({
-    where: { slug: "sunduza-case-study" },
+    where: { slug: "sunduza-architectural" },
     update: {},
     create: {
-      name: "Sunduza Case Study",
-      slug: "sunduza-case-study",
+      name: "Sunduza Architectural",
+      slug: "sunduza-architectural",
+      githubFullName: "GrowthCore-Solutions/sunduza-architectural",
+      liveUrl: "https://sunduza-architectural.vercel.app",
       organizationId: sunduza.id,
       statusId: finishedStatus.id,
       domainId: architectureDomain.id,
       description: "Architectural and project management systems for a construction client.",
       isFlagship: false,
-      // ANONYMIZED_ONLY + clientApproved=true (required to publish at all,
-      // BR-1.1) + nameDisclosureApproved=false (default): publishable, but
-      // the organization name still masks to a generic label (BR-1.4) — a
-      // deliberately separate authorization from clientApproved.
+      // ANONYMIZED_ONLY + clientApproved (required to publish at all, BR-1.1)
+      // + nameDisclosureApproved: the client agreed to be named (owner,
+      // 2026-09-30), a separate authorization from publishing (BR-1.4).
       clientVisibility: "ANONYMIZED_ONLY",
       clientApproved: true,
-      nameDisclosureApproved: false,
+      nameDisclosureApproved: true,
       contentStatus: "PUBLISHED",
     },
   });
@@ -167,9 +170,11 @@ async function main() {
     where: { slug: "fundslink-academy" },
     update: {},
     create: {
-      name: "FundsLink-Academy",
+      name: "FundsLink Academy",
       slug: "fundslink-academy",
-      organizationId: growthcore.id,
+      githubFullName: "KSDRILL-SA/fundslink-Academy",
+      repoPrivate: true,
+      organizationId: ksdrillSa.id,
       statusId: inProgressStatus.id,
       domainId: edtechDomain.id,
       description: "In-progress EdTech platform — not yet published.",

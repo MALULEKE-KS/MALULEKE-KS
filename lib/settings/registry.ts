@@ -65,6 +65,19 @@ export const SETTINGS = {
     description: "Largest CV file the admin can upload, in megabytes.",
     rule: "BR-7.6",
   }),
+  "profile.photo.maxMegabytes": define({
+    // Capped at 4: Vercel refuses request bodies over 4.5 MB before the app sees them.
+    schema: z.number().int().min(1).max(4),
+    default: 4,
+    description: "Largest photo the admin can upload, in megabytes (it is re-encoded smaller).",
+    rule: "BR-1.17",
+  }),
+  "profile.photo.maxEdgePixels": define({
+    schema: z.number().int().min(400).max(4000),
+    default: 1600,
+    description: "Longest side a stored photo is resized to, in pixels.",
+    rule: "BR-1.17",
+  }),
   "cv.download.rateLimit.maxPerWindow": define({
     schema: z.number().int().min(1).max(500),
     default: 30,
@@ -114,6 +127,67 @@ export const SETTINGS = {
     default: 24,
     description: "Inquiries and analytics events are anonymised or purged after this many months.",
     rule: "BR-5.2",
+  }),
+  "github.sync.newRepoVisibility": define({
+    // The owner's rule (2026-10-01): the catalog comes from GitHub — shown by default, hidden by choice.
+    schema: z.enum(["public-and-private", "public-only", "hidden"]),
+    // Public repos only to start (owner, 2026-10-01): private ones wait in the admin for review.
+    default: "public-only" as "public-and-private" | "public-only" | "hidden",
+    description: "Which new repos from your own GitHub homes appear on the site by default (public-and-private, public-only or hidden). Private ones show as private, never linked; client and collaborated work always waits for approval.",
+    rule: "BR-1.6",
+  }),
+  // The AI guide (PUBLIC-REDESIGN-PLAN §3a). Every limit is the owner's to tune;
+  // turning the guide off is the concierge.enabled flag, not a setting.
+  "concierge.model": define({
+    // An AI Gateway model id, "provider/model".
+    schema: z.string().trim().regex(/^[a-z0-9-]+\/[a-z0-9.-]+$/),
+    // Haiku keeps the guide inside the AI Gateway's free monthly credit (owner, 2026-09-30); Sonnet is one setting away.
+    default: "anthropic/claude-haiku-4.5",
+    description: "The model the AI guide answers with (an AI Gateway id, provider/model).",
+    rule: "Constitution §6",
+  }),
+  "concierge.maxMessagesPerConversation": define({
+    schema: z.number().int().min(2).max(100),
+    default: 20,
+    description: "Questions a visitor can ask in one conversation with the AI guide.",
+    rule: "Constitution §6",
+  }),
+  "concierge.rateLimit.maxPerWindow": define({
+    schema: z.number().int().min(1).max(500),
+    default: 40,
+    description: "Questions one visitor can ask the AI guide per window.",
+    rule: "BR-2.4",
+  }),
+  "concierge.rateLimit.windowHours": define({
+    schema: z.number().int().min(1).max(168),
+    default: 24,
+    description: "Length of the AI guide's per-visitor window, in hours.",
+    rule: "BR-2.4",
+  }),
+  "concierge.maxQuestionCharacters": define({
+    schema: z.number().int().min(100).max(4000),
+    default: 1000,
+    description: "Longest question a visitor can send the AI guide, in characters.",
+    rule: "Constitution §6",
+  }),
+  "concierge.dailyMessageCap": define({
+    // The spend cap: past it the guide rests until tomorrow and offers the contact form.
+    schema: z.number().int().min(10).max(20000),
+    default: 30,
+    description: "Questions the AI guide answers per day across every visitor — the spending cap.",
+    rule: "Constitution §6",
+  }),
+  "concierge.maxAnswerTokens": define({
+    schema: z.number().int().min(100).max(2000),
+    default: 700,
+    description: "Longest answer the AI guide gives, in tokens (about ¾ of a word each).",
+    rule: "Constitution §6",
+  }),
+  "concierge.contextBudgetTokens": define({
+    schema: z.number().int().min(5000).max(150000),
+    default: 60000,
+    description: "The site's content is given to the guide whole up to this many tokens; past it, the guide searches it instead.",
+    rule: "Constitution §6",
   }),
 } as const;
 

@@ -12,12 +12,12 @@ describe("GET /api/v1/organizations", () => {
     const body = await res.json();
     const slugs = body.map((o: { slug: string }) => o.slug);
 
-    // ksdrill-sa has a published, disclosed system (Xkimm Xa Mali).
-    // growthcore-solutions only has the DRAFT fundslink-academy.
-    // sunduza's only published system is ANONYMIZED_ONLY without name
-    // disclosure, so listing it would reveal the client (BR-1.4, #72).
+    // ksdrill-sa has a published, disclosed system (Xkimi Xa Mali).
+    // growthcore-solutions has no published system (FundsLink Academy is a KSDRILL-SA draft).
+    // sunduza approved being named (BR-1.4), so it is listed; an unnamed
+    // client never is (public-views.test.ts, #72).
     expect(slugs).toContain("ksdrill-sa");
-    expect(slugs).not.toContain("sunduza");
+    expect(slugs).toContain("sunduza");
     expect(slugs).not.toContain("growthcore-solutions");
   });
 });

@@ -7,6 +7,7 @@
 //   status             stage + curated colour (#52)
 //   repo-relationship  whether the repo owner's permission gates publishing (#69, BR-1.11)
 //   milestone-type     whether it's the type a first ship is auto-drafted as (#70)
+//   title-kind, organization-kind  plain (F5c): kinds of the owner's titles, kinds of organisation
 
 import { Prisma, type PipelineStage } from "@prisma/client";
 import { db, dbPublic } from "@/lib/db";
@@ -18,6 +19,8 @@ export const LOOKUP_TYPES = [
   "milestone-type",
   "skill-category",
   "repo-relationship",
+  "title-kind",
+  "organization-kind",
 ] as const;
 
 export type LookupType = (typeof LOOKUP_TYPES)[number];
@@ -42,6 +45,10 @@ function delegateFor(type: LookupType, client: Prisma.TransactionClient) {
       return client.skillCategory;
     case "repo-relationship":
       return client.repoRelationship;
+    case "title-kind":
+      return client.titleKind;
+    case "organization-kind":
+      return client.organizationKind;
   }
 }
 
@@ -94,6 +101,8 @@ const EXTRAS_BY_TYPE: Record<LookupType, (keyof LookupExtras)[]> = {
   "milestone-type": ["autoDraftOnShip"],
   "skill-category": [],
   "repo-relationship": ["requiresOwnerPermission"],
+  "title-kind": [],
+  "organization-kind": [],
 };
 
 /** Extras supplied that this type doesn't have, e.g. a stage on a domain. */

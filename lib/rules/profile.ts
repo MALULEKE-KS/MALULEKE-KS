@@ -63,6 +63,9 @@ export function checkViolationMessage(err: unknown): string | null {
     ProfileLink_url_format: "Links must start with https:// or mailto:.",
     Achievement_title_present: "An achievement needs a title.",
     Achievement_url_format: "An achievement link must start with https://.",
+    ProfileTitle_label_present: "A title is 1–120 characters.",
+    ProfileTitle_detail_length: "A title's detail is 1–160 characters.",
+    ProfileTitle_dates_ordered: "A title can't end before it starts.",
   };
   return messages[match[1]!] ?? `Refused by the database rule ${match[1]}.`;
 }

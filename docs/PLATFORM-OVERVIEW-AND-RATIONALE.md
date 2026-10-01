@@ -19,13 +19,13 @@ So the frame changed: the site itself had to be the proof. Database, backend, au
 
 ## 3. Why It Has to Represent the Whole Body of Work, Not One Flagship
 
-Kurhula's actual work isn't one project — it's a portfolio of systems at different stages, across different organizations: Xkimm Xa Mali and Sunduza finished, FundsLink-Academy and Governova in progress, more already planned. A site built around one flagship project goes stale the day the next system ships, and there will always be a next system.
+Kurhula's actual work isn't one project — it's a portfolio of systems at different stages, across different organizations: Xkimi Xa Mali and Sunduza finished, FundsLink Academy and Governova in progress, more already planned. A site built around one flagship project goes stale the day the next system ships, and there will always be a next system.
 
 That's why systems live in a database rather than being hand-built pages — synced automatically where public, curated where private. The site is built to grow at the same rate the body of work grows, instead of needing a rebuild every time something new ships.
 
 ## 4. Why One Platform Has to Speak to Many Different Visitors
 
-The realistic audience for this platform isn't one type of person. It's a technical recruiter, a non-technical hiring panel, a fintech client evaluating Xkimm Xa Mali's rigor, a GovTech client evaluating Governova, an architecture client who already knows Sunduza, an academic reviewer for grad school, a fellow engineer, a potential investor, and increasingly, an AI system trying to summarize who Kurhula is. One static homepage message serves none of these particularly well.
+The realistic audience for this platform isn't one type of person. It's a technical recruiter, a non-technical hiring panel, a fintech client evaluating Xkimi Xa Mali's rigor, a GovTech client evaluating Governova, an architecture client who already knows Sunduza, an academic reviewer for grad school, a fellow engineer, a potential investor, and increasingly, an AI system trying to summarize who Kurhula is. One static homepage message serves none of these particularly well.
 
 The visitor-lens approach exists so the same underlying data can reorder itself by who's actually looking, instead of maintaining a separate site — or a separate lie — for each audience.
 
@@ -33,7 +33,7 @@ The visitor-lens approach exists so the same underlying data can reorder itself 
 
 Early in the design, the scope explicitly widened to include CV, academic record, and full career and life journey — not just repositories. The reasoning: a list of systems tells you what Kurhula has built. It doesn't tell you why, and it doesn't tell you who's building it.
 
-Part of that journey is already real and worth carrying into the site directly: Xkimm Xa Mali wasn't a solo technical exercise — it began as a shared vision among four brothers who co-founded the Xkimm Xa Mali Foundation as a private savings collective, with Kurhula building the technology platform on top of that shared vision. That's the kind of detail a systems catalog alone will never surface, and it's exactly what the Timeline and journey sections of the platform exist to hold.
+Part of that journey is already real and worth carrying into the site directly: Xkimi Xa Mali wasn't a solo technical exercise — it began as a shared vision among four brothers who co-founded the Xkimi Xa Mali Foundation as a private savings collective, with Kurhula building the technology platform on top of that shared vision. That's the kind of detail a systems catalog alone will never surface, and it's exactly what the Timeline and journey sections of the platform exist to hold.
 
 ## 6. Why an AI Lives Inside the Platform Itself
 
@@ -61,7 +61,7 @@ Every gap below was open as of the first draft of this document. All six are now
 
 - **Name.** MALULEKE-KS is the platform's technical identity — domain, repo, dev-facing contexts. "Kurhula Success Maluleke" is the human-facing display name across site content — hero, CV title, meta titles — the "KS" behind the handle spelled out in full. One platform, two names doing two different jobs.
 - **Voice and tone.** First-person, direct, precise — Kurhula's own communication register, not marketing copy. Depth adapts by `VisitorLens` (plain-language for non-technical readers, rule-citing and technical for engineers) over the same underlying facts — the lens mechanism already built, applied to writing register as well as content ordering.
-- **Mission statement.** "I build systems disciplined enough to be trusted with real money, real institutions, and real people's outcomes — engineered in South Africa, held to a global standard." Threads Xkimm Xa Mali (real money, family stakes), Governova (institutions), client work generally, and the "African Engineer, Global Standards" line already present in the GitHub profile README.
+- **Mission statement.** "I build systems disciplined enough to be trusted with real money, real institutions, and real people's outcomes — engineered in South Africa, held to a global standard." Threads Xkimi Xa Mali (real money, family stakes), Governova (institutions), client work generally, and the "African Engineer, Global Standards" line already present in the GitHub profile README.
 - **Timeline.** No external deadline existed, so one was set deliberately: V1 live within 8–10 weeks, anchored to the next real recruiting, grad-school, or client-facing window rather than left open-ended.
 - **Success definition.** Not traffic. Qualified inquiries by type per month, at least one converting to something real (interview, client call, grad-school follow-up) within 90 days of launch, the concierge resolving most visitor questions without escalation, zero privacy or security incidents.
 - **Maintenance model.** Solo-maintained, consistent with the single-`AdminUser` decision in the constitution. Monthly review of sync-flagged new systems, inquiries handled as they arrive, a quarterly freshness pass on CV and case studies — kept light specifically because the automation exists to make maintenance proportional to a side commitment, not a second job.

@@ -1,0 +1,235 @@
+// lib/guide/corpus.ts
+// What the AI guide knows (PUBLIC-REDESIGN-PLAN §3a, "Grounding"): the site's
+// own public data — every public view — serialised into one document the
+// model reads whole. Each section names the page it came from, so every
+// answer can cite a source a visitor can open.
+//
+// Read through the public role only (F1.8): the guide can never know a draft,
+// a masked client's name or anything else a visitor couldn't see. Whole-corpus
+// grounding holds while the document fits concierge.contextBudgetTokens; past
+// it, case studies and READMEs are shortened first (retrieval over
+// ContentChunk is the V2 step — ROADMAP-V2 §3).
+//
+// GitHub is the guide's closest source (owner, 2026-09-30): every public repo
+// in his homes from the day it began, its languages, topics, README and
+// activity, and what changed in the last 90 days — refreshed by the daily
+// sync, read fresh on every question.
+
+import { cache } from "react";
+import { dbPublic } from "@/lib/db";
+import { getPublicHomes, getPublicTitles } from "@/lib/queries/profile";
+import { getSkillEvidence } from "@/lib/queries/evidence";
+import { getContentBlock } from "@/lib/content/blocks";
+import { getReviewSlaHours } from "@/lib/queries/site";
+import { SHEETS } from "@/lib/content/sheets";
+
+/** Rough token estimate — about four characters a token for English prose. */
+export const estimateTokens = (text: string) => Math.ceil(text.length / 4);
+
+const day = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 10) : null);
+const month = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 7) : null);
+const list = (xs: (string | null | undefined)[]) => xs.filter(Boolean).join(", ");
+
+export interface GuideCorpus {
+  text: string;
+  tokens: number;
+  /** Paths the guide may open or cite — the site's pages and each published system. */
+  paths: string[];
+  ownerName: string;
+  ownerFirstName: string;
+}
+
+async function load() {
+  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits] =
+    await Promise.all([
+      dbPublic.publicProfile.findFirst(),
+      dbPublic.publicProfileLink.findMany({ orderBy: { sortOrder: "asc" } }),
+      getPublicTitles(),
+      getPublicHomes(),
+      dbPublic.publicSystem.findMany({ orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }] }),
+      dbPublic.publicImpact.findMany({ orderBy: { sortOrder: "asc" } }),
+      dbPublic.publicExperience.findMany({ orderBy: { startDate: "desc" } }),
+      dbPublic.publicEducation.findMany({ orderBy: { startDate: "desc" } }),
+      dbPublic.publicAchievement.findMany({ orderBy: [{ sortOrder: "asc" }, { achievedOn: "desc" }] }),
+      dbPublic.publicTimeline.findMany({ orderBy: { date: "desc" }, take: 40 }),
+      dbPublic.publicMetric.findMany({ orderBy: { sortOrder: "asc" } }),
+      getSkillEvidence(),
+      getContentBlock("how-i-build"),
+      getReviewSlaHours(),
+      dbPublic.publicCvOption.findMany(),
+      dbPublic.publicGithubRepo.findMany({ orderBy: [{ pushedAt: { sort: "desc", nulls: "last" } }, { fullName: "asc" }] }),
+      dbPublic.publicRepoCommit.findMany({ orderBy: { committedAt: "desc" }, take: 400 }),
+    ]);
+  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits };
+}
+
+/** Top languages by share of code, e.g. "TypeScript 82%, CSS 11%". */
+function languageShare(languages: unknown): string | null {
+  if (!languages || typeof languages !== "object") return null;
+  const entries = Object.entries(languages as Record<string, number>).filter(([, n]) => typeof n === "number" && n > 0);
+  const total = entries.reduce((sum, [, n]) => sum + n, 0);
+  if (!total) return null;
+  return entries
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([lang, n]) => `${lang} ${Math.max(1, Math.round((n / total) * 100))}%`)
+    .join(", ");
+}
+
+function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null): string {
+  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits } = data;
+  const out: string[] = [];
+  const section = (title: string, source: string) => out.push("", `## ${title} (source: ${source})`);
+
+  section("The owner", "/about");
+  if (profile) {
+    out.push(`Name: ${profile.displayName}`);
+    if (profile.headline) out.push(`Headline: ${profile.headline}`);
+    out.push(`Role: ${profile.role}`);
+    if (profile.location) out.push(`Location: ${profile.location}`);
+    if (profile.buildingSinceYear) out.push(`Building software since: ${profile.buildingSinceYear}`);
+    if (profile.availability) out.push(`Availability: ${profile.availability}`);
+    if (profile.summary) out.push(`Summary: ${profile.summary}`);
+    if (profile.bio) out.push(`Bio: ${profile.bio}`);
+  }
+  for (const t of titles) out.push(`Current ${t.kindLabel.toLowerCase()}: ${t.label}${t.detail ? ` (${t.detail})` : ""}`);
+  if (links.length) out.push(`Profiles: ${links.filter((l) => !l.url.includes("wa.me")).map((l) => `${l.label} ${l.url}`).join("; ")}`);
+
+  if (method) {
+    section("Mission and method", "/method");
+    out.push(`Mission: ${method.mission}`);
+    for (const p of method.principles) out.push(`- ${p.name}: ${p.summary} ${p.body}`);
+  }
+
+  section("Where the code lives — GitHub homes", "/systems");
+  for (const h of homes) {
+    out.push(`- ${h.name} (${h.kind ?? "organisation"}${h.role ? `, the owner's role: ${h.role}` : ""}): ${h.publishedSystems} published systems; GitHub ${h.github.map((g) => g.url).join(", ") || "none listed"}`);
+  }
+
+  if (repos.length) {
+    const now = Date.now();
+    const recent = (days: number) => commits.filter((c) => now - c.committedAt.getTime() <= days * 86_400_000).length;
+    section("GitHub — every public repo, from the first to the latest", "GitHub");
+    out.push(
+      `${repos.length} public repositories across his homes. Commits seen in the last 7 days: ${recent(7)}; last 30 days: ${recent(30)}. ` +
+        "Repos marked 'not written up on the site yet' are real public work he hasn't curated into a case study — talk about them as what they are on GitHub, never as published systems.",
+    );
+    for (const r of repos) {
+      const own = commits.filter((c) => c.fullName === r.fullName).slice(0, 6);
+      out.push(
+        "",
+        `### ${r.fullName} — ${r.name} (source: ${r.published && r.slug ? `/systems/${r.slug}` : `https://github.com/${r.fullName}`})`,
+        `Home: ${r.home}. ${r.published ? "Written up on the site." : "Not written up on the site yet."} GitHub: https://github.com/${r.fullName}`,
+        `Started: ${day(r.createdAt) ?? "unknown"}. Last push: ${day(r.pushedAt) ?? "unknown"}. Commits in the last 4 weeks: ${r.commitsLast4Weeks}; last year: ${r.commitsLastYear}.${r.stars ? ` Stars: ${r.stars}.` : ""}`,
+        `About: ${r.description}`,
+      );
+      const langs = languageShare(r.languages);
+      if (langs) out.push(`Languages: ${langs}`);
+      if (r.topics.length) out.push(`Topics: ${r.topics.join(", ")}`);
+      if (r.readmeExcerpt && readmeChars !== 0) {
+        const text = r.readmeExcerpt.replace(/\s+/g, " ").trim();
+        out.push(`README: ${readmeChars !== null && text.length > readmeChars ? `${text.slice(0, readmeChars)}…` : text}`);
+      }
+      if (own.length) {
+        out.push("Recent changes:");
+        for (const c of own) out.push(`  - ${day(c.committedAt)}: ${c.message}`);
+      }
+    }
+  }
+
+  section("Systems — every published system", "/systems");
+  for (const s of systems) {
+    const own = impacts.filter((i) => i.systemId === s.id).map((i) => `${i.label}: ${i.value}`);
+    out.push(
+      "",
+      `### ${s.name} (source: /systems/${s.slug})`,
+      `Organisation: ${s.organization}. Status: ${s.status} (${s.stage}).${s.domain ? ` Domain: ${s.domain}.` : ""}${s.isFlagship ? " Flagship." : ""}`,
+      `What it is: ${s.description}`,
+    );
+    if (s.techStack.length) out.push(`Stack: ${s.techStack.join(", ")}`);
+    if (own.length) out.push(`Impact: ${own.join("; ")}`);
+    if (s.liveUrl) out.push(`Live: ${s.liveUrl}`);
+    out.push(s.repoUrl ? `Code: ${s.repoUrl}` : s.repoPrivate ? "Code: private repository" : "Code: not public");
+    if (s.caseStudyBody.trim()) {
+      const body = s.caseStudyBody.trim();
+      out.push(`Case study: ${caseStudyChars !== null && body.length > caseStudyChars ? `${body.slice(0, caseStudyChars)}… (continues on the page)` : body}`);
+    }
+  }
+
+  if (experience.length) {
+    section("Experience", "/journey");
+    for (const e of experience) {
+      out.push(`- ${e.title}, ${e.organization}${e.location ? `, ${e.location}` : ""} — ${month(e.startDate)} to ${month(e.endDate) ?? "present"}. ${e.description}`);
+      for (const h of e.highlights) out.push(`  - ${h}`);
+      if (e.skills.length) out.push(`  Skills: ${e.skills.join(", ")}`);
+    }
+  }
+
+  if (education.length) {
+    section("Education", "/journey");
+    for (const e of education) {
+      out.push(
+        `- ${e.qualification}${e.fieldOfStudy ? ` in ${e.fieldOfStudy}` : ""}, ${e.institution} — from ${month(e.startDate)}${e.endDate ? ` to ${month(e.endDate)}` : e.expectedGraduation ? `, expected ${month(e.expectedGraduation)}` : ", in progress"}.${e.honors ? ` ${e.honors}.` : ""}${e.description ? ` ${e.description}` : ""}`,
+      );
+      if (e.coursework.length) out.push(`  Coursework: ${e.coursework.join(", ")}`);
+    }
+  }
+
+  if (achievements.length) {
+    section("Certifications and awards", "/journey");
+    for (const a of achievements) out.push(`- ${a.title}${a.issuer ? ` — ${a.issuer}` : ""}, ${day(a.achievedOn)}${a.description ? `. ${a.description}` : ""}`);
+  }
+
+  if (skills.length) {
+    section("Skills, with the evidence for each", "/cv");
+    for (const s of skills) {
+      const evidence = list([
+        s.systemCount ? `${s.systemCount} system${s.systemCount === 1 ? "" : "s"} (${s.systemSlugs.join(", ")})` : null,
+        s.roleCount ? `${s.roleCount} role${s.roleCount === 1 ? "" : "s"}` : null,
+        s.studyCount ? "studied" : null,
+      ]);
+      out.push(`- ${s.name}: ${evidence || "listed"}${s.inCurrentRole ? "; used in the current role" : ""}`);
+    }
+  }
+
+  if (timeline.length) {
+    section("Journey — latest milestones", "/journey");
+    for (const t of timeline) out.push(`- ${day(t.date)} · ${t.milestoneTypeLabel}: ${t.title}${t.description ? ` — ${t.description}` : ""}`);
+  }
+
+  if (metrics.length) {
+    section("Numbers the owner has approved", "/");
+    for (const m of metrics) out.push(`- ${m.label}: ${m.value}${m.unit ? ` ${m.unit}` : ""}${m.description ? ` (${m.description})` : ""}`);
+  }
+
+  section("CV", "/cv");
+  out.push(cvOptions.length ? `Available: ${cvOptions.map((o) => `${o.label} (${o.formats.join("/")})`).join("; ")}` : "No CV is published right now.");
+
+  section("Contact", "/contact");
+  out.push(`Visitors reach the owner through the contact form at /contact. Every message is reviewed within ${reviewSlaHours} hours.`);
+  if (profile?.email) out.push(`His public contact email: ${profile.email}`);
+
+  section("Pages on this site", "/");
+  for (const s of SHEETS) out.push(`- ${s.label}: ${s.href}`);
+
+  return out.join("\n").trim();
+}
+
+/** The corpus, built once per request, shortened to the token budget if it has to be. */
+export const getGuideCorpus = cache(async (budgetTokens: number): Promise<GuideCorpus> => {
+  const data = await load();
+  // Past the budget, shorten in steps: READMEs first, then case studies too.
+  let text = render(data, null, null);
+  for (const [caseChars, readmeChars] of [[null, 1200], [2000, 600], [800, 300], [300, 0]] as const) {
+    if (estimateTokens(text) <= budgetTokens) break;
+    text = render(data, caseChars, readmeChars);
+  }
+  const name = data.profile?.displayName ?? "the owner";
+  return {
+    text,
+    tokens: estimateTokens(text),
+    paths: [...SHEETS.map((s) => s.href), ...data.systems.map((s) => `/systems/${s.slug}`)],
+    ownerName: name,
+    ownerFirstName: name.split(/\s+/)[0] ?? name,
+  };
+});

@@ -140,7 +140,9 @@ Remove-Item Env:ADMIN_PASSWORD, Env:ADMIN_PASSWORD_CONFIRM
 
 Verifies the new hash, clears the failed-attempt counter and any lock, and writes an audit entry (SYSTEM actor). 2FA and recovery codes are untouched. A password is data: no redeploy needed.
 
-## Deploy budget (Vercel Hobby caps deployments per day)
+## Deploy budget (Vercel Hobby caps deployments per day and per month)
+
+- **The owner decides when a batch ships** (2026-09-30): work accumulates on one local release branch, fully verified; nothing is pushed, PR'd or merged until the owner says it's ready.
 
 - `vercel.ts` `ignoreCommand` → `scripts/vercel-ignore.mjs` **skips builds** whose changes touch only docs, tests, CI or Markdown, and **skips previews** unless UI paths changed (CI already builds and tests every PR). Anything it can't diff, it builds.
 - Ship related issues in **one PR** (several `Closes #N`) → one production deploy.
@@ -199,7 +201,25 @@ Neon keeps a history of the database (the restore window depends on the Neon pla
 
 Drill log: see "Known gaps" until a production drill is recorded here.
 
+## Pending release (built locally, not yet pushed)
+
+Branch `release/f5b-admin` — F5b (admin panel) and F5c so far (see the update log in ROADMAP-V2.md). New migrations, applied automatically by the build, all additive:
+
+| Migration | What it does in production |
+|---|---|
+| `20260930130000_site_content_blocks` | `SiteContent` + `PublicSiteContent`; the method's mission and principles as data |
+| `20260930140000_reconcile_seeded_systems` | Xkimi Xa Mali renamed (old address redirects), FundsLink Academy → KSDRILL-SA + private, Sunduza linked to its repo, personal home named MALULEKE-KS — only rows still in their seeded state |
+| `20260930150000_sunduza_named` | Sunduza Architectural, client disclosure approved (owner, 2026-09-30) |
+| `20260930160000_titles_homes_pulse` | `ProfileTitle` / `TitleKind` (seeded with the owner's two titles), `OrganizationKind` + `PublicHome`, `PublicPlatformPulse` |
+| `20260930170000_profile_photos` | `ProfilePhoto` + `PublicProfilePhoto` (BR-1.17) |
+
+After that deploy, the owner:
+1. Uploads the About portrait in **Admin → Profile → Photos** (`design/character/about-portrait-graphite.png`) — photos are data, so the local copy doesn't travel with the code.
+2. Sets `GITHUB_SYNC_TOKEN` (read-only fine-grained tokens, one per GitHub owner) if not done, then **Admin → Jobs → github.sync → Run now**, and curates which synced systems to publish.
+3. Sets `CRON_SECRET` (fresh value) if not done.
+
 ## Known gaps
 
 - **Custom domain** — not configured yet, still on the `*.vercel.app` subdomain.
+- **AI guide (F5c)** — calls models through the Vercel AI Gateway: on Vercel by OIDC (enable AI Gateway for the project; nothing to set), locally with `AI_GATEWAY_API_KEY` in `.env.development.local` (and `.env.test.local` for `npm run test:ai-evals`). Without either it answers `503 GUIDE_UNAVAILABLE` and the chat says it's resting. It is off until the owner turns on `concierge.enabled` in Admin → Settings → Flags; its model and limits are `concierge.*` settings.
 - **Env vars documented but unread** — see the table above. The rate-limit and retention vars that used to be listed here were removed: those tunables now live in the `PlatformSetting` table (#67).

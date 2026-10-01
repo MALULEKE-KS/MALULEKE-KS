@@ -11,9 +11,39 @@ Page by page, every piece of data and every action the backend offers — so a r
 **Owner profile and links** — Header name, footer contact and social links
 
 - Call `GET /profile`
+- Call `GET /profile/photo/{purpose}`
 - Never hardcode owner details — read them here (owner's rule).
 - phone, bio, availability and summary may be null: render nothing, not a placeholder.
 - links[].kind names the brand icon (github, linkedin, whatsapp, …).
+- titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
+- photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
+
+**GitHub homes** — Footer: the three homes with their system counts
+
+- Call `GET /homes`
+- Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
+
+**Visitor lenses** — AI guide: opening chips
+
+- Call `GET /lenses`
+- Key and label only — the framing prompt and priority content stay private (they are the guide's instructions).
+
+**Public GitHub work** — AI guide: its GitHub knowledge
+
+- Call `GET /github/repos`
+- Call `GET /github/commits`
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
+
+**The AI guide** — Docked launcher and the chat panel
+
+- Call `POST /guide`
+- Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
+- Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+
+**Platform pulse** — Footer status line
+
+- Call `GET /platform/pulse`
+- Aggregates only — no rows, no actors. deployment is null outside Vercel.
 
 **Instant search** — ⌘K search palette
 
@@ -27,17 +57,51 @@ Page by page, every piece of data and every action the backend offers — so a r
 **Owner profile and links** — Hero: name, headline
 
 - Call `GET /profile`
+- Call `GET /profile/photo/{purpose}`
 - Never hardcode owner details — read them here (owner's rule).
 - phone, bio, availability and summary may be null: render nothing, not a placeholder.
 - links[].kind names the brand icon (github, linkedin, whatsapp, …).
+- titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
+- photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
 
-**Homepage** — Hero ledger (years building, organizations founded, shipped / in progress / queued); Featured work (the admin's picks, in order); Numbers band (approved metrics only)
+**GitHub homes** — System map: homes → systems → technologies
+
+- Call `GET /homes`
+- Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
+
+**Visitor lenses** — Hero: lens chips
+
+- Call `GET /lenses`
+- Key and label only — the framing prompt and priority content stay private (they are the guide's instructions).
+
+**Weekly build activity** — Selected work: a sparkline on each system
+
+- Call `GET /activity`
+- Only systems that are live on the site; no commit content, no authors.
+
+**The AI guide** — Hero: the character, greeting and lens chips
+
+- Call `POST /guide`
+- Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
+- Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+
+**Platform pulse** — Control room
+
+- Call `GET /platform/pulse`
+- Aggregates only — no rows, no actors. deployment is null outside Vercel.
+
+**Homepage** — Hero ledger (years building, organizations founded, shipped / in progress / queued); Featured work (the admin's picks, in order); Control room: approved figures (approved metrics only)
 
 - Call `GET /home`
 - Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).
 - featured falls back to flagship-first until the admin picks some; never empty while anything is published.
 
-**Curated numbers** — Numbers band
+**Page content blocks** — Principles band
+
+- Call `GET /content/{key}`
+- 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
+
+**Curated numbers** — Control room: approved figures
 
 - Call `GET /metrics`
 - Show approvedAt as "as of" — these are point-in-time figures.
@@ -47,9 +111,12 @@ Page by page, every piece of data and every action the backend offers — so a r
 **Owner profile and links** — Bio, availability, location, building since
 
 - Call `GET /profile`
+- Call `GET /profile/photo/{purpose}`
 - Never hardcode owner details — read them here (owner's rule).
 - phone, bio, availability and summary may be null: render nothing, not a placeholder.
 - links[].kind names the brand icon (github, linkedin, whatsapp, …).
+- titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
+- photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
 
 **Skills with evidence** — What I work with
 
@@ -71,9 +138,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 **Owner profile and links** — Email, phone (only when set), links
 
 - Call `GET /profile`
+- Call `GET /profile/photo/{purpose}`
 - Never hardcode owner details — read them here (owner's rule).
 - phone, bio, availability and summary may be null: render nothing, not a placeholder.
 - links[].kind names the brand icon (github, linkedin, whatsapp, …).
+- titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
+- photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
+
+**The AI guide** — A draft from the guide, for the visitor to review and send
+
+- Call `POST /guide`
+- Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
+- Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
 
 **Contact — send an inquiry** — Inquiry form and confirmation
 
@@ -120,6 +196,33 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `GET /timeline`
 - Filter options come from GET /lookups/milestone-type.
+
+### /method
+
+**Page content blocks** — Mission and principles
+
+- Call `GET /content/{key}`
+- 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
+
+### /now (proposed)
+
+**Public GitHub work** — What's changing: recent commits and active repos
+
+- Call `GET /github/repos`
+- Call `GET /github/commits`
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
+
+**Weekly build activity** — What's moving this week
+
+- Call `GET /activity`
+- Only systems that are live on the site; no commit content, no authors.
+
+### /organizations/[slug] (proposed)
+
+**GitHub homes** — One page per home
+
+- Call `GET /homes`
+- Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
 
 ### /systems
 
@@ -177,16 +280,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
 - github.sync summaries list unmappedOwners (map them via an Organization's githubLogins) and activityPending (GitHub still computing; retried next run).
 
-### /admin (proposed: /admin/account)
+### /admin/account
 
 **Admin sign-in (password + 2FA)** — Change password; recovery codes — remaining count, low-count notice, regenerate (show the ten codes once)
 
 - Call `POST /admin/auth/login`
 - Call `POST /admin/auth/verify-2fa`
+- Call `POST /admin/auth/logout`
 - Call `POST /admin/auth/change-password`
 - Call `GET /admin/auth/recovery-codes`
 - Call `POST /admin/auth/recovery-codes`
 - Show neutral copy on expiry ("session ended"), not an error.
+- Sign-out (POST /admin/auth/logout) ends every session, not just this browser's.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
 - Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
 - Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
@@ -198,6 +303,16 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `GET /admin/activity-log`
 - "[redacted]" marks a secret or personal field that's never stored in the log.
+
+### /admin/content
+
+**Page content blocks** — One editor per block; save replaces the block
+
+- Call `GET /admin/content`
+- Call `GET /admin/content/{key}`
+- Call `PUT /admin/content/{key}`
+- Each key has a schema (lib/content/blocks.ts); a body that doesn't match is refused with the issues.
+- An unknown key is 404 — a new block is one registry entry and one row, no migration.
 
 ### /admin/cv
 
@@ -228,7 +343,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - The suggested summary is an offer: save it only through PATCH /admin/profile when the owner accepts.
 - Scheduling (BR-1.13): send contentStatus published with a future publishAt — every publish gate is checked now, and it goes live at that time on its own. Show scheduled items with their time; a publishAt on unpublished content is a 400.
 
-### /admin/freshness (proposed)
+### /admin/freshness
 
 **Freshness nudges** — Stale items oldest first — open to edit, or Mark reviewed
 
@@ -245,7 +360,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/inquiries/{id}`
 - Only offer the transitions BR-2.1 allows; 409 INVALID_STATUS_TRANSITION otherwise.
 
-### /admin/jobs (proposed)
+### /admin/jobs
 
 **Scheduled jobs and their runs** — Jobs with schedule and last run; runs by job, failures first; Run now
 
@@ -260,16 +375,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `POST /admin/auth/login`
 - Call `POST /admin/auth/verify-2fa`
+- Call `POST /admin/auth/logout`
 - Call `POST /admin/auth/change-password`
 - Call `GET /admin/auth/recovery-codes`
 - Call `POST /admin/auth/recovery-codes`
 - Show neutral copy on expiry ("session ended"), not an error.
+- Sign-out (POST /admin/auth/logout) ends every session, not just this browser's.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
 - Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
 - Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
 - Mutations must come from this site's own pages; a 403 CSRF_REJECTED means a cross-site request (BR-3.9).
 
-### /admin/numbers (proposed)
+### /admin/numbers
 
 **Curated numbers — define, propose, decide** — Metrics, pending proposals with approve / reject, history
 
@@ -282,7 +399,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/metrics/snapshots/{id}/reject`
 - A proposal's value can't be edited — enter a new one (the database refuses changes).
 
-### /admin/organizations (proposed)
+### /admin/organizations
 
 **Organizations** — List and editor
 
@@ -291,12 +408,21 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `PATCH /admin/organizations/{id}`
 - isClient only affects systems created afterwards (BR-1.2) — say so next to the switch.
 
-### /admin/profile (proposed)
+### /admin/profile
 
 **Profile, links and achievements** — Profile form, links, achievements
 
 - Call `GET /admin/profile`
 - Call `PATCH /admin/profile`
+- Call `GET /admin/profile/photos`
+- Call `POST /admin/profile/photos`
+- Call `GET /admin/profile/photos/{id}`
+- Call `PATCH /admin/profile/photos/{id}`
+- Call `POST /admin/profile/photos/{id}/restore`
+- Call `GET /admin/profile/titles`
+- Call `POST /admin/profile/titles`
+- Call `PATCH /admin/profile/titles/{id}`
+- Call `DELETE /admin/profile/titles/{id}`
 - Call `POST /admin/profile/links`
 - Call `PATCH /admin/profile/links/{id}`
 - Call `DELETE /admin/profile/links/{id}`
@@ -388,7 +514,16 @@ Page by page, every piece of data and every action the backend offers — so a r
 | Endpoint | Capability | Audience |
 |---|---|---|
 | `GET /profile` | Owner profile and links | public |
+| `GET /profile/photo/{purpose}` | Owner profile and links | public |
+| `GET /homes` | GitHub homes | public |
+| `GET /lenses` | Visitor lenses | public |
+| `GET /github/repos` | Public GitHub work | public |
+| `GET /github/commits` | Public GitHub work | public |
+| `GET /activity` | Weekly build activity | public |
+| `POST /guide` | The AI guide | public |
+| `GET /platform/pulse` | Platform pulse | public |
 | `GET /home` | Homepage | public |
+| `GET /content/{key}` | Page content blocks | public |
 | `GET /systems` | Systems catalog | public |
 | `GET /organizations` | Systems catalog | public |
 | `GET /systems/{slug}` | Case study | public |
@@ -410,6 +545,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /lookups/{type}/{id}/deprecate` | Lookups — statuses, domains, types, categories, relationships | public |
 | `POST /admin/auth/login` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/verify-2fa` | Admin sign-in (password + 2FA) | admin |
+| `POST /admin/auth/logout` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/change-password` | Admin sign-in (password + 2FA) | admin |
 | `GET /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
 | `POST /admin/auth/recovery-codes` | Admin sign-in (password + 2FA) | admin |
@@ -456,6 +592,15 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `PATCH /admin/cv/options` | CV content, options, uploads, completeness and history | admin |
 | `GET /admin/profile` | Profile, links and achievements | admin |
 | `PATCH /admin/profile` | Profile, links and achievements | admin |
+| `GET /admin/profile/photos` | Profile, links and achievements | admin |
+| `POST /admin/profile/photos` | Profile, links and achievements | admin |
+| `GET /admin/profile/photos/{id}` | Profile, links and achievements | admin |
+| `PATCH /admin/profile/photos/{id}` | Profile, links and achievements | admin |
+| `POST /admin/profile/photos/{id}/restore` | Profile, links and achievements | admin |
+| `GET /admin/profile/titles` | Profile, links and achievements | admin |
+| `POST /admin/profile/titles` | Profile, links and achievements | admin |
+| `PATCH /admin/profile/titles/{id}` | Profile, links and achievements | admin |
+| `DELETE /admin/profile/titles/{id}` | Profile, links and achievements | admin |
 | `POST /admin/profile/links` | Profile, links and achievements | admin |
 | `PATCH /admin/profile/links/{id}` | Profile, links and achievements | admin |
 | `DELETE /admin/profile/links/{id}` | Profile, links and achievements | admin |
@@ -478,6 +623,9 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/settings/lenses` | Platform settings, feature flags, visitor lenses | admin |
 | `PATCH /admin/settings/lenses/{id}` | Platform settings, feature flags, visitor lenses | admin |
 | `GET /admin/activity-log` | Audit trail | admin |
+| `GET /admin/content` | Page content blocks | admin |
+| `GET /admin/content/{key}` | Page content blocks | admin |
+| `PUT /admin/content/{key}` | Page content blocks | admin |
 | `GET /admin/freshness` | Freshness nudges | admin |
 | `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
 | `GET /admin/jobs` | Scheduled jobs and their runs | admin |

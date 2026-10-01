@@ -1,175 +1,106 @@
-# MALULEKE-KS — PROJECT FILE STRUCTURE v1.0
+# MALULEKE-KS — PROJECT FILE STRUCTURE v2.0
 
-**Derives from:** PLATFORM-CONSTITUTION-v1.md §12 (route map)
-**Convention basis:** Next.js App Router, route-group separation by access level, colocation over shared-folder sprawl, Ports & Adapters made visible in the folder tree itself (EXT-1 — the adapter pattern isn't just a coding practice, the structure enforces it)
+**Derives from:** PLATFORM-CONSTITUTION-v1.md §12 (route map), PUBLIC-REDESIGN-PLAN.md §2
+**Convention basis:** Next.js App Router, route-group separation by access level, colocation over shared-folder sprawl, business rules as code beside the database's own enforcement, Ports & Adapters for external services (EXT-1).
+**Updated:** 2026-09-30 — rewritten from the real tree (v1.0 was the plan before the build).
 
 ```
-malulekeks/
-├── CLAUDE.md                          # Claude Code reads this automatically
-├── .env.example
-├── .env.local                         # gitignored — real secrets
-├── openapi-contract.yaml              # source of truth — schemas.ts is generated from this
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-├── next.config.ts
+maluleke-ks/
+├── CLAUDE.md                          # read automatically by Claude Code — binding
+├── README.md                          # the owner's GitHub profile README — never edited by the platform work
+├── Kurhula_Maluleke_CV_2025-1.docx    # the owner's CV — source material for the CV rewrite (street address never published)
+├── modern_ui_ux_layout_structuring_guide.md   # working design reference (DESIGN-SYSTEM.md wins)
+├── openapi-contract.yaml              # the API contract — lib/schemas.ts and the routes match it
+├── proxy.ts                           # Next.js 16 "middleware": admin session gate for /admin and /api/v1/admin
+├── next.config.ts                     # redirects (e.g. /how-i-build → /method), image hosts
+├── vercel.ts                          # Vercel config as code — cron schedule as literals, build ignore
+├── tailwind.config.ts, app/globals.css   # design tokens (DESIGN-SYSTEM.md)
 │
-├── docs/                              # the four (now five) governing documents
-│   ├── PLATFORM-CONSTITUTION-v1.md
-│   ├── PLATFORM-OVERVIEW-AND-RATIONALE.md
-│   ├── BUSINESS-RULES-v1.md
-│   ├── DESIGN-SYSTEM.md
-│   └── PAGE-SPECIFICATIONS.md
+├── docs/                              # governing documents — table in CLAUDE.md
+│   ├── PLATFORM-CONSTITUTION-v1.md, PLATFORM-OVERVIEW-AND-RATIONALE.md, BUSINESS-RULES-v1.md
+│   ├── DESIGN-SYSTEM.md, PAGE-SPECIFICATIONS.md, PUBLIC-REDESIGN-PLAN.md, ROADMAP-V2.md
+│   ├── DEPLOYMENT.md, ENFORCEMENT-REGISTER.md, PROJECT-STRUCTURE.md
+│   └── BACKEND-API-GUIDE.md, FRONTEND-DATA-GUIDE.md   # generated — npm run docs:capabilities
+│
+├── design/
+│   └── character/                     # the AI guide's master art and the owner-approved portraits
 │
 ├── prisma/
-│   ├── schema.prisma
-│   ├── seed.ts
-│   └── migrations/                    # additive-only, per BR-8.1 — CI enforces this (migration-check job)
+│   ├── schema.prisma                  # models + Public* views (the only thing public pages read)
+│   ├── seed.ts                        # lookups, orgs, flags, a small real system set for local dev
+│   └── migrations/                    # additive only — CI migration guard; business rules as CHECKs/triggers
 │
-├── scripts/
-│   └── github-sync.ts                 # runner-agnostic — wire one scheduler adapter to it, see lib/adapters/scheduler/
+├── scripts/                           # operator scripts (run in the owner's terminal where secrets are involved)
+│   ├── github-sync.ts, backup-drill.ts, create-admin.ts, reset-admin-password.ts, create-db-roles.ts
+│   ├── generate-capability-docs.ts, migration-guard.mjs, cv-continuity.mjs
+│   └── vercel-build.mjs, vercel-ignore.mjs, run-e2e-if-present.mjs
 │
-├── hooks/
-│   └── useTypewriterLines.ts          # sequencing for LedgerHero — see Design System §7
-│
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-│
-├── proxy.ts                            # session check, rate limiting hook — runs before every request
-│                                        # (Next.js 16 renamed "middleware.ts" -> "proxy.ts"; same role)
+├── .github/workflows/                 # ci.yml (typecheck, lint, tests, build, migration guard), cv-continuity.yml
 │
 ├── lib/
-│   ├── db.ts                          # Prisma client singleton
-│   ├── schemas.ts                     # Zod, generated from openapi-contract.yaml
-│   │
-│   ├── adapters/                      # Ports & Adapters, made literal (EXT-1) — every external
-│   │   │                              # dependency behind an interface here. Core logic imports
-│   │   │                              # the interface, never the vendor SDK directly.
-│   │   ├── ai/
-│   │   │   ├── ai-provider.interface.ts
-│   │   │   └── anthropic-provider.ts  # today's implementation — swappable without touching callers
-│   │   ├── analytics/
-│   │   │   ├── analytics-provider.interface.ts
-│   │   │   └── vercel-analytics-provider.ts
-│   │   ├── storage/
-│   │   │   ├── storage-provider.interface.ts
-│   │   │   └── vercel-blob-provider.ts
-│   │   └── scheduler/
-│   │       └── vercel-cron-adapter.ts # calls scripts/github-sync.ts — swap for BullMQ later, zero change upstream
-│   │
-│   ├── auth/
-│   │   ├── session.ts                 # 2FA-gated session helpers (BR-3.1)
-│   │   ├── rate-limit.ts              # BR-2.4, BR-3.2 — shared limiter, not duplicated per route
-│   │   └── activity-log.ts            # BR-3.4 — the one write path every mutation calls through
-│   │
-│   ├── rules/                         # business rules as enforceable code, not just prose —
-│   │   │                              # one file per BR-x.x cluster, so BUSINESS-RULES-v1.md
-│   │   │                              # and this folder stay in lockstep
-│   │   ├── publishing.ts              # BR-1.1 – BR-1.6
-│   │   ├── inquiries.ts               # BR-2.1 – BR-2.5
-│   │   └── lookups.ts                 # BR-8.1, BR-8.2
-│   │
-│   └── flags.ts                       # reads the Flag table — every Tier 2 tool checks here first (BR-4.4)
+│   ├── db.ts                          # Prisma clients: db (platform_runtime) and dbPublic (platform_public, views only)
+│   ├── audit.ts, db-errors.ts         # audited transactions (actor context for the DB audit trigger); rule-violation mapping
+│   ├── schemas.ts                     # Zod schemas, matching openapi-contract.yaml
+│   ├── flags.ts                       # reads the Flag table — every agent tool checks here first (BR-4.4)
+│   ├── site-url.ts, og.tsx, utils.ts
+│   ├── adapters/                      # Ports & Adapters: ai/, analytics/, storage/, scheduler/ (vercel-cron-adapter)
+│   ├── admin/request.ts               # the admin screens' one way to call the admin API
+│   ├── auth/                          # session.ts (signed cookies + session version), with-admin.ts, totp.ts,
+│   │                                  # reauth.ts, recovery-codes.ts, rate-limit.ts, activity-log.ts, current-admin.ts, crypto.ts
+│   ├── capabilities/                  # map.ts — every capability: DB objects, endpoints, rules, pages; render.ts
+│   ├── content/                       # blocks.ts (SiteContent registry), sheets.ts (page list + nav)
+│   ├── cv/                            # the CV engine: model, check, tailor, render-pdf, render-docx, uploads, options
+│   ├── jobs/                          # registry, schedule, run-job, github-sync, maintenance (retention)
+│   ├── metrics/                       # curated numbers (BR-5.3)
+│   ├── profile/photos.ts              # photo processing and versions (BR-1.17)
+│   ├── queries/                       # read models: site, profile (titles, homes, pulse, photos), systems, search, …
+│   ├── rules/                         # business rules as code, one file per cluster (publishing, inquiries, lookups,
+│   │                                  # slugs, revisions, scheduling, titles, organizations, cv, timeline, profile)
+│   ├── security/                      # csrf.ts (BR-3.9), keyed-hash.ts, client-ip.ts
+│   └── settings/                      # registry.ts — every admin-editable tunable, typed with bounds; index.ts
+│
+├── hooks/                             # usePrefersReducedMotion, useTypewriterLines
 │
 ├── components/
-│   ├── ui/                            # shadcn/ui primitives — unmodified except via shadcn's own CLI
-│   ├── shared/                        # cross-cutting, content-aware components
-│   │   ├── StatusBadge.tsx            # color IS the status (Design System §3) — one component, every list
-│   │   ├── RuleCitation.tsx           # renders "BR-1.1" style references, mono, linked
-│   │   └── VisitorLensProvider.tsx    # session-level lens context (Constitution §4)
-│   ├── home/                          # colocated — only ever rendered on / (Design System §7)
-│   │   ├── LedgerHero.tsx
-│   │   └── ScaleFigure.tsx            # self-drawing scale-figure line art, synced to LedgerHero's typewriter timing
-│   └── admin/
-│       └── ActivityLogTable.tsx
+│   ├── ui/                            # shadcn/ui + Magic UI primitives, converted to the tokens
+│   ├── shared/                        # cross-page: PublicShell, SiteHeader + HeaderFrame + NavLinks, SiteFooter +
+│   │                                  # DitheredWordmark, SearchPalette, SystemCard, PageHero, Consent, SocialLinks, …
+│   ├── home/                          # home-page sections (being rebuilt in F5c)
+│   └── admin/                         # AdminNav, ui.tsx (the admin kit), ConfirmDelete, ActivityLogTable
 │
 ├── app/
-│   ├── layout.tsx                     # root layout — fonts, VisitorLensProvider
-│   ├── globals.css
-│   │
-│   ├── (public)/                      # route group — no auth, visitor-facing
-│   │   ├── page.tsx                   # / — lens-aware home
-│   │   ├── systems/
-│   │   │   ├── page.tsx               # /systems — catalog
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx           # /systems/[slug] — case study
-│   │   ├── journey/page.tsx
-│   │   ├── cv/page.tsx
-│   │   ├── how-i-build/page.tsx
-│   │   ├── about/page.tsx
-│   │   └── contact/
-│   │       ├── page.tsx
-│   │       └── _components/
-│   │           └── InquiryForm.tsx    # colocated — only used on this route
-│   │
-│   ├── (admin)/                       # route group — every route here requires 2FA session (proxy.ts)
-│   │   └── admin/
-│   │       ├── login/
-│   │       │   └── page.tsx           # the two-step flow — Design System §5
-│   │       ├── page.tsx               # dashboard overview
-│   │       ├── systems/
-│   │       │   ├── page.tsx
-│   │       │   └── [id]/page.tsx
-│   │       ├── inquiries/page.tsx     # triage inbox
-│   │       ├── timeline/page.tsx
-│   │       ├── cv/page.tsx
-│   │       ├── settings/page.tsx      # flags, lenses, lookup-table management
-│   │       └── activity-log/page.tsx
-│   │
+│   ├── layout.tsx, not-found.tsx, globals.css
+│   ├── sitemap.ts, robots.ts, icon.svg, opengraph-image.tsx
+│   ├── (public)/                      # visitor-facing — no auth
+│   │   ├── page.tsx                   # /
+│   │   ├── systems/page.tsx, systems/[slug]/page.tsx
+│   │   ├── journey/, cv/, method/, about/, contact/     # /method was /how-i-build (redirect)
+│   │   └── (planned, F5c) now/, organizations/[slug]/
+│   ├── (admin)/admin/
+│   │   ├── login/                     # outside the panel — two-step sign-in
+│   │   └── (panel)/                   # layout re-checks the session; one page per admin capability:
+│   │       # overview, systems (+ editor), organizations, timeline, cv, profile, content, inquiries,
+│   │       # numbers, freshness, jobs, settings, activity-log, account
 │   └── api/
-│       └── v1/                        # mirrors openapi-contract.yaml path-for-path — no divergence
-│           ├── systems/
-│           │   ├── route.ts
-│           │   └── [slug]/route.ts
-│           ├── organizations/route.ts
-│           ├── inquiries/route.ts
-│           ├── lookups/[type]/route.ts
-│           ├── admin/
-│           │   ├── systems/
-│           │   │   ├── route.ts
-│           │   │   └── [id]/route.ts
-│           │   ├── inquiries/
-│           │   │   ├── route.ts
-│           │   │   └── [id]/route.ts
-│           │   ├── auth/
-│           │   │   ├── login/route.ts
-│           │   │   └── verify-2fa/route.ts
-│           │   ├── timeline/
-│           │   │   ├── route.ts
-│           │   │   └── [id]/route.ts
-│           │   ├── cv/
-│           │   │   ├── experience/
-│           │   │   │   ├── route.ts
-│           │   │   │   └── [id]/route.ts
-│           │   │   ├── education/
-│           │   │   │   ├── route.ts
-│           │   │   │   └── [id]/route.ts
-│           │   │   └── skills/
-│           │   │       ├── route.ts
-│           │   │       └── [id]/route.ts
-│           │   ├── settings/
-│           │   │   ├── flags/
-│           │   │   │   ├── route.ts
-│           │   │   │   └── [key]/route.ts
-│           │   │   └── lenses/
-│           │   │       ├── route.ts
-│           │   │       └── [id]/route.ts
-│           │   └── activity-log/route.ts
-│           ├── timeline/route.ts
-│           └── cv/generate/route.ts
+│       ├── cron/[job]/                # Vercel cron entry (CRON_SECRET)
+│       └── v1/                        # mirrors openapi-contract.yaml path for path
+│           ├── systems, organizations, homes, platform/pulse, profile (+ photo/[purpose]), home, search,
+│           │   skills, achievements, metrics, timeline, cv, content/[key], inquiries, lookups/[type]
+│           └── admin/…                # every admin endpoint, each wrapped in withAdmin (session, CSRF, audit)
 │
 └── tests/
-    ├── unit/                          # 70%
-    ├── integration/                   # 20%
-    ├── e2e/                           # 10% — Playwright
-    └── ai-evals/                      # fourth category, Constitution §6 — not part of the 70/20/10 split
+    ├── unit/                          # pure logic (session, CV engine, migration guard, display names, vercel config)
+    ├── integration/                   # route handlers + the real local test database (.env.test.local)
+    ├── e2e/                           # Playwright — reserved
+    ├── ai-evals/                      # the AI guide's evals (Constitution §6) — to be filled in F5c
+    └── helpers/
 ```
 
 ## Conventions worth stating explicitly
 
-- **Route groups by access level, not by feature.** `(public)` and `(admin)` split at the top, because the access boundary — not the content type — is the thing that must never leak across a route by accident.
-- **`_components/` colocation for single-route components; `components/shared/` only for genuinely cross-cutting ones.** A component used on one page lives next to that page. Promoting it to `shared/` is a deliberate act when a second route needs it, not a default.
-- **`lib/adapters/` makes Ports & Adapters visible in the tree, not just in code review.** Anyone — including a future Claude Code session — can see at a glance which three or four files own a vendor dependency, and knows the rest of the codebase should never import that vendor's SDK directly.
-- **`lib/rules/` exists so the business rules document and the code can't quietly drift apart.** A rule changing in `BUSINESS-RULES-v1.md` without a corresponding change here is a signal something was missed, not a normal state.
-- **`app/api/v1/` mirrors the OpenAPI paths exactly.** If a route exists in code with no matching path in `openapi-contract.yaml`, that's the contract-first rule being violated, not a shortcut.
+- **Route groups by access level, not by feature.** `(public)` and `(admin)` split at the top, because the access boundary — not the content type — is the thing that must never leak.
+- **Public pages read only `Public*` views through `dbPublic`** (the `platform_public` role can't see raw tables). Admin and writes use `db` as `platform_runtime`, which can't undo the database's rules.
+- **`_components/` colocation for single-route components; `components/shared/` only for genuinely cross-cutting ones.**
+- **Business rules live in two places on purpose:** the database (CHECKs, triggers, views — can't be bypassed) and `lib/rules/` (friendly messages, workflow). `BUSINESS-RULES-v1.md` and `ENFORCEMENT-REGISTER.md` say which is which.
+- **`app/api/v1/` mirrors the OpenAPI paths exactly**, and `lib/capabilities/map.ts` names every endpoint and database object — the coverage test fails on anything missing.
+- **Tunables are data:** a new limit or window is a `lib/settings/registry.ts` entry, editable in Admin → Settings; a new growing list is a lookup table.

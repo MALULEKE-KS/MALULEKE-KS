@@ -1,11 +1,15 @@
 // components/admin/ActivityLogTable.tsx
-// Read-only table for /admin/activity-log — timestamp, action, entity,
-// admin, expandable before/after diff (BR-3.4).
+// Read-only table for /admin/activity-log (#105) — when, who, what, which
+// record, and an expandable diff showing only the fields that changed
+// (BR-3.4). Scrolls sideways on small screens rather than squashing.
 
 "use client";
 
 import { Fragment, useState } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { adminButton, formatWhen } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 
 interface ActivityLogEntry {
   id: string;
@@ -18,114 +22,91 @@ interface ActivityLogEntry {
   createdAt: string;
 }
 
-interface ActivityLogTableProps {
-  entries: ActivityLogEntry[];
-  page: number;
-  totalPages: number;
+/** Fields whose value differs between before and after; all fields when one side is missing. */
+function changedKeys(before: Record<string, unknown> | null, after: Record<string, unknown> | null): string[] {
+  const keys = new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})]);
+  if (!before || !after) return [...keys];
+  return [...keys].filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]));
 }
 
-function formatTimestamp(iso: string): string {
-  return new Date(iso).toLocaleString("en-ZA", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+const show = (v: unknown) => (v === undefined ? "—" : typeof v === "string" ? v : JSON.stringify(v, null, 2));
 
-export function ActivityLogTable({ entries, page, totalPages }: ActivityLogTableProps) {
+export function ActivityLogTable({ entries, page, totalPages }: { entries: ActivityLogEntry[]; page: number; totalPages: number }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  if (entries.length === 0) {
-    return <p className="font-sans text-slate">No activity recorded yet.</p>;
-  }
+  if (entries.length === 0) return <p className="text-sm text-slate">No activity recorded yet.</p>;
 
   return (
     <div>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate/30 text-left font-mono text-xs text-slate">
-            <th className="py-2 pr-4">Timestamp</th>
-            <th className="py-2 pr-4">Admin</th>
-            <th className="py-2 pr-4">Action</th>
-            <th className="py-2 pr-4">Entity</th>
-            <th className="py-2 pr-4" />
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => {
-            const hasDiff = entry.before !== null || entry.after !== null;
-            const expanded = expandedId === entry.id;
-            return (
-              <Fragment key={entry.id}>
-                <tr className="border-b border-slate/10 hover:bg-slate/5">
-                  <td className="py-2 pr-4 font-mono text-xs text-slate whitespace-nowrap">
-                    {formatTimestamp(entry.createdAt)}
-                  </td>
-                  <td className="py-2 pr-4 font-mono text-xs text-slate">{entry.adminUserEmail}</td>
-                  <td className="py-2 pr-4 font-mono text-xs text-ink">{entry.action}</td>
-                  <td className="py-2 pr-4 font-mono text-xs text-slate">
-                    {entry.entityType ? `${entry.entityType}${entry.entityId ? ` · ${entry.entityId}` : ""}` : "—"}
-                  </td>
-                  <td className="py-2 pr-4">
-                    {hasDiff && (
-                      <button
-                        type="button"
-                        onClick={() => setExpandedId(expanded ? null : entry.id)}
-                        className="font-mono text-xs text-slate hover:text-accent transition-colors"
-                      >
-                        {expanded ? "Hide" : "Diff"}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-                {expanded && (
-                  <tr key={`${entry.id}-diff`} className="border-b border-slate/10 bg-slate/5">
-                    <td colSpan={5} className="py-3 px-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
-                        <div>
-                          <p className="text-slate mb-1">Before</p>
-                          <pre className="whitespace-pre-wrap text-ink">
-                            {entry.before ? JSON.stringify(entry.before, null, 2) : "—"}
-                          </pre>
-                        </div>
-                        <div>
-                          <p className="text-slate mb-1">After</p>
-                          <pre className="whitespace-pre-wrap text-ink">
-                            {entry.after ? JSON.stringify(entry.after, null, 2) : "—"}
-                          </pre>
-                        </div>
-                      </div>
+      <div className="-m-5 overflow-x-auto">
+        <table className="w-full min-w-[44rem] text-sm">
+          <thead>
+            <tr className="border-b border-ink/10 text-left text-xs text-slate">
+              <th scope="col" className="px-5 py-3 font-medium">When</th>
+              <th scope="col" className="px-3 py-3 font-medium">Who</th>
+              <th scope="col" className="px-3 py-3 font-medium">Action</th>
+              <th scope="col" className="px-3 py-3 font-medium">Record</th>
+              <th scope="col" className="px-5 py-3"><span className="sr-only">Changes</span></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-ink/[0.06]">
+            {entries.map((entry) => {
+              const keys = changedKeys(entry.before, entry.after);
+              const expanded = expandedId === entry.id;
+              return (
+                <Fragment key={entry.id}>
+                  <tr className={cn("transition-colors hover:bg-paper", expanded && "bg-paper")}>
+                    <td className="whitespace-nowrap px-5 py-2.5 text-xs text-slate">{formatWhen(entry.createdAt)}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate">{entry.adminUserEmail}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-ink">{entry.action}</td>
+                    <td className="max-w-56 truncate px-3 py-2.5 font-mono text-xs text-slate">
+                      {entry.entityType ? `${entry.entityType}${entry.entityId ? ` · ${entry.entityId}` : ""}` : "—"}
+                    </td>
+                    <td className="px-5 py-2.5 text-right">
+                      {keys.length > 0 && (
+                        <button
+                          type="button"
+                          aria-expanded={expanded}
+                          onClick={() => setExpandedId(expanded ? null : entry.id)}
+                          className="text-xs font-medium text-accent hover:underline"
+                        >
+                          {expanded ? "Hide" : `${keys.length} field${keys.length === 1 ? "" : "s"}`}
+                        </button>
+                      )}
                     </td>
                   </tr>
-                )}
-              </Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+                  {expanded && (
+                    <tr className="bg-paper">
+                      <td colSpan={5} className="px-5 pb-4">
+                        <dl className="space-y-2">
+                          {keys.map((k) => (
+                            <div key={k} className="grid gap-2 rounded-xl border border-ink/10 bg-sheet p-3 font-mono text-xs md:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1fr)]">
+                              <dt className="text-slate">{k}</dt>
+                              <dd className="whitespace-pre-wrap break-words text-critical/90 line-through decoration-critical/40">{show(entry.before?.[k])}</dd>
+                              <dd className="whitespace-pre-wrap break-words text-signal-finished">{show(entry.after?.[k])}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center gap-4 mt-6 font-mono text-xs text-slate">
+        <nav aria-label="Pages" className="mt-8 flex items-center justify-between gap-4 border-t border-ink/10 pt-4 text-sm text-slate">
           {page > 1 ? (
-            <Link href={`/admin/activity-log?page=${page - 1}`} className="hover:text-accent transition-colors">
-              ← Prev
-            </Link>
-          ) : (
-            <span className="opacity-40">← Prev</span>
-          )}
-          <span>
-            {page} / {totalPages}
-          </span>
+            <Link href={`/admin/activity-log?page=${page - 1}`} className={cn(adminButton.ghost, "px-3 py-1.5")}><ChevronLeft aria-hidden="true" /> Newer</Link>
+          ) : <span />}
+          <span className="font-mono text-xs">{page} / {totalPages}</span>
           {page < totalPages ? (
-            <Link href={`/admin/activity-log?page=${page + 1}`} className="hover:text-accent transition-colors">
-              Next →
-            </Link>
-          ) : (
-            <span className="opacity-40">Next →</span>
-          )}
-        </div>
+            <Link href={`/admin/activity-log?page=${page + 1}`} className={cn(adminButton.ghost, "px-3 py-1.5")}>Older <ChevronRight aria-hidden="true" /></Link>
+          ) : <span />}
+        </nav>
       )}
     </div>
   );

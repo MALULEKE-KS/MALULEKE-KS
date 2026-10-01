@@ -28,21 +28,16 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <section aria-labelledby="page-title" className="hero-field text-paper overflow-hidden">
-      <Container className="py-16 md:py-20">
+      <Container className="pt-28 pb-16 md:pt-32 md:pb-20">
         <div className={wide ? "max-w-4xl" : "max-w-3xl"}>
           <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
             <Icon aria-hidden="true" className="text-ember size-3.5" />
             {eyebrow}
           </span>
-          <h1
-            id="page-title"
-            className="mt-6 font-sans text-4xl leading-[1.05] font-semibold tracking-tight md:text-6xl"
-          >
+          <h1 id="page-title" className="type-display mt-6">
             {title}
           </h1>
-          {description && (
-            <div className="text-mist mt-5 max-w-2xl text-lg leading-relaxed">{description}</div>
-          )}
+          {description && <div className="type-lede text-mist mt-5 max-w-2xl">{description}</div>}
         </div>
         {children && <div className="mt-10">{children}</div>}
       </Container>

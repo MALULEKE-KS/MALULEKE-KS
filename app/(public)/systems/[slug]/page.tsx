@@ -103,7 +103,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
     <>
       <JsonLd data={workLd} />
       <section aria-labelledby="system-title" className="hero-field text-paper overflow-hidden">
-        <Container className="py-14 md:py-20">
+        <Container className="pt-28 pb-14 md:pt-32 md:pb-20">
           <Link
             href="/systems"
             className="text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-2 rounded-full text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"

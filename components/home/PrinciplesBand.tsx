@@ -1,19 +1,23 @@
 // components/home/PrinciplesBand.tsx
-// Home, section 3 (DESIGN-SYSTEM.md v3 §7.3): how the work is governed. The
-// mission leads as a large serif quote; the four principles follow as
-// spotlight cards with an icon each. Full text lives on /how-i-build.
+// Home — the method (DESIGN-SYSTEM.md v3 §7.3): how the work is governed. A
+// titled section ("How I build."), the mission as a large serif blockquote,
+// then the principles as spotlight cards with an icon each. Full text lives on /method. The
+// words are the owner's content block (#106), edited in the admin.
 
 import { Activity, Blocks, Compass, ShieldCheck, Zap, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { Spotlight } from "@/components/shared/Spotlight";
-import { MISSION, PRINCIPLES } from "@/lib/content/principles";
+import type { ContentBody } from "@/lib/content/blocks";
+import { Accent } from "@/components/shared/Accent";
 
-// Same order as PRINCIPLES (lib/content/principles.ts).
+// One icon per principle, in order; a fifth or later principle reuses the first.
 const ICONS: LucideIcon[] = [Blocks, Zap, Activity, ShieldCheck];
 
-export function PrinciplesBand() {
+export function PrinciplesBand({ content }: { content: ContentBody<"how-i-build"> | null }) {
+  if (!content) return null;
+  const { mission, principles } = content;
   return (
     <section aria-labelledby="principles-title" className="relative overflow-hidden bg-night-deep py-20 text-paper md:py-28">
       <div
@@ -25,16 +29,21 @@ export function PrinciplesBand() {
           <SectionHeader
             tone="dark"
             icon={Compass}
-            eyebrow="How I build"
+            eyebrow="The method"
             id="principles-title"
-            title={<span className="block font-serif text-2xl font-normal italic leading-snug tracking-normal md:text-4xl">&ldquo;{MISSION}&rdquo;</span>}
-            action={{ href: "/how-i-build", label: "The full method" }}
-            wide
+            title={<Accent text="How I *build.*" className="type-accent text-ember-gradient pr-[0.06em]" />}
+            action={{ href: "/method", label: "The full method" }}
+            className="mb-8 md:mb-10"
           />
+        </Reveal>
+        <Reveal delay={60}>
+          <blockquote className="mb-12 max-w-4xl border-l-2 border-ember/60 pl-6 md:mb-14">
+            <p className="font-serif text-2xl leading-snug text-paper/90 italic md:text-[2rem]">&ldquo;{mission}&rdquo;</p>
+          </blockquote>
         </Reveal>
 
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PRINCIPLES.map((p, i) => {
+          {principles.map((p, i) => {
             const Icon = ICONS[i] ?? Blocks;
             return (
               <li key={p.name}>

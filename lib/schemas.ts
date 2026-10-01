@@ -102,6 +102,8 @@ export const LookupTypeEnum = z.enum([
   "milestone-type",
   "skill-category",
   "repo-relationship",
+  "title-kind",
+  "organization-kind",
   // New lookup types extend this enum only — no new endpoint required (EXT-1)
 ]);
 
@@ -425,6 +427,7 @@ export const VisitorLensEntrySchema = z.object({
   label: z.string(),
   priorityContent: z.record(z.string(), z.unknown()),
   aiFramingPrompt: z.string(),
+  sortOrder: z.number().int(),
 });
 
 export const VisitorLensInputSchema = z.object({
@@ -432,6 +435,7 @@ export const VisitorLensInputSchema = z.object({
   label: z.string().min(1),
   priorityContent: z.record(z.string(), z.unknown()),
   aiFramingPrompt: z.string().min(1),
+  sortOrder: z.number().int().min(0).max(1000).default(0),
 });
 
 export const TimelineCreateInputSchema = z.object({
@@ -692,12 +696,28 @@ export const OrganizationInputSchema = z.object({
   // BR-1.2: applies to systems created afterwards — never retroactive.
   isClient: z.boolean().default(false),
   githubLogins: z.array(z.string().trim().min(1).max(100)).max(20).default([]),
+  // An OrganizationKind key (F5c) — personal, venture, client, … ; null clears it.
+  kind: z.string().trim().min(1).nullable().optional(),
 });
 
 export const OrganizationUpdateInputSchema = OrganizationInputSchema.partial().refine(
   (d) => Object.values(d).some((v) => v !== undefined),
   { message: "Nothing to update" }
 );
+
+// F5c (D13) — one of the owner's titles or qualifications. kind is a
+// TitleKind key; a title with an end date in the past leaves the public view.
+export const ProfileTitleInputSchema = z
+  .object({
+    kind: z.string().trim().min(1),
+    label: z.string().trim().min(1).max(120),
+    detail: z.string().trim().min(1).max(160).nullable().optional(),
+    educationId: z.string().min(1).nullable().optional(),
+    sortOrder: z.number().int().min(0).default(0),
+    startsOn: z.string().date().nullable().optional(),
+    endsOn: z.string().date().nullable().optional(),
+  })
+  .refine((t) => !t.startsOn || !t.endsOn || t.endsOn >= t.startsOn, { message: "The end date can't be before the start date", path: ["endsOn"] });
 
 export const ImpactInputSchema = z.object({
   label: z.string().trim().min(1).max(120), // "Audit findings closed"

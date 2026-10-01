@@ -7,6 +7,9 @@
 // lens system exists, not a placeholder pretending to be the real thing.
 
 import { Suspense } from "react";
+import type { Metadata } from "next";
+import { getContentBlock } from "@/lib/content/blocks";
+import { plainAccent } from "@/components/shared/Accent";
 import { HomeContent } from "./_components/HomeContent";
 
 // The ledger hero's whole point is a live, current count — Next.js's
@@ -19,7 +22,17 @@ import { HomeContent } from "./_components/HomeContent";
 // the real current numbers on every visit.
 export const dynamic = "force-dynamic";
 
-export const metadata = { alternates: { canonical: "/" } };
+// The description search results and link previews show: the owner's own
+// introduction (the "home-intro" block), not a generic line — capped for search.
+export async function generateMetadata(): Promise<Metadata> {
+  const intro = await getContentBlock("home-intro").catch(() => null);
+  const text = intro ? plainAccent(intro.lede).replace(/\s+/g, " ").trim() : null;
+  const description = text && text.length > 160 ? `${text.slice(0, 157).replace(/\s+\S*$/, "")}…` : text;
+  return {
+    alternates: { canonical: "/" },
+    ...(description && { description, openGraph: { description }, twitter: { description } }),
+  };
+}
 
 // Loading state: the hero's graphite field, already laid down, so the page
 // doesn't flash from vellum to blue when the data arrives.

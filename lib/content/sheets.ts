@@ -8,16 +8,18 @@ export interface Sheet {
   number: string;
   href: string;
   label: string;
+  /** In the header nav. Home is the logo; Contact is "Let's talk" (F5c, D10). */
+  inHeader: boolean;
 }
 
 export const SHEETS: Sheet[] = [
-  { number: "01", href: "/", label: "Home" },
-  { number: "02", href: "/systems", label: "Systems" },
-  { number: "03", href: "/journey", label: "Journey" },
-  { number: "04", href: "/cv", label: "CV" },
-  { number: "05", href: "/how-i-build", label: "How I build" },
-  { number: "06", href: "/about", label: "About" },
-  { number: "07", href: "/contact", label: "Contact" },
+  { number: "01", href: "/", label: "Home", inHeader: false },
+  { number: "02", href: "/systems", label: "Systems", inHeader: true },
+  { number: "03", href: "/journey", label: "Journey", inHeader: true },
+  { number: "04", href: "/cv", label: "CV", inHeader: true },
+  { number: "05", href: "/method", label: "Method", inHeader: true },
+  { number: "06", href: "/about", label: "About", inHeader: true },
+  { number: "07", href: "/contact", label: "Contact", inHeader: false },
 ];
 
 // The stack this platform itself runs on — real, from CLAUDE.md "Stack".

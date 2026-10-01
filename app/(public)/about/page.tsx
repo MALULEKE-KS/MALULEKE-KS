@@ -3,7 +3,7 @@
 // code: the headline and location from the profile, the first-person
 // narrative from Profile.bio (admin-editable at /admin/profile; paragraphs
 // split on blank lines), and the organizations from the owner's affiliations.
-// Then pointers to /journey and /how-i-build for depth.
+// Then pointers to /journey and /method for depth.
 //
 // The spec's lens-driven subtitle waits for VisitorLens (V1.1 scope); the
 // subtitle here is the owner's own headline, not a faked lens.
@@ -22,7 +22,7 @@ export const metadata = { title: "About", alternates: { canonical: "/about" } };
 
 const POINTERS = [
   { href: "/journey", label: "The full journey", note: "Every milestone, dated.", Icon: BookOpen },
-  { href: "/how-i-build", label: "How I build", note: "The rules behind the work.", Icon: Compass },
+  { href: "/method", label: "Method", note: "The rules behind the work.", Icon: Compass },
 ];
 
 export default async function AboutPage() {

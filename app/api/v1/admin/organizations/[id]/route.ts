@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client";
 import { OrganizationUpdateInputSchema } from "@/lib/schemas";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { checkViolationMessage } from "@/lib/rules/profile";
-import { organizationWithCount, toAdminOrganization } from "@/lib/rules/organizations";
+import { organizationKindData, organizationWithCount, toAdminOrganization } from "@/lib/rules/organizations";
 
 function errorResponse(code: string, message: string, status: number, details?: object) {
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
@@ -20,9 +20,12 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
     return errorResponse("VALIDATION_ERROR", "Invalid organization update", 400, { issues: parsed.error.issues });
   }
   try {
-    const org = await write((tx) =>
-      tx.organization.update({ where: { id }, data: parsed.data, ...organizationWithCount }),
-    );
+    const { kind, ...fields } = parsed.data;
+    const org = await write(async (tx) => {
+      const kindData = await organizationKindData(tx, kind);
+      return kindData === "invalid" ? null : tx.organization.update({ where: { id }, data: { ...fields, ...kindData }, ...organizationWithCount });
+    });
+    if (!org) return errorResponse("VALIDATION_ERROR", `Unknown or deprecated organization kind "${kind}"`, 400);
     return NextResponse.json(toAdminOrganization(org));
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {

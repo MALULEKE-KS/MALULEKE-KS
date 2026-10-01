@@ -9,7 +9,8 @@
 
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { INQUIRY_DRAFT_KEY } from "@/lib/guide/keys";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InquiryCreateInputSchema } from "@/lib/schemas";
@@ -65,6 +66,24 @@ export function InquiryForm({ inquiryTypes, email, reviewSlaHours }: InquiryForm
   const [website, setWebsite] = useState(""); // honeypot — real visitors never see this field
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [state, setState] = useState<SubmitState>("idle");
+  const [fromGuide, setFromGuide] = useState(false);
+
+  // A draft the AI guide wrote for the visitor (BR-4.1/4.2): it only fills the
+  // message — the visitor reviews it, adds their details and sends it through
+  // this same form, validation and rate limit. Read once, then forgotten.
+  useEffect(() => {
+    try {
+      const draft = sessionStorage.getItem(INQUIRY_DRAFT_KEY);
+      if (!draft) return;
+      sessionStorage.removeItem(INQUIRY_DRAFT_KEY);
+      /* eslint-disable react-hooks/set-state-in-effect -- reading the session once, after hydration */
+      setMessage((current) => current || draft);
+      setFromGuide(true);
+      /* eslint-enable react-hooks/set-state-in-effect */
+    } catch {
+      // Storage blocked: nothing to prefill.
+    }
+  }, []);
   // One key per form, kept across retries, so a resubmission is deduplicated (BR-2.6).
   const idempotencyKey = useRef<string | null>(null);
 
@@ -135,7 +154,12 @@ export function InquiryForm({ inquiryTypes, email, reviewSlaHours }: InquiryForm
   const described = (field: string) => (err(field) ? `${uid}-${field}-error` : undefined);
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-6">
+    <form id="inquiry-form" onSubmit={handleSubmit} noValidate className="space-y-6 scroll-mt-28">
+      {fromGuide && (
+        <p role="status" className="rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm">
+          The AI guide drafted your message below. Read it, change anything you like, add your details — nothing is sent until you press send.
+        </p>
+      )}
       {/* Honeypot — off-screen, not display:none (some bots skip that),
           never focusable or announced to real visitors (BR-2.7). */}
       <div className="absolute -left-[9999px]" aria-hidden="true">

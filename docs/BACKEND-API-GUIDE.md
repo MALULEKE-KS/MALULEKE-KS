@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**25 capabilities · 95 endpoints.**
+**33 capabilities · 117 endpoints.**
 
 ## Public
 
@@ -17,12 +17,15 @@ Who the owner is — name, headline, role, location, contact, summary, bio, avai
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `GET /profile`
+- `GET /profile/photo/{purpose}`
 
 **Database**
 
 - `PublicProfile`
 - `PublicProfileLink`
 - `PublicAffiliation`
+- `PublicProfileTitle`
+- `PublicProfilePhoto`
 
 **Rules:** —
 
@@ -31,6 +34,137 @@ Who the owner is — name, headline, role, location, contact, summary, bio, avai
 - Never hardcode owner details — read them here (owner's rule).
 - phone, bio, availability and summary may be null: render nothing, not a placeholder.
 - links[].kind names the brand icon (github, linkedin, whatsapp, …).
+- titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
+- photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
+
+### GitHub homes
+
+`homes` · public
+
+The organisations the owner's repositories live under — their own account and their ventures — each with role, GitHub accounts and how many published systems it holds (F5c, D12).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /homes`
+
+**Database**
+
+- `PublicHome`
+- `OrganizationKind`
+- `PublicSystemHome`
+
+**Rules:** BR-1.4, BR-1.13
+
+**Notes**
+
+- Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
+
+### Visitor lenses
+
+`lenses` · public
+
+The lenses a visitor picks to frame the site and the AI guide — I'm hiring, I have a project, I'm an engineer, just exploring — in the owner's order (Constitution §4).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /lenses`
+
+**Database**
+
+- `PublicVisitorLens`
+
+**Rules:** —
+
+**Notes**
+
+- Key and label only — the framing prompt and priority content stay private (they are the guide's instructions).
+
+### Public GitHub work
+
+`github` · public
+
+Every public repo in the owner's homes — from the day it began — with languages, topics, stars, activity and README excerpt, and the last 90 days of commits. Refreshed by the daily GitHub sync; private, archived and client-restricted repos never appear (F5c).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /github/repos`
+- `GET /github/commits`
+
+**Database**
+
+- `PublicGithubRepo`
+- `PublicRepoCommit`
+- `RepoCommit`
+
+**Rules:** BR-1.3, BR-1.4, BR-1.7
+
+**Notes**
+
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
+
+### Weekly build activity
+
+`activity` · public
+
+Commits per week for each published system over the last 26 weeks — counts only, from the daily GitHub sync (F5c).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /activity`
+
+**Database**
+
+- `PublicSystemActivity`
+
+**Rules:** BR-1.1, BR-1.13
+
+**Notes**
+
+- Only systems that are live on the site; no commit content, no authors.
+
+### The AI guide
+
+`guide` · public
+
+The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `POST /guide`
+
+**Database**
+
+- `PublicFlag`
+- `VisitorLens`
+
+**Rules:** BR-2.4, BR-4.1, BR-4.2, BR-4.3, BR-4.4, BR-4.6
+
+**Notes**
+
+- Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
+- Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+
+### Platform pulse
+
+`platform.pulse` · public
+
+The platform reporting on itself — business rules the database enforces (counted from its own constraints, triggers and functions), audit events, the last successful job and GitHub sync, the running build (F5c §3.2).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /platform/pulse`
+
+**Database**
+
+- `PublicPlatformPulse`
+- `ActivityLog`
+- `JobRun`
+
+**Rules:** BR-3.4
+
+**Notes**
+
+- Aggregates only — no rows, no actors. deployment is null outside Vercel.
 
 ### Homepage
 
@@ -54,6 +188,26 @@ Everything the homepage shows in one call: the live ledger, the admin's homepage
 
 - Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).
 - featured falls back to flagship-first until the admin picks some; never empty while anything is published.
+
+### Page content blocks
+
+`content` · public
+
+Admin-edited site copy by key — e.g. how-i-build: the mission statement and governing principles (#106).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /content/{key}`
+
+**Database**
+
+- `PublicSiteContent`
+
+**Rules:** —
+
+**Notes**
+
+- 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
 
 ### Systems catalog
 
@@ -294,6 +448,8 @@ Every open list the platform uses, read publicly for filters and forms; created,
 - `MilestoneType`
 - `SkillCategory`
 - `RepoRelationship`
+- `TitleKind`
+- `OrganizationKind`
 
 **Rules:** EXT-1, BR-8.1, BR-8.2, BR-8.3, BR-1.11
 
@@ -315,6 +471,7 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 
 - `POST /admin/auth/login`
 - `POST /admin/auth/verify-2fa`
+- `POST /admin/auth/logout`
 - `POST /admin/auth/change-password`
 - `GET /admin/auth/recovery-codes`
 - `POST /admin/auth/recovery-codes`
@@ -332,6 +489,7 @@ Password then TOTP or recovery code; lockout, timing-safe, every attempt audited
 **Notes**
 
 - Show neutral copy on expiry ("session ended"), not an error.
+- Sign-out (POST /admin/auth/logout) ends every session, not just this browser's.
 - Password rotation (BR-3.15) needs the current password and a live TOTP code; it ends every prior session. On `SESSION_REVOKED` send the admin back to sign in.
 - Show ACCOUNT_LOCKED with its lockedUntil countdown — lockouts grow with repeated failures (BR-3.2).
 - Regenerated recovery codes are in that one response only — make the admin save them before leaving (BR-3.12).
@@ -411,7 +569,7 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 
 `admin.organizations` · admin
 
-The organizations systems belong to — ventures founded, clients, the owner's own — with GitHub logins for the sync.
+The organizations systems belong to — ventures founded, clients, the owner's own — with their kind (a lookup) and GitHub logins for the sync.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -422,6 +580,7 @@ The organizations systems belong to — ventures founded, clients, the owner's o
 **Database**
 
 - `Organization`
+- `OrganizationKind`
 
 **Rules:** BR-1.2, BR-1.4
 
@@ -533,6 +692,15 @@ The owner's details, social links (and which go on the CV), certifications and a
 
 - `GET /admin/profile`
 - `PATCH /admin/profile`
+- `GET /admin/profile/photos`
+- `POST /admin/profile/photos`
+- `GET /admin/profile/photos/{id}`
+- `PATCH /admin/profile/photos/{id}`
+- `POST /admin/profile/photos/{id}/restore`
+- `GET /admin/profile/titles`
+- `POST /admin/profile/titles`
+- `PATCH /admin/profile/titles/{id}`
+- `DELETE /admin/profile/titles/{id}`
 - `POST /admin/profile/links`
 - `PATCH /admin/profile/links/{id}`
 - `DELETE /admin/profile/links/{id}`
@@ -546,6 +714,9 @@ The owner's details, social links (and which go on the CV), certifications and a
 - `Profile`
 - `ProfileLink`
 - `Achievement`
+- `ProfileTitle`
+- `TitleKind`
+- `ProfilePhoto`
 
 **Rules:** BR-1.13
 
@@ -632,6 +803,29 @@ Every change the database logged — who (admin / visitor / system), what change
 
 - "[redacted]" marks a secret or personal field that's never stored in the log.
 
+### Page content blocks
+
+`admin.content` · admin
+
+Site copy that isn't tied to a system, role or the profile — the mission and principles, and whatever block comes next — as validated data the admin edits (#106).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /admin/content`
+- `GET /admin/content/{key}`
+- `PUT /admin/content/{key}`
+
+**Database**
+
+- `SiteContent`
+
+**Rules:** —
+
+**Notes**
+
+- Each key has a schema (lib/content/blocks.ts); a body that doesn't match is refused with the issues.
+- An unknown key is 404 — a new block is one registry entry and one row, no migration.
+
 ### Freshness nudges
 
 `admin.freshness` · admin
@@ -691,7 +885,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | Object | Used by |
 |---|---|
 | `Achievement` | admin.profile |
-| `ActivityLog` | admin.auth, admin.overview, admin.audit |
+| `ActivityLog` | platform.pulse, admin.auth, admin.overview, admin.audit |
 | `AdminUser` | admin.auth |
 | `apply_retention` | admin.jobs |
 | `approve_metric_snapshot` | admin.metrics |
@@ -705,15 +899,18 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
 | `InquiryType` | inquiries.submit, lookups |
-| `JobRun` | admin.overview, admin.metrics, admin.jobs |
+| `JobRun` | platform.pulse, admin.overview, admin.metrics, admin.jobs |
 | `LoginChallenge` | admin.auth, admin.jobs |
 | `Metric` | admin.metrics |
 | `MetricSnapshot` | admin.overview, admin.metrics |
 | `MilestoneType` | journey, lookups |
 | `Organization` | admin.organizations |
+| `OrganizationKind` | homes, lookups, admin.organizations |
 | `PlatformSetting` | admin.settings, admin.freshness |
 | `Profile` | admin.profile, admin.freshness |
 | `ProfileLink` | admin.profile |
+| `ProfilePhoto` | admin.profile |
+| `ProfileTitle` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `prune_expired` | admin.jobs |
 | `PublicAchievement` | achievements, cv |
@@ -722,20 +919,33 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `PublicCvUpload` | cv |
 | `PublicEducation` | cv |
 | `PublicExperience` | cv |
+| `PublicFlag` | guide |
+| `PublicGithubRepo` | github |
+| `PublicHome` | homes |
 | `PublicImpact` | systems.caseStudy |
 | `PublicLedger` | home, admin.overview |
 | `PublicMetric` | home, metrics |
 | `PublicOrganization` | systems.catalog |
+| `PublicPlatformPulse` | platform.pulse |
 | `PublicProfile` | profile, cv |
 | `PublicProfileLink` | profile, cv |
+| `PublicProfilePhoto` | profile |
+| `PublicProfileTitle` | profile |
+| `PublicRepoCommit` | github |
+| `PublicSiteContent` | content |
 | `PublicSlugRedirect` | systems.caseStudy |
 | `PublicSystem` | home, systems.catalog, systems.caseStudy |
+| `PublicSystemActivity` | activity |
+| `PublicSystemHome` | homes |
 | `PublicTestimonial` | systems.caseStudy |
 | `PublicTimeline` | journey |
+| `PublicVisitorLens` | lenses |
 | `rate_limit_hit` | search, cv, inquiries.submit, admin.auth |
 | `RateLimitEntry` | admin.auth, admin.jobs |
+| `RepoCommit` | github |
 | `RepoRelationship` | lookups, admin.systems |
 | `search_public` | search |
+| `SiteContent` | admin.content |
 | `Skill` | skills, admin.cv |
 | `SkillCategory` | skills, lookups |
 | `SkillEvidence` | skills, cv |
@@ -752,7 +962,8 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `SystemStatusChange` | admin.systems |
 | `Testimonial` | admin.systems |
 | `Timeline` | admin.overview, admin.journey |
-| `VisitorLens` | admin.settings |
+| `TitleKind` | lookups, admin.profile |
+| `VisitorLens` | guide, admin.settings |
 
 ## Not exposed
 

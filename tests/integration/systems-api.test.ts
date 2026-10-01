@@ -3,10 +3,49 @@
 // route handlers — verifies BR-1.1 (published-only) and the generic-404
 // behavior end to end, not just the serializer in isolation.
 
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { GET as getSystems } from "@/app/api/v1/systems/route";
 import { GET as getSystemBySlug } from "@/app/api/v1/systems/[slug]/route";
+import { db } from "@/lib/db";
+
+// An unnamed client of this suite's own (BR-1.4): published with the client's
+// approval, but without approval to name them.
+const RUN = `sa${Date.now().toString(36)}`;
+const CLIENT_NAME = `${RUN} Hidden Client Ltd`;
+
+beforeAll(async () => {
+  const org = await db.organization.create({ data: { name: CLIENT_NAME, slug: `${RUN}-client`, isClient: true } });
+  const status = await db.status.findUniqueOrThrow({ where: { key: "finished" } });
+  await db.system.create({
+    data: {
+      name: `${RUN} Client Work`,
+      slug: `${RUN}-client-work`,
+      organizationId: org.id,
+      statusId: status.id,
+      description: "A client system published without naming the client.",
+      clientVisibility: "ANONYMIZED_ONLY",
+      clientApproved: true,
+      nameDisclosureApproved: false,
+      contentStatus: "PUBLISHED",
+    },
+  });
+});
+
+afterAll(async () => {
+  await db.system.updateMany({ where: { slug: { startsWith: RUN } }, data: { contentStatus: "ARCHIVED" } });
+});
+
+async function findPublished(slug: string) {
+  // Page through: other test files add published systems of their own.
+  for (let page = 1; page <= 20; page++) {
+    const body = await (await getSystems(new NextRequest(`http://localhost/api/v1/systems?page=${page}`))).json();
+    if (body.data.length === 0) return undefined;
+    const found = body.data.find((s: { slug: string }) => s.slug === slug);
+    if (found) return found as { organization: string };
+  }
+  return undefined;
+}
 
 describe("GET /api/v1/systems", () => {
   it("returns only published systems", async () => {
@@ -14,21 +53,21 @@ describe("GET /api/v1/systems", () => {
     const body = await res.json();
 
     const slugs = body.data.map((s: { slug: string }) => s.slug);
-    expect(slugs).toContain("xkimm-xa-mali");
+    expect(slugs).toContain("xkimi-xa-mali");
     // fundslink-academy is seeded as DRAFT — must never appear here (BR-1.1)
     expect(slugs).not.toContain("fundslink-academy");
   });
 
-  it("masks the organization name for the seeded ANONYMIZED_ONLY system", async () => {
-    // Page through: other test files add published systems of their own.
-    let sunduza: { organization: string } | undefined;
-    for (let page = 1; !sunduza && page <= 20; page++) {
-      const body = await (await getSystems(new NextRequest(`http://localhost/api/v1/systems?page=${page}`))).json();
-      if (body.data.length === 0) break;
-      sunduza = body.data.find((s: { slug: string }) => s.slug === "sunduza-case-study");
-    }
+  it("masks the organization name of an ANONYMIZED_ONLY client without name approval (BR-1.4)", async () => {
+    const system = await findPublished(`${RUN}-client-work`);
+    expect(system).toBeDefined();
+    expect(system!.organization).not.toContain(CLIENT_NAME);
+  });
+
+  it("names a client once they have approved it — Sunduza (BR-1.4)", async () => {
+    const sunduza = await findPublished("sunduza-architectural");
     expect(sunduza).toBeDefined();
-    expect(sunduza!.organization).not.toContain("Sunduza");
+    expect(sunduza!.organization).toContain("Sunduza");
   });
 
   it("filters by domain", async () => {
@@ -48,12 +87,12 @@ describe("GET /api/v1/systems", () => {
 
 describe("GET /api/v1/systems/[slug]", () => {
   it("returns a published system's full detail", async () => {
-    const res = await getSystemBySlug(new NextRequest("http://localhost/api/v1/systems/xkimm-xa-mali"), {
-      params: Promise.resolve({ slug: "xkimm-xa-mali" }),
+    const res = await getSystemBySlug(new NextRequest("http://localhost/api/v1/systems/xkimi-xa-mali"), {
+      params: Promise.resolve({ slug: "xkimi-xa-mali" }),
     });
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.slug).toBe("xkimm-xa-mali");
+    expect(body.slug).toBe("xkimi-xa-mali");
     expect(body).toHaveProperty("caseStudyBody");
     expect(body).toHaveProperty("impacts");
   });

@@ -81,15 +81,26 @@ All of it renders the final state under `prefers-reduced-motion: reduce`.
 
 - **Icons:** Lucide for UI; real brand marks via `react-icons` — Font Awesome brands for LinkedIn, WhatsApp and GitHub, Simple Icons for the tech stack.
 - **shadcn/ui:** `button`, `input`, `card`, `badge`, `tooltip`, `separator` — restyled to these tokens.
-- **Magic UI** (shadcn registry): `number-ticker`, `border-beam`, `dot-pattern` — adapted (real server values, reduced motion).
-- **21st.dev** components may be used the same way: brought in, then converted to these tokens and fonts (never their bundled fonts or colours).
-- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `BrandMark`.
+- **Magic UI** (shadcn registry): `number-ticker`, `border-beam`, `dot-pattern` in use; chosen for the redesign — `animated-beam`, `orbiting-circles`, `bento-grid`, `magic-card`, `animated-list`, `flickering-grid`, `noise-texture`, `blur-fade`, `safari` / `iphone` mockups, `shimmer-button` (the one primary CTA). Adapted: real server values, reduced motion, content visible without JavaScript.
+- **21st.dev**: *Dithered Footer* (the footer's wordmark band) and *Message Thread* (the AI guide's chat) — converted to these tokens and fonts (never their bundled fonts or colours). The header follows the floating-pill navbar pattern. Full list and reasons: PUBLIC-REDESIGN-PLAN §7a.
+- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `BrandMark`, `HeaderFrame` + `NavLinks` (floating header), `DitheredWordmark`, and the admin kit (`components/admin/ui.tsx`).
+
+### 6a. Header and footer (F5c, amended 2026-09-30)
+
+- **Header:** no full-width bar — floating pieces over the page's own bands: the logo in a graphite glass pill (left); the nav — Systems · Journey · CV · Method · About — in one graphite glass pill (centre, current page = filled pill + ember dot + `aria-current`); search (⌘K) and **Let's talk**, the only contact entry and the only ember button (right). The glass firms up once the page scrolls. Below `lg`, a Menu pill opens a glass sheet of the same items.
+- **Footer:** graphite. The mission (from the method content block), social links; *Where the code lives* — the three GitHub homes with live system counts; *Write to me* — email, the review promise (setting), *Start a conversation*; a live status line from the platform pulse; then the signature band — **MALULEKE-KS cut out of a drifting field of dithered ember dots**, brightening under the cursor; the legal row (privacy choices, colophon, back to top). It never repeats the header's page links.
+
+### 6b. The AI guide (F5c)
+
+The owner's likeness as a 2D anime character (`design/character/master-anime-2d.png`), always labelled *AI guide*. Motion follows §5: purposeful, reduced-motion safe (still pose), never blocking content. Full behaviour: PUBLIC-REDESIGN-PLAN §3a.
 
 ## 7. Home
 
+*Being rebuilt in F5c — the target is PUBLIC-REDESIGN-PLAN §3 (hero with positioning and the AI guide, control room, selected-work bento, system map of the three homes, numbers, method teaser, now, let's talk). The sections below describe the page as shipped in F5a until the rebuild lands.*
+
 1. **Hero** (graphite): live-data badge, name and sourced role, the ledger with gradient numbers, ember CTA + glass CTA, real facts with icons; right — the system map in a glass window with a border beam.
 2. **Selected work** (bone): bento — flagship card, pipeline card (count-up), stack card (real brand marks + how the platform ships).
-3. **How I build** (graphite): the mission as a serif quote, four principle cards with icons.
+3. **Method** (graphite): the mission as a serif quote, the principle cards with icons — from the admin-edited content block.
 4. **Contact** (bone, with a graphite feature panel): the reply window, the real inquiry types, brand links.
 
 ## 8. Login
