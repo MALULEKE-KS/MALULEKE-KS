@@ -11,7 +11,7 @@
 import Link from "next/link";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
-import { BrandMark } from "@/components/shared/BrandMark";
+import { BrandMark, Wordmark } from "@/components/shared/BrandMark";
 import { Container } from "@/components/shared/Container";
 import { DitheredWordmark } from "@/components/shared/DitheredWordmark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
@@ -64,8 +64,8 @@ export function SiteFooter({
       <Container className="grid gap-12 pb-12 pt-20 md:grid-cols-12">
         <div className="md:col-span-5">
           <Link href="/" className="inline-flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-ember">
-            <BrandMark className="size-8 text-paper" />
-            <span className="font-mono text-sm font-medium">MALULEKE-KS</span>
+            <BrandMark className="h-8 text-paper" />
+            <Wordmark className="font-mono text-sm font-medium" />
           </Link>
           <SocialLinks links={profile.links} email={profile.email} className="mt-8" />
         </div>

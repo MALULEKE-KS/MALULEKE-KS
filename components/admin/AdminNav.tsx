@@ -114,7 +114,7 @@ export function AdminNav() {
   const footer = (
     <div className="border-t border-white/10 p-3">
       <Link href="/" className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-mist hover:bg-white/5 hover:text-paper">
-        <BrandMark className="size-4 text-mist" />
+        <BrandMark cut="heavy" className="h-3.5 text-mist" />
         View the site
       </Link>
       <button
@@ -134,7 +134,7 @@ export function AdminNav() {
       {/* Small screens: a top bar with a menu. */}
       <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 bg-night-deep px-4 text-paper lg:hidden">
         <Link href="/admin" className="flex items-center gap-2.5">
-          <BrandMark className="size-6 text-paper" />
+          <BrandMark cut="heavy" className="h-5 text-paper" />
           <span className="font-mono text-sm">Admin</span>
         </Link>
         <button
@@ -158,7 +158,7 @@ export function AdminNav() {
       {/* Large screens: a fixed graphite sidebar. */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/10 bg-night-deep text-paper lg:flex">
         <Link href="/admin" className="flex h-16 items-center gap-3 border-b border-white/10 px-6">
-          <BrandMark className="size-7 text-paper" />
+          <BrandMark cut="heavy" className="h-6 text-paper" />
           <span>
             <span className="block font-mono text-sm font-medium">MALULEKE-KS</span>
             <span className="block text-xs text-line">Admin</span>

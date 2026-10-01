@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The share images draw the 3D K-S piece, read from disk at request time
+  // (lib/og.tsx) — so it must travel with those functions on Vercel.
+  outputFileTracingIncludes: {
+    "/opengraph-image": ["./design/brand/ks-3d-graphite-og.png"],
+    "/systems/[slug]/opengraph-image": ["./design/brand/ks-3d-graphite-og.png"],
+  },
   // Renamed pages keep their old addresses working (F5c, D10).
   async redirects() {
     return [{ source: "/how-i-build", destination: "/method", permanent: true }];

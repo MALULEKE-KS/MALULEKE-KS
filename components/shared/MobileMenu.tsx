@@ -23,7 +23,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ArrowUpRight, Clock, Menu, X } from "lucide-react";
-import { BrandMark } from "@/components/shared/BrandMark";
+import { BrandMark, Wordmark } from "@/components/shared/BrandMark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { SHEETS } from "@/lib/content/sheets";
 import type { SiteLink } from "@/lib/queries/site";
@@ -119,8 +119,8 @@ export function MobileMenu({ links, email, reviewSlaHours }: { links: SiteLink[]
 
                 <div className="relative flex h-[4.25rem] shrink-0 items-center justify-between px-6">
                   <Link href="/" onClick={() => setOpenFor(null)} aria-label="MALULEKE-KS — home" className="focus-visible:outline-ember flex h-10 items-center gap-2.5 rounded-full focus-visible:outline-2">
-                    <BrandMark className="text-paper size-6" />
-                    <span className="font-mono text-sm font-medium tracking-tight">MALULEKE-KS</span>
+                    <BrandMark cut="heavy" className="text-paper h-5" />
+                    <Wordmark className="font-mono text-sm font-medium tracking-tight" />
                   </Link>
                   <button
                     type="button"

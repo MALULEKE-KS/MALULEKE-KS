@@ -1,5 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#0B0C0E"/>
-  <path d="M7 13V7h6M19 7h6v6M25 19v6h-6M13 25H7v-6" fill="none" stroke="#F4F2EE" stroke-width="2.6" stroke-linecap="square"/>
-  <rect x="12.5" y="12.5" width="7" height="7" fill="#FF5B1F"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The K-S Stencil mark, heavy cut (components/shared/BrandMark.tsx), on a graphite tile. -->
+  <rect width="64" height="64" rx="14" fill="#0B0C0E"/>
+  <g transform="translate(5.5 15.2) scale(0.9) translate(-4 -13)">
+    <g fill="#F4F2EE">
+      <path d="M6 15L12.6 15L12.6 49L6 49Z"/>
+      <path d="M16 30.3L23.8 15L31 15L23.2 30.3Z"/>
+      <path d="M16 33.7L23.2 33.7L31 49L23.8 49Z"/>
+      <path d="M58.14 18.61A10.1 10.1 0 1 0 48.13 34.94L49.57 28.71A3.7 3.7 0 1 1 53.23 22.72Z"/>
+      <path d="M52.67 29.06A10.1 10.1 0 1 1 42.66 45.39L47.57 41.28A3.7 3.7 0 1 0 51.23 35.29Z"/>
+    </g>
+    <path d="M31.8 28.8L38.2 28.8L38.2 35.2L31.8 35.2Z" fill="#FF5B1F"/>
+  </g>
 </svg>

@@ -83,12 +83,23 @@ All of it renders the final state under `prefers-reduced-motion: reduce`.
 - **shadcn/ui:** `button`, `input`, `card`, `badge`, `tooltip`, `separator` — restyled to these tokens.
 - **Magic UI** (shadcn registry): `number-ticker`, `border-beam`, `dot-pattern` in use; chosen for the redesign — `animated-beam`, `orbiting-circles`, `bento-grid`, `magic-card`, `animated-list`, `flickering-grid`, `noise-texture`, `blur-fade`, `safari` / `iphone` mockups, `shimmer-button` (the one primary CTA). Adapted: real server values, reduced motion, content visible without JavaScript.
 - **21st.dev**: *Dithered Footer* (the footer's wordmark band) and *Message Thread* (the AI guide's chat) — converted to these tokens and fonts (never their bundled fonts or colours). The header follows the floating-pill navbar pattern. Full list and reasons: PUBLIC-REDESIGN-PLAN §7a.
-- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `BrandMark`, `HeaderFrame` + `NavLinks` (floating header), `DitheredWordmark`, and the admin kit (`components/admin/ui.tsx`).
+- **Own:** `SystemsBlueprint` (the live system map), `LedgerHero`, `SectionHeader`, `StatusBadge`, `SystemPreviewFrame`, `SocialLinks`, `Spotlight`, `Reveal`, `BrandMark` + `Wordmark` (§6c), `HeaderFrame` + `NavLinks` (floating header), `DitheredWordmark`, and the admin kit (`components/admin/ui.tsx`).
 
 ### 6a. Header and footer (F5c, amended 2026-09-30)
 
 - **Header:** no full-width bar — floating pieces over the page's own bands: the logo in a graphite glass pill (left); the nav — Systems · Journey · CV · Method · About — in one graphite glass pill (centre, current page = filled pill + ember dot + `aria-current`); search (⌘K) and **Let's talk**, the only contact entry and the only ember button (right). The glass firms up once the page scrolls. Below `lg`, a Menu pill opens a glass sheet of the same items.
 - **Footer:** graphite. The mission (from the method content block), social links; *Where the code lives* — the three GitHub homes with live system counts; *Write to me* — email, the review promise (setting), *Start a conversation*; a live status line from the platform pulse; then the signature band — **MALULEKE-KS cut out of a drifting field of dithered ember dots**, brightening under the cursor; the legal row (privacy choices, colophon, back to top). It never repeats the header's page links.
+
+### 6c. The mark — K-S Stencil (owner-approved 2026-10-01, Graphite)
+
+Engineered letters with the joints showing: the K's arms stand apart from its stem by a stencil gap, the S is two geometric bowls cut at the spine (a stencil bridge), and the hyphen is one **International Orange block** — the only colour in the mark. Drawn on a 64-unit grid (letters 34 units tall); the source, the 3D piece and the construction drawing are in `design/brand/`.
+
+- **Flat mark** (`BrandMark`, letters in `currentColor`): header, phone menu, footer, admin, sign-in. `cut="heavy"` (wider gaps, a larger block) at 24 px and below so the stencil still reads.
+- **Wordmark:** MALULEKE-KS in Plex Mono with the hyphen in ember (`Wordmark`).
+- **Icons:** `app/icon.svg` (heavy cut on a graphite tile) and `app/apple-icon.png` (full-bleed for home screens).
+- **3D piece** (Graphite: satin graphite letters, bevelled edges, the orange block): only where it can be the moment — the share image (`lib/og.tsx`) and the 404 page. Never in running UI.
+- **Motion:** the header mark assembles once on first paint (the pieces slide together by a hair, the block lands last); the 404 piece drifts slowly. Nothing else moves; reduced motion shows the mark at rest.
+- Don't recolour the letters other than graphite or bone, don't outline it, don't put anything between the K, the block and the S.
 
 ### 6b. The AI guide (F5c)
 

@@ -25,7 +25,13 @@ export function TypingAnimation({ children, className, speed = 22, delay = 250 }
   const inView = useInView(ref, { once: true, amount: 0.6 })
   const reduced = useReducedMotion()
   const [count, setCount] = useState(0)
-  const done = reduced || count >= children.length
+  // The server can't know the visitor's motion setting, so the first render
+  // matches the server's (typing not started); reduced motion applies right
+  // after hydration. Deciding it during the first render broke hydration.
+  const [hydrated, setHydrated] = useState(false)
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- marks hydration done, once
+  useEffect(() => setHydrated(true), [])
+  const done = (hydrated && reduced === true) || count >= children.length
 
   useEffect(() => {
     if (!inView || reduced) return
