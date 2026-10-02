@@ -51,7 +51,7 @@
 | BR-2.7 | Honeypot returns an identical 201, creates nothing | `POST /inquiries` | ✅ | App | — |
 | BR-2.8 | A message needs a signed form token, shown long enough before sending | `lib/inquiries/form-token.ts` (HMAC, own label, timing-safe), `GET /inquiries/form`. Tested: missing, forged, too fast → decoy, nothing stored; expired → FORM_EXPIRED | ✅ | App | — |
 | BR-2.9 | Per-address limits: messages sent, automatic emails received | `hitRateLimitKey` on a hash of the address; `recipientUnderCap` in `lib/notifications`. Tested: `inquiries-api.test.ts` | ✅ | App + DB function | — |
-| LT-1/2 | Each category asks only its own questions; another form's field is refused | `lib/inquiries/forms.ts` (strict per-category schemas), server-side in `POST /inquiries`. Tested | ✅ | App | — |
+| LT-1/2 | Each category asks only its own questions; another form's field is refused | `lib/inquiries/forms.ts` (strict per-category schemas), server-side in `POST /inquiries`. The form shows only fields from the same spec (`lib/inquiries/fields.ts`); `tests/unit/inquiry-fields.test.ts` fails if the spec and the schemas disagree. Tested | ✅ | App | — |
 | LT-3 | A non-sequential reference, unique, never a credential | `new_inquiry_reference()` + unique index; nothing authorises by reference | ✅ | DB | — |
 | LT-4 | Compensation is a choice; a range never runs backwards or below zero | Schema `Compensation`; CHECK `Inquiry_lt_4_compensation`. Tested (app and database) | ✅ | App + DB | — |
 | LT-5 | Meetings are events with their own IANA time zone | `InquiryMeeting` + CHECK `InquiryMeeting_lt_5`; `isTimeZone`/`zonedToUtc`. Tested | ✅ | App + DB | — |

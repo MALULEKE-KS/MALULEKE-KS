@@ -22,6 +22,8 @@ interface MagicCardProps {
   gradientTo?: string
   /** The soft light inside the card under the pointer. */
   spotlight?: string
+  /** The border away from the pointer — a light hairline on dark, a dark one on bone. */
+  rest?: string
 }
 
 export function MagicCard({
@@ -32,6 +34,7 @@ export function MagicCard({
   gradientFrom = "var(--color-ember)",
   gradientTo = "#ffb547",
   spotlight = "rgb(255 91 31 / 0.07)",
+  rest = "rgb(255 255 255 / 0.1)",
 }: MagicCardProps) {
   const reduced = useReducedMotion()
   const mouseX = useMotionValue(-gradientSize)
@@ -54,7 +57,7 @@ export function MagicCard({
 
   const border = useMotionTemplate`
     linear-gradient(${surface} 0 0) padding-box,
-    radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px, ${gradientFrom}, ${gradientTo}, rgb(255 255 255 / 0.1) 100%) border-box`
+    radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px, ${gradientFrom}, ${gradientTo}, ${rest} 100%) border-box`
   const glow = useMotionTemplate`radial-gradient(${gradientSize * 1.6}px circle at ${mouseX}px ${mouseY}px, ${spotlight}, transparent 100%)`
 
   return (

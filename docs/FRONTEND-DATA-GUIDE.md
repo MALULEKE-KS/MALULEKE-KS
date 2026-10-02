@@ -117,6 +117,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /metrics`
 - Show approvedAt as "as of" — these are point-in-time figures.
 
+**CV — the options, view and download** — Header and phone menu: a CV button to the uploaded file while it's offered; the home hero's 'Get my CV'
+
+- Call `GET /cv/options`
+- Call `GET /cv`
+- Call `POST /cv/generate`
+- Call `GET /cv/documents/{id}`
+- Call `GET /cv/uploads/{id}`
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
+
 **Let's Talk — send a message** — Let's talk band: each category opens /contact?about=<key>
 
 - Call `POST /inquiries`
@@ -139,7 +151,12 @@ Page by page, every piece of data and every action the backend offers — so a r
 - titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
 - photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
 
-**Skills with evidence** — What I work with
+**Page content blocks** — Method: the mission and principles, each with its evidence (#method)
+
+- Call `GET /content/{key}`
+- 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
+
+**Skills with evidence** — Skills, with the evidence for each (#skills)
 
 - Call `GET /skills`
 - Show evidence, not self-rating: "used in 3 systems, 2 roles" beats a bar chart.
@@ -153,6 +170,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `GET /metrics`
 - Show approvedAt as "as of" — these are point-in-time figures.
+
+**CV — the options, view and download** — Download my CV, while the uploaded option is offered
+
+- Call `GET /cv/options`
+- Call `GET /cv`
+- Call `POST /cv/generate`
+- Call `GET /cv/documents/{id}`
+- Call `GET /cv/uploads/{id}`
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
 ### /contact
 
@@ -192,17 +221,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /cv
 
-**Skills with evidence** — Skills
-
-- Call `GET /skills`
-- Show evidence, not self-rating: "used in 3 systems, 2 roles" beats a bar chart.
-
-**Certifications and awards** — Certifications
-
-- Call `GET /achievements`
-- systemSlug links an achievement to its case study when present.
-
-**CV — the options, view and download** — CV options (GET /cv/options), in the order given, each with its label and note; the uploaded one shows its upload date; On-screen CV, target-role box, Download PDF / Word — only while the generated option is listed
+**CV — the options, view and download** — Redirects to the uploaded CV file (or About when it's off). The generated CV is dormant (owner, 2026-10-02): switched off in Admin → CV, its page kept unrouted
 
 - Call `GET /cv/options`
 - Call `GET /cv`
@@ -220,13 +239,6 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `GET /timeline`
 - Filter options come from GET /lookups/milestone-type.
-
-### /method
-
-**Page content blocks** — Mission and principles
-
-- Call `GET /content/{key}`
-- 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
 
 ### /now (proposed)
 
