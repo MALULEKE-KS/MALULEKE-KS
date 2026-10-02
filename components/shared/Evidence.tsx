@@ -149,7 +149,7 @@ export function Evidence({
 export function EvidenceList({ claims }: { claims: ResolvedClaim[] }) {
   if (claims.length === 0) return null; // EV-1
   return (
-    <div className="grid gap-3 md:grid-cols-2">
+    <div className={cn("grid gap-3", claims.length > 1 && "md:grid-cols-2")}>
       {claims.map((c) => (
         <ClaimCard key={c.id} c={c} />
       ))}

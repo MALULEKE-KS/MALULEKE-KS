@@ -30,6 +30,9 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — /journey: one rail through time (2026-10-02, local)
+- The journey was empty in production (no timeline entries yet). It now reads every public, dated fact the site already holds — milestones, roles, study (expected graduation drawn dashed, ahead), achievements, systems started and shipped — on one rail with a year scrubber and a live *Today* node. Nothing invented; filters only for what's present.
+
 ### F5c — Let's Talk V1 (2026-10-02, local)
 - **"What brings you here?"** — /contact is Let's Talk: five categories as tiles (hiring, a software project, collaboration, marketing or growth, something else), each with its kinds and an "Other" escape, then a form that asks only what that category needs; a reference (`KS-26-7QM4-K2`) at the end. The home band's categories open the form already on that category.
 - **Strengthened on the way** (the owner's spec, LETS-TALK-SPEC): compensation is a choice (range, prefer to discuss, unpaid) checked by the database; interviews keep their own time zone; PDFs only, checked by their bytes; the idempotency key is bound to its message; a per-address limit; a signed form token (fill-time check); duplicates flagged, never removed.
