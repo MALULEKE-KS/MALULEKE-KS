@@ -20,6 +20,7 @@ import { getUploadedCvLink } from "@/lib/cv/options";
 import { getPublicLenses } from "@/lib/queries/lenses";
 import { FLAGS, isFlagOn } from "@/lib/flags";
 import { getSetting } from "@/lib/settings";
+import { dbPublic } from "@/lib/db";
 import { GuideProvider } from "@/components/guide/GuideProvider";
 import { guideProviderConfigured } from "@/lib/guide/model";
 import { GuideLauncher } from "@/components/guide/GuideLauncher";
@@ -44,6 +45,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     maxQuestionCharacters,
     aiGuide,
     cv,
+    liveSites,
   ] = await Promise.all([
     getSiteProfile(),
     getReviewSlaHours(),
@@ -54,21 +56,19 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     getSetting("concierge.maxQuestionCharacters"),
     getContentBlock("ai-guide"),
     getUploadedCvLink(),
+    // Published systems' live sites (the public view never carries an NDA system's link, BR-1.3).
+    dbPublic.publicSystem.findMany({ where: { liveUrl: { not: null } }, select: { liveUrl: true } }),
   ]);
-  // Where the guide's answers may link out: GitHub and the owner's own public profiles.
-  const linkHosts = [
-    ...new Set([
-      "github.com",
-      ...profile.links.flatMap((l) => {
-        try {
-          const u = new URL(l.url);
-          return u.protocol === "https:" && !u.hostname.endsWith("wa.me") ? [u.hostname.toLowerCase().replace(/^www\./, "")] : [];
-        } catch {
-          return [];
-        }
-      }),
-    ]),
-  ];
+  // Where the guide's answers may link out: GitHub, the owner's own public profiles, and his published systems' live sites.
+  const httpsHost = (url: string | null) => {
+    try {
+      const u = new URL(url ?? "");
+      return u.protocol === "https:" && !u.hostname.endsWith("wa.me") ? [u.hostname.toLowerCase().replace(/^www\./, "")] : [];
+    } catch {
+      return [];
+    }
+  };
+  const linkHosts = [...new Set(["github.com", ...profile.links.flatMap((l) => httpsHost(l.url)), ...liveSites.flatMap((s) => httpsHost(s.liveUrl))])];
   return (
     // Analytics consent (BR-5.1/5.4) wraps the public site only — never the admin.
     <ConsentProvider>
@@ -98,7 +98,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           />
         </div>
         <GuideLauncher />
-        <GuidePanel maxQuestionCharacters={maxQuestionCharacters} suggestions={aiGuide?.suggestions ?? []} />
+        <GuidePanel maxQuestionCharacters={maxQuestionCharacters} suggestions={aiGuide?.suggestions ?? []} pageSuggestions={aiGuide?.pageSuggestions ?? []} />
       </GuideProvider>
     </ConsentProvider>
   );

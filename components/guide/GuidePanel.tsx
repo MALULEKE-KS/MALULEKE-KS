@@ -10,6 +10,13 @@
 //
 // It drives the character: thinking while waiting, speaking while the answer
 // streams (the mouth follows the text), a point when it opens a page.
+//
+// V1 guide audit (2026-10-02): it tells the guide which page the visitor is
+// on ("this system" means the one on screen) and opens with questions about
+// that page; the conversation survives a reload (this tab only —
+// sessionStorage, never the server); a failed answer can be retried; a
+// reasoning model's thinking shows as "Thinking…" and then "Thought for Ns";
+// answers can be copied; a drafted message opens the right kind of contact form.
 
 "use client";
 
@@ -18,7 +25,9 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type UIMessage } from "ai";
-import { ArrowUp, ArrowUpRight, Compass, PenLine, RotateCcw, Search, ShieldCheck, Square, X, type LucideIcon } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Brain, Compass, PenLine, RefreshCw, RotateCcw, Search, ShieldCheck, Square, X, type LucideIcon } from "lucide-react";
+import { CopyButton } from "@/components/guide/CopyButton";
+import { questionsFor, type PageSuggestions } from "@/lib/guide/suggestions";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -45,13 +54,20 @@ function textOf(message: UIMessage) {
   return message.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
 }
 
+const CHAT_KEY = "mks.guide.chat";
+/** The saved conversation is capped well under the route's own limits. */
+const MAX_SAVED_CHARS = 60_000;
+
 export function GuidePanel({
   maxQuestionCharacters,
   suggestions,
+  pageSuggestions = [],
 }: {
   maxQuestionCharacters: number;
   /** Example questions (the "ai-guide" content block), so the panel never opens blank. */
   suggestions: string[];
+  /** Questions for particular pages, shown first there (the same block). */
+  pageSuggestions?: PageSuggestions[];
 }) {
   const { enabled, ready, linkHosts, open, setOpen, ownerFirstName, lenses, lens, setLens, pending, clearPending, setMood, speak, flashPose } = useGuide();
   const router = useRouter();
@@ -60,19 +76,18 @@ export function GuidePanel({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<Element | null>(null);
-
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/v1/guide",
-        // Send only what the route accepts: the history and the lens.
+        // Send only what the route accepts: the history, the lens and the page (read at send time).
         // The lens is read at send time from the session (setLens saves it synchronously).
-        prepareSendMessagesRequest: ({ messages }) => ({ body: { messages, lens: readSessionLens() } }),
+        prepareSendMessagesRequest: ({ messages }) => ({ body: { messages, lens: readSessionLens(), page: window.location.pathname } }),
       }),
     [],
   );
 
-  const { messages, sendMessage, status, error, stop, setMessages, addToolOutput, clearError } = useChat({
+  const { messages, sendMessage, regenerate, status, error, stop, setMessages, addToolOutput, clearError } = useChat({
     transport,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall({ toolCall }) {
@@ -90,19 +105,48 @@ export function GuidePanel({
         addToolOutput({ tool: "open_page", toolCallId: toolCall.toolCallId, output: { opened: path } });
       }
       if (toolCall.toolName === "draft_inquiry") {
-        const { message } = toolCall.input as { message: string };
+        const { message, category } = toolCall.input as { message: string; category?: string };
         try {
           sessionStorage.setItem(INQUIRY_DRAFT_KEY, String(message).slice(0, 2000));
         } catch {
           // Storage blocked: the draft stays in the chat for the visitor to copy.
         }
-        router.push("/contact#inquiry-form");
+        // The kind of message, when the guide knew it — a lookup key, so only letters, digits and dashes.
+        const about = typeof category === "string" && /^[a-z0-9-]{1,60}$/.test(category) ? `?about=${category}` : "";
+        router.push(`/contact${about}`);
         addToolOutput({ tool: "draft_inquiry", toolCallId: toolCall.toolCallId, output: { drafted: true, sent: false } });
       }
     },
   });
 
   const busy = status === "submitted" || status === "streaming";
+
+  // The conversation survives a reload in this tab (never sent anywhere but the guide).
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    try {
+      const saved = sessionStorage.getItem(CHAT_KEY);
+      if (saved) setMessages(JSON.parse(saved) as UIMessage[]);
+    } catch {
+      // Unreadable or blocked: start fresh.
+    }
+  }, [setMessages]);
+  useEffect(() => {
+    if (busy || !restored.current) return;
+    try {
+      const json = JSON.stringify(messages);
+      if (messages.length === 0) sessionStorage.removeItem(CHAT_KEY);
+      else if (json.length <= MAX_SAVED_CHARS) sessionStorage.setItem(CHAT_KEY, json);
+    } catch {
+      // Storage full or blocked: the conversation just won't survive a reload.
+    }
+  }, [messages, busy]);
+
+  // How long the guide thought before its first word, per answer.
+  const startedAt = useRef<number | null>(null);
+  const [thoughtFor, setThoughtFor] = useState<Record<string, number>>({});
 
   // Drive the character from the chat's state.
   useEffect(() => {
@@ -113,6 +157,17 @@ export function GuidePanel({
   const spoken = useRef(0);
   const last = messages[messages.length - 1];
   const lastText = last?.role === "assistant" ? textOf(last) : "";
+  useEffect(() => {
+    if (status === "submitted") startedAt.current = Date.now();
+  }, [status]);
+  const lastId = last?.role === "assistant" ? last.id : null;
+  const answering = lastText.length > 0;
+  useEffect(() => {
+    if (!lastId || !answering || startedAt.current === null) return;
+    const seconds = Math.round((Date.now() - startedAt.current) / 1000);
+    startedAt.current = null;
+    setThoughtFor((t) => (t[lastId] ? t : { ...t, [lastId]: seconds }));
+  }, [lastId, answering]);
   useEffect(() => {
     if (status !== "streaming") {
       spoken.current = 0;
@@ -157,6 +212,10 @@ export function GuidePanel({
 
   const errorText = readError(error);
   const tooLong = input.length > maxQuestionCharacters;
+  // This page's questions first, then the general ones — never more than four.
+  const opening = [...new Set([...questionsFor(pathname, pageSuggestions), ...suggestions])].slice(0, 4);
+  // A reasoning model thinks before its first word: say so.
+  const reasoning = status === "streaming" && last?.role === "assistant" && !lastText && last.parts.some((p) => p.type === "reasoning");
 
   function submit() {
     const text = input.trim();
@@ -220,6 +279,7 @@ export function GuidePanel({
                 void stop();
                 setMessages([]);
                 clearError();
+                setThoughtFor({});
               }}
               className="text-mist rounded-full p-2 hover:bg-white/10 hover:text-paper"
               aria-label="Start a new conversation"
@@ -262,11 +322,11 @@ export function GuidePanel({
                 )}
               </GuideRow>
 
-              {suggestions.length > 0 && (
+              {opening.length > 0 && (
                 <div>
                   <p className="text-mist mb-2 text-[11px] font-medium tracking-wide uppercase">Try asking</p>
                   <ul className="space-y-1.5">
-                    {suggestions.map((q, i) => (
+                    {opening.map((q, i) => (
                       <li key={q}>
                         <BlurFade delay={0.3 + 0.06 * i} y={4}>
                           <button
@@ -294,7 +354,12 @@ export function GuidePanel({
               </div>
             ) : (
               <GuideRow key={m.id}>
-                <div className="space-y-2">
+                <div className="group/answer space-y-2">
+                  {thoughtFor[m.id] !== undefined && thoughtFor[m.id]! >= 2 && m.parts.some((p) => p.type === "reasoning") && (
+                    <p className="text-line inline-flex items-center gap-1.5 text-[11px]">
+                      <Brain aria-hidden="true" className="size-3" /> Thought for {thoughtFor[m.id]}s
+                    </p>
+                  )}
                   {m.parts.map((part, i) => {
                     if (part.type === "text") return part.text.trim() ? <GuideText key={i} text={part.text} hosts={linkHosts} onNavigate={() => window.innerWidth < 640 && setOpen(false)} /> : null;
                     if (part.type === "tool-open_page") {
@@ -315,12 +380,25 @@ export function GuidePanel({
                     }
                     return null;
                   })}
+                  {!(busy && m.id === last?.id) && (m.metadata as { finishReason?: string } | undefined)?.finishReason === "length" && (
+                    <p className="text-mist text-[11px]">
+                      That answer ran long and was cut short —{" "}
+                      <button type="button" onClick={() => void sendMessage({ text: "Please continue where you left off." })} className="text-ember underline underline-offset-2">
+                        continue
+                      </button>
+                    </p>
+                  )}
+                  {!(busy && m.id === last?.id) && textOf(m).trim() && (
+                    <div className="opacity-60 transition-opacity group-hover/answer:opacity-100 focus-within:opacity-100">
+                      <CopyButton text={textOf(m)} label="Copy answer" className="-ml-1.5" />
+                    </div>
+                  )}
                 </div>
               </GuideRow>
             ),
           )}
 
-          {status === "submitted" && (
+          {(status === "submitted" || reasoning) && (
             <GuideRow>
               <p className="inline-flex items-center gap-2 text-[13px]" aria-label="Thinking">
                 <AnimatedShinyText>Thinking</AnimatedShinyText>
@@ -335,6 +413,16 @@ export function GuidePanel({
           {errorText && (
             <p role="alert" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs">
               {errorText}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  clearError();
+                  void regenerate();
+                }}
+                className="text-paper inline-flex items-center gap-1 underline underline-offset-2"
+              >
+                <RefreshCw aria-hidden="true" className="size-3" /> Try again
+              </button>{" "}
               {pathname !== "/contact" && (
                 <a href="/contact" className="text-ember underline underline-offset-2">
                   Write to {ownerFirstName}

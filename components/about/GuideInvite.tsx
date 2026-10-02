@@ -53,17 +53,17 @@ export function GuideInvite({ questions }: { questions: string[] }) {
             {ownerFirstName}&rsquo;s guide
           </p>
           <p className="mt-2 font-sans text-xl font-semibold tracking-tight">Curious about something? Ask me about him.</p>
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-4 grid gap-2">
             {questions.slice(0, 3).map((q) => (
               <li key={q}>
                 <button
                   type="button"
                   onClick={() => ask(q)}
-                  className="group/q hover:border-ember/40 text-mist hover:text-paper inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-left text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
+                  className="group/q hover:border-ember/40 text-mist hover:text-paper flex w-full items-start gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2 text-left text-[13px] leading-snug transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
                 >
-                  <Sparkles aria-hidden="true" className="text-ember size-3.5 shrink-0" />
-                  <span className="truncate">{q}</span>
-                  <ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0" />
+                  <Sparkles aria-hidden="true" className="text-ember mt-0.5 size-3.5 shrink-0" />
+                  <span className="min-w-0 flex-1">{q}</span>
+                  <ArrowUpRight aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 transition-transform group-hover/q:-translate-y-0.5 group-hover/q:translate-x-0.5" />
                 </button>
               </li>
             ))}

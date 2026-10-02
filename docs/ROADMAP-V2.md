@@ -30,6 +30,46 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — The AI guide, audited and strengthened; V1 hardening (2026-10-02, local)
+- **Why.** Owner: make the guide "the smartest and most intelligent AI ever", able to know "each and every corner of the system", with strong reasoning, speed, humour and conscience, robust to abuse and testing. Full detail in PUBLIC-REDESIGN-PLAN §3a, under "Strengthened — the V1 guide audit".
+- **Reliability.**
+  - **Fallback models.** The free gateway models allow about 5 requests a minute for the whole team, and a baseline eval run failed every case on that limit alone. The default for `concierge.fallbackModels` is the three free general models.
+  - **Reasoning allowance.** A new setting, `concierge.maxReasoningTokens`, fixes answers that were cut off, or never started, when thinking used up the answer budget.
+  - **Honest errors.** The chat says "busy" when it's busy, offers **Try again**, and offers **continue** after a cut-short answer.
+  - **Faster.** The guide's knowledge is cached for a short window (`concierge.corpusCacheSeconds`), and gateway caching is on.
+- **Intelligence.**
+  - **Page context.** The guide knows the page the visitor is on, and the chat's suggestions follow the page (`ai-guide.pageSuggestions`, migration `guide_page_suggestions`).
+  - **Wider knowledge.** It now knows the Journey chapters, every evidence claim (including what each doesn't prove), the platform's live figures and the kinds of message the contact form takes.
+  - **Rewritten instructions:**
+    - a reasoning method;
+    - date arithmetic;
+    - "site vs general" honesty;
+    - the visitor's language;
+    - an honest description of itself;
+    - care in distress;
+    - formats the chat can render.
+  - **Drafts open the right form.** A drafted message opens the matching contact category.
+- **Security.**
+  - **Tool results are rebuilt server-side.** A forged history can no longer plant a fake "search result".
+  - **The knowledge is data, never instructions.** README or commit text can't steer the guide.
+  - **Baseline headers on every response:**
+    - no framing;
+    - nosniff;
+    - a strict referrer policy;
+    - a Permissions-Policy;
+    - COOP;
+    - a CSP limited to `frame-ancestors`, `base-uri`, `form-action` and `object-src`.
+- **Chat.**
+  - **The renderer:** a safe Markdown subset — code blocks with copy, inline code, steps, `[label](target)` links and anchors.
+  - **The panel:** the conversation survives a reload in this tab, it shows "Thought for Ns", and answers can be copied.
+  - **Links:** published systems' live sites are linkable.
+- **Evals.**
+  - **Coverage:** 39 cases.
+  - **Running them:** they run on a gateway OIDC token, use a plain-verdict judge, are paced for free models, retry judge outages, and lift and restore the daily cap.
+- **Smaller fixes.**
+  - `/how-i-build` redirects straight to `/about#method`.
+  - The About guide card's questions wrap instead of being truncated.
+
 ### F5c — Structure: no CV page, Method in About, Journey and About rebuilt, Let's Talk restructured (2026-10-02, local)
 
 **Why:** the owner's critique — only Home and Systems were good.

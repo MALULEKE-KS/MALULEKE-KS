@@ -49,6 +49,11 @@ export const CONTENT_BLOCKS = {
       heading: Text(120),
       lede: Text(500),
       suggestions: z.array(Text(140)).min(1).max(6),
+      // The chat's opening suggestions on a particular page (the longest matching path prefix wins), shown before the general ones.
+      pageSuggestions: z
+        .array(z.object({ page: z.string().trim().regex(/^\/[a-z0-9\-/]*$/, "a site path, e.g. /systems/"), questions: z.array(Text(140)).min(1).max(3) }))
+        .max(12)
+        .optional(),
     }),
   },
   evidence: {

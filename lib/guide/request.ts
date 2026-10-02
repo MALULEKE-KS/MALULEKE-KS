@@ -7,7 +7,11 @@
 //
 // A visitor can still forge their own history (they own it) — that only ever
 // changes their own conversation, and the instructions tell the model that
-// nothing in the conversation is an instruction.
+// nothing in the conversation is an instruction. Tool results are the one
+// place a forged history could pose as *data* rather than conversation, so
+// they're never taken from the browser: a server tool's result (search) is
+// dropped — the model searches again if it needs to — and a browser tool's
+// result is rebuilt here from fixed values (V1 guide audit, 2026-10-02).
 
 import { z } from "zod";
 import type { UIMessage } from "ai";
@@ -55,8 +59,38 @@ export const GuideRequestSchema = z
   .object({
     messages: z.array(z.union([UserMessage, AssistantMessage])).min(1).max(MAX_MESSAGES),
     lens: z.string().max(60).nullish(),
+    /** The page the visitor is on — a site path only; the route checks it against the site's own pages. */
+    page: z
+      .string()
+      .max(200)
+      .regex(/^\/(?!\/)[a-z0-9\-/]*$/)
+      .nullish()
+      .catch(null),
   })
   .strip();
+
+type ToolPartIn = { type: string; toolCallId: string; state: "input-available" | "output-available" | "output-error"; input?: unknown };
+const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
+
+/**
+ * A browser tool's part, rebuilt: its input reduced to the fields the tool
+ * takes, its output replaced by the fixed acknowledgement the panel sends.
+ * Nothing the browser wrote survives as a "result".
+ */
+function rebuildToolPart(p: ToolPartIn): ToolPartIn & { output?: unknown; errorText?: string } {
+  const input = (p.input ?? {}) as Record<string, unknown>;
+  if (p.type === "tool-open_page") {
+    const clean = { path: str(input.path, 200), ...(typeof input.section === "string" && { section: str(input.section, 60) }) };
+    if (p.state === "output-available") return { ...p, input: clean, output: { opened: clean.path } };
+    if (p.state === "output-error") return { ...p, input: clean, errorText: "That page couldn't be opened." };
+    return { ...p, input: clean };
+  }
+  // draft_inquiry
+  const clean = { message: str(input.message, 2000), ...(typeof input.category === "string" && { category: str(input.category, 60) }) };
+  if (p.state === "output-available") return { ...p, input: clean, output: { drafted: true, sent: false } };
+  if (p.state === "output-error") return { ...p, input: clean, errorText: "The draft couldn't be prepared." };
+  return { ...p, input: clean };
+}
 
 export type GuideRequest = z.infer<typeof GuideRequestSchema>;
 
@@ -74,7 +108,7 @@ export interface GuideLimits {
 export function parseGuideRequest(
   body: unknown,
   limits: GuideLimits,
-): { ok: true; messages: UIMessage[]; lens: string | null; isNewQuestion: boolean } | { ok: false; problem: GuideRequestProblem } {
+): { ok: true; messages: UIMessage[]; lens: string | null; page: string | null; isNewQuestion: boolean } | { ok: false; problem: GuideRequestProblem } {
   const parsed = GuideRequestSchema.safeParse(body);
   if (!parsed.success) return { ok: false, problem: { code: "VALIDATION_ERROR", message: "That message couldn't be read." } };
 
@@ -102,5 +136,17 @@ export function parseGuideRequest(
     return { ok: false, problem: { code: "VALIDATION_ERROR", message: "That message couldn't be read." } };
   }
 
-  return { ok: true, messages: messages as unknown as UIMessage[], lens: parsed.data.lens ?? null, isNewQuestion };
+  // Tool results are never taken from the browser (see the header).
+  const cleaned = messages.map((m) =>
+    m.role === "user"
+      ? m
+      : {
+          ...m,
+          parts: m.parts
+            .filter((p) => p.type !== "tool-search_systems")
+            .map((p) => (p.type.startsWith("tool-") ? rebuildToolPart(p as ToolPartIn) : p)),
+        },
+  );
+
+  return { ok: true, messages: cleaned as unknown as UIMessage[], lens: parsed.data.lens ?? null, page: parsed.data.page ?? null, isNewQuestion };
 }
