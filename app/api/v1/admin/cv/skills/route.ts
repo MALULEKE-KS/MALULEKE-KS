@@ -32,6 +32,7 @@ export const POST = withAdmin(async (request, { write }) => {
       name: parsed.data.name,
       categoryId: parsed.data.categoryId,
       yearsExperience: parsed.data.yearsExperience ?? null,
+      ...(parsed.data.aliases && { aliases: parsed.data.aliases }),
     },
     ...skillWithCategory,
   }));

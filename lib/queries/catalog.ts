@@ -82,6 +82,7 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
       status: s.status,
       statusKey: s.statusKey,
       statusColorToken: s.statusColorToken,
+      stage: s.stage,
       isFlagship: s.isFlagship,
       repoPrivate: s.repoPrivate,
       hasCaseStudy: s.caseStudyBody.trim().length > 0,

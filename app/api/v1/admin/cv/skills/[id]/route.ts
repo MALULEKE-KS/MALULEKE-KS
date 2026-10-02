@@ -27,6 +27,8 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         name: parsed.data.name,
         categoryId: parsed.data.categoryId,
         yearsExperience: parsed.data.yearsExperience ?? null,
+        // Left as they are when the request doesn't mention them.
+        ...(parsed.data.aliases && { aliases: parsed.data.aliases }),
       },
       ...skillWithCategory,
     }));

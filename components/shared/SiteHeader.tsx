@@ -16,7 +16,7 @@ import { HeaderFrame } from "@/components/shared/HeaderFrame";
 import { MobileMenu } from "@/components/shared/MobileMenu";
 import type { SiteLink } from "@/lib/queries/site";
 
-export function SiteHeader({ links, email, reviewSlaHours, cvUrl }: { links: SiteLink[]; email: string | null; reviewSlaHours: number; cvUrl: string | null }) {
+export function SiteHeader({ links, reviewSlaHours, cvUrl }: { links: SiteLink[]; reviewSlaHours: number; cvUrl: string | null }) {
   return (
     <HeaderFrame>
       <Link
@@ -48,7 +48,7 @@ export function SiteHeader({ links, email, reviewSlaHours, cvUrl }: { links: Sit
           Let&rsquo;s talk
           <ArrowUpRight aria-hidden="true" className="size-4" />
         </Link>
-        <MobileMenu links={links} email={email} reviewSlaHours={reviewSlaHours} cvUrl={cvUrl} />
+        <MobileMenu links={links} reviewSlaHours={reviewSlaHours} cvUrl={cvUrl} />
       </div>
     </HeaderFrame>
   );

@@ -39,6 +39,7 @@ export function PrinciplesBand({
       <Container className="relative">
         <Reveal>
           <SectionHeader
+            copyKey="home.method"
             tone="dark"
             icon={Compass}
             eyebrow="The method"

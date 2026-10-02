@@ -17,7 +17,11 @@ import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 const MASTER = "/character/guide-master.webp";
-const POSES = { wave: "/character/guide-wave.webp", point: "/character/guide-point.webp", thinking: "/character/guide-thinking.webp" } as const;
+const POSES = {
+  wave: "/character/guide-wave.webp",
+  point: "/character/guide-point.webp",
+  thinking: "/character/guide-thinking.webp",
+} as const;
 
 export function GuideCharacter({
   className,
@@ -34,7 +38,10 @@ export function GuideCharacter({
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const rigRef = useRef<Rig | null>(null);
+  const img = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
+  // Poses load on first use or once the page is idle — not with the first view (spec WP-102).
+  const [posesWanted, setPosesWanted] = useState(false);
 
   // Build the rig once the page is interactive; keep the static image if WebGL2 isn't there.
   useEffect(() => {
@@ -43,7 +50,10 @@ export function GuideCharacter({
     let unregister: (() => void) | null = null;
     const start = () => {
       if (!canvas.current) return;
-      void createRig(canvas.current, MASTER, reducedMotion).then((r) => {
+      // The rig's texture is the image the page already downloaded (its chosen size, from the
+      // browser cache) — never a second, full-size copy of the master (spec WP-102: 116 KB saved).
+      const texture = img.current?.currentSrc || MASTER;
+      void createRig(canvas.current, texture, reducedMotion).then((r) => {
         if (cancelled || !r) return;
         rig = r;
         rigRef.current = r;
@@ -70,7 +80,9 @@ export function GuideCharacter({
   // The hero character reports whether it is on screen (independent of the rig loading).
   useEffect(() => {
     if (!reportInView || !box.current) return;
-    const io = new IntersectionObserver(([entry]) => setHeroInView(!!entry?.isIntersecting), { threshold: 0.25 });
+    const io = new IntersectionObserver(([entry]) => setHeroInView(!!entry?.isIntersecting), {
+      threshold: 0.25,
+    });
     io.observe(box.current);
     return () => {
       io.disconnect();
@@ -82,7 +94,8 @@ export function GuideCharacter({
   useEffect(() => {
     if (!ready || !box.current) return;
     let onScreen = true;
-    const update = () => rigRef.current?.setRunning(onScreen && document.visibilityState === "visible");
+    const update = () =>
+      rigRef.current?.setRunning(onScreen && document.visibilityState === "visible");
     const io = new IntersectionObserver(([entry]) => {
       onScreen = !!entry?.isIntersecting;
       update();
@@ -105,7 +118,10 @@ export function GuideCharacter({
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height * 0.18; // the face, not the middle of the body
       // Up and down count as much as left and right: the vertical span is the face-to-screen-edge distance.
-      rigRef.current?.setLook((e.clientX - cx) / (r.width * 1.1), (e.clientY - cy) / Math.max(r.height * 0.45, 160));
+      rigRef.current?.setLook(
+        (e.clientX - cx) / (r.width * 1.1),
+        (e.clientY - cy) / Math.max(r.height * 0.45, 160)
+      );
       if (mood === "idle") rigRef.current?.setMood("attentive");
     };
     const onLeave = () => {
@@ -120,30 +136,61 @@ export function GuideCharacter({
   }, [ready, reducedMotion, mood]);
 
   // A flashed pose (wave, point) wins; otherwise the thinking frame shows for as long as the guide is thinking.
-  const shown: keyof typeof POSES | null = reducedMotion ? null : pose !== "none" ? pose : mood === "thinking" ? "thinking" : null;
+  const shown: keyof typeof POSES | null = reducedMotion
+    ? null
+    : pose !== "none"
+      ? pose
+      : mood === "thinking"
+        ? "thinking"
+        : null;
   const posing = shown !== null;
+  useEffect(() => {
+    if (reducedMotion || posesWanted) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- a pose is needed now; mount the frames
+    if (shown) return setPosesWanted(true);
+    const t = window.setTimeout(() => setPosesWanted(true), 6000);
+    return () => window.clearTimeout(t);
+  }, [shown, posesWanted, reducedMotion]);
 
   return (
-    <div ref={box} aria-hidden="true" className={cn("relative aspect-[2/3] select-none", className)}>
+    <div
+      ref={box}
+      aria-hidden="true"
+      className={cn("relative aspect-[2/3] select-none", className)}
+    >
       <Image
+        ref={img}
         src={MASTER}
         alt=""
         fill
         priority={priority}
         sizes="(min-width: 1024px) 420px, 60vw"
-        className={cn("object-contain transition-opacity duration-500", ready ? "opacity-0" : "opacity-100")}
+        className={cn(
+          "object-contain transition-opacity duration-500",
+          ready ? "opacity-0" : "opacity-100"
+        )}
       />
-      <canvas ref={canvas} className={cn("absolute inset-0 size-full transition-opacity duration-300", ready && !posing ? "opacity-100" : "opacity-0")} />
-      {(Object.keys(POSES) as (keyof typeof POSES)[]).map((key) => (
-        <Image
-          key={key}
-          src={POSES[key]}
-          alt=""
-          fill
-          sizes="(min-width: 1024px) 420px, 60vw"
-          className={cn("object-contain transition-opacity duration-300", shown === key ? "opacity-100" : "opacity-0")}
-        />
-      ))}
+      <canvas
+        ref={canvas}
+        className={cn(
+          "absolute inset-0 size-full transition-opacity duration-300",
+          ready && !posing ? "opacity-100" : "opacity-0"
+        )}
+      />
+      {posesWanted &&
+        (Object.keys(POSES) as (keyof typeof POSES)[]).map((key) => (
+          <Image
+            key={key}
+            src={POSES[key]}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 420px, 60vw"
+            className={cn(
+              "object-contain transition-opacity duration-300",
+              shown === key ? "opacity-100" : "opacity-0"
+            )}
+          />
+        ))}
     </div>
   );
 }

@@ -2,12 +2,18 @@
 // Section header (DESIGN-SYSTEM.md v3 §6): a pill micro-badge with an icon
 // sets the context, then the title, an optional one-line description and an
 // optional right-aligned link. Sentence case — no all-caps eyebrows.
+// With a copyKey, the eyebrow, title and description come from the
+// "page-copy" content block (lib/content/copy.ts); the props are the fallback.
 
 import Link from "next/link";
 import { ArrowRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Accent } from "@/components/shared/Accent";
+import { sectionCopy } from "@/lib/content/copy";
 
 interface SectionHeaderProps {
+  /** The section's key in the page-copy block, e.g. "home.map". */
+  copyKey?: string;
   icon: LucideIcon;
   eyebrow: string;
   title: React.ReactNode;
@@ -20,8 +26,12 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-export function SectionHeader({ icon: Icon, eyebrow, title, description, action, tone = "light", id, wide = false, className }: SectionHeaderProps) {
+export async function SectionHeader({ copyKey, icon: Icon, eyebrow: eyebrowProp, title: titleProp, description: descriptionProp, action, tone = "light", id, wide = false, className }: SectionHeaderProps) {
   const dark = tone === "dark";
+  const copy = copyKey ? await sectionCopy(copyKey, {}) : {};
+  const eyebrow = copy.eyebrow ?? eyebrowProp;
+  const title = copy.title ? <Accent text={copy.title} className="type-accent text-ember-gradient pr-[0.06em]" /> : titleProp;
+  const description = copy.description ?? descriptionProp;
   return (
     <div className={cn("mb-12 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between", className)}>
       <div className={wide ? "max-w-4xl" : "max-w-2xl"}>

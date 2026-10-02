@@ -30,6 +30,34 @@
 
 ## Part 2 — Update log (newest first)
 
+### V1 final — the finalization batch; the V2 plan locked (2026-10-02/03)
+- **V2 plan locked:** `docs/V2-IMPROVEMENT-SPEC.md` (the owner's improvement spec, verified against the repo and production, with revision 3) is the V2 plan, built as a relay: `docs/improvements/TRACKER.md` (status, Next up, handoff log) and `DECISIONS.md`, read first by every session (CLAUDE.md "Start here"); `tests/unit/v2-tracker.test.ts` keeps the tracker complete.
+- **About and Journey redesigned:**
+  - **What changed:** editorial layouts with hairlines instead of boxes and one accent, and nothing repeated.
+  - **About:** the portrait badges and the organisations section are gone (the organisations are in the footer).
+  - **Journey:** the chapters are a sticky-years timeline, and three milestones that restated their chapter were unpublished.
+- **Footer:** the typed-in "Built on …" stack is gone, and there's no raw email or WhatsApp on every page (also removed from the home band and the phone menu).
+  - The status line now says the version: **"V1 · V2 on the way"**, from the `release` content block.
+- **Nothing hard-coded:**
+  - **Page copy is data.** Every section's eyebrow, title and description lives in the `page-copy` content block, seeded word for word and edited in Admin → Page content. Interface labels stay in code (D-010).
+  - **Descriptions come from data.** Page descriptions are taken from the page's own data; the map no longer counts the homes in words.
+- **GitHub's real state, kept current:**
+  - **New on the site:** FundsLink-Academy and Governova are public, so they're shown *In progress* with GitHub's own descriptions.
+  - **Retired:** repos the owner deleted leave every public list (`System.githubGoneAt`).
+  - **Ongoing:** the sync now re-decides a repo that goes public, and keeps uncurated descriptions in step with GitHub until a write-up exists (D-013).
+- **From the V2 spec, pulled into V1:**
+  - **WP-101 link previews:** one metadata helper for every page, and share-image alt text per system.
+  - **WP-102 phone weight:** the master character image is no longer downloaded twice, and poses load on first use.
+  - **WP-103 skill evidence from the repos themselves:**
+    - **How it works:** the sync reads package.json (including monorepo workspaces), requirements.txt and pyproject.toml; skills carry admin-editable aliases; manifest links never touch the owner's own (D-015).
+    - **What it proves:** this platform 11 skills, Sunduza 15, Xkimi 12.
+  - **WP-105 contact exposure:** done as above.
+  - **WP-107 guide suggestions:** no question asks the guide to judge its own owner.
+  - **WP-108 honest activity labels:** recency is shown only for building work or recent commits; `stage` was added to the public system shape.
+  - **WP-110:** a post-deploy smoke check that every page serves the deployed build.
+  - **WP-203:** `/.well-known/security.txt`, built from data.
+  - **WP-204:** axe WCAG 2.2 AA checks on every public page and a case study, in CI; four case-study issues fixed.
+
 ### F5c — The AI guide, audited and strengthened; V1 hardening (2026-10-02, local)
 - **Why.** Owner: make the guide "the smartest and most intelligent AI ever", able to know "each and every corner of the system", with strong reasoning, speed, humour and conscience, robust to abuse and testing. Full detail in PUBLIC-REDESIGN-PLAN §3a, under "Strengthened — the V1 guide audit".
 - **Reliability.**

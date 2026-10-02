@@ -48,7 +48,10 @@
 
 **Behavior:** an unknown or unpublished slug renders the same generic not-found page as a real 404 — never a distinct "this one's private" message, which would itself leak that a hidden system exists.
 
-### `/journey` — the person's life and career (rebuilt 2026-10-02)
+### `/journey` — the person's life and career (rebuilt 2026-10-02; redesigned the same day)
+
+**Redesign:** an editorial timeline — the chapters as stops under the title, then each chapter with its years and place in a sticky column, his words, and its dated moments as a quiet list. No cards, no glow. Moments that only restate the chapter's own heading are not shown (unpublished, D-014).
+
 
 The owner's story from school to now, in chapters. It covers his life and career, not his repositories (those are on `/systems`). Owner: "the journey is about me and my life since day one".
 
@@ -90,7 +93,10 @@ The owner's uploaded CV is the CV. Owner: generation "is building harder and vio
 
 `/method` (and `/how-i-build`) redirect permanently to `/about#method`.
 
-### `/about` — the person, and how he builds (rebuilt 2026-10-02)
+### `/about` — the person, and how he builds (rebuilt 2026-10-02; redesigned the same day — owner: "overcrowded … not professional")
+
+**Redesign:** editorial and calm — hairlines instead of boxes, one accent. No badges on the portrait and no organisations section (the footer has the homes; the facts row has his company roles). Section headings come from the `page-copy` block (`about.*`). Skill categories are ordered by evidence.
+
 
 1. **Hero**
    - **His portrait**, large and lit. The uploaded `about` photo wins (BR-1.17); otherwise the approved portrait.

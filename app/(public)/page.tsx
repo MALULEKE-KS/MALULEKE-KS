@@ -7,6 +7,8 @@
 // lens system exists, not a placeholder pretending to be the real thing.
 
 import { Suspense } from "react";
+import { pageMetadata, SITE_NAME } from "@/lib/seo/metadata";
+import { getSiteProfile } from "@/lib/queries/site";
 import type { Metadata } from "next";
 import { getContentBlock } from "@/lib/content/blocks";
 import { plainAccent } from "@/components/shared/Accent";
@@ -25,13 +27,15 @@ export const dynamic = "force-dynamic";
 // The description search results and link previews show: the owner's own
 // introduction (the "home-intro" block), not a generic line — capped for search.
 export async function generateMetadata(): Promise<Metadata> {
-  const intro = await getContentBlock("home-intro").catch(() => null);
-  const text = intro ? plainAccent(intro.lede).replace(/\s+/g, " ").trim() : null;
-  const description = text && text.length > 160 ? `${text.slice(0, 157).replace(/\s+\S*$/, "")}…` : text;
-  return {
-    alternates: { canonical: "/" },
-    ...(description && { description, openGraph: { description }, twitter: { description } }),
-  };
+  const [intro, profile] = await Promise.all([getContentBlock("home-intro").catch(() => null), getSiteProfile().catch(() => null)]);
+  const title = profile ? `${profile.name} — ${SITE_NAME}` : SITE_NAME;
+  return pageMetadata({
+    title,
+    absoluteTitle: true,
+    description: intro ? plainAccent(intro.lede) : null,
+    path: "/",
+    imageAlt: profile?.headline ? `${profile.name} — ${profile.headline}` : title,
+  });
 }
 
 // Loading state: the hero's graphite field, already laid down, so the page

@@ -13,6 +13,7 @@ import { db } from "@/lib/db";
 // approval, but without approval to name them.
 const RUN = `sa${Date.now().toString(36)}`;
 const CLIENT_NAME = `${RUN} Hidden Client Ltd`;
+const DRAFT = `${RUN}-draft`;
 
 beforeAll(async () => {
   const org = await db.organization.create({ data: { name: CLIENT_NAME, slug: `${RUN}-client`, isClient: true } });
@@ -28,6 +29,18 @@ beforeAll(async () => {
       clientApproved: true,
       nameDisclosureApproved: false,
       contentStatus: "PUBLISHED",
+    },
+  });
+  // A draft of this suite's own (not a seeded row — real systems change state, e.g. a repo going public).
+  await db.system.create({
+    data: {
+      name: `${RUN} Draft`,
+      slug: DRAFT,
+      organizationId: org.id,
+      statusId: status.id,
+      description: "Not published.",
+      clientVisibility: "PUBLIC",
+      contentStatus: "DRAFT",
     },
   });
 });
@@ -54,8 +67,8 @@ describe("GET /api/v1/systems", () => {
 
     const slugs = body.data.map((s: { slug: string }) => s.slug);
     expect(slugs).toContain("xkimi-xa-mali");
-    // fundslink-academy is seeded as DRAFT — must never appear here (BR-1.1)
-    expect(slugs).not.toContain("fundslink-academy");
+    // A draft must never appear here (BR-1.1).
+    expect(slugs).not.toContain(DRAFT);
   });
 
   it("masks the organization name of an ANONYMIZED_ONLY client without name approval (BR-1.4)", async () => {
@@ -98,15 +111,15 @@ describe("GET /api/v1/systems/[slug]", () => {
   });
 
   it("returns a generic 404 for a draft system's slug", async () => {
-    const res = await getSystemBySlug(new NextRequest("http://localhost/api/v1/systems/fundslink-academy"), {
-      params: Promise.resolve({ slug: "fundslink-academy" }),
+    const res = await getSystemBySlug(new NextRequest(`http://localhost/api/v1/systems/${DRAFT}`), {
+      params: Promise.resolve({ slug: DRAFT }),
     });
     expect(res.status).toBe(404);
   });
 
   it("returns the identical 404 shape for a genuinely unknown slug", async () => {
-    const known = await getSystemBySlug(new NextRequest("http://localhost/api/v1/systems/fundslink-academy"), {
-      params: Promise.resolve({ slug: "fundslink-academy" }),
+    const known = await getSystemBySlug(new NextRequest(`http://localhost/api/v1/systems/${DRAFT}`), {
+      params: Promise.resolve({ slug: DRAFT }),
     });
     const unknown = await getSystemBySlug(new NextRequest("http://localhost/api/v1/systems/does-not-exist"), {
       params: Promise.resolve({ slug: "does-not-exist" }),

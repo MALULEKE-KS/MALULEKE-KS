@@ -73,6 +73,7 @@ export function ControlRoom({
           <div className="lg:col-span-5">
             <Reveal>
               <SectionHeader
+                copyKey="home.control-room"
                 icon={Activity}
                 eyebrow="Proof, not claims"
                 id="control-title"

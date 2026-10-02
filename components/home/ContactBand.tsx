@@ -5,19 +5,26 @@
 // InquiryType lookup, #99), and offers the owner's real links. Nothing invented.
 
 import Link from "next/link";
-import { ArrowRight, Clock, Mail, MessageSquareText } from "lucide-react";
+import { Accent } from "@/components/shared/Accent";
+import { sectionCopy } from "@/lib/content/copy";
+import { ArrowRight, Clock, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
-import type { InquiryTypeOption, SiteProfile } from "@/lib/queries/site";
+import type { InquiryTypeOption } from "@/lib/queries/site";
 
 interface ContactBandProps {
-  profile: SiteProfile;
   inquiryTypes: InquiryTypeOption[];
   reviewSlaHours: number;
 }
 
-export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBandProps) {
+export async function ContactBand({ inquiryTypes, reviewSlaHours }: ContactBandProps) {
+  // Words are data (the page-copy block); these are the fallbacks the seed matches.
+  const copy = await sectionCopy("home.contact", {
+    eyebrow: "Contact",
+    title: "Have something to *build*?",
+    description: "Tell me what it is. Every inquiry goes through one form, and I review each one.",
+  });
   return (
     <section aria-labelledby="contact-title" className="bg-paper overflow-x-clip py-20 md:py-28">
       <Container>
@@ -36,14 +43,12 @@ export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBa
               <div className="lg:col-span-7">
                 <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium">
                   <MessageSquareText aria-hidden="true" className="text-ember size-3.5" />
-                  Contact
+                  {copy.eyebrow}
                 </span>
                 <h2 id="contact-title" className="type-display mt-6">
-                  Have something to <em className="type-accent text-ember-gradient pr-[0.06em]">build</em>?
+                  <Accent text={copy.title ?? ""} className="type-accent text-ember-gradient pr-[0.06em]" />
                 </h2>
-                <p className="type-lede text-mist mt-6 max-w-xl">
-                  Tell me what it is. Every inquiry goes through one form, and I review each one.
-                </p>
+                {copy.description && <p className="type-lede text-mist mt-6 max-w-xl">{copy.description}</p>}
                 <p className="text-paper mt-4 inline-flex items-center gap-2 text-sm">
                   <Clock aria-hidden="true" className="text-ember size-4" />
                   Reviewed within {reviewSlaHours} hours
@@ -55,12 +60,6 @@ export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBa
                       Start a conversation
                       <ArrowRight />
                     </Link>
-                  </Button>
-                  <Button asChild variant="glass" size="lg">
-                    <a href={`mailto:${profile.email}`}>
-                      <Mail />
-                      Email instead
-                    </a>
                   </Button>
                 </div>
               </div>

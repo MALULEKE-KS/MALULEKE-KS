@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 const PAGES = SHEETS.filter((s) => s.href !== "/contact");
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
-export function MobileMenu({ links, email, reviewSlaHours, cvUrl = null }: { links: SiteLink[]; email: string | null; reviewSlaHours: number; cvUrl?: string | null }) {
+export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: SiteLink[]; reviewSlaHours: number; cvUrl?: string | null }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -181,7 +181,8 @@ export function MobileMenu({ links, email, reviewSlaHours, cvUrl = null }: { lin
                   <p className="text-mist mt-4 flex items-center justify-center gap-1.5 text-xs">
                     <Clock aria-hidden="true" className="size-3.5" /> Every inquiry is reviewed within {reviewSlaHours} hours
                   </p>
-                  <SocialLinks links={links} email={email} className="mt-5 justify-center" />
+                  {/* Public profiles only — the email and WhatsApp number live on /contact (spec WP-105). */}
+                  <SocialLinks links={links.filter((l) => !l.url.includes("wa.me"))} className="mt-5 justify-center" />
                 </motion.div>
               </motion.div>
             )}

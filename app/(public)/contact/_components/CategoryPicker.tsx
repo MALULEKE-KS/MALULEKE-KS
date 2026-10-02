@@ -23,7 +23,7 @@ function costOf(form: CategoryKey) {
   return `${questions} questions · about ${Math.max(1, Math.round(questions / 3))} min`;
 }
 
-export function CategoryPicker({ categories, fromGuide, onChoose }: { categories: InquiryTypeOption[]; fromGuide: boolean; onChoose: (key: string) => void }) {
+export function CategoryPicker({ categories, fromGuide, onChoose, title, description }: { categories: InquiryTypeOption[]; fromGuide: boolean; onChoose: (key: string) => void; title: string; description: string | null }) {
   return (
     <div>
       {fromGuide && (
@@ -32,8 +32,8 @@ export function CategoryPicker({ categories, fromGuide, onChoose }: { categories
           The AI guide drafted your message — choose what it&rsquo;s about, then read it and add your details. Nothing is sent until you press send.
         </p>
       )}
-      <h2 className="text-ink font-sans text-2xl font-semibold tracking-tight md:text-3xl">What brings you here?</h2>
-      <p className="text-slate mt-2">Pick the closest — the form asks only what that needs.</p>
+      <h2 className="text-ink font-sans text-2xl font-semibold tracking-tight md:text-3xl">{title}</h2>
+      {description && <p className="text-slate mt-2">{description}</p>}
       <ul className="mt-8 grid gap-3 sm:grid-cols-2">
         {categories.map((c, i) => {
           const form = c.form ?? "general";

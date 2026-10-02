@@ -2,6 +2,16 @@
 
 This file is loaded automatically by Claude Code at the start of every session in this repository. Do not treat anything below as optional context — it is binding for all implementation work here.
 
+## Start here — V2 is a relay (owner, 2026-10-02)
+
+V1 is finished and released. **All V2 work follows `/docs/V2-IMPROVEMENT-SPEC.md` — LOCKED.** Before any code in any session:
+
+1. Read `/docs/V2-IMPROVEMENT-SPEC.md` in full (Section 0.1 is the relay protocol).
+2. Read `/docs/improvements/TRACKER.md` — take the WP named in **Next up**, claim it (status `In progress`, date, branch) in your first commit.
+3. Read `/docs/improvements/DECISIONS.md` — the open conflicts and owner answers.
+
+Before you stop — even mid-WP — update the WP's row, append a handoff entry, move **Next up**, and log decisions, so the next session picks up exactly where you left off. `tests/unit/v2-tracker.test.ts` keeps the tracker complete. Never add scope the spec doesn't name (spec Section 2.4); never fabricate owner-supplied content.
+
 ## What this project is
 
 MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portfolio: a full-stack, database-backed system that is itself the proof of full-stack capability. See `/docs/PLATFORM-OVERVIEW-AND-RATIONALE.md` for why it's built this way.
@@ -20,7 +30,9 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/docs/PAGE-BUILD-PLAYBOOK.md` | **How every public page is built** — the owner's rules, the stages (brief → data → structure → components → copy → build → verify → document → review), the reusable toolkit, the audit checklist, pitfalls, and a sheet per page. Follow it for every page; the home page is the reference build |
 | `/docs/EVIDENCE-SPEC.md` | Evidence Density & Proof — every claim leads to honest, inspectable evidence (EV-1…EV-8) |
 | `/docs/LETS-TALK-SPEC.md` | Let's Talk — opportunity intake & management on `Inquiry` (LT-1…LT-14), V2 accountless tracking |
-| `/docs/ROADMAP-V2.md` | Every feature agreed for later (V2), with its trigger, and the update log — add to both in the same PR as the change |
+| `/docs/V2-IMPROVEMENT-SPEC.md` | **The locked V2 plan** — every work package (WP), in order, with acceptance and verification; the relay protocol (§0.1) |
+| `/docs/improvements/TRACKER.md`, `/docs/improvements/DECISIONS.md` | Where V2 stands (status per WP, Next up, handoff log) and why (decisions, conflicts, owner answers) — updated by every session |
+| `/docs/ROADMAP-V2.md` | V2 features that wait for a trigger (Part 1, reconciled with the spec in its §1.2.4), and the update log — add to both in the same PR as the change |
 | `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, migration pipeline, local dev/test databases |
 | `/docs/ENFORCEMENT-REGISTER.md` | Where every claim is actually enforced — update the row in the same PR that adds, changes or enforces a claim |
 | `/docs/BACKEND-API-GUIDE.md`, `/docs/FRONTEND-DATA-GUIDE.md` | Generated from `lib/capabilities/map.ts` (`npm run docs:capabilities`) — every database capability, its endpoints and the page that shows it. Never hand-edit |
@@ -50,11 +62,9 @@ Deliberately NOT extensible, per the constitution's own exception: `ClientVisibi
 
 ## Current phase — do not build ahead of this
 
-**V1 (Phase 0 + 1) is feature-complete and live in production** — systems catalog, CV generation (two options: generated and uploaded), unified inquiry intake, admin curation, hardened 2FA auth, activity logging, scheduled jobs and GitHub sync. See `/docs/DEPLOYMENT.md`.
+**V1 is complete and live in production (2026-10-02):** systems catalog synced from GitHub, the uploaded CV (generation switched off, code kept), Let's Talk intake and management, admin panel with 2FA, activity logging, scheduled jobs, the redesigned public site (F5c — Home, Systems, Journey, About, Let's talk) and the AI guide. See `/docs/DEPLOYMENT.md` and the update log in `/docs/ROADMAP-V2.md`.
 
-**Built locally, not yet pushed:** F5b — the admin panel (a screen for every admin capability) and the first part of F5c (data layer, header, footer). See the update log in `/docs/ROADMAP-V2.md`.
-
-**In progress (owner direction, 2026-09-30):** F5c — the page-by-page public-site redesign, home page first, and the **AI guide**: the Constitution §6 concierge as an animated character in the owner's likeness, specified in `/docs/PUBLIC-REDESIGN-PLAN.md` §3a.
+**V2 is in progress, one work package at a time:** `/docs/V2-IMPROVEMENT-SPEC.md`, tracked in `/docs/improvements/TRACKER.md` (see "Start here" above).
 
 **Still out of scope:** testimonials, public API exposure beyond `/systems` read, full analytics dashboard, and everything else in `/docs/ROADMAP-V2.md` — real and specified, but not scaffolded until its trigger.
 

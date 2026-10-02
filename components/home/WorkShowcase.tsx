@@ -12,6 +12,7 @@
 // Data: lib/queries/work.ts (public views only).
 
 import Link from "next/link";
+import { activityText } from "@/lib/rules/activity";
 import { ArrowRight, ArrowUpRight, Github, GitCommitHorizontal, Layers, Lock, Radio, Star } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
@@ -30,9 +31,9 @@ import { cn } from "@/lib/utils";
 
 type Work = SelectedWork["featured"][number];
 
+/** Recency only where it's honest — still being built, or moved lately (spec WP-108). */
 function activityLine(w: Work) {
-  const parts = [w.commitsLast4Weeks > 0 ? `${w.commitsLast4Weeks} commit${w.commitsLast4Weeks === 1 ? "" : "s"} in 4 weeks` : "Quiet this month", w.lastPush && `last push ${w.lastPush}`];
-  return parts.filter(Boolean).join(" · ");
+  return activityText(w) ?? "";
 }
 
 function hasActivity(w: Work) {
@@ -254,6 +255,7 @@ export function WorkShowcase({ featured, more, nowBuilding, totalPublished }: Se
       <Container>
         <Reveal>
           <SectionHeader
+            copyKey="home.selected-work"
             icon={Layers}
             eyebrow="Selected work"
             id="work-title"

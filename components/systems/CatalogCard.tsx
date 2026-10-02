@@ -6,6 +6,7 @@
 // the system's page. Data: lib/queries/catalog.ts.
 
 import Link from "next/link";
+import { activityText } from "@/lib/rules/activity";
 import { ArrowUpRight, BookOpenText, Lock, Star } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -17,8 +18,15 @@ import type { CatalogSystem } from "@/lib/queries/catalog";
 export function CatalogCard({ s, showHome = true }: { s: CatalogSystem; showHome?: boolean }) {
   const moving = s.weeks.some((n) => n > 0);
   return (
-    <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" spotlight="rgb(255 91 31 / 0.05)">
-      <Link href={`/systems/${s.slug}`} className="group/c flex h-full flex-col p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember md:p-6">
+    <MagicCard
+      className="shadow-soft h-full rounded-3xl"
+      surface="var(--color-sheet)"
+      spotlight="rgb(255 91 31 / 0.05)"
+    >
+      <Link
+        href={`/systems/${s.slug}`}
+        className="group/c focus-visible:outline-ember flex h-full flex-col p-5 focus-visible:outline-2 focus-visible:outline-offset-2 md:p-6"
+      >
         <span className="flex items-center justify-between gap-2">
           <StatusBadge label={s.status} colorToken={s.statusColorToken} />
           <span className="flex items-center gap-1.5">
@@ -37,9 +45,16 @@ export function CatalogCard({ s, showHome = true }: { s: CatalogSystem; showHome
 
         <span className="text-ink mt-5 flex items-center gap-1.5 text-lg font-semibold tracking-tight">
           <span className="min-w-0 truncate">{s.name}</span>
-          <ArrowUpRight aria-hidden="true" className="text-slate group-hover/c:text-accent size-4 shrink-0 transition-all group-hover/c:translate-x-0.5 group-hover/c:-translate-y-0.5" />
+          <ArrowUpRight
+            aria-hidden="true"
+            className="text-slate group-hover/c:text-accent size-4 shrink-0 transition-all group-hover/c:translate-x-0.5 group-hover/c:-translate-y-0.5"
+          />
         </span>
-        {s.description && <span className="text-slate mt-1.5 line-clamp-2 text-sm leading-relaxed">{s.description}</span>}
+        {s.description && (
+          <span className="text-slate mt-1.5 line-clamp-2 text-sm leading-relaxed">
+            {s.description}
+          </span>
+        )}
 
         {(() => {
           const facts = [
@@ -66,26 +81,27 @@ export function CatalogCard({ s, showHome = true }: { s: CatalogSystem; showHome
           </span>
         )}
 
-        <span className="border-ink/10 mt-auto flex items-center gap-3 border-t pt-4 [&:not(:first-child)]:mt-5">
-          {moving ? (
-            <>
-              <Sparkline values={s.weeks} className="w-24" />
-              <span className="text-slate flex items-center gap-1.5 text-[11px]">
-                {s.commitsLast4Weeks > 0 && (
-                  // The card's one live indicator (PAGE-BUILD-PLAYBOOK §5): commits in the last four weeks.
-                  <span aria-hidden="true" className="relative flex size-1.5">
-                    <span className="bg-ember absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:animate-none" />
-                    <span className="bg-ember relative inline-flex size-1.5 rounded-full" />
-                  </span>
-                )}
-                {s.commitsLast4Weeks > 0 ? `${s.commitsLast4Weeks} commits in 4 weeks` : "Quiet this month"}
-                {s.lastPush && ` · ${s.lastPush}`}
-              </span>
-            </>
-          ) : (
-            <span className="text-slate text-[11px]">{s.lastPush ? `Last push ${s.lastPush}` : "No recent activity"}</span>
-          )}
-        </span>
+        {(moving || activityText(s)) && (
+          <span className="border-ink/10 mt-auto flex items-center gap-3 border-t pt-4 [&:not(:first-child)]:mt-5">
+            {moving ? (
+              <>
+                <Sparkline values={s.weeks} className="w-24" />
+                <span className="text-slate flex items-center gap-1.5 text-[11px]">
+                  {s.commitsLast4Weeks > 0 && (
+                    // The card's one live indicator (PAGE-BUILD-PLAYBOOK §5): commits in the last four weeks.
+                    <span aria-hidden="true" className="relative flex size-1.5">
+                      <span className="bg-ember absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:animate-none" />
+                      <span className="bg-ember relative inline-flex size-1.5 rounded-full" />
+                    </span>
+                  )}
+                  {activityText(s)}
+                </span>
+              </>
+            ) : (
+              <span className="text-slate text-[11px]">{activityText(s)}</span>
+            )}
+          </span>
+        )}
       </Link>
     </MagicCard>
   );

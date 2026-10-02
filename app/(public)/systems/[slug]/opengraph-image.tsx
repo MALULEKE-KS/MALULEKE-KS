@@ -6,9 +6,13 @@
 import { renderOgCard, OG_SIZE } from "@/lib/og";
 import { getPublicSystemBySlug } from "@/lib/queries/systems";
 
-export const alt = "A system on MALULEKE-KS";
-export const size = OG_SIZE;
-export const contentType = "image/png";
+// One image per system, with alt text that says which system it is (spec
+// WP-101 — not a generic "A system on …"). Served at …/opengraph-image/card.
+export async function generateImageMetadata({ params }: { params: { slug: string } }) {
+  const system = await getPublicSystemBySlug(params.slug);
+  const alt = system ? `${system.name} — ${system.description}`.slice(0, 200) : "The systems — MALULEKE-KS";
+  return [{ id: "card", alt, size: OG_SIZE, contentType: "image/png" }];
+}
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

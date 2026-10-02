@@ -9,7 +9,7 @@ import { cache } from "react";
 import { z } from "zod";
 import { dbPublic } from "@/lib/db";
 import { EvidenceBlock } from "@/lib/evidence/schema";
-import { JourneyBlock } from "@/lib/content/json-blocks";
+import { JourneyBlock, PageCopyBlock } from "@/lib/content/json-blocks";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 
@@ -60,6 +60,26 @@ export const CONTENT_BLOCKS = {
     title: "Evidence — claims and their proof",
     description: "The claims the site makes and the evidence a visitor can open for each (docs/EVIDENCE-SPEC.md). Links: repo:<path>, /public-route or actions:<workflow>.yml.",
     schema: EvidenceBlock,
+  },
+  "page-copy": {
+    title: "Section copy — every page's headings and introductions",
+    description: "The eyebrow, title and description of each section on every page, keyed by page.section (e.g. home.map, about.skills). *Word* marks the accent; {reviewSlaHours} and {owner} are filled in for you. Buttons and form labels aren't here.",
+    schema: PageCopyBlock,
+  },
+  release: {
+    title: "Release — the version the site is on",
+    description: "The status line at the foot of every page says which version the site is on and what's next (e.g. \"V1 · V2 on the way\"). The AI guide knows it too.",
+    schema: z.object({
+      current: Text(20),
+      next: z.string().trim().max(20).default(""),
+      nextNote: z.string().trim().max(60).default(""),
+      link: z
+        .string()
+        .trim()
+        .max(120)
+        .regex(/^(\/[a-z0-9\-/#]*)?$/, "a site path such as /systems/maluleke-ks, or empty")
+        .default(""),
+    }),
   },
   journey: {
     title: "Journey — your story in chapters",

@@ -17,14 +17,31 @@ import { SocialLinks } from "@/components/shared/SocialLinks";
 import { getInquiryTypes, getRetentionMonths, getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
 import { getPublicPhotos } from "@/lib/queries/profile";
 import { getSetting } from "@/lib/settings";
+import { Accent } from "@/components/shared/Accent";
+import { sectionCopy } from "@/lib/content/copy";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { LetsTalk } from "./_components/LetsTalk";
 
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Let's talk",
-  description: "Hiring, a project, a collaboration or just a question — tell me what brings you here and the form asks only what that needs.",
-  alternates: { canonical: "/contact" },
+// Words are data (the page-copy block); these are the fallbacks the seed matches.
+const HERO = {
+  eyebrow: "Let's talk",
+  title: "Let's *talk.*",
+  description: "Hiring, a project, a collaboration, or a question — tell me what brings you here, and the form asks only what that needs.",
 };
+const STEPS = {
+  items: [
+    { title: "You choose", body: "What it's about — the form adapts." },
+    { title: "You send", body: "And get a reference, right away." },
+    { title: "Reviewed within {reviewSlaHours} h", body: "{owner} reads it himself." },
+    { title: "You hear back", body: "The way you said you prefer." },
+  ],
+};
+
+export async function generateMetadata() {
+  const hero = await sectionCopy("contact.hero", HERO);
+  return pageMetadata({ title: "Let's talk", description: hero.description, path: "/contact", imageAlt: "Let's talk — MALULEKE-KS" });
+}
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ about?: string }> }) {
   const [{ about }, profile, photos, categories, reviewSlaHours, retentionMonths, maxFiles, maxMegabytes] = await Promise.all([
@@ -38,15 +55,21 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
     getSetting("inquiry.documents.maxMegabytes"),
   ]);
   const first = profile.name.split(" ")[0] ?? profile.name;
+  const vars = { reviewSlaHours, owner: first };
+  const [hero, stepsCopy, picker, emailCard, detailsCard] = await Promise.all([
+    sectionCopy("contact.hero", HERO, vars),
+    sectionCopy("contact.steps", STEPS, vars),
+    sectionCopy("contact.picker", { title: "What brings you here?", description: "Pick the closest — the form asks only what that needs." }, vars),
+    sectionCopy("contact.email", { title: "Prefer email?" }, vars),
+    sectionCopy("contact.details", {
+      title: "Your details",
+      description: "No account, no password. What you send is kept for {retentionMonths} months, then anonymised automatically — attachments deleted.",
+    }, { ...vars, retentionMonths }),
+  ]);
   // His uploaded About photo (BR-1.17), else the portrait he approved.
   const face = photos.about ?? { url: "/character/about-portrait.webp", alt: `Portrait of ${profile.name}` };
 
-  const steps = [
-    { title: "You choose", body: "What it's about — the form adapts." },
-    { title: "You send", body: "And get a reference, right away." },
-    { title: `Reviewed within ${reviewSlaHours} h`, body: `${first} reads it himself.` },
-    { title: "You hear back", body: "The way you said you prefer." },
-  ];
+  const steps = stepsCopy.items ?? [];
 
   return (
     <>
@@ -57,12 +80,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             <div className="min-w-0 lg:col-span-7">
               <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
                 <MessageSquareText aria-hidden="true" className="text-ember size-3.5" />
-                Let&rsquo;s talk
+                {hero.eyebrow}
               </span>
               <h1 id="talk-title" className="type-display mt-6">
-                Let&rsquo;s <span className="type-accent text-ember-gradient pr-[0.06em]">talk.</span>
+                <Accent text={hero.title ?? ""} className="type-accent text-ember-gradient pr-[0.06em]" />
               </h1>
-              <p className="type-lede text-mist mt-5 max-w-xl">Hiring, a project, a collaboration, or a question — tell me what brings you here, and the form asks only what that needs.</p>
+              {hero.description && <p className="type-lede text-mist mt-5 max-w-xl">{hero.description}</p>}
             </div>
             <div className="min-w-0 lg:col-span-5">
               <div className="flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
@@ -88,7 +111,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
               <li key={s.title} className="relative md:text-center">
                 <span className={`relative mx-0 grid size-8 place-items-center rounded-full font-mono text-xs font-semibold md:mx-auto ${i === 0 ? "bg-ember text-ink shadow-glow-ember" : "bg-night border border-white/20 text-paper"}`}>{String(i + 1).padStart(2, "0")}</span>
                 <span className="mt-3 block text-sm font-semibold">{s.title}</span>
-                <span className="text-mist mt-0.5 hidden text-sm sm:block">{s.body}</span>
+                {s.body && <span className="text-mist mt-0.5 hidden text-sm sm:block">{s.body}</span>}
               </li>
             ))}
           </ol>
@@ -105,12 +128,13 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             reviewSlaHours={reviewSlaHours}
             retentionMonths={retentionMonths}
             documents={{ maxFiles, maxMegabytes }}
+            picker={{ title: picker.title ?? "", description: picker.description ?? null }}
             aside={
               <>
                 <div className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-6">
                   <p className="flex items-center gap-2">
                     <Mail aria-hidden="true" className="text-accent size-5" />
-                    <span className="text-ink font-sans text-base font-semibold">Prefer email?</span>
+                    <span className="text-ink font-sans text-base font-semibold">{emailCard.title}</span>
                   </p>
                   <a href={`mailto:${profile.email}`} className="text-accent mt-3 inline-block text-sm font-medium break-all underline underline-offset-4">
                     {profile.email}
@@ -120,11 +144,9 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
                 <div className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-6">
                   <p className="flex items-center gap-2">
                     <ShieldCheck aria-hidden="true" className="text-signal-finished size-5" />
-                    <span className="text-ink font-sans text-base font-semibold">Your details</span>
+                    <span className="text-ink font-sans text-base font-semibold">{detailsCard.title}</span>
                   </p>
-                  <p className="text-slate mt-3 text-sm leading-relaxed">
-                    No account, no password. What you send is kept for {retentionMonths} months, then anonymised automatically — attachments deleted.
-                  </p>
+                  {detailsCard.description && <p className="text-slate mt-3 text-sm leading-relaxed">{detailsCard.description}</p>}
                 </div>
               </>
             }
