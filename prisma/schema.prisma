@@ -418,6 +418,8 @@ model Timeline {
   title           String
   description     String?
   date            DateTime      @db.Timestamptz(3)
+  // How much of the date is known: day | month | year — readers show only that much.
+  datePrecision   String        @default("day")
   media           String?
   tags            String[]
   // Only PUBLISHED entries are public. Auto-drafted entries start as DRAFT
@@ -1129,6 +1131,7 @@ view PublicTimeline {
   autoDrafted        Boolean
   systemId           String?
   systemSlug         String?
+  datePrecision      String
 }
 
 view PublicEducation {

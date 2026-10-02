@@ -17,6 +17,7 @@ import { Reveal } from "@/components/shared/Reveal";
 import { getJourney, type JourneyEvent, type JourneyKind } from "@/lib/queries/journey";
 import { dbPublic } from "@/lib/db";
 import { cn } from "@/lib/utils";
+import { formatMilestoneDate } from "@/lib/rules/timeline";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -33,7 +34,6 @@ const CHIP = (on: boolean) =>
     on ? "border-ink bg-ink text-paper" : "border-ink/15 bg-sheet text-ink hover:border-ink/35",
   );
 
-const day = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
 function Entry({ e, i }: { e: JourneyEvent; i: number }) {
   const Icon = ICON[e.kind];
@@ -54,7 +54,7 @@ function Entry({ e, i }: { e: JourneyEvent; i: number }) {
         <article className={cn("rounded-2xl border p-5 transition-shadow target:ring-2 target:ring-ember sm:p-6", e.ahead ? "border-ink/15 border-dashed bg-transparent" : "border-ink/10 bg-sheet shadow-soft")}>
           <div className="flex flex-wrap items-center gap-2.5">
             <time dateTime={e.date.toISOString().slice(0, 10)} className="text-slate font-mono text-xs">
-              {day(e.date)}
+              {formatMilestoneDate(e.date, e.precision, "short")}
             </time>
             <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", e.kind === "shipped" ? "bg-ember/15 text-accent" : "bg-ink/[0.06] text-slate")}>{e.label}</span>
           </div>
