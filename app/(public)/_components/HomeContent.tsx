@@ -27,7 +27,7 @@ import { FLAGS, getFlags } from "@/lib/flags";
 import { getSetting } from "@/lib/settings";
 import { guideProviderConfigured } from "@/lib/guide/model";
 import { AiGuideSection } from "@/components/home/AiGuideSection";
-import { isAnyCvOffered } from "@/lib/cv/options";
+import { getUploadedCvLink } from "@/lib/cv/options";
 import { dbPublic } from "@/lib/db";
 import {
   countPublishedSystems,
@@ -48,7 +48,7 @@ export async function HomeContent() {
     flags,
     intro,
     aiGuide,
-    hasCv,
+    cv,
     githubRepos,
     systemMap,
     pulse,
@@ -65,7 +65,7 @@ export async function HomeContent() {
     getFlags(),
     getContentBlock("home-intro"),
     getContentBlock("ai-guide"),
-    isAnyCvOffered(),
+    getUploadedCvLink(),
     dbPublic.publicGithubRepo.count(),
     getSystemMap(),
     getPlatformPulse(),
@@ -111,7 +111,7 @@ export async function HomeContent() {
         profile={profile}
         titles={titles}
         intro={intro}
-        hasCv={hasCv}
+        cvUrl={cv?.url ?? null}
       />
       {guideEnabled && aiGuide && (
         <AiGuideSection

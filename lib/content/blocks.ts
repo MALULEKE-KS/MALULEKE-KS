@@ -9,6 +9,7 @@ import { cache } from "react";
 import { z } from "zod";
 import { dbPublic } from "@/lib/db";
 import { EvidenceBlock } from "@/lib/evidence/schema";
+import { JourneyBlock } from "@/lib/content/json-blocks";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 
@@ -54,6 +55,11 @@ export const CONTENT_BLOCKS = {
     title: "Evidence — claims and their proof",
     description: "The claims the site makes and the evidence a visitor can open for each (docs/EVIDENCE-SPEC.md). Links: repo:<path>, /public-route or actions:<workflow>.yml.",
     schema: EvidenceBlock,
+  },
+  journey: {
+    title: "Journey — your story in chapters",
+    description: "The /journey page: headline, introduction, the chapters of your life and career (years, place, a paragraph each) and what's next. Milestones inside each chapter come from Admin → Journey. Set reviewed to true once you've read the draft.",
+    schema: JourneyBlock,
   },
 } as const;
 

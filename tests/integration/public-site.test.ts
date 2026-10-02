@@ -92,7 +92,9 @@ describe("launch surfaces show only what a visitor may see (#101)", () => {
     const urls = (await sitemap()).map((e) => e.url);
     expect(urls.some((u) => u.endsWith(`/systems/${RUN}-live`))).toBe(true);
     expect(urls.some((u) => u.endsWith(`/systems/${RUN}-draft`))).toBe(false);
-    expect(urls.some((u) => u.endsWith("/cv"))).toBe(true);
+    // The pages that remain (owner, 2026-10-02): no /cv, no /method — both redirect.
+    expect(urls.some((u) => u.endsWith("/about"))).toBe(true);
+    expect(urls.some((u) => u.endsWith("/cv") || u.endsWith("/method"))).toBe(false);
   });
 
   it("robots keeps the admin and the API out of indexes", () => {

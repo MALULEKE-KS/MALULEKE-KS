@@ -35,11 +35,11 @@ interface HomeHeroProps {
   profile: SiteProfile;
   titles: { kind: string; label: string; detail: string | null }[];
   intro: { headline: string; lede: string } | null;
-  /** Whether a CV is offered (PublicCvOption) — the second button, else the method. */
-  hasCv: boolean;
+  /** The owner's uploaded CV while it's switched on — the second button; else how he builds. */
+  cvUrl: string | null;
 }
 
-export function HomeHero({ stats, profile, titles, intro, hasCv }: HomeHeroProps) {
+export function HomeHero({ stats, profile, titles, intro, cvUrl }: HomeHeroProps) {
   // The ledger is computed per request, so "as of" is literally now.
   const asOf = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   // Until the block is written, the profile's own headline stands in.
@@ -95,13 +95,13 @@ export function HomeHero({ stats, profile, titles, intro, hasCv }: HomeHeroProps
                 section below — so the second button is the other thing visitors come
                 for: the CV (or, if none is offered, how the work is done). */}
             <Button asChild variant="glass" size="lg" className="w-full sm:w-auto">
-              {hasCv ? (
-                <Link href="/cv">
+              {cvUrl ? (
+                <a href={cvUrl}>
                   <FileText />
                   Get my CV
-                </Link>
+                </a>
               ) : (
-                <Link href="/method">
+                <Link href="/about#method">
                   <Workflow />
                   How I build
                 </Link>

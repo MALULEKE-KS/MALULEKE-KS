@@ -97,7 +97,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   if (links.length) out.push(`Profiles: ${links.filter((l) => !l.url.includes("wa.me")).map((l) => `${l.label} ${l.url}`).join("; ")}`);
 
   if (method) {
-    section("Mission and method", "/method");
+    section("Mission and method", "/about#method");
     out.push(`Mission: ${method.mission}`);
     for (const p of method.principles) out.push(`- ${p.name}: ${p.summary} ${p.body}`);
   }
@@ -182,7 +182,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   }
 
   if (skills.length) {
-    section("Skills, with the evidence for each", "/cv");
+    section("Skills, with the evidence for each", "/about#skills");
     for (const s of skills) {
       const evidence = list([
         s.systemCount ? `${s.systemCount} system${s.systemCount === 1 ? "" : "s"} (${s.systemSlugs.join(", ")})` : null,

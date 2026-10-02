@@ -97,7 +97,7 @@ export async function POST(request: Request) {
           kind: r.kind,
           title: r.title,
           subtitle: r.subtitle,
-          path: r.kind === "system" ? `/systems/${r.key}` : r.kind === "journey" ? "/journey" : "/cv",
+          path: r.kind === "system" ? `/systems/${r.key}` : r.kind === "journey" ? "/journey" : "/about#skills",
         })),
     };
   }

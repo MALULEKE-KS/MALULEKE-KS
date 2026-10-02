@@ -44,7 +44,7 @@ export function PrinciplesBand({
             eyebrow="The method"
             id="principles-title"
             title={<Accent text="How I *build.*" className="type-accent text-ember-gradient pr-[0.06em]" />}
-            action={{ href: "/method", label: "The full method" }}
+            action={{ href: "/about#method", label: "The full method" }}
             className="mb-8 md:mb-10"
           />
         </Reveal>

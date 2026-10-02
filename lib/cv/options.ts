@@ -63,3 +63,15 @@ export async function getPublicCvOptions() {
           },
     );
 }
+
+/**
+ * The owner's uploaded CV, when he has switched it on (owner, 2026-10-02: the
+ * CV is his own file, shown only while that option is on — no CV page, no
+ * generated CV). PDF first. Null hides every CV button on the site.
+ */
+export async function getUploadedCvLink(): Promise<{ url: string; format: string } | null> {
+  const uploaded = (await getPublicCvOptions()).find((o) => o.kind === "uploaded");
+  if (!uploaded || uploaded.kind !== "uploaded") return null;
+  const file = uploaded.files.find((f) => f.format === "pdf") ?? uploaded.files[0];
+  return file ? { url: file.url, format: file.format } : null;
+}

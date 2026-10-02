@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
 import { CONTENT_BLOCKS, type ContentKey } from "@/lib/content/blocks";
 import { HowIBuildEditor } from "./_components/HowIBuildEditor";
 import { FieldsBlockEditor, type BlockField } from "./_components/FieldsBlockEditor";
-import { EvidenceEditor } from "./_components/EvidenceEditor";
+import { JsonBlockEditor } from "./_components/JsonBlockEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,7 @@ export default async function AdminContentPage() {
   const howIBuild = byKey.get("how-i-build");
   const parsed = CONTENT_BLOCKS["how-i-build"].schema.safeParse(howIBuild?.body);
   const evidence = byKey.get("evidence");
+  const journey = byKey.get("journey");
 
   return (
     <>
@@ -63,7 +64,20 @@ export default async function AdminContentPage() {
           <HowIBuildEditor key={howIBuild?.updatedAt.toISOString() ?? "new"} initial={parsed.success ? parsed.data : null} />
         </Panel>
         <Panel title={CONTENT_BLOCKS.evidence.title} description={`${CONTENT_BLOCKS.evidence.description} Last changed ${formatWhen(evidence?.updatedAt)}.`}>
-          <EvidenceEditor key={evidence?.updatedAt.toISOString() ?? "new"} initial={evidence?.body ?? null} />
+          <JsonBlockEditor
+            blockKey="evidence"
+            key={evidence?.updatedAt.toISOString() ?? "new"}
+            initial={evidence?.body ?? null}
+            hint="Each claim: id, claim, where (principle:<name>, pulse:<key> or system:<slug>), status (verified, partial, planned), proves, doesNotProve, 1–6 evidence links, reviewedAt (YYYY-MM-DD). Links: repo:<path>, /public-route or actions:<workflow>.yml. A verified claim shows “Review due” on its own once its review is older than the evidence.reviewDays setting."
+          />
+        </Panel>
+        <Panel title={CONTENT_BLOCKS.journey.title} description={`${CONTENT_BLOCKS.journey.description} Last changed ${formatWhen(journey?.updatedAt)}.`}>
+          <JsonBlockEditor
+            blockKey="journey"
+            key={journey?.updatedAt.toISOString() ?? "new"}
+            initial={journey?.body ?? null}
+            hint="headline (≤160, *word* for the accent), lede, chapters: id, from (year), to (year or null for ongoing), title, place (optional), body (≤1200) — then ahead: title, body. Drafted from your CV and your answers: read it, change anything, then set reviewed to true."
+          />
         </Panel>
       </div>
     </>
