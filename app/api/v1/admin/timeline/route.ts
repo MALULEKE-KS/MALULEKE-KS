@@ -34,6 +34,7 @@ export const POST = withAdmin(async (request, { write }) => {
       title: parsed.data.title,
       description: parsed.data.description ?? null,
       date: new Date(parsed.data.date),
+      ...(parsed.data.datePrecision && { datePrecision: parsed.data.datePrecision }),
       media: parsed.data.media ?? null,
       tags: parsed.data.tags,
       contentStatus: CONTENT_STATUS_FROM_WIRE[parsed.data.contentStatus ?? "published"],

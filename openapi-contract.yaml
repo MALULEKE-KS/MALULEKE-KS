@@ -2018,6 +2018,7 @@ components:
         title: { type: string }
         description: { type: string, nullable: true }
         date: { type: string, format: date }
+        datePrecision: { type: string, enum: [day, month, year], description: "How much of the date is known — show only that much (a month or year is stored as its first day)" }
         tags: { type: array, items: { type: string } }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Public reads return published entries only" }
         publishAt: { type: string, format: date-time, nullable: true, description: "BR-1.13 — admin responses only. When published content goes live; null = as soon as published" }
@@ -2032,6 +2033,7 @@ components:
         title: { type: string, minLength: 1 }
         description: { type: string, nullable: true }
         date: { type: string, format: date }
+        datePrecision: { type: string, enum: [day, month, year], description: "Omitted: day on create, unchanged on update" }
         media: { type: string, nullable: true }
         tags: { type: array, items: { type: string }, default: [] }
         contentStatus: { type: string, enum: [draft, published, archived], description: "Omitted on create = published; omitted on update = unchanged. Publishing an auto-drafted entry approves it." }

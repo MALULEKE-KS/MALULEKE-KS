@@ -22,6 +22,7 @@ import { getSkillEvidence } from "@/lib/queries/evidence";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getReviewSlaHours } from "@/lib/queries/site";
 import { SHEETS } from "@/lib/content/sheets";
+import { formatMilestoneDate } from "@/lib/rules/timeline";
 
 /** Rough token estimate — about four characters a token for English prose. */
 export const estimateTokens = (text: string) => Math.ceil(text.length / 4);
@@ -194,7 +195,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
 
   if (timeline.length) {
     section("Journey — latest milestones", "/journey");
-    for (const t of timeline) out.push(`- ${day(t.date)} · ${t.milestoneTypeLabel}: ${t.title}${t.description ? ` — ${t.description}` : ""}`);
+    for (const t of timeline) out.push(`- ${formatMilestoneDate(t.date, t.datePrecision)} · ${t.milestoneTypeLabel}: ${t.title}${t.description ? ` — ${t.description}` : ""}`);
   }
 
   if (metrics.length) {

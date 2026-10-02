@@ -22,6 +22,7 @@ interface TimelineEntry {
   title: string;
   description: string | null;
   date: string;
+  datePrecision: "day" | "month" | "year";
   tags: string[];
   contentStatus: ContentStatus;
   autoDrafted: boolean;
@@ -80,7 +81,7 @@ export function TimelineManager({ now, entries, milestoneTypes }: { now: number;
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">{entry.title}</p>
           <p className="mt-0.5 text-xs text-slate">
-            {typeLabel(entry.milestoneType)} · {entry.date}
+            {typeLabel(entry.milestoneType)} · {entry.datePrecision === "year" ? entry.date.slice(0, 4) : entry.datePrecision === "month" ? entry.date.slice(0, 7) : entry.date}
             {entry.autoDrafted && " · drafted by the sync"}
           </p>
           {entry.description && <p className="mt-1 line-clamp-2 text-sm text-slate">{entry.description}</p>}
@@ -137,6 +138,7 @@ function wireFrom(entry: TimelineEntry, types: MilestoneType[]) {
     title: entry.title,
     description: entry.description,
     date: entry.date,
+    datePrecision: entry.datePrecision,
     tags: entry.tags,
   };
 }
@@ -146,6 +148,8 @@ function TimelineForm({ entry, milestoneTypes, onDone, onCancel }: { entry?: Tim
   const [title, setTitle] = useState(entry?.title ?? "");
   const [description, setDescription] = useState(entry?.description ?? "");
   const [date, setDate] = useState(entry?.date ?? "");
+  // How much of the date is known — the site shows only that much (never an invented day).
+  const [precision, setPrecision] = useState<"day" | "month" | "year">(entry?.datePrecision ?? "day");
   const [tags, setTags] = useState(entry?.tags.join(", ") ?? "");
   const [contentStatus, setContentStatus] = useState<ContentStatus>(entry?.contentStatus ?? "published");
   const [publishAt, setPublishAt] = useState(toLocalInput(entry?.publishAt));
@@ -162,7 +166,9 @@ function TimelineForm({ entry, milestoneTypes, onDone, onCancel }: { entry?: Tim
         milestoneTypeId,
         title: title.trim(),
         description: description.trim() || null,
-        date,
+        // A month or a year is stored as its first day.
+        date: precision === "year" ? `${date.slice(0, 4)}-01-01` : precision === "month" ? `${date.slice(0, 7)}-01` : date,
+        datePrecision: precision,
         tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
         contentStatus,
         ...(contentStatus === "published" ? { publishAt: fromLocalInput(publishAt) } : {}),
@@ -184,7 +190,15 @@ function TimelineForm({ entry, milestoneTypes, onDone, onCancel }: { entry?: Tim
         </div>
         <div>
           <label htmlFor="t-date" className={adminLabel}>Date</label>
-          <input id="t-date" type="date" className={adminInput} value={date} onChange={(e) => setDate(e.target.value)} />
+          <div className="flex gap-2">
+            <input id="t-date" type="date" className={adminInput} value={date} onChange={(e) => setDate(e.target.value)} />
+            <label htmlFor="t-precision" className="sr-only">Known to</label>
+            <select id="t-precision" className={`${adminInput} w-auto`} value={precision} onChange={(e) => setPrecision(e.target.value as "day" | "month" | "year")}>
+              <option value="day">Exact day</option>
+              <option value="month">Month only</option>
+              <option value="year">Year only</option>
+            </select>
+          </div>
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="t-title" className={adminLabel}>Title</label>

@@ -21,6 +21,8 @@ export type JourneyKind = "milestone" | "role" | "study" | "achievement" | "ship
 export interface JourneyEvent {
   id: string; // stable anchor: #entry-<id> (instant search links here)
   date: Date;
+  /** How much of the date is known — milestones can be month- or year-only; derived facts are exact. */
+  precision: "day" | "month" | "year";
   kind: JourneyKind;
   /** The milestone type for milestones (a lookup), otherwise the kind's own label. */
   label: string;
@@ -60,6 +62,7 @@ export const getJourney = cache(async () => {
     events.push({
       id: t.id,
       date: t.date,
+      precision: (t.datePrecision as JourneyEvent["precision"]) ?? "day",
       kind: "milestone",
       label: t.milestoneTypeLabel,
       filter: t.milestoneType,
@@ -72,21 +75,22 @@ export const getJourney = cache(async () => {
   }
 
   for (const e of experience) {
-    events.push({ id: `role-${e.id}`, date: e.startDate, kind: "role", label: KIND_LABEL.role, filter: "role", title: `${e.title}, ${e.organization}`, detail: e.description, tags: e.skills.slice(0, 6), href: null, ahead: false });
+    events.push({ precision: "day", id: `role-${e.id}`, date: e.startDate, kind: "role", label: KIND_LABEL.role, filter: "role", title: `${e.title}, ${e.organization}`, detail: e.description, tags: e.skills.slice(0, 6), href: null, ahead: false });
     if (e.endDate && e.endDate <= now) {
-      events.push({ id: `role-end-${e.id}`, date: e.endDate, kind: "role", label: KIND_LABEL.role, filter: "role", title: `Moved on from ${e.organization}`, detail: null, tags: [], href: null, ahead: false });
+      events.push({ precision: "day", id: `role-end-${e.id}`, date: e.endDate, kind: "role", label: KIND_LABEL.role, filter: "role", title: `Moved on from ${e.organization}`, detail: null, tags: [], href: null, ahead: false });
     }
   }
 
   for (const ed of education) {
     const what = ed.fieldOfStudy ? `${ed.qualification} — ${ed.fieldOfStudy}` : ed.qualification;
-    events.push({ id: `study-${ed.id}`, date: ed.startDate, kind: "study", label: KIND_LABEL.study, filter: "study", title: `Began ${what}, ${ed.institution}`, detail: ed.description, tags: ed.skills.slice(0, 6), href: null, ahead: false });
+    events.push({ precision: "day", id: `study-${ed.id}`, date: ed.startDate, kind: "study", label: KIND_LABEL.study, filter: "study", title: `Began ${what}, ${ed.institution}`, detail: ed.description, tags: ed.skills.slice(0, 6), href: null, ahead: false });
     const end = ed.endDate ?? ed.expectedGraduation;
     if (end) {
       const ahead = end > now;
       events.push({
         id: `study-end-${ed.id}`,
         date: end,
+        precision: "day",
         kind: "study",
         label: ahead ? "Expected" : KIND_LABEL.study,
         filter: "study",
@@ -100,7 +104,7 @@ export const getJourney = cache(async () => {
   }
 
   for (const a of achievements) {
-    events.push({ id: `achievement-${a.id}`, date: a.achievedOn, kind: "achievement", label: KIND_LABEL.achievement, filter: "achievement", title: a.issuer ? `${a.title} — ${a.issuer}` : a.title, detail: a.description, tags: [], href: a.systemSlug ? `/systems/${a.systemSlug}` : a.url, ahead: false });
+    events.push({ precision: "day", id: `achievement-${a.id}`, date: a.achievedOn, kind: "achievement", label: KIND_LABEL.achievement, filter: "achievement", title: a.issuer ? `${a.title} — ${a.issuer}` : a.title, detail: a.description, tags: [], href: a.systemSlug ? `/systems/${a.systemSlug}` : a.url, ahead: false });
   }
 
   // A system the owner already wrote a milestone for (BR-1.x auto-drafted first ship) isn't announced twice.
@@ -109,12 +113,12 @@ export const getJourney = cache(async () => {
   for (const p of pace) {
     const s = systems.find((x) => x.id === p.systemId);
     if (!s || !p.shippedAt || told.has(s.slug)) continue;
-    events.push({ id: `shipped-${s.slug}`, date: p.shippedAt, kind: "shipped", label: KIND_LABEL.shipped, filter: "shipped", title: `Shipped ${s.name}`, detail: null, tags: [], href: `/systems/${s.slug}`, ahead: false });
+    events.push({ precision: "day", id: `shipped-${s.slug}`, date: p.shippedAt, kind: "shipped", label: KIND_LABEL.shipped, filter: "shipped", title: `Shipped ${s.name}`, detail: null, tags: [], href: `/systems/${s.slug}`, ahead: false });
   }
   for (const r of repos) {
     const s = r.slug ? bySlug.get(r.slug) : undefined;
     if (!s || !r.createdAt) continue;
-    events.push({ id: `started-${s.slug}`, date: r.createdAt, kind: "started", label: KIND_LABEL.started, filter: "started", title: `Started ${s.name}`, detail: null, tags: [], href: `/systems/${s.slug}`, ahead: false });
+    events.push({ precision: "day", id: `started-${s.slug}`, date: r.createdAt, kind: "started", label: KIND_LABEL.started, filter: "started", title: `Started ${s.name}`, detail: null, tags: [], href: `/systems/${s.slug}`, ahead: false });
   }
 
   events.sort((a, b) => b.date.getTime() - a.date.getTime() || a.title.localeCompare(b.title));

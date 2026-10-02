@@ -29,6 +29,7 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
         title: parsed.data.title,
         description: parsed.data.description ?? null,
         date: new Date(parsed.data.date),
+        ...(parsed.data.datePrecision && { datePrecision: parsed.data.datePrecision }),
         media: parsed.data.media ?? null,
         tags: parsed.data.tags,
         // Approving an auto-drafted entry is publishing it (#70).

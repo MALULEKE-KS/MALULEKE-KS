@@ -421,6 +421,8 @@ export const TimelineEntrySchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
   date: z.string().date(),
+  // How much of the date is known; show only that much (day | month | year).
+  datePrecision: z.enum(["day", "month", "year"]),
   tags: z.array(z.string()),
   // #70 — only published entries are public; auto-drafted ones await approval.
   contentStatus: ContentStatusEnum,
@@ -476,6 +478,8 @@ export const TimelineCreateInputSchema = z.object({
   title: z.string().min(1),
   description: z.string().nullable().optional(),
   date: z.string().date(),
+  // Omitted = day on create, unchanged on update. A year or month stores its first day.
+  datePrecision: z.enum(["day", "month", "year"]).optional(),
   media: z.string().nullable().optional(),
   tags: z.array(z.string()).default([]),
   // Omitted on create = published (an entry the admin writes is ready);
