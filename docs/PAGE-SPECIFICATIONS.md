@@ -79,7 +79,7 @@ Single vertical log, not a generic icon-and-card timeline component — visually
 ### `/about`
 
 1. First-person narrative (`Profile.bio`) — voice per Design System/Overview §voice-and-tone.
-2. **The owner's photo** — the current `about` photo (`GET /profile` → `photos.about`, uploaded in Admin → Profile → Photos, BR-1.17); nothing rendered when none is set.
+2. **The owner's photo** — the current `about` photo (`GET /profile` → `photos.about`, uploaded in Admin → Profile → Photos, BR-1.17); until one is uploaded, the portrait the owner approved for this page (`design/character/about-portrait-graphite.png`, web copy `public/character/about-portrait.webp`). An upload always wins.
 3. **Titles and qualifications** — every current `ProfileTitle` (e.g. "Software & AI Engineer", "Final-year BSc Computer Science & Mathematics student · North-West University"), in the owner's order.
 4. Organizational affiliations — KSDRILL-SA, GrowthCore, brief, not a repeated systems list.
 5. Pointers to `/journey` and `/method` for anyone wanting depth.

@@ -2,9 +2,10 @@
 // /about — the person behind the work (PAGE-SPECIFICATIONS "/about";
 // PAGE-BUILD-PLAYBOOK §9). Its own idea, in the site's family: a portrait
 // page. The hero carries the name, headline and every current title
-// (ProfileTitle, in the owner's order). Then a frame — the owner's About photo
-// when one is uploaded (BR-1.17), otherwise the K-S Cube standing in, never a
-// stock image — with a few plain facts from the profile; beside it the
+// (ProfileTitle, in the owner's order). Then a frame — the owner's uploaded
+// About photo (BR-1.17), otherwise the portrait he approved for this page
+// (design/character/about-portrait-graphite.png), never a stock image — with
+// a few plain facts from the profile; beside it the
 // first-person story (Profile.bio, paragraphs on blank lines, the first one
 // set larger), and the organisations, each with his role and the systems it
 // holds. Every word is data; nothing about the owner lives in this file.
@@ -15,7 +16,6 @@ import { ArrowRight, ArrowUpRight, BookOpen, Building2, Compass, UserRound } fro
 import { Container } from "@/components/shared/Container";
 import { PageHero } from "@/components/shared/PageHero";
 import { Reveal } from "@/components/shared/Reveal";
-import { CubeMark } from "@/components/shared/BrandMark";
 import { getSiteProfile } from "@/lib/queries/site";
 import { getPublicHomes, getPublicPhotos, getPublicTitles } from "@/lib/queries/profile";
 import { dbPublic } from "@/lib/db";
@@ -40,7 +40,9 @@ export default async function AboutPage() {
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
-  const photo = photos.about;
+  // The owner's uploaded About photo wins (BR-1.17); until there is one, the
+  // portrait he approved for this page (design/character/, 2026-09-30).
+  const photo = photos.about ?? { url: "/character/about-portrait.webp", alt: `Portrait of ${profile.name}`, width: 900, height: 1207 };
   const subtitle = [profile.headline, profile.location && `based in ${profile.location}`].filter(Boolean).join(", ");
   const facts = [
     profile.location && { label: "Based in", value: profile.location },
@@ -70,13 +72,7 @@ export default async function AboutPage() {
           <div className="min-w-0 lg:col-span-5">
             <Reveal className="lg:sticky lg:top-28">
               <figure className="bg-night shadow-lift relative overflow-hidden rounded-3xl border border-white/10">
-                {photo ? (
-                  <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="h-auto w-full" priority />
-                ) : (
-                  <div className="grid aspect-[4/5] place-items-center bg-[radial-gradient(60%_50%_at_50%_40%,rgb(255_91_31/0.14),transparent)]">
-                    <CubeMark className="size-40 sm:size-48" />
-                  </div>
-                )}
+                <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="h-auto w-full" priority />
               </figure>
               {facts.length > 0 && (
                 <dl className="border-ink/10 bg-sheet shadow-soft mt-5 divide-y divide-[var(--color-ink)]/10 rounded-2xl border px-5">
