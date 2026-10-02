@@ -37,15 +37,17 @@ async function main() {
     )
   );
 
-  // --- InquiryType ---
+  // --- InquiryType — the Let's Talk categories (LETS-TALK-SPEC LT-1) ---
+  // The same five the 20261002110000_lets_talk_intake migration writes (with
+  // their kinds); hire, partnership and contribution are retired there and
+  // never seeded again. update: {} — the admin's edits always win.
   await Promise.all(
     [
-      { key: "hire", label: "Hire" },
-      { key: "partnership", label: "Partnership" },
-      { key: "service", label: "Service Request" },
-      { key: "contribution", label: "Contribution" },
-      { key: "recruitment", label: "Recruitment" },
-      { key: "collaboration", label: "Collaboration" },
+      { key: "recruitment", label: "I'm hiring or recruiting", description: "A role — full-time, contract, freelance, internship or graduate.", sortOrder: 10 },
+      { key: "service", label: "I have a software project", description: "Something to build, improve, automate or advise on.", sortOrder: 20 },
+      { key: "collaboration", label: "I want to collaborate", description: "A product, startup, research or open-source idea to build together.", sortOrder: 30 },
+      { key: "growth", label: "Marketing or growth", description: "Digital presence, campaigns, content or a growth strategy.", sortOrder: 40 },
+      { key: "general", label: "Something else", description: "A question, an introduction, or anything that doesn't fit above.", sortOrder: 50 },
     ].map((t) =>
       prisma.inquiryType.upsert({ where: { key: t.key }, update: {}, create: t })
     )

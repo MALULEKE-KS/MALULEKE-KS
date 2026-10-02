@@ -31,7 +31,7 @@ beforeAll(async () => {
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId, 1);
 
-  const inquiryType = await db.inquiryType.findFirstOrThrow({ where: { key: "hire" } });
+  const inquiryType = await db.inquiryType.findFirstOrThrow({ where: { key: "general" } });
   inquiryTypeId = inquiryType.id;
 });
 

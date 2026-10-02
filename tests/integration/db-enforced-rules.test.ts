@@ -25,7 +25,7 @@ beforeAll(async () => {
     await db.organization.create({ data: { name: "DB Rules Client", slug: `${RUN}-client`, isClient: true } })
   ).id;
   statusId = (await db.status.findFirstOrThrow({ where: { key: "planned" } })).id;
-  inquiryTypeId = (await db.inquiryType.findFirstOrThrow({ where: { key: "hire" } })).id;
+  inquiryTypeId = (await db.inquiryType.findFirstOrThrow({ where: { key: "general" } })).id;
   skillCategoryId = (await db.skillCategory.findFirstOrThrow()).id;
 });
 
