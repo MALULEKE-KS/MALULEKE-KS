@@ -122,3 +122,17 @@ export async function ownerAddress(): Promise<string | null> {
   const profile = await db.profile.findFirst({ select: { email: true } });
   return profile?.email ?? null;
 }
+
+/**
+ * Send what's queued once the response has gone (next/server after()).
+ * Outside a request — a script, a test calling a handler directly — there's
+ * no "after", so nothing is sent here; the daily job and the admin's retry
+ * pick it up. Never throws: sending can't fail the change it reports.
+ */
+export function sendAfterResponse(afterFn: (cb: () => Promise<unknown>) => void) {
+  try {
+    afterFn(() => sendDue().catch(() => undefined));
+  } catch {
+    /* no request scope */
+  }
+}

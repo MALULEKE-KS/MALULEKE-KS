@@ -68,12 +68,15 @@ export function ContactBand({ profile, inquiryTypes, reviewSlaHours }: ContactBa
               <div className="lg:col-span-5">
                 <p className="text-mist text-sm">What you can reach out about</p>
                 <ul className="mt-4 flex flex-wrap gap-2">
+                  {/* Each one opens Let's Talk already on that category (?about=). */}
                   {inquiryTypes.map((t) => (
-                    <li
-                      key={t.value}
-                      className="text-paper rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm"
-                    >
-                      {t.label}
+                    <li key={t.value}>
+                      <Link
+                        href={`/contact?about=${t.value}`}
+                        className="text-paper hover:border-ember/50 focus-visible:outline-ember inline-flex rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2"
+                      >
+                        {t.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>

@@ -10,7 +10,7 @@ import { z } from "zod";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { db } from "@/lib/db";
 import { sendApplicantMessage } from "@/lib/inquiries/admin";
-import { sendDue } from "@/lib/notifications";
+import { sendAfterResponse } from "@/lib/notifications";
 import { after } from "next/server";
 
 const MessageInput = z
@@ -33,6 +33,6 @@ export const POST = withAdmin<{ id: string }>(async (request, { write }, { param
   const message = await write((tx) =>
     sendApplicantMessage(tx, inquiry, parsed.data.kind, parsed.data.body, { requestedItems: parsed.data.requestedItems, dueAt: parsed.data.dueAt ? new Date(parsed.data.dueAt) : null }),
   );
-  after(() => sendDue().catch(() => undefined));
+  sendAfterResponse(after); // the daily job and the admin's retry cover anything left
   return NextResponse.json({ id: message.id, kind: message.kind, channel: message.channel, at: message.createdAt.toISOString() }, { status: 201 });
 });

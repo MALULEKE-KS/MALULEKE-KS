@@ -102,7 +102,8 @@ export const Meeting = z
     }),
   ])
   .superRefine((m, ctx) => {
-    if (m.status !== "scheduled") return;
+    // Only a real zone can place the time (its own refinement already reported a bad one).
+    if (m.status !== "scheduled" || !isTimeZone(m.timeZone)) return;
     const at = zonedToUtc(m.startsAtLocal, m.timeZone);
     if (!at) return ctx.addIssue({ code: "custom", message: "That date and time doesn't exist", path: ["startsAtLocal"] });
     const now = Date.now();
@@ -209,7 +210,8 @@ export const Contact = z
     phone: Phone,
     organization: Opt(160).transform((v) => (v ? clean(v) : v)),
     role: Opt(120).transform((v) => (v ? clean(v) : v)),
-    website: Url,
+    // Not "website": that name is the honeypot (BR-2.7) — a visitor's own site must never trip it.
+    organizationWebsite: Url,
     profileUrl: Url,
     preferredChannel: z.enum(CHANNELS).default("email"),
     preferredChannelOther: Opt(120),

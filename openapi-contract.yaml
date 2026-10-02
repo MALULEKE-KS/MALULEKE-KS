@@ -218,33 +218,89 @@ paths:
   /inquiries:
     post:
       tags: [Inquiries]
-      summary: Submit a visitor inquiry
+      summary: Let's Talk — submit a message (docs/LETS-TALK-SPEC.md)
       description: >
-        The single visitor write path. Used identically by the human contact
-        form and the agent's submit_inquiry tool (BR-4.2). Rate-limited per
-        BR-2.4 — 5 submissions per IP per 24 hours. If the request includes a
-        honeypot field with a non-empty value, the endpoint returns the same
-        201 confirmation shape without creating a row (BR-2.7) — bot filling
-        gets no distinguishable signal. Resubmission with a previously-used
-        idempotencyKey within 10 minutes returns the original confirmation
-        rather than creating a duplicate (BR-2.6).
+        The single visitor write path, used identically by the form and the AI
+        guide's draft (BR-4.2). JSON, or multipart/form-data with a "payload"
+        JSON field plus up to inquiry.documents.maxFiles "documents" (PDF only,
+        checked by their bytes, at most inquiry.documents.maxMegabytes in total;
+        413 above the platform's request limit). Requires a formToken from GET
+        /inquiries/form at least inquiry.minFillSeconds old (a missing, forged
+        or too-fast token is treated like the honeypot; an expired one is 400
+        FORM_EXPIRED). The honeypot "website" returns the same 201 with a
+        plausible reference and stores nothing (BR-2.7). Rate-limited per
+        connection (BR-2.4) and per email address (inquiry.rateLimit.perEmailPerDay).
+        The category's own fields go in "details", validated by its form
+        (LT-1/LT-2); a field another category uses is refused. A reused
+        idempotencyKey returns the original confirmation within 10 minutes when
+        the payload is the same, 409 CONFLICT when it isn't (BR-2.6). Returns
+        the reference (LT-3) — it identifies, never authorises.
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: "#/components/schemas/InquiryCreateInput" }
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                payload: { type: string, description: "InquiryCreateInput as JSON" }
+                documents: { type: array, items: { type: string, format: binary } }
       responses:
         "201":
-          description: Inquiry received
+          description: Received — with the reference to quote
           content:
             application/json:
               schema: { $ref: "#/components/schemas/InquiryConfirmation" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "429":
-          description: Rate limit exceeded (BR-2.4)
+        "409":
+          description: The idempotency key was already used for a different message
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "413":
+          description: Attachments over the request limit
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "429":
+          description: Rate limit exceeded (per connection or per address)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /inquiries/form:
+    get:
+      tags: [Inquiries]
+      summary: A signed form token (the fill-time check)
+      description: Fetched when the form is shown; sent back as formToken. Never cached.
+      responses:
+        "200":
+          description: The token
+          content:
+            application/json:
+              schema: { type: object, properties: { token: { type: string } } }
+
+  /inquiries/types:
+    get:
+      tags: [Inquiries]
+      summary: Let's Talk categories, with their kinds and forms (LT-1)
+      description: Active categories in the admin's order — value, label, description, the form it uses (recruitment | service | collaboration | growth | general), and its active subtypes.
+      responses:
+        "200":
+          description: The categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value: { type: string }
+                    label: { type: string }
+                    description: { type: string, nullable: true }
+                    form: { type: string }
+                    subtypes: { type: array, items: { type: object, properties: { value: { type: string }, label: { type: string } } } }
 
   /admin/inquiries:
     get:
@@ -254,7 +310,7 @@ paths:
       parameters:
         - name: status
           in: query
-          schema: { type: string, enum: [new, reviewed, responded, closed] }
+          schema: { type: string, enum: [new, reviewed, responded, closed, needs_info, accepted, declined, on_hold, withdrawn] }
         - name: inquiryType
           in: query
           schema: { type: string }
@@ -272,21 +328,31 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
 
   /admin/inquiries/{id}:
-    patch:
+    get:
       tags: [Inquiries]
-      summary: Update inquiry status
-      description: >
-        Enforces sequential status transitions per BR-2.1. new -> reviewed is
-        always required first. From reviewed, either responded or closed is
-        valid (closed covers spam/irrelevant inquiries without requiring a
-        fake responded step). new -> responded and new -> closed both return
-        409, as does any other non-adjacent jump.
+      summary: One inquiry in full
+      description: Contact, the category's details, compensation, meetings, documents (metadata), status history, applicant-facing messages, private notes and its emails — with the moves allowed next and the version to send back.
       security: [{ adminSession: [] }]
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: The inquiry, content: { application/json: { schema: { type: object } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Inquiries]
+      summary: Move an inquiry on, or set its priority (LT-6)
+      description: >
+        Either { priority: low|normal|high|urgent } (admin metadata — it never
+        decides anything), or a status change. Allowed moves are a database
+        trigger: NEW → REVIEWED first (BR-2.1); then needs_info, responded (in
+        discussion), accepted, declined, on_hold, withdrawn, closed; decisions
+        reopen to reviewed with history kept. expectedVersion makes a change
+        from a stale screen 409 STALE. internalReason is private;
+        applicantMessage is stored as what the applicant was told (and emailed
+        only with applicant emails on). The database records every change.
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
       requestBody:
         required: true
         content:
@@ -294,7 +360,11 @@ paths:
             schema:
               type: object
               properties:
-                status: { type: string, enum: [reviewed, responded, closed] }
+                status: { type: string, enum: [reviewed, responded, closed, needs_info, accepted, declined, on_hold, withdrawn] }
+                expectedVersion: { type: integer }
+                internalReason: { type: string, maxLength: 2000 }
+                applicantMessage: { type: string, maxLength: 5000 }
+                priority: { type: string, enum: [low, normal, high, urgent] }
       responses:
         "200":
           description: Inquiry updated
@@ -302,10 +372,157 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InquiryAdmin" }
         "409":
-          description: Invalid status transition (BR-2.1)
+          description: INVALID_STATUS_TRANSITION or STALE
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/inquiries/{id}/notes:
+    post:
+      tags: [Inquiries]
+      summary: Add a private note (LT-7 — never reaches the applicant)
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [body], properties: { body: { type: string, maxLength: 5000 } } } } }
+      responses:
+        "201": { description: Note added }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/inquiries/{id}/messages:
+    post:
+      tags: [Inquiries]
+      summary: Write to the applicant, or ask for information (LT-7)
+      description: Stored as applicant-facing. Emailed when notifications.applicant_emails is on; otherwise channel "manual" — sent by the owner directly. Doesn't change the status.
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, body]
+              properties:
+                kind: { type: string, enum: [message, info-request] }
+                body: { type: string, maxLength: 5000 }
+                requestedItems: { type: array, maxItems: 12, items: { type: string } }
+                dueAt: { type: string, format: date-time }
+      responses:
+        "201": { description: Recorded }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { description: The inquiry was anonymised }
+
+  /admin/inquiries/{id}/meetings:
+    post:
+      tags: [Inquiries]
+      summary: Schedule an interview or meeting (LT-5)
+      description: startsAtLocal is wall-clock time in timeZone (IANA) — never assumed.
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, startsAtLocal, timeZone]
+              properties:
+                kind: { type: string, enum: [hr, technical, manager, panel, discovery, client, general, other] }
+                startsAtLocal: { type: string, example: "2026-10-14T10:00" }
+                timeZone: { type: string, example: "Europe/London" }
+                durationMinutes: { type: integer, minimum: 5, maximum: 480 }
+                location: { type: string }
+                link: { type: string }
+                contactPerson: { type: string }
+                instructions: { type: string }
+      responses:
+        "201": { description: Scheduled }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /admin/inquiries/{id}/meetings/{meetingId}:
+    patch:
+      tags: [Inquiries]
+      summary: Reschedule, complete, cancel or mark a no-show (LT-5)
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: meetingId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { state: { type: string, enum: [completed, cancelled, no_show, rescheduled] }, startsAtLocal: { type: string }, timeZone: { type: string }, durationMinutes: { type: integer } } } } }
+      responses:
+        "200": { description: Updated }
+        "404": { description: Not this inquiry's meeting }
+
+  /admin/inquiries/{id}/documents/{documentId}:
+    get:
+      tags: [Inquiries]
+      summary: Download an applicant's PDF (LT-8)
+      description: Always an attachment, nosniff, sandboxed, never cached; only a document belonging to the inquiry in the path.
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: documentId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: The PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/notifications:
+    get:
+      tags: [Inquiries]
+      summary: The email outbox (LT-10)
+      description: Newest first; ?state=pending|failed. Says whether email is connected at all.
+      security: [{ adminSession: [] }]
+      responses:
+        "200": { description: The outbox, content: { application/json: { schema: { type: object } } } }
+
+  /admin/notifications/{id}/retry:
+    post:
+      tags: [Inquiries]
+      summary: Retry a waiting or failed email now
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Tried — the result is in state and lastError }
+        "409": { description: Already sent, or email isn't connected }
+
+  /admin/inquiry-subtypes:
+    get:
+      tags: [Inquiries]
+      summary: Every category's kinds, active and retired
+      security: [{ adminSession: [] }]
+      responses:
+        "200": { description: The subtypes }
+    post:
+      tags: [Inquiries]
+      summary: Add a kind to a category (EXT-1)
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [inquiryType, key, label], properties: { inquiryType: { type: string }, key: { type: string }, label: { type: string }, sortOrder: { type: integer } } } } }
+      responses:
+        "201": { description: Added }
+        "409": { description: LOOKUP_KEY_EXISTS }
+
+  /admin/inquiry-subtypes/{id}:
+    patch:
+      tags: [Inquiries]
+      summary: Rename, reorder, retire or restore a kind (BR-8.2 — never deleted; "other" can't be retired)
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { label: { type: string }, sortOrder: { type: integer }, active: { type: boolean } } } } }
+      responses:
+        "200": { description: Updated }
+        "409": { description: The other option can't be retired }
 
   # ============================================================
   # LOOKUPS — one generic endpoint for every EXT-1 lookup table
@@ -1761,12 +1978,24 @@ components:
           pattern: "^[a-z0-9]+([_-][a-z0-9]+)*$"
           description: "An active InquiryType lookup key (GET /lookups/inquiry_type). A lookup (EXT-1): new types need no API change; unknown or deprecated keys are a 400 (BR-8.2)."
         source: { type: string, nullable: true, description: "Captured automatically, not client-supplied (BR-2.5); \"direct\" when no Referer header is present" }
-        idempotencyKey: { type: string, format: uuid, nullable: true, description: "Optional; dedupes a resubmission within 10 minutes (BR-2.6)" }
+        idempotencyKey: { type: string, format: uuid, nullable: true, description: "Optional; the same key and the same payload within 10 minutes returns the original confirmation; a different payload is 409 (BR-2.6)" }
+        formToken: { type: string, description: "From GET /inquiries/form — required; the fill-time check" }
+        subtype: { type: string, description: "A kind within the category (GET /inquiries/types); 'other' needs subtypeOther (LT-1)" }
+        subtypeOther: { type: string, maxLength: 200 }
+        phone: { type: string, maxLength: 40, description: "Required when preferredChannel is phone, whatsapp or sms" }
+        organization: { type: string, maxLength: 160 }
+        role: { type: string, maxLength: 120 }
+        organizationWebsite: { type: string, maxLength: 300, description: "The visitor's site, a full https link. Never 'website' — that name is the hidden honeypot (BR-2.7)" }
+        profileUrl: { type: string, maxLength: 300 }
+        preferredChannel: { type: string, enum: [email, phone, whatsapp, sms, other] }
+        preferredChannelOther: { type: string, maxLength: 120 }
+        details: { type: object, description: "The category's own fields, validated by its form (lib/inquiries/forms.ts) — compensation { mode: range|discuss|unpaid|not-applicable, … } and meeting { status: none|tbd|scheduled, … } where the form has them (LT-1, LT-4, LT-5)" }
 
     InquiryConfirmation:
       type: object
       properties:
-        id: { type: string }
+        id: { type: string, description: "Kept for v1 compatibility; authorises nothing" }
+        reference: { type: string, example: "KS-26-7QM4-K2", description: "LT-3 — quote it; identifies, never authorises" }
         status: { type: string, example: "new" }
         submittedAt: { type: string, format: date-time }
 

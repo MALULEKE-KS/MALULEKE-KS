@@ -117,6 +117,16 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /metrics`
 - Show approvedAt as "as of" — these are point-in-time figures.
 
+**Let's Talk — send a message** — Let's talk band: each category opens /contact?about=<key>
+
+- Call `POST /inquiries`
+- Call `GET /inquiries/form`
+- Call `GET /inquiries/types`
+- Fetch GET /inquiries/form when the form is shown and send its token as formToken; include the hidden honeypot field "website" (the visitor's own site is organizationWebsite).
+- Send an idempotencyKey (uuid), kept across retries, so a double-submit returns the original confirmation.
+- The review promise comes from the inquiry.reviewSlaHours setting — don't hardcode "48 hours".
+- Show the reference from the response; it identifies the message, it never unlocks anything.
+
 ### /about
 
 **Owner profile and links** — Bio, availability, location, building since
@@ -162,12 +172,15 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
 
-**Contact — send an inquiry** — Inquiry form and confirmation
+**Let's Talk — send a message** — What brings you here? — the category tiles (GET /inquiries/types); The form shaped to the category, and the confirmation with its reference
 
 - Call `POST /inquiries`
-- Types come from GET /lookups/inquiry-type; include the hidden honeypot field "website".
-- Send an idempotencyKey (uuid) so a double-submit returns the original confirmation.
+- Call `GET /inquiries/form`
+- Call `GET /inquiries/types`
+- Fetch GET /inquiries/form when the form is shown and send its token as formToken; include the hidden honeypot field "website" (the visitor's own site is organizationWebsite).
+- Send an idempotencyKey (uuid), kept across retries, so a double-submit returns the original confirmation.
 - The review promise comes from the inquiry.reviewSlaHours setting — don't hardcode "48 hours".
+- Show the reference from the response; it identifies the message, it never unlocks anything.
 
 **Lookups — statuses, domains, types, categories, relationships** — Inquiry type select
 
@@ -390,11 +403,43 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/inquiries
 
-**Inquiries — triage** — Inbox, overdue badge (reviewDueAt / overdue), status actions
+**Inquiries — Let's Talk management** — Inbox: search, filters, overdue and duplicate flags, failed-email banner
 
 - Call `GET /admin/inquiries`
+- Call `GET /admin/inquiries/{id}`
 - Call `PATCH /admin/inquiries/{id}`
-- Only offer the transitions BR-2.1 allows; 409 INVALID_STATUS_TRANSITION otherwise.
+- Call `POST /admin/inquiries/{id}/notes`
+- Call `POST /admin/inquiries/{id}/messages`
+- Call `POST /admin/inquiries/{id}/meetings`
+- Call `PATCH /admin/inquiries/{id}/meetings/{meetingId}`
+- Call `GET /admin/inquiries/{id}/documents/{documentId}`
+- Call `GET /admin/notifications`
+- Call `POST /admin/notifications/{id}/retry`
+- Call `GET /admin/inquiry-subtypes`
+- Call `POST /admin/inquiry-subtypes`
+- Call `PATCH /admin/inquiry-subtypes/{id}`
+- Offer only the moves in nextStatuses; send expectedVersion — 409 STALE means reload.
+- internalReason is private; applicantMessage is what they were told — never mix them.
+
+### /admin/inquiries/[id]
+
+**Inquiries — Let's Talk management** — Workbench: status (stale-screen guard), priority, details, meetings, documents, messages, notes, history, emails
+
+- Call `GET /admin/inquiries`
+- Call `GET /admin/inquiries/{id}`
+- Call `PATCH /admin/inquiries/{id}`
+- Call `POST /admin/inquiries/{id}/notes`
+- Call `POST /admin/inquiries/{id}/messages`
+- Call `POST /admin/inquiries/{id}/meetings`
+- Call `PATCH /admin/inquiries/{id}/meetings/{meetingId}`
+- Call `GET /admin/inquiries/{id}/documents/{documentId}`
+- Call `GET /admin/notifications`
+- Call `POST /admin/notifications/{id}/retry`
+- Call `GET /admin/inquiry-subtypes`
+- Call `POST /admin/inquiry-subtypes`
+- Call `PATCH /admin/inquiry-subtypes/{id}`
+- Offer only the moves in nextStatuses; send expectedVersion — 409 STALE means reload.
+- internalReason is private; applicantMessage is what they were told — never mix them.
 
 ### /admin/jobs
 
@@ -587,7 +632,9 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /cv/generate` | CV — the options, view and download | public |
 | `GET /cv/documents/{id}` | CV — the options, view and download | public |
 | `GET /cv/uploads/{id}` | CV — the options, view and download | public |
-| `POST /inquiries` | Contact — send an inquiry | public |
+| `POST /inquiries` | Let's Talk — send a message | public |
+| `GET /inquiries/form` | Let's Talk — send a message | public |
+| `GET /inquiries/types` | Let's Talk — send a message | public |
 | `GET /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
 | `POST /lookups/{type}` | Lookups — statuses, domains, types, categories, relationships | public |
 | `PATCH /lookups/{type}/{id}` | Lookups — statuses, domains, types, categories, relationships | public |
@@ -618,8 +665,19 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /admin/organizations` | Organizations | admin |
 | `POST /admin/organizations` | Organizations | admin |
 | `PATCH /admin/organizations/{id}` | Organizations | admin |
-| `GET /admin/inquiries` | Inquiries — triage | admin |
-| `PATCH /admin/inquiries/{id}` | Inquiries — triage | admin |
+| `GET /admin/inquiries` | Inquiries — Let's Talk management | admin |
+| `GET /admin/inquiries/{id}` | Inquiries — Let's Talk management | admin |
+| `PATCH /admin/inquiries/{id}` | Inquiries — Let's Talk management | admin |
+| `POST /admin/inquiries/{id}/notes` | Inquiries — Let's Talk management | admin |
+| `POST /admin/inquiries/{id}/messages` | Inquiries — Let's Talk management | admin |
+| `POST /admin/inquiries/{id}/meetings` | Inquiries — Let's Talk management | admin |
+| `PATCH /admin/inquiries/{id}/meetings/{meetingId}` | Inquiries — Let's Talk management | admin |
+| `GET /admin/inquiries/{id}/documents/{documentId}` | Inquiries — Let's Talk management | admin |
+| `GET /admin/notifications` | Inquiries — Let's Talk management | admin |
+| `POST /admin/notifications/{id}/retry` | Inquiries — Let's Talk management | admin |
+| `GET /admin/inquiry-subtypes` | Inquiries — Let's Talk management | admin |
+| `POST /admin/inquiry-subtypes` | Inquiries — Let's Talk management | admin |
+| `PATCH /admin/inquiry-subtypes/{id}` | Inquiries — Let's Talk management | admin |
 | `GET /admin/timeline` | Journey — entries and approvals | admin |
 | `POST /admin/timeline` | Journey — entries and approvals | admin |
 | `PATCH /admin/timeline/{id}` | Journey — entries and approvals | admin |

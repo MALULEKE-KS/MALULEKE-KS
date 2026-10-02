@@ -15,6 +15,7 @@ import { NextRequest } from "next/server";
 import { PATCH as patchSystem } from "@/app/api/v1/admin/systems/[id]/route";
 import { GET as listFlags } from "@/app/api/v1/admin/settings/flags/route";
 import { POST as postInquiry } from "@/app/api/v1/inquiries/route";
+import { issueFormToken } from "@/lib/inquiries/form-token";
 import { withActor } from "@/lib/audit";
 import { db } from "@/lib/db";
 import { createSessionCookieValue } from "@/lib/auth/session";
@@ -36,6 +37,8 @@ const EXEMPT = new Set([
   "SystemActivityWeek", // GitHub sync data, recorded by JobRun
   "RepoCommit", // mirror of GitHub commits for the AI guide, refreshed and pruned by the sync (JobRun)
   "ContentChunk", // AI index (V1.1)
+  "InquiryStatusChange", // append-only history, written by the database itself (LT-6)
+  "Notification", // the email outbox — its own state is its history (LT-10)
 ]);
 
 let adminId: string;
@@ -197,7 +200,8 @@ describe("behaviour", () => {
           name: `${RUN} Visitor`,
           email: `${RUN}-visitor@example.com`,
           message: "A message long enough to pass the twenty-character rule.",
-          inquiryType: "hire",
+          inquiryType: "general",
+          formToken: issueFormToken(Date.now() - 10_000),
         }),
       }),
     );

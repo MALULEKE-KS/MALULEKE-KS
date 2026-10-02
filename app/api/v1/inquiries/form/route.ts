@@ -7,6 +7,6 @@ import { issueFormToken } from "@/lib/inquiries/form-token";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
+export async function GET() {
   return NextResponse.json({ token: issueFormToken() }, { headers: { "Cache-Control": "no-store" } });
 }

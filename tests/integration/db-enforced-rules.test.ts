@@ -146,7 +146,21 @@ describe("BR-2.x inquiries — enforced by the database", () => {
     const closed = await db.inquiry.update({ where: { id }, data: { status: "CLOSED" } });
     expect(closed.status).toBe("CLOSED");
 
-    await expect(db.inquiry.update({ where: { id }, data: { status: "REVIEWED" } })).rejects.toThrow(/BR-2\.1/);
+    // LT-6: a closed inquiry can be reopened for review — and nowhere else.
+    await expect(db.inquiry.update({ where: { id }, data: { status: "ACCEPTED" } })).rejects.toThrow(/BR-2\.1/);
+    await db.inquiry.update({ where: { id }, data: { status: "REVIEWED" } });
+    await expect(db.inquiry.update({ where: { id }, data: { status: "NEW" } })).rejects.toThrow(/BR-2\.1/);
+  });
+
+  it("LT-6: the database writes every status change itself, append-only", async () => {
+    const created = await db.inquiry.create({ data: inquiry() });
+    inquiryIds.push(created.id);
+    await db.inquiry.update({ where: { id: created.id }, data: { status: "REVIEWED" } });
+    await db.inquiry.update({ where: { id: created.id }, data: { status: "DECLINED" } });
+    const history = await db.inquiryStatusChange.findMany({ where: { inquiryId: created.id }, orderBy: { createdAt: "asc" } });
+    expect(history.map((h) => [h.fromStatus, h.toStatus])).toEqual([[null, "NEW"], ["NEW", "REVIEWED"], ["REVIEWED", "DECLINED"]]);
+    await expect(db.inquiryStatusChange.update({ where: { id: history[0]!.id }, data: { toStatus: "ACCEPTED" } })).rejects.toThrow(/LT-6/);
+    await expect(db.inquiryStatusChange.delete({ where: { id: history[0]!.id } })).rejects.toThrow(/LT-6/);
   });
 });
 

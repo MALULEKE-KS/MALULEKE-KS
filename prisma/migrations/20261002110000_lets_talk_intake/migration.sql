@@ -53,7 +53,11 @@ ADD COLUMN "website" TEXT;
 
 -- Existing inquiries get their references one by one (the function checks the
 -- column it fills), then the column becomes required with the function as default.
+-- An anonymised inquiry is frozen by BR-5.2's trigger; a reference is not
+-- personal data, so the trigger stands aside for this one backfill only.
+ALTER TABLE "Inquiry" DISABLE TRIGGER "Inquiry_br_5_2_anonymized";
 UPDATE "Inquiry" SET "reference" = new_inquiry_reference() WHERE "reference" IS NULL;
+ALTER TABLE "Inquiry" ENABLE TRIGGER "Inquiry_br_5_2_anonymized";
 ALTER TABLE "Inquiry" ALTER COLUMN "reference" SET NOT NULL, ALTER COLUMN "reference" SET DEFAULT new_inquiry_reference();
 
 ALTER TABLE "InquiryType" ADD COLUMN "description" TEXT,
@@ -374,6 +378,9 @@ CREATE TRIGGER "InquiryDocument_audit" AFTER INSERT OR UPDATE OR DELETE ON "Inqu
 -- History and the outbox are their own record (exempt, like SystemStatusChange
 -- and JobRun); the runtime role can't rewrite history.
 REVOKE UPDATE, DELETE, TRUNCATE ON "InquiryStatusChange" FROM platform_runtime;
+-- The kinds are public lookup data, read with the categories by the public role
+-- (like "InquiryType"); nothing else here is readable without the admin.
+GRANT SELECT ON "InquirySubtype" TO platform_public;
 
 -- ─── The categories (LT-1) ────────────────────────────────────────────
 -- Existing keys keep their rows (and their past inquiries); hire, partnership

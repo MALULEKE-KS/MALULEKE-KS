@@ -332,7 +332,7 @@ export const InquiryCreateInputSchema = z.object({
   phone: z.string().optional(),
   organization: z.string().optional(),
   role: z.string().optional(),
-  website: z.string().optional(),
+  organizationWebsite: z.string().optional(), // never "website" — that's the honeypot (BR-2.7)
   profileUrl: z.string().optional(),
   preferredChannel: z.string().optional(),
   preferredChannelOther: z.string().optional(),

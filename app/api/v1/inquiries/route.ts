@@ -22,7 +22,7 @@ import { isFlagOn, FLAGS } from "@/lib/flags";
 import { Contact, DOCUMENTS_ALLOWED, formFor, parseDetails, zonedToUtc, type MeetingT } from "@/lib/inquiries/forms";
 import { checkFormToken } from "@/lib/inquiries/form-token";
 import { checkDocuments } from "@/lib/inquiries/documents";
-import { enqueue, ownerAddress, recipientUnderCap, sendDue } from "@/lib/notifications";
+import { enqueue, ownerAddress, recipientUnderCap, sendAfterResponse } from "@/lib/notifications";
 import { ownerAlertEmail, receivedEmail } from "@/lib/inquiries/emails";
 
 const MAX_REQUEST_BYTES = 4_400_000; // under the platform's 4.5 MB request ceiling
@@ -166,7 +166,7 @@ export async function POST(request: Request) {
           phone: contact.data.phone,
           organization: contact.data.organization,
           role: contact.data.role,
-          website: contact.data.website,
+          website: contact.data.organizationWebsite,
           profileUrl: contact.data.profileUrl,
           preferredChannel: contact.data.preferredChannel,
           preferredChannelOther: contact.data.preferredChannel === "other" ? contact.data.preferredChannelOther : undefined,
@@ -201,7 +201,7 @@ export async function POST(request: Request) {
       return created;
     });
 
-    after(() => sendDue().catch(() => undefined)); // the daily job and the admin's retry cover anything left
+    sendAfterResponse(after); // the daily job and the admin's retry cover anything left
     return confirmation(inquiry);
   } catch (err) {
     // Two identical retries racing: the second hits the unique key — answer with the first.
