@@ -86,14 +86,14 @@ Single vertical log, not a generic icon-and-card timeline component — visually
 
 **Behavior:** core content is stable; the subtitle/framing line shifts per active `VisitorLens`, the body does not.
 
-### `/contact`
+### `/contact` — Let's Talk (docs/LETS-TALK-SPEC.md)
 
-1. `InquiryForm` — a real `<select>` for the six `InquiryType` values, not six separate buttons competing for attention.
-2. Name / email / message fields, validated client-side against `InquiryCreateInputSchema` before submit.
-3. Inline confirmation on success — no redirect: *"Received. I review every inquiry within 48 hours."* — states the actual BR-2.2 commitment (a review, not a promised reply) rather than a vague "soon", followed by the BR-5.5 removal route: *"To request removal of this submission, email <owner email>."*
-4. Rate-limit error state: *"Too many requests from this connection — try again tomorrow."*
+1. **What brings you here?** — the active categories as tiles (`GET /inquiries/types`, in the admin's order), each with its description. `?about=<category>` opens one directly (the home band's links).
+2. **A form shaped to the category** — its kinds (with an "Other — describe" escape), its own fields, the message (labelled for the category), compensation as an explicit choice where it applies, an arranged interview or meeting with its own time zone, the person and their preferred channel, and optional PDFs.
+3. **Confirmation** — inline, with the reference to quote, the review window (`inquiry.reviewSlaHours`), and the removal route (BR-5.5). No account.
+4. Beside it: how it goes from here (four steps), email as the other way in, and what happens to their details (retention, BR-5.2).
 
-**Behavior:** a hidden honeypot field for basic bot filtering, in addition to the server-side rate limit (BR-2.4). The review window in the copy is the setting `inquiry.reviewSlaHours`, never a typed number. Reached from **Let's talk** (header) and the footer, and — when the visitor asks — pre-filled by the AI guide's `draft_inquiry`, which the visitor still sends themselves (BR-4.1/4.2).
+**Behavior:** the same rules run in the browser and on the server (the server's answer counts); a hidden honeypot, a signed form token, per-connection and per-address limits; one idempotency key per message. Reached from **Let's talk** (header), the home band and the footer, and — when the visitor asks — pre-filled by the AI guide's `draft_inquiry`, which only fills the message; the visitor still sends it (BR-4.1/4.2).
 
 ### `/now` (F5c, planned)
 
