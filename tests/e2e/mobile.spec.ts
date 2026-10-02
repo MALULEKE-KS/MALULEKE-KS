@@ -7,7 +7,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 
-const PAGES = ["/", "/systems", "/journey", "/cv", "/method", "/about", "/contact"];
+const PAGES = ["/", "/systems", "/journey", "/about", "/contact"];
 const PHONES = [
   { name: "small phone", width: 360, height: 760 },
   { name: "phone", width: 390, height: 844 },

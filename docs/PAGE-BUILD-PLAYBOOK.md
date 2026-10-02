@@ -242,33 +242,44 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 - **Owner inputs:** case study body (or generated from the repo, BR-4.5), impacts, screenshots (captured automatically from the live site, or uploaded — BR-1.18).
 - **Built (2026-10-01):** one template for every case study — phone-safe whatever the write-up holds, and every system page tested at phone widths automatically.
 
-### `/journey` — the timeline
-- **Story:** from zero to here, dated and sourced.
-- **Data:** `PublicTimeline`, `PublicExperience`, `PublicEducation`, `PublicAchievement`, repo start dates.
-- **Candidates:** a scroll-driven timeline with Blur Fade; years as anchors; GitHub milestones interleaved.
-- **Built (2026-10-02):** one rail through time (`lib/queries/journey.ts`): milestones, roles (start and leaving), study (start, finish, or expected — drawn dashed as *ahead*), achievements, systems started (first commit of a published system's public repo) and shipped (`SystemPace`). Never empty, never invented; a system the owner already wrote a milestone for isn't announced twice. A year scrubber (sticky column on desktop, swipeable strip on phones), a pulsing *Today* node, filters only for kinds present, `#entry-<id>` anchors kept for search.
+### `/journey` — the person's chapters
+- **Story:** from Basopa Secondary School to building companies — his life and career, not his repositories.
+- **Data:** the `journey` content block (headline, lede, chapters, ahead), `PublicTimeline` (with `datePrecision`), experience starts.
+- **Built (2026-10-02, rebuilt on owner feedback):**
+  - a life line of chapter segments, with now pulsing and the future dashed;
+  - chapter cards with their dated moments, the current one lit (BorderBeam);
+  - "What's next", with Let's talk and the CV.
+- **Rejected first build:** one rail of every record and GitHub event. It duplicated `/systems`, and the owner turned it down.
 
-### `/cv` — the CV engine (designed from zero, §5 of the plan)
-- **Story:** a world-class, ATS-safe CV, generated from the same records, tailored to a role.
-- **Data:** `PublicCvOption`, the CV model (`lib/cv/model.ts`), uploads.
-- **Candidates:** live preview beside the options; role tailoring input; completeness indicator.
-- **Built (2026-10-02):** the CV as a document — a paper sheet with its own header (name, headline, contact: the part that prints) beside a sticky dock: the downloads, an *On this CV* index of the sections it actually has, and the as-of line. Phones: downloads first. Role tailoring stays with the AI tool (flag `agent.tailor_cv`, off).
+### `/cv` — retired (2026-10-02)
+- The uploaded file is the CV, and `/cv` redirects to it. The generator is dormant, not deleted.
 
-### `/method`
-- **Story:** how the work is governed — principles as enforced rules.
-- **Data:** `how-i-build` block (five principles, *Make It Exist First* leads), the `evidence` block (EVIDENCE-SPEC), the pulse.
-- **Candidates:** principles as a numbered sequence, each opening its evidence (EvidenceDrawer); the terminal pattern.
+### `/method` → `/about#method`
 
-### `/about`
-- **Story:** the person behind the work.
-- **Data:** profile, titles, photo (`PublicProfilePhoto` — the approved graphite portrait), affiliations, links.
-- **Candidates:** portrait with a restrained treatment; titles as data; "by the numbers" figures when approved.
+### `/about` — the person, and how he builds
+- **Story:** who he is in his own words, how he works and what he works with — enough to make a recruiter stay.
+- **Data:** profile, titles, photo, bio, `how-i-build` + `evidence`, `SkillEvidence`, homes, the guide's suggestions, the uploaded CV.
+- **Built (2026-10-02):**
+  - a portrait hero with glass badges;
+  - his bio beside the AI guide and his facts. The guide's poses cross-fade, and only the first loads with the page;
+  - Method as MagicCards with evidence;
+  - Skills, grouped, each with "used in N systems";
+  - organisations with their GitHub avatars.
 
 ### `/contact` — Let's Talk
 - **Story:** the one way in — "What brings you here?" — then a form shaped to the answer, ending in a reference.
-- **Spec:** `docs/LETS-TALK-SPEC.md` (LT-1…LT-14): categories and subtypes as lookups, per-category server-validated fields, explicit compensation, meetings as events, PDF-only documents, reference ≠ credential, email via an outbox.
-- **Data:** inquiry types and subtypes, the review SLA setting, the guide's draft (when enabled).
-- **Candidates:** a choice step of large glass tiles, then a stepped form; the promise and privacy notice visible; the AI draft banner.
+- **Spec:** `docs/LETS-TALK-SPEC.md` (LT-1…LT-14).
+- **Data:** inquiry types and subtypes, the review SLA, retention, document limits, the about photo, and the guide's draft (when enabled).
+- **Built (2026-10-02, restructured on owner feedback):**
+  - **Page:**
+    - a hero with the person and four connected steps;
+    - MagicCard tiles, each showing its form's cost;
+    - numbered parts with a progress rail.
+  - **Architecture:**
+    - the field spec as data (`lib/inquiries/fields.ts`);
+    - a state hook;
+    - one component per part;
+    - a test that the spec matches the server's schemas.
 
 ### `/now` (new)
 - **Story:** what's moving this week.

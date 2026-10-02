@@ -30,6 +30,45 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — Structure: no CV page, Method in About, Journey and About rebuilt, Let's Talk restructured (2026-10-02, local)
+
+**Why:** the owner's critique — only Home and Systems were good.
+
+**Site structure**
+- **Navigation:** Systems · Journey · About, with a **CV** button beside Let's talk.
+- **The CV:** the uploaded CV is the CV, and `/cv` redirects to the file. CV generation is switched off; its code is kept.
+- **Method:** now part of About, at `/about#method`.
+
+**Journey** — the owner's life and career, in chapters:
+- Basopa Secondary School, 2018–2022
+- University of Limpopo, 2023
+- North-West University, 2024–now
+- building companies, 2025–now
+- what's next
+
+The chapter text is a draft from his CV, marked `reviewed: false` for his approval (Admin → Page content → Journey). Year milestones are stored to the year.
+
+**About** — the page, top to bottom:
+- a portrait hero with glass badges;
+- his bio beside the AI guide, whose poses change;
+- Method, with evidence;
+- skills, grouped, each with the systems that use it;
+- his organisations.
+
+The skills are 48 entries taken from his CV and his systems' stacks (migration `skills_from_cv`), each linked to the systems that list it.
+
+**Let's Talk** — restructured, not just restyled.
+- **Architecture:**
+  - the category fields are data: one spec, one renderer, and a payload built from the same list;
+  - the form's state lives in a hook, with one component per part;
+  - a test proves the field spec matches the server's schemas.
+- **On the page:**
+  - a hero with the person and connected steps;
+  - tiles that state each form's cost;
+  - a progress rail.
+
+**Component:** MagicCard takes a resting border (`rest`), so it works on bone surfaces too.
+
 ### F5c — /journey: one rail through time (2026-10-02, local)
 - The journey was empty in production (no timeline entries yet). It now reads every public, dated fact the site already holds — milestones, roles, study (expected graduation drawn dashed, ahead), achievements, systems started and shipped — on one rail with a year scrubber and a live *Today* node. Nothing invented; filters only for what's present.
 

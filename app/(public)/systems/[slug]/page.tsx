@@ -400,12 +400,15 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
             {/* Evidence, not self-rating (FRONTEND-DATA-GUIDE "/systems/[slug]"). */}
             <ul className="flex flex-wrap gap-3">
               {cs.skills.map((s) => (
-                <li key={s.name} className="border-ink/10 bg-sheet shadow-soft rounded-2xl border px-4 py-3">
-                  <span className="text-ink font-medium">{s.name}</span>
-                  <span className="text-slate mt-0.5 block text-xs">
-                    used in {s.systems} {s.systems === 1 ? "system" : "systems"}
-                    {s.roles > 0 && `, ${s.roles} ${s.roles === 1 ? "role" : "roles"}`}
-                  </span>
+                <li key={s.name}>
+                  {/* Each skill opens the other systems that prove it. */}
+                  <Link href={`/systems?tech=${encodeURIComponent(s.name)}`} className="border-ink/10 bg-sheet shadow-soft hover:border-ember/40 focus-visible:outline-ember block rounded-2xl border px-4 py-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
+                    <span className="text-ink font-medium">{s.name}</span>
+                    <span className="text-slate mt-0.5 block text-xs">
+                      used in {s.systems} {s.systems === 1 ? "system" : "systems"}
+                      {s.roles > 0 && `, ${s.roles} ${s.roles === 1 ? "role" : "roles"}`}
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>

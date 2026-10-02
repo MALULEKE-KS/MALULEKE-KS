@@ -17,11 +17,11 @@ export interface Sheet {
 export const SHEETS: Sheet[] = [
   { number: "01", href: "/", label: "Home", inHeader: false, hint: "Where it all starts" },
   { number: "02", href: "/systems", label: "Systems", inHeader: true, hint: "Everything built, straight from GitHub" },
-  { number: "03", href: "/journey", label: "Journey", inHeader: true, hint: "Every milestone, dated" },
-  { number: "04", href: "/cv", label: "CV", inHeader: true, hint: "Generated live, as PDF or Word" },
-  { number: "05", href: "/method", label: "Method", inHeader: true, hint: "The rules behind the work" },
-  { number: "06", href: "/about", label: "About", inHeader: true, hint: "The person behind it" },
-  { number: "07", href: "/contact", label: "Contact", inHeader: false, hint: "One form, reviewed by a person" },
+  { number: "03", href: "/journey", label: "Journey", inHeader: true, hint: "From school to now, and what's next" },
+  { number: "04", href: "/about", label: "About", inHeader: true, hint: "The person, and how he builds" },
+  { number: "05", href: "/contact", label: "Contact", inHeader: false, hint: "Let's talk — one conversation, any reason" },
+  // No CV page (owner, 2026-10-02): the uploaded CV is a button wherever it's useful.
+  // No Method page: it's a section of About (/method redirects there).
 ];
 
 // The stack this platform itself runs on — real, from CLAUDE.md "Stack".

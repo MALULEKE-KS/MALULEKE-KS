@@ -16,6 +16,7 @@ import { ConsentProvider } from "@/components/shared/Consent";
 import { getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
 import { getPlatformPulse, getPublicHomes } from "@/lib/queries/profile";
 import { getContentBlock } from "@/lib/content/blocks";
+import { getUploadedCvLink } from "@/lib/cv/options";
 import { getPublicLenses } from "@/lib/queries/lenses";
 import { FLAGS, isFlagOn } from "@/lib/flags";
 import { getSetting } from "@/lib/settings";
@@ -42,6 +43,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     lenses,
     maxQuestionCharacters,
     aiGuide,
+    cv,
   ] = await Promise.all([
     getSiteProfile(),
     getReviewSlaHours(),
@@ -51,6 +53,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     getPublicLenses(),
     getSetting("concierge.maxQuestionCharacters"),
     getContentBlock("ai-guide"),
+    getUploadedCvLink(),
   ]);
   // Where the guide's answers may link out: GitHub and the owner's own public profiles.
   const linkHosts = [
@@ -83,7 +86,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           >
             Skip to content
           </a>
-          <SiteHeader links={profile.links} email={profile.email} reviewSlaHours={reviewSlaHours} />
+          <SiteHeader links={profile.links} email={profile.email} reviewSlaHours={reviewSlaHours} cvUrl={cv?.url ?? null} />
           <main id="main" className="flex-1">
             {children}
           </main>

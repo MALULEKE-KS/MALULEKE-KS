@@ -19,6 +19,7 @@ import {
   getSiteProfile,
 } from "@/lib/queries/site";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { personLd } from "@/lib/seo/person";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getEvidence } from "@/lib/evidence";
 import { siteUrl } from "@/lib/site-url";
@@ -27,7 +28,7 @@ import { FLAGS, getFlags } from "@/lib/flags";
 import { getSetting } from "@/lib/settings";
 import { guideProviderConfigured } from "@/lib/guide/model";
 import { AiGuideSection } from "@/components/home/AiGuideSection";
-import { isAnyCvOffered } from "@/lib/cv/options";
+import { getUploadedCvLink } from "@/lib/cv/options";
 import { dbPublic } from "@/lib/db";
 import {
   countPublishedSystems,
@@ -48,7 +49,7 @@ export async function HomeContent() {
     flags,
     intro,
     aiGuide,
-    hasCv,
+    cv,
     githubRepos,
     systemMap,
     pulse,
@@ -65,7 +66,7 @@ export async function HomeContent() {
     getFlags(),
     getContentBlock("home-intro"),
     getContentBlock("ai-guide"),
-    isAnyCvOffered(),
+    getUploadedCvLink(),
     dbPublic.publicGithubRepo.count(),
     getSystemMap(),
     getPlatformPulse(),
@@ -76,24 +77,7 @@ export async function HomeContent() {
 
   const base = siteUrl();
   // Structured data (#101): who this is and what the site is — the same data the page shows.
-  const personLd = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: profile.name,
-    jobTitle: profile.headline ?? profile.role,
-    url: base,
-    email: `mailto:${profile.email}`,
-    // Public profiles only — not the WhatsApp link, which reaches a phone number.
-    sameAs: profile.links
-      .filter((l) => l.url.startsWith("https://") && !l.url.includes("wa.me"))
-      .map((l) => l.url),
-    ...(profile.location && {
-      address: { "@type": "PostalAddress", addressCountry: profile.location },
-    }),
-    ...(affiliations.length > 0 && {
-      worksFor: affiliations.map((a) => ({ "@type": "Organization", name: a.name })),
-    }),
-  };
+  const personLdData = { "@context": "https://schema.org", ...personLd(profile, base, { organisations: affiliations }) };
   const siteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -104,14 +88,14 @@ export async function HomeContent() {
 
   return (
     <>
-      <JsonLd data={personLd} />
+      <JsonLd data={personLdData} />
       <JsonLd data={siteLd} />
       <HomeHero
         stats={stats}
         profile={profile}
         titles={titles}
         intro={intro}
-        hasCv={hasCv}
+        cvUrl={cv?.url ?? null}
       />
       {guideEnabled && aiGuide && (
         <AiGuideSection

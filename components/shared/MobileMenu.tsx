@@ -22,7 +22,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Clock, Menu, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Clock, Menu, X, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { SHEETS } from "@/lib/content/sheets";
@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 const PAGES = SHEETS.filter((s) => s.href !== "/contact");
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
-export function MobileMenu({ links, email, reviewSlaHours }: { links: SiteLink[]; email: string | null; reviewSlaHours: number }) {
+export function MobileMenu({ links, email, reviewSlaHours, cvUrl = null }: { links: SiteLink[]; email: string | null; reviewSlaHours: number; cvUrl?: string | null }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -169,6 +169,15 @@ export function MobileMenu({ links, email, reviewSlaHours }: { links: SiteLink[]
                   >
                     Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
                   </Link>
+                  {/* The uploaded CV, while it's switched on — the phone's way to it (no CV page). */}
+                  {cvUrl && (
+                    <a
+                      href={cvUrl}
+                      className="text-paper focus-visible:outline-ember mt-3 flex h-12 items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+                    >
+                      <FileDown aria-hidden="true" className="size-4" /> Download my CV
+                    </a>
+                  )}
                   <p className="text-mist mt-4 flex items-center justify-center gap-1.5 text-xs">
                     <Clock aria-hidden="true" className="size-3.5" /> Every inquiry is reviewed within {reviewSlaHours} hours
                   </p>

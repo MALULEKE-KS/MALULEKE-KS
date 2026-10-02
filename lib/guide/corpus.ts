@@ -41,7 +41,7 @@ export interface GuideCorpus {
 }
 
 async function load() {
-  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits] =
+  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey] =
     await Promise.all([
       dbPublic.publicProfile.findFirst(),
       dbPublic.publicProfileLink.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -60,8 +60,9 @@ async function load() {
       dbPublic.publicCvOption.findMany(),
       dbPublic.publicGithubRepo.findMany({ orderBy: [{ pushedAt: { sort: "desc", nulls: "last" } }, { fullName: "asc" }] }),
       dbPublic.publicRepoCommit.findMany({ orderBy: { committedAt: "desc" }, take: 400 }),
+      getContentBlock("journey"),
     ]);
-  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits };
+  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey };
 }
 
 /** Top languages by share of code, e.g. "TypeScript 82%, CSS 11%". */
@@ -78,7 +79,7 @@ function languageShare(languages: unknown): string | null {
 }
 
 function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null): string {
-  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits } = data;
+  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey } = data;
   const out: string[] = [];
   const section = (title: string, source: string) => out.push("", `## ${title} (source: ${source})`);
 
@@ -97,7 +98,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   if (links.length) out.push(`Profiles: ${links.filter((l) => !l.url.includes("wa.me")).map((l) => `${l.label} ${l.url}`).join("; ")}`);
 
   if (method) {
-    section("Mission and method", "/method");
+    section("Mission and method", "/about#method");
     out.push(`Mission: ${method.mission}`);
     for (const p of method.principles) out.push(`- ${p.name}: ${p.summary} ${p.body}`);
   }
@@ -182,7 +183,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   }
 
   if (skills.length) {
-    section("Skills, with the evidence for each", "/cv");
+    section("Skills, with the evidence for each", "/about#skills");
     for (const s of skills) {
       const evidence = list([
         s.systemCount ? `${s.systemCount} system${s.systemCount === 1 ? "" : "s"} (${s.systemSlugs.join(", ")})` : null,
@@ -191,6 +192,13 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
       ]);
       out.push(`- ${s.name}: ${evidence || "listed"}${s.inCurrentRole ? "; used in the current role" : ""}`);
     }
+  }
+
+  if (journey) {
+    // His story as the Journey page tells it, in his own (first-person) words.
+    section("Journey — his story, in chapters (his words)", "/journey");
+    for (const c of journey.chapters) out.push(`- ${c.from}${c.to === c.from ? "" : `–${c.to ?? "now"}`} · ${c.title}${c.place ? ` (${c.place})` : ""}: ${c.body}`);
+    if (journey.ahead) out.push(`- Ahead · ${journey.ahead.title}: ${journey.ahead.body}`);
   }
 
   if (timeline.length) {

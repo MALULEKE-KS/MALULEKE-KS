@@ -113,14 +113,18 @@ export const Meeting = z
 export type MeetingT = z.infer<typeof Meeting>;
 
 // ─── The categories' own fields ─────────────────────────────────────────
-const WORK_ARRANGEMENTS = ["remote", "hybrid", "on-site", "flexible", "other"] as const;
-const TIMELINES = ["asap", "1-3-months", "3-6-months", "6-plus-months", "flexible"] as const;
+// Exported so the form's labels (lib/inquiries/fields.ts) are checked against them.
+export const REPRESENTATIONS = ["own", "client", "agency", "other"] as const;
+export const WORK_ARRANGEMENTS = ["remote", "hybrid", "on-site", "flexible", "other"] as const;
+export const TIMELINES = ["asap", "1-3-months", "3-6-months", "6-plus-months", "flexible"] as const;
+export const STAGES = ["idea", "prototype", "building", "live", "other"] as const;
+export const COMMITMENTS = ["a-few-hours", "part-time", "full-time", "unsure"] as const;
 
 const recruitment = z
   .object({
     jobTitle: Text(160),
     seniority: Opt(80),
-    representation: z.enum(["own", "client", "agency", "other"]),
+    representation: z.enum(REPRESENTATIONS),
     representationNote: Opt(200),
     workArrangement: z.enum(WORK_ARRANGEMENTS),
     workArrangementNote: Opt(200),
@@ -155,9 +159,9 @@ const service = z
 const collaboration = z
   .object({
     projectName: Text(160),
-    stage: z.enum(["idea", "prototype", "building", "live", "other"]),
+    stage: z.enum(STAGES),
     expectedContribution: Text(1000),
-    commitment: z.enum(["a-few-hours", "part-time", "full-time", "unsure"]),
+    commitment: z.enum(COMMITMENTS),
     compensation: Compensation,
     meeting: Meeting,
   })

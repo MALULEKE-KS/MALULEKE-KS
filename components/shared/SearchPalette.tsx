@@ -37,7 +37,7 @@ const GROUPS = [
 function hrefFor(r: Result): string {
   if (r.kind === "system") return `/systems/${r.key}`;
   if (r.kind === "journey") return `/journey#entry-${r.key}`;
-  return "/cv#skills";
+  return "/about#skills";
 }
 
 const MIN_QUERY = 2; // the API's own minimum (SearchQuerySchema)

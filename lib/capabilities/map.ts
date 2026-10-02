@@ -167,7 +167,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /content/{key}"],
     rules: [],
     frontend: [
-      { page: "/method", section: "Mission and principles" },
+      { page: "/about", section: "Method: the mission and principles, each with its evidence (#method)" },
       { page: "/", section: "Principles band" },
     ],
     notes: ["404 for an unknown or empty block — hide the section rather than showing placeholder copy."],
@@ -241,8 +241,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /skills"],
     rules: ["BR-1.1"],
     frontend: [
-      { page: "/cv", section: "Skills" },
-      { page: "/about", section: "What I work with" },
+      { page: "/about", section: "Skills, with the evidence for each (#skills)" },
       { page: "/systems/[slug]", section: "Skills this system proves (match systemSlugs)" },
     ],
     notes: ["Show evidence, not self-rating: \"used in 3 systems, 2 roles\" beats a bar chart."],
@@ -257,7 +256,6 @@ export const CAPABILITIES: Capability[] = [
     rules: [],
     frontend: [
       { page: "/about", section: "Certifications and awards" },
-      { page: "/cv", section: "Certifications" },
     ],
     notes: ["systemSlug links an achievement to its case study when present."],
   },
@@ -296,8 +294,9 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /cv/options", "GET /cv", "POST /cv/generate", "GET /cv/documents/{id}", "GET /cv/uploads/{id}"],
     rules: ["BR-7.1", "BR-7.2", "BR-7.3", "BR-7.4", "BR-7.5", "BR-7.6"],
     frontend: [
-      { page: "/cv", section: "CV options (GET /cv/options), in the order given, each with its label and note; the uploaded one shows its upload date" },
-      { page: "/cv", section: "On-screen CV, target-role box, Download PDF / Word — only while the generated option is listed" },
+      { page: "/", section: "Header and phone menu: a CV button to the uploaded file while it's offered; the home hero's 'Get my CV'" },
+      { page: "/about", section: "Download my CV, while the uploaded option is offered" },
+      { page: "/cv", section: "Redirects to the uploaded CV file (or About when it's off). The generated CV is dormant (owner, 2026-10-02): switched off in Admin → CV, its page kept unrouted" },
     ],
     notes: [
       "Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.",

@@ -48,52 +48,103 @@
 
 **Behavior:** an unknown or unpublished slug renders the same generic not-found page as a real 404 — never a distinct "this one's private" message, which would itself leak that a hidden system exists.
 
-### `/journey` — Timeline
+### `/journey` — the person's life and career (rebuilt 2026-10-02)
 
-Single vertical log, not a generic icon-and-card timeline component — visually a continuation of the homepage's ledger language: each `Timeline` entry is a dated line, title, short description, tag pills. Filterable by `MilestoneType` via mono filter chips at the top.
+The owner's story from school to now, in chapters. It covers his life and career, not his repositories (those are on `/systems`). Owner: "the journey is about me and my life since day one".
 
-**Behavior:** empty state per filter — *"No entries tagged [type] yet."* — plain, not apologetic.
+1. **Hero**
+   - The headline and lede from the content block `journey`.
+   - A **life line** showing every year from the first chapter to the year ahead:
+     - each chapter is a segment that links to that chapter;
+     - *now* pulses;
+     - the future is dashed.
+2. **Chapters** — each shows its number, years and place, then his words, then the dated moments inside it.
+   - The moments are `PublicTimeline` milestones and experience starts. Each goes in the latest chapter covering its year.
+   - Dates are shown only as precisely as he gave them (`Timeline.datePrecision`, `formatMilestoneDate`).
+   - The chapter he's living now is marked and lit.
+3. **What's next** — his ambition, his future milestones, Let's talk, and his CV while it's offered.
 
-### `/cv`
+**Behavior:**
+- **Words** come from Admin → Page content → Journey, marked `reviewed: false` until the owner approves the draft.
+- **Dates** come from Admin → Journey.
+- **No content block:** the page shows "The journey is being written."
+- **Never** an invented date or fact.
 
-1. Header — name, role line, and the **CV options** the admin shows (`GET /cv/options`, #92), in the admin's order, each with its label and note (BR-7.1, BR-7.5):
-   - **Generated CV** — **Download PDF** / **Download Word** (`POST /cv/generate` with `format`, #74), the same ATS-safe CV in both formats, built from live data on click.
-   - **Uploaded CV** — the owner's own file(s), with the upload date; plain download links.
+### `/cv` — retired as a page (2026-10-02)
 
-   Sections 2–5 are the generated CV on screen, so they show only while the generated option is visible.
-2. Experience — reverse-chronological.
-3. Education.
-4. Skills — grouped by `SkillCategory`, not one flat tag cloud.
-5. A small on-screen note: *"Formatted for print — use Download PDF for the cleanest copy."*
+The owner's uploaded CV is the CV. Owner: generation "is building harder and violating our own rule".
 
-**Behavior:** on-screen view uses the full design system; the downloaded/printed version uses the ink-only print stylesheet already built in `globals.css` — genuinely different outputs for genuinely different jobs (reading vs. printing/attaching to an application).
+**Where the CV is offered:**
+- `/cv` redirects to the uploaded file while it's offered, else to `/about`.
+- Everywhere else links the uploaded file directly through `getUploadedCvLink()`, PDF first:
+  - the header's **CV** button;
+  - the phone menu's *Download my CV*;
+  - the home hero's *Get my CV*;
+  - the calls to action on Journey and About.
 
-### `/method` (was `/how-i-build`, which redirects permanently)
+**The generator** is switched off, not deleted:
+- Its code, API and admin screen stay; the generated `PublicCvOption` is hidden.
+- The old page is kept, unrouted, as `_generated-cv-page.tsx`.
 
-1. Mission statement, set prominently but not oversized — restraint, per Design System §4.
-2. The governing principles — EXT-1, Smart Not Hard, Controlled Imperfection Engineering, Permission Boundaries — each with a short, plain-language explanation of what it means in practice, not the full constitution text.
-3. Two or three real rule citations rendered as actual `RuleCitation` components (e.g. BR-1.1, BR-4.1) — making the discipline tangible instead of asserted. This is the page the Overview document flagged as currently "buried in a README" — this is where it surfaces properly.
+### `/method` — now a section of About
 
-**Behavior:** the mission and principles are the admin-edited content block `how-i-build` (Admin → Page content, #106) — never text in the page's code.
+`/method` (and `/how-i-build`) redirect permanently to `/about#method`.
 
-### `/about`
+### `/about` — the person, and how he builds (rebuilt 2026-10-02)
 
-1. First-person narrative (`Profile.bio`) — voice per Design System/Overview §voice-and-tone.
-2. **The owner's photo** — the current `about` photo (`GET /profile` → `photos.about`, uploaded in Admin → Profile → Photos, BR-1.17); until one is uploaded, the portrait the owner approved for this page (`design/character/about-portrait-graphite.png`, web copy `public/character/about-portrait.webp`). An upload always wins.
-3. **Titles and qualifications** — every current `ProfileTitle` (e.g. "Software & AI Engineer", "Final-year BSc Computer Science & Mathematics student · North-West University"), in the owner's order.
-4. Organizational affiliations — KSDRILL-SA, GrowthCore, brief, not a repeated systems list.
-5. Pointers to `/journey` and `/method` for anyone wanting depth.
+1. **Hero**
+   - **His portrait**, large and lit. The uploaded `about` photo wins (BR-1.17); otherwise the approved portrait.
+   - **Two glass badges** on the portrait's edges, both from his own data: his company role and his study.
+   - **Beside it:** his name, his headline and the titles the headline doesn't already state, then Let's talk and *Get my CV*.
+2. **In my own words**
+   - `Profile.bio`, with the first paragraph set large in serif.
+   - **Beside it, the AI guide**, hidden when the guide is off:
+     - the anime character, its poses cross-fading;
+     - labelled AI;
+     - three suggested questions, each opening the guide.
+   - **Plain facts:** based in, building since, studying, companies.
+3. **Method** (`#method`) — the mission and the five principles from the `how-i-build` block, each opening its evidence (EVIDENCE-SPEC).
+4. **Skills** (`#skills`)
+   - Grouped by `SkillCategory`, as on his CV.
+   - Each skill shows how many published systems use it (`SkillEvidence`) — evidence rather than a rating.
+5. **Organisations** — each with his role, its systems count and its GitHub link. The page closes with *Let's build something real.*
 
-**Behavior:** core content is stable; the subtitle/framing line shifts per active `VisitorLens`, the body does not.
+**Behavior:** nothing about the owner lives in the page's code. Every section hides when its data is empty.
 
-### `/contact` — Let's Talk (docs/LETS-TALK-SPEC.md)
+### `/contact` — Let's Talk (docs/LETS-TALK-SPEC.md; rebuilt 2026-10-02)
 
-1. **What brings you here?** — the active categories as tiles (`GET /inquiries/types`, in the admin's order), each with its description. `?about=<category>` opens one directly (the home band's links).
-2. **A form shaped to the category** — its kinds (with an "Other — describe" escape), its own fields, the message (labelled for the category), compensation as an explicit choice where it applies, an arranged interview or meeting with its own time zone, the person and their preferred channel, and optional PDFs.
-3. **Confirmation** — inline, with the reference to quote, the review window (`inquiry.reviewSlaHours`), and the removal route (BR-5.5). No account.
-4. Beside it: how it goes from here (four steps), email as the other way in, and what happens to their details (retention, BR-5.2).
+1. **Hero**
+   - "Let's talk."
+   - A person rather than a mailbox: his face and "reads every message himself — reviewed within N hours" (`inquiry.reviewSlaHours`).
+   - How it goes from here, as four connected steps. Phones show only the step titles.
+2. **What brings you here?** — the active categories as tiles, in the admin's order (`GET /inquiries/types`).
+   - Each tile shows its description and what the form will ask, e.g. "8 questions · about 3 min", counted from the form's own spec.
+   - `?about=<category>` opens a category directly.
+3. **A form shaped to the category**, in numbered parts:
+   - **What it is** — the kinds (with "Other — describe"), the category's own fields, and the message.
+   - **Compensation**, where it applies.
+   - **An arranged interview or meeting**, with its own time zone.
+   - **You**, with the preferred channel.
+   - **Documents** — PDFs, dropped or chosen.
 
-**Behavior:** the same rules run in the browser and on the server (the server's answer counts); a hidden honeypot, a signed form token, per-connection and per-address limits; one idempotency key per message. Reached from **Let's talk** (header), the home band and the footer, and — when the visitor asks — pre-filled by the AI guide's `draft_inquiry`, which only fills the message; the visitor still sends it (BR-4.1/4.2).
+   Beside the form, a **progress rail** ticks each part off and jumps to it.
+4. **Confirmation** — inline: the reference, the review window and the removal route (BR-5.5). No account.
+5. **Beside the form:** email as the other way in, and what happens to their details (BR-5.2).
+
+**Structure:**
+- **The category fields are data** in `lib/inquiries/fields.ts`. One spec is drawn by one renderer and read by the payload builder; its labels are typed against the schema enums.
+- **State and sending** live in `use-inquiry-form.ts`, with one component per part.
+- **`tests/unit/inquiry-fields.test.ts`** proves the spec and the server schemas (`lib/inquiries/forms.ts`) agree.
+
+**Behavior:**
+- **Validation:** the same rules run in the browser and on the server. The server's answer counts.
+- **Abuse protection:** a hidden honeypot, a signed form token, and per-connection and per-address limits.
+- **Duplicates:** one idempotency key per message.
+- **Ways in:**
+  - **Let's talk** in the header;
+  - the home band;
+  - the footer;
+  - the AI guide's `draft_inquiry`, when the visitor asks. It only fills the message; the visitor still sends it (BR-4.1/4.2).
 
 ### `/now` (F5c, planned)
 
