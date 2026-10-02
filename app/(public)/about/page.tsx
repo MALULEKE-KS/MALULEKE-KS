@@ -226,7 +226,7 @@ export default async function AboutPage() {
             <h2 id="skills-title" className="type-h2 text-ink mt-4 max-w-3xl">
               Skills, with <span className="type-accent text-ember-gradient pr-[0.06em]">the work that proves them.</span>
             </h2>
-            <p className="text-slate mt-4 max-w-2xl">The number beside a skill counts the published systems built with it.</p>
+            <p className="text-slate mt-4 max-w-2xl">The number beside a skill counts the published systems built with it — open one to see them.</p>
             <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {groups.map((g) => (
                 <Reveal key={g.key} className="h-full">
@@ -234,15 +234,21 @@ export default async function AboutPage() {
                     <h3 className="text-ink font-sans text-base font-semibold">{g.label}</h3>
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {g.skills.map((s) => (
-                        <li
-                          key={s.skillId}
-                          className={s.systemCount > 0 ? "border-ink/15 bg-paper text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm" : "border-ink/10 text-slate inline-flex items-center rounded-full border px-3 py-1 text-sm"}
-                        >
-                          {s.name}
-                          {s.systemCount > 0 && (
-                            <span className="bg-ember/15 text-accent rounded-full px-1.5 font-mono text-[11px]" title={`Used in ${s.systemCount} published system${s.systemCount === 1 ? "" : "s"}`}>
-                              {s.systemCount}
-                            </span>
+                        <li key={s.skillId}>
+                          {s.systemCount > 0 ? (
+                            // Evidence you can open: the systems built with it.
+                            <Link
+                              href={`/systems?tech=${encodeURIComponent(s.name)}`}
+                              aria-label={`${s.name} — used in ${s.systemCount} published system${s.systemCount === 1 ? "" : "s"}`}
+                              className="border-ink/15 bg-paper text-ink hover:border-ember/50 focus-visible:outline-ember inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                            >
+                              {s.name}
+                              <span aria-hidden="true" className="bg-ember/15 text-accent rounded-full px-1.5 font-mono text-[11px]">
+                                {s.systemCount}
+                              </span>
+                            </Link>
+                          ) : (
+                            <span className="border-ink/10 text-slate inline-flex items-center rounded-full border px-3 py-1 text-sm">{s.name}</span>
                           )}
                         </li>
                       ))}
