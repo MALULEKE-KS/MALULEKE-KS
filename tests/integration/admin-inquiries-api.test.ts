@@ -31,7 +31,7 @@ beforeAll(async () => {
   adminId = admin.id;
   sessionCookie = createSessionCookieValue(adminId, 1);
 
-  const inquiryType = await db.inquiryType.findFirstOrThrow({ where: { key: "hire" } });
+  const inquiryType = await db.inquiryType.findFirstOrThrow({ where: { key: "general" } });
   inquiryTypeId = inquiryType.id;
 });
 
@@ -179,13 +179,37 @@ describe("PATCH /api/v1/admin/inquiries/[id]", () => {
     expect(res.status).toBe(200);
   });
 
-  it("blocks any transition out of closed — a terminal state (BR-2.1)", async () => {
+  it("a closed inquiry can only be reopened for review (LT-6)", async () => {
     const inquiry = await createFixtureInquiry({ status: "CLOSED" });
+    const url = `http://localhost/api/v1/admin/inquiries/${inquiry.id}`;
+    expect((await patchInquiry(makeRequest(url, "PATCH", { status: "accepted" }, true), { params: Promise.resolve({ id: inquiry.id }) })).status).toBe(409);
+    expect((await patchInquiry(makeRequest(url, "PATCH", { status: "reviewed" }, true), { params: Promise.resolve({ id: inquiry.id }) })).status).toBe(200);
+  });
+
+  it("refuses a change made from a stale screen (LT-6)", async () => {
+    const inquiry = await createFixtureInquiry();
+    const url = `http://localhost/api/v1/admin/inquiries/${inquiry.id}`;
+    const ok = await patchInquiry(makeRequest(url, "PATCH", { status: "reviewed", expectedVersion: 0 }, true), { params: Promise.resolve({ id: inquiry.id }) });
+    expect(ok.status).toBe(200);
+    const stale = await patchInquiry(makeRequest(url, "PATCH", { status: "declined", expectedVersion: 0 }, true), { params: Promise.resolve({ id: inquiry.id }) });
+    expect(stale.status).toBe(409);
+    expect((await stale.json()).error.code).toBe("STALE");
+  });
+
+  it("keeps the private reason apart from what the applicant is told (LT-7)", async () => {
+    const inquiry = await createFixtureInquiry({ status: "REVIEWED" });
+    const url = `http://localhost/api/v1/admin/inquiries/${inquiry.id}`;
     const res = await patchInquiry(
-      makeRequest(`http://localhost/api/v1/admin/inquiries/${inquiry.id}`, "PATCH", { status: "reviewed" }, true),
-      { params: Promise.resolve({ id: inquiry.id }) }
+      makeRequest(url, "PATCH", { status: "declined", internalReason: "Budget far too low", applicantMessage: "Thank you — it isn't a fit right now." }, true),
+      { params: Promise.resolve({ id: inquiry.id }) },
     );
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(200);
+    const messages = await db.inquiryMessage.findMany({ where: { inquiryId: inquiry.id } });
+    expect(messages).toHaveLength(1);
+    expect(messages[0]!.kind).toBe("decline");
+    expect(messages[0]!.body).not.toContain("Budget");
+    const change = await db.inquiryStatusChange.findFirstOrThrow({ where: { inquiryId: inquiry.id, toStatus: "DECLINED" } });
+    expect(change.internalReason).toBe("Budget far too low");
   });
 
   it("returns 404 for a nonexistent inquiry", async () => {

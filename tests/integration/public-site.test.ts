@@ -7,6 +7,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { POST as submitInquiry } from "@/app/api/v1/inquiries/route";
+import { issueFormToken } from "@/lib/inquiries/form-token";
 import { GET as getProfile } from "@/app/api/v1/profile/route";
 import sitemap from "@/app/sitemap";
 import robots from "@/app/robots";
@@ -67,7 +68,7 @@ describe("inquiry types are a lookup, end to end (EXT-1, #99)", () => {
       new NextRequest("http://localhost/api/v1/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-forwarded-for": `198.51.100.${i}` },
-        body: JSON.stringify({ name: "Visitor", email: `${RUN}.${i}@example.com`, message: "A message long enough to pass the rules.", inquiryType }),
+        body: JSON.stringify({ name: "Visitor", email: `${RUN}.${i}@example.com`, message: "A message long enough to pass the rules.", inquiryType, formToken: issueFormToken(Date.now() - 10_000) }),
       }),
     );
 

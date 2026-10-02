@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**33 capabilities · 123 endpoints.**
+**33 capabilities · 136 endpoints.**
 
 ## Public
 
@@ -407,29 +407,37 @@ Two clearly labelled CV options (#92): the CV generated from live data — as da
 - Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
 - POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
 
-### Contact — send an inquiry
+### Let's Talk — send a message
 
 `inquiries.submit` · public
 
-The single visitor write path: validated, rate-limited, honeypot-protected, idempotent; reviewed within the admin-set deadline.
+The single visitor write path (docs/LETS-TALK-SPEC.md): a category and kind, a form shaped to it, PDFs checked by their bytes; honeypot, signed form token, per-connection and per-address limits, payload-bound idempotency; a reference back; email queued in the same transaction.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `POST /inquiries`
+- `GET /inquiries/form`
+- `GET /inquiries/types`
 
 **Database**
 
 - `Inquiry`
 - `InquiryType`
+- `InquirySubtype`
+- `InquiryMeeting`
+- `InquiryDocument`
+- `Notification`
 - `rate_limit_hit`
+- `new_inquiry_reference`
 
-**Rules:** BR-2.2, BR-2.3, BR-2.4, BR-2.5, BR-2.6, BR-2.7
+**Rules:** BR-2.2, BR-2.3, BR-2.4, BR-2.5, BR-2.6, BR-2.7, LT-1, LT-2, LT-3, LT-4, LT-5, LT-8, LT-9, LT-10, LT-12, LT-13
 
 **Notes**
 
-- Types come from GET /lookups/inquiry-type; include the hidden honeypot field "website".
-- Send an idempotencyKey (uuid) so a double-submit returns the original confirmation.
+- Fetch GET /inquiries/form when the form is shown and send its token as formToken; include the hidden honeypot field "website" (the visitor's own site is organizationWebsite).
+- Send an idempotencyKey (uuid), kept across retries, so a double-submit returns the original confirmation.
 - The review promise comes from the inquiry.reviewSlaHours setting — don't hardcode "48 hours".
+- Show the reference from the response; it identifies the message, it never unlocks anything.
 
 ### Lookups — statuses, domains, types, categories, relationships
 
@@ -599,26 +607,45 @@ The organizations systems belong to — ventures founded, clients, the owner's o
 
 - isClient only affects systems created afterwards (BR-1.2) — say so next to the switch.
 
-### Inquiries — triage
+### Inquiries — Let's Talk management
 
 `admin.inquiries` · admin
 
-The inbox: filter by status, type or overdue; move each through NEW → REVIEWED → RESPONDED/CLOSED; the review deadline is an admin setting.
+The inbox (search, status, category, priority, overdue, possible duplicates) and each inquiry in full: the guarded workflow with its database-written history, private notes apart from what the applicant is told, information requests, meetings with their own time zone, PDFs, and the email outbox with retry; the kinds within each category.
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `GET /admin/inquiries`
+- `GET /admin/inquiries/{id}`
 - `PATCH /admin/inquiries/{id}`
+- `POST /admin/inquiries/{id}/notes`
+- `POST /admin/inquiries/{id}/messages`
+- `POST /admin/inquiries/{id}/meetings`
+- `PATCH /admin/inquiries/{id}/meetings/{meetingId}`
+- `GET /admin/inquiries/{id}/documents/{documentId}`
+- `GET /admin/notifications`
+- `POST /admin/notifications/{id}/retry`
+- `GET /admin/inquiry-subtypes`
+- `POST /admin/inquiry-subtypes`
+- `PATCH /admin/inquiry-subtypes/{id}`
 
 **Database**
 
 - `Inquiry`
+- `InquiryStatusChange`
+- `InquiryNote`
+- `InquiryMessage`
+- `InquiryMeeting`
+- `InquiryDocument`
+- `Notification`
+- `InquirySubtype`
 
-**Rules:** BR-2.1, BR-2.2, BR-5.5
+**Rules:** BR-2.1, BR-2.2, BR-5.5, LT-5, LT-6, LT-7, LT-10, LT-11, LT-12
 
 **Notes**
 
-- Only offer the transitions BR-2.1 allows; 409 INVALID_STATUS_TRANSITION otherwise.
+- Offer only the moves in nextStatuses; send expectedVersion — 409 STALE means reload.
+- internalReason is private; applicantMessage is what they were told — never mix them.
 
 ### Journey — entries and approvals
 
@@ -909,12 +936,20 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `Flag` | admin.settings |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
+| `InquiryDocument` | inquiries.submit, admin.inquiries |
+| `InquiryMeeting` | inquiries.submit, admin.inquiries |
+| `InquiryMessage` | admin.inquiries |
+| `InquiryNote` | admin.inquiries |
+| `InquiryStatusChange` | admin.inquiries |
+| `InquirySubtype` | inquiries.submit, admin.inquiries |
 | `InquiryType` | inquiries.submit, lookups |
 | `JobRun` | platform.pulse, admin.overview, admin.metrics, admin.jobs |
 | `LoginChallenge` | admin.auth, admin.jobs |
 | `Metric` | admin.metrics |
 | `MetricSnapshot` | admin.overview, admin.metrics |
 | `MilestoneType` | journey, lookups |
+| `new_inquiry_reference` | inquiries.submit |
+| `Notification` | inquiries.submit, admin.inquiries |
 | `Organization` | admin.organizations |
 | `OrganizationKind` | homes, lookups, admin.organizations |
 | `PlatformSetting` | admin.settings, admin.freshness |

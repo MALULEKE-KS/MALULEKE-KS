@@ -30,6 +30,13 @@
 
 ## Part 2 — Update log (newest first)
 
+### F5c — Let's Talk V1 (2026-10-02, local)
+- **"What brings you here?"** — /contact is Let's Talk: five categories as tiles (hiring, a software project, collaboration, marketing or growth, something else), each with its kinds and an "Other" escape, then a form that asks only what that category needs; a reference (`KS-26-7QM4-K2`) at the end. The home band's categories open the form already on that category.
+- **Strengthened on the way** (the owner's spec, LETS-TALK-SPEC): compensation is a choice (range, prefer to discuss, unpaid) checked by the database; interviews keep their own time zone; PDFs only, checked by their bytes; the idempotency key is bound to its message; a per-address limit; a signed form token (fill-time check); duplicates flagged, never removed.
+- **The admin**: a searchable inbox and a workbench per inquiry — the nine-state workflow (database-enforced, history written by the database, stale screens refused), private reason vs what the applicant is told, information requests, meetings, documents, notes, and the email outbox with retry.
+- **Found and fixed**: the audit log would have stored applicants' new personal fields in clear (now redacted); retention didn't clear them or the documents (now does); the visitor's "website" field shared its name with the honeypot (renamed — a visitor with a site would have been silently dropped); the reference backfill would have failed on any anonymised inquiry (now safe); the public role couldn't read the new kinds.
+- **Email**: Resend over HTTP via an outbox. Owner alerts work once the Resend integration is installed; applicant confirmations stay off (flag) until a sending domain is verified — the site has no custom domain yet.
+
 ### F5c — Owner adjustments locked (2026-10-02, local)
 - **Principle 01, Make It Exist First** (owner: *"make it exist first … then you will make it beautiful later"*): leads the five principles (content migration, Constitution §1), with its guardrail — unfinished, never unsafe.
 - **Two specs, audited against the code and tightened:** `docs/EVIDENCE-SPEC.md` (every claim leads to inspectable evidence, links pinned to the running commit and checked in CI, status capped by review date; a content block, no new table) and `docs/LETS-TALK-SPEC.md` (opportunity intake on `Inquiry`: categories + subtypes, server-validated per-category fields, explicit compensation, meetings as events, PDF-only documents, reference ≠ credential, email outbox via Resend; four loopholes in today's intake fixed; noise cut). Owner decisions recorded in each.

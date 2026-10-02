@@ -62,7 +62,16 @@ The owner's feature spec (2026-10-01, "approved; V1 + V2 accountless tracking"),
 3. **Compensation: "Prefer to discuss" is allowed as an explicit, recorded choice** — never assumed from a blank.
 4. **Owner alert:** an email to the owner on every new inquiry (default; a digest can be a setting later).
 
-## 7. V2 (in ROADMAP-V2 when V1 ships)
+## 6a. Built (2026-10-02) — and where the build differs from the plan
+
+- **Categories reuse the existing lookup keys:** recruitment, service, collaboration, growth, general; hire, partnership and contribution retired (BR-8.2), their old inquiries untouched. Statuses were *added*, not renamed: `REVIEWED` reads "Reviewing", `RESPONDED` "In discussion".
+- **`id` is still returned** beside `reference` — removing it would break the v1 contract (additive only); it authorises nothing.
+- **The visitor's site is `organizationWebsite`** — `website` is the honeypot's name (BR-2.7) and a shared name would have dropped real visitors as bots.
+- **Information requests are messages** (kind `info-request`); the applicant replies by email. The 5-state action requests wait for V2.
+- **Email:** sent after the response, by the daily job (Hobby crons run daily) and by the admin's retry. Applicant confirmations need a verified domain (DEPLOYMENT.md) and stay behind the flag `notifications.applicant_emails`.
+- Tests: `tests/integration/inquiries-api.test.ts` (intake), `admin-inquiries-api.test.ts`, `db-enforced-rules.test.ts`, `audit-trail.test.ts`; register rows in ENFORCEMENT-REGISTER §2.
+
+## 7. V2 (ROADMAP-V2 #15)
 
 Accountless tracking: a separate 256-bit random token per inquiry, stored hashed, emailed as a link; states active / expired / revoked / replaced; one token unlocks one inquiry's **applicant-facing** data only (LT-7 makes leakage structurally impossible); rate-limited; never logged. V1 builds nothing for it beyond keeping LT-7's separation.
 

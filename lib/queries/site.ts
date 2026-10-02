@@ -7,6 +7,7 @@
 // deploy. Memoised per request (React cache), so the header, footer and page
 // share one read. Public views and public lookups only (platform_public).
 
+import { formFor, type CategoryKey } from "@/lib/inquiries/forms";
 import { cache } from "react";
 import { dbPublic as db } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
@@ -47,16 +48,28 @@ export const getSiteProfile = cache(async (): Promise<SiteProfile> => {
 export interface InquiryTypeOption {
   value: string;
   label: string;
+  description?: string | null;
+  /** Which form the category uses (lib/inquiries/forms.ts). */
+  form?: CategoryKey;
+  subtypes?: { value: string; label: string }[];
 }
 
 /** Active inquiry types, in the order they were added (EXT-1 lookup). */
 export const getInquiryTypes = cache(async (): Promise<InquiryTypeOption[]> => {
-  // Label breaks ties: the seed created every type in the same instant.
+  // The admin's order first; label breaks ties (the seed created every type in the same instant).
   const types = await db.inquiryType.findMany({
     where: { active: true },
-    orderBy: [{ createdAt: "asc" }, { label: "asc" }],
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { label: "asc" }],
+    include: { subtypes: { where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] } },
   });
-  return types.map((t) => ({ value: t.key, label: t.label }));
+  // Let's Talk (LT-1): each category carries its subtypes and the form it uses.
+  return types.map((t) => ({
+    value: t.key,
+    label: t.label,
+    description: t.description,
+    form: formFor(t.key),
+    subtypes: t.subtypes.map((s) => ({ value: s.key, label: s.label })),
+  }));
 });
 
 export interface Affiliation {

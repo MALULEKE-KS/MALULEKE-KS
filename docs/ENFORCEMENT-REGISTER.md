@@ -42,13 +42,25 @@
 
 | Rule | Claim | Enforced today | Status | Target | Step |
 |---|---|---|---|---|---|
-| BR-2.1 | `new → reviewed → responded/closed`, never skipped | `lib/rules/inquiries.ts`; trigger `Inquiry_br_2_1_workflow` (start NEW, valid transitions only) — enforced in the database too (F1.2, #60) | ✅ | App + DB trigger | — |
+| BR-2.1 / LT-6 | NEW → REVIEWED first; then the Let's Talk workflow, reopenable; history kept; stale screens refused | Trigger `Inquiry_br_2_1_workflow` (allowed moves — replaced 2026-10-02), `Inquiry_lt_6_history` (the database writes every change), `InquiryStatusChange_append_only` + runtime role without UPDATE/DELETE (two locks); version check in `lib/inquiries/admin.ts` — `prisma/migrations/20261002110000_lets_talk_intake`. Tested: `db-enforced-rules.test.ts` (transitions, append-only history), `admin-inquiries-api.test.ts` (reopen, STALE, private vs applicant) | ✅ | DB + App | — |
 | BR-2.2 | Every `new` inquiry reviewed within the configured deadline (48 hours by default) | `GET /admin/inquiries?overdue=true` filters `NEW` inquiries past the admin-editable `inquiry.reviewSlaHours` deadline; every admin inquiry shape also exposes `reviewDueAt` and `overdue`. Integration-tested (#82) | ✅ | Admin query + setting | — |
 | BR-2.3 | Name, valid email, message 20–5000 chars, type | Zod; CHECKs `Inquiry_br_2_3_*` (length, name, email shape) — enforced in the database too (F1.2, #60). The 20/5000 bounds become settings in F1.6 | ✅ | App + DB CHECK | F1.6 (tunable) |
 | BR-2.4 | Max 5 per IP per 24h, no privileged bypass | `rate_limit_hit()` — one atomic call per request, serialised per key (#64); proven: 20 simultaneous requests → exactly 5 allowed. Limit and window are admin-editable settings (#67), bounded 1–100 per 1–168h | ✅ | DB function + settings table | Done |
 | BR-2.5 | `source` captured server-side, `"direct"` fallback | `POST /inquiries` | ✅ | App | — |
-| BR-2.6 | Idempotency key dedupes within 10 minutes | `POST /inquiries` + unique index | ✅ | App + DB unique | — |
+| BR-2.6 | Idempotency key bound to its payload: same → original, different → 409 | `payloadHash` on `Inquiry` + unique key; `app/api/v1/inquiries/route.ts`. Tested: `inquiries-api.test.ts` | ✅ | App + DB unique | — |
 | BR-2.7 | Honeypot returns an identical 201, creates nothing | `POST /inquiries` | ✅ | App | — |
+| BR-2.8 | A message needs a signed form token, shown long enough before sending | `lib/inquiries/form-token.ts` (HMAC, own label, timing-safe), `GET /inquiries/form`. Tested: missing, forged, too fast → decoy, nothing stored; expired → FORM_EXPIRED | ✅ | App | — |
+| BR-2.9 | Per-address limits: messages sent, automatic emails received | `hitRateLimitKey` on a hash of the address; `recipientUnderCap` in `lib/notifications`. Tested: `inquiries-api.test.ts` | ✅ | App + DB function | — |
+| LT-1/2 | Each category asks only its own questions; another form's field is refused | `lib/inquiries/forms.ts` (strict per-category schemas), server-side in `POST /inquiries`. Tested | ✅ | App | — |
+| LT-3 | A non-sequential reference, unique, never a credential | `new_inquiry_reference()` + unique index; nothing authorises by reference | ✅ | DB | — |
+| LT-4 | Compensation is a choice; a range never runs backwards or below zero | Schema `Compensation`; CHECK `Inquiry_lt_4_compensation`. Tested (app and database) | ✅ | App + DB | — |
+| LT-5 | Meetings are events with their own IANA time zone | `InquiryMeeting` + CHECK `InquiryMeeting_lt_5`; `isTimeZone`/`zonedToUtc`. Tested | ✅ | App + DB | — |
+| LT-7 | Private notes and applicant messages never share a table | `InquiryNote` vs `InquiryMessage`; status reason vs applicant message in separate columns. Tested | ✅ | DB structure | — |
+| LT-8 | Documents are PDFs by their bytes, bounded, admin-only downloads | `lib/inquiries/documents.ts`; CHECK `InquiryDocument_lt_8` (PDF signature, size, plain name); download route: attachment, nosniff, sandbox, scoped to its inquiry. Tested (app and database) | ✅ | App + DB | — |
+| LT-9/10 | Email can't be weaponised; a failed send never undoes state | Fixed-copy confirmation (`lib/inquiries/emails.ts`) behind flag `notifications.applicant_emails`; outbox `Notification` queued in the same transaction, sent after the response, by the daily job and by retry. Tested: queued, no applicant email with the flag off | ✅ | App | — |
+| LT-12 | Possible duplicates flagged, never removed | `possibleDuplicateOfId` within `inquiry.duplicateWindowDays`. Tested | ✅ | App | — |
+| Audit | No personal field of an inquiry reaches the activity log | `Inquiry_audit` redacts every personal column; notes, messages, meetings, documents redacted in theirs. Tested: phone, organisation, email absent from the log | ✅ | DB | — |
+| BR-5.2 | Retention clears every Let's Talk field and purges documents | `apply_retention` (replaced 2026-10-02) | ✅ | DB function | — |
 
 ## 3. Admin security (BR-3.x) — re-verified end to end in F3
 
