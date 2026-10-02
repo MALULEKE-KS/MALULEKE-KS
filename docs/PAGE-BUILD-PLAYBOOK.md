@@ -246,6 +246,7 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 - **Story:** from zero to here, dated and sourced.
 - **Data:** `PublicTimeline`, `PublicExperience`, `PublicEducation`, `PublicAchievement`, repo start dates.
 - **Candidates:** a scroll-driven timeline with Blur Fade; years as anchors; GitHub milestones interleaved.
+- **Built (2026-10-02):** one rail through time (`lib/queries/journey.ts`): milestones, roles (start and leaving), study (start, finish, or expected — drawn dashed as *ahead*), achievements, systems started (first commit of a published system's public repo) and shipped (`SystemPace`). Never empty, never invented; a system the owner already wrote a milestone for isn't announced twice. A year scrubber (sticky column on desktop, swipeable strip on phones), a pulsing *Today* node, filters only for kinds present, `#entry-<id>` anchors kept for search.
 
 ### `/cv` — the CV engine (designed from zero, §5 of the plan)
 - **Story:** a world-class, ATS-safe CV, generated from the same records, tailored to a role.
