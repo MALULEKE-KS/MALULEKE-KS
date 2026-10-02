@@ -55,6 +55,7 @@ ADD COLUMN "website" TEXT;
 -- column it fills), then the column becomes required with the function as default.
 -- An anonymised inquiry is frozen by BR-5.2's trigger; a reference is not
 -- personal data, so the trigger stands aside for this one backfill only.
+-- migration-guard: allow the BR-5.2 freeze stands aside for one statement — adding a non-personal reference to anonymised rows — and is re-enabled on the next line
 ALTER TABLE "Inquiry" DISABLE TRIGGER "Inquiry_br_5_2_anonymized";
 UPDATE "Inquiry" SET "reference" = new_inquiry_reference() WHERE "reference" IS NULL;
 ALTER TABLE "Inquiry" ENABLE TRIGGER "Inquiry_br_5_2_anonymized";
@@ -314,6 +315,7 @@ BEGIN
 
   -- What hangs off an expiring inquiry goes first: documents purged, notes and
   -- messages and meeting details stripped, queued email cleared.
+  -- migration-guard: allow retention (BR-5.2) purges an expired inquiry's documents — inside apply_retention, run by the daily job, never at migration time
   DELETE FROM "InquiryDocument" d USING "Inquiry" i
    WHERE d."inquiryId" = i."id" AND i."createdAt" < cutoff AND i."anonymizedAt" IS NULL;
   UPDATE "InquiryNote" n SET "body" = 'Removed after the retention period (BR-5.2).'
