@@ -19,6 +19,7 @@ import {
   getSiteProfile,
 } from "@/lib/queries/site";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { personLd } from "@/lib/seo/person";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getEvidence } from "@/lib/evidence";
 import { siteUrl } from "@/lib/site-url";
@@ -76,24 +77,7 @@ export async function HomeContent() {
 
   const base = siteUrl();
   // Structured data (#101): who this is and what the site is — the same data the page shows.
-  const personLd = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: profile.name,
-    jobTitle: profile.headline ?? profile.role,
-    url: base,
-    email: `mailto:${profile.email}`,
-    // Public profiles only — not the WhatsApp link, which reaches a phone number.
-    sameAs: profile.links
-      .filter((l) => l.url.startsWith("https://") && !l.url.includes("wa.me"))
-      .map((l) => l.url),
-    ...(profile.location && {
-      address: { "@type": "PostalAddress", addressCountry: profile.location },
-    }),
-    ...(affiliations.length > 0 && {
-      worksFor: affiliations.map((a) => ({ "@type": "Organization", name: a.name })),
-    }),
-  };
+  const personLdData = { "@context": "https://schema.org", ...personLd(profile, base, { organisations: affiliations }) };
   const siteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -104,7 +88,7 @@ export async function HomeContent() {
 
   return (
     <>
-      <JsonLd data={personLd} />
+      <JsonLd data={personLdData} />
       <JsonLd data={siteLd} />
       <HomeHero
         stats={stats}

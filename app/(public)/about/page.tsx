@@ -28,6 +28,9 @@ import { getContentBlock } from "@/lib/content/blocks";
 import { claimsFor, getEvidence } from "@/lib/evidence";
 import { getUploadedCvLink } from "@/lib/cv/options";
 import { dbPublic } from "@/lib/db";
+import { JsonLd } from "@/components/shared/JsonLd";
+import { personLd } from "@/lib/seo/person";
+import { siteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "About", description: "The person behind the work — in his own words, how he builds, and what he works with.", alternates: { canonical: "/about" } };
@@ -70,8 +73,17 @@ export default async function AboutPage() {
     .sort((a, b) => (ORDER.indexOf(a) + 99) % 99 - (ORDER.indexOf(b) + 99) % 99)
     .map((key) => ({ key, label: catLabel.get(key) ?? key, skills: skills.filter((s) => s.categoryKey === key) }));
 
+  // Structured data: this page is his profile (#101) — the same facts it shows.
+  const profileLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: `${siteUrl()}/about`,
+    mainEntity: personLd(profile, siteUrl(), { organisations: companies, image: photo.url, knowsAbout: skills.filter((s) => s.systemCount > 0).map((s) => s.name) }),
+  };
+
   return (
     <>
+      <JsonLd data={profileLd} />
       {/* ─── 1. Hero ─── */}
       <section aria-labelledby="about-title" className="hero-field text-paper relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute -top-20 right-[-10%] size-[42rem] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.16),transparent)]" />
