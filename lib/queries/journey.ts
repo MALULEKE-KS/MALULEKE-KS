@@ -61,13 +61,17 @@ export const getJourney = cache(async () => {
   // Each fact goes in the latest chapter that covers its year — chapters can overlap (study and companies run side by side).
   const chapters: JourneyChapter[] = block.chapters.map((c) => ({ ...c, place: c.place ?? null, moments: [], current: c.from <= thisYear && (c.to === null || c.to >= thisYear) }));
   const ahead: JourneyMoment[] = [];
+  // A fact no chapter covers (a gap, or before the first) goes to the nearest one —
+  // never dropped, so every milestone search can land on is on the page.
+  const distance = (c: JourneyChapter, y: number) => (y < c.from ? c.from - y : c.to !== null && y > c.to ? y - c.to : 0);
   for (const m of moments) {
     const y = m.date.getUTCFullYear();
-    if (m.ahead) {
+    if (m.ahead && block.ahead) {
       ahead.push(m);
       continue;
     }
-    const home = [...chapters].reverse().find((c) => y >= c.from && (c.to === null || y <= c.to));
+    const covering = [...chapters].reverse().find((c) => distance(c, y) === 0);
+    const home = covering ?? [...chapters].sort((a, b) => distance(a, y) - distance(b, y))[0];
     home?.moments.push(m);
   }
 
