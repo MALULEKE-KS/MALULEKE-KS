@@ -189,6 +189,31 @@ export const SETTINGS = {
     description: "The site's content is given to the guide whole up to this many tokens; past it, the guide searches it instead.",
     rule: "Constitution §6",
   }),
+  "concierge.maxReasoningTokens": define({
+    schema: z.number().int().min(0).max(8000),
+    default: 1500,
+    description: "Tokens a reasoning model may think with before it answers, on top of the answer itself (0 for models that don't reason). Too low and answers get cut short.",
+    rule: "Constitution §6",
+  }),
+  "concierge.corpusCacheSeconds": define({
+    schema: z.number().int().min(0).max(3600),
+    default: 60,
+    description: "How long the guide reuses what it knows before reading the site's data again (0 = every question). Lower is fresher; higher answers faster.",
+    rule: "Constitution §6",
+  }),
+  "concierge.fallbackModels": define({
+    // A comma-separated list, so the settings screen edits it as text.
+    schema: z
+      .string()
+      .trim()
+      .max(400)
+      .regex(/^([a-z0-9-]+\/[a-z0-9.-]+(\s*,\s*[a-z0-9-]+\/[a-z0-9.-]+){0,3})?$/, "provider/model ids separated by commas — at most 4"),
+    // The gateway's free models each allow about 5 requests a minute for the whole team
+    // (measured 2026-10-02) — a list of them multiplies what the guide can take at once.
+    default: "inclusionai/ling-3.1-flash-free, poolside/laguna-s-2.1-free, inclusionai/ling-3.0-flash-sante-free",
+    description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
+    rule: "Constitution §6",
+  }),
   // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
   "inquiry.minFillSeconds": define({
     schema: z.number().int().min(0).max(60),

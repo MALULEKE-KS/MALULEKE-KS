@@ -56,6 +56,42 @@ describe("GuideText", () => {
     },
   );
 
+  it("links a section of a page", () => {
+    const { container } = render(<GuideText text="His principles are at /about#method." />);
+    expect(links(container)).toEqual(["/about#method"]);
+  });
+
+  it("renders [label](target) links only to allowed targets, showing just the label otherwise", () => {
+    const { container } = render(
+      <GuideText hosts={["github.com"]} text="See [the method](/about#method), [the repo](https://github.com/x/y), [click](javascript:alert(1)) and [login](https://evil.example/login)." />,
+    );
+    expect(links(container)).toEqual(["/about#method", "https://github.com/x/y"]);
+    expect(container.textContent).toContain("click");
+    expect(container.textContent).not.toContain("javascript:");
+    expect(container.textContent).not.toContain("evil.example");
+  });
+
+  it("shows code exactly — nothing inside a code block or span is parsed", () => {
+    const { container } = render(<GuideText text={"Try `SELECT 1` then:\n\n```sql\nSELECT * FROM \"System\"; -- /systems/x **not bold** <b>\n```"} />);
+    expect(container.querySelector("p code")?.textContent).toBe("SELECT 1");
+    const pre = container.querySelector("pre");
+    expect(pre?.textContent).toContain('SELECT * FROM "System"; -- /systems/x **not bold** <b>');
+    expect(pre?.querySelector("a, strong, b")).toBeNull();
+    expect(container.textContent).toContain("sql");
+  });
+
+  it("shows an unclosed fence (mid-stream) as code so far", () => {
+    const { container } = render(<GuideText text={"Here:\n\n```ts\nconst a = 1;"} />);
+    expect(container.querySelector("pre")?.textContent).toContain("const a = 1;");
+  });
+
+  it("renders numbered steps, and a lead-in line above a list", () => {
+    const { container } = render(<GuideText text={"Three steps:\n1. Schema\n2. Contract\n3. Code"} />);
+    expect(container.querySelector("p")?.textContent).toBe("Three steps:");
+    expect(container.querySelectorAll("ol li")).toHaveLength(3);
+    expect(container.textContent).not.toMatch(/\d\.\s/);
+  });
+
   it("renders bullets and bold without the markers", () => {
     const { container } = render(<GuideText text={"**Stack**\n\n- Next.js\n- Postgres"} />);
     expect(container.querySelector("strong")?.textContent).toBe("Stack");

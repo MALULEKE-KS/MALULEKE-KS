@@ -218,6 +218,30 @@ describe("POST /api/v1/guide — switched on", () => {
     }
   });
 
+  it("tells the model which page the visitor is on — only if it's one of the site's own", async () => {
+    const one = await db.publicSystem.findFirst({ select: { slug: true } });
+    await (await ask({ ...question("What's this built with?"), page: `/systems/${one!.slug}` })).text();
+    expect(systemText(calls[0]!)).toContain(`The visitor is reading /systems/${one!.slug}`);
+
+    calls = [];
+    await (await ask({ ...question("What's this built with?"), page: "/systems/not-a-real-system" })).text();
+    expect(systemText(calls[0]!)).not.toContain("The visitor is reading");
+  });
+
+  it("says plainly when the models are busy, without the provider's words", async () => {
+    vi.mocked(guideModel).mockImplementation(
+      () =>
+        new MockLanguageModelV4({
+          doStream: async () => {
+            throw Object.assign(new Error("Rate limit exceeded for team abc123"), { name: "GatewayRateLimitError", statusCode: 429 });
+          },
+        }),
+    );
+    const body = await (await ask(question("hi"))).text();
+    expect(body).toContain("A lot of people are talking to the guide");
+    expect(body).not.toContain("abc123");
+  });
+
   it("never shows the browser a provider error", async () => {
     vi.mocked(guideModel).mockImplementation(
       () =>

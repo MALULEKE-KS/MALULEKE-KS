@@ -20,7 +20,9 @@ import { dbPublic } from "@/lib/db";
 import { getPublicHomes, getPublicTitles } from "@/lib/queries/profile";
 import { getSkillEvidence } from "@/lib/queries/evidence";
 import { getContentBlock } from "@/lib/content/blocks";
-import { getReviewSlaHours } from "@/lib/queries/site";
+import { getInquiryTypes, getReviewSlaHours } from "@/lib/queries/site";
+import { getPlatformPulse } from "@/lib/queries/profile";
+import { getEvidence } from "@/lib/evidence";
 import { SHEETS } from "@/lib/content/sheets";
 import { formatMilestoneDate } from "@/lib/rules/timeline";
 
@@ -41,7 +43,7 @@ export interface GuideCorpus {
 }
 
 async function load() {
-  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey] =
+  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes] =
     await Promise.all([
       dbPublic.publicProfile.findFirst(),
       dbPublic.publicProfileLink.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -61,8 +63,11 @@ async function load() {
       dbPublic.publicGithubRepo.findMany({ orderBy: [{ pushedAt: { sort: "desc", nulls: "last" } }, { fullName: "asc" }] }),
       dbPublic.publicRepoCommit.findMany({ orderBy: { committedAt: "desc" }, take: 400 }),
       getContentBlock("journey"),
+      getEvidence(),
+      getPlatformPulse(),
+      getInquiryTypes(),
     ]);
-  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey };
+  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes };
 }
 
 /** Top languages by share of code, e.g. "TypeScript 82%, CSS 11%". */
@@ -79,7 +84,7 @@ function languageShare(languages: unknown): string | null {
 }
 
 function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null): string {
-  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey } = data;
+  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes } = data;
   const out: string[] = [];
   const section = (title: string, source: string) => out.push("", `## ${title} (source: ${source})`);
 
@@ -102,6 +107,22 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
     out.push(`Mission: ${method.mission}`);
     for (const p of method.principles) out.push(`- ${p.name}: ${p.summary} ${p.body}`);
   }
+
+  if (evidence.claims.length) {
+    // What the site claims and how a visitor can check it (EVIDENCE-SPEC) — including what each claim does NOT prove.
+    section("Claims this site makes, and their evidence", "/about#method");
+    for (const c of evidence.claims) {
+      out.push(`- ${c.claim} [${c.status}; about ${c.where.replace(/^\w+:/, "")}] Proves: ${c.proves} Does not prove: ${c.doesNotProve}`);
+      for (const l of c.links) out.push(`  - ${l.label} (${l.kind}): ${l.url}`);
+    }
+  }
+
+  section("This platform, live", "/");
+  out.push(
+    `This site is itself one of his published systems (its stack and case study are in its entry under Systems), and its rules are enforced in the database, not just the UI. Right now: ${pulse.rulesEnforcedByDatabase} business rules enforced by the database; ${pulse.auditEventsLast7Days} audited changes in the last 7 days (${pulse.auditEventsTotal} in all).` +
+      (pulse.lastGithubSyncAt ? ` Last GitHub sync: ${pulse.lastGithubSyncAt.slice(0, 10)}.` : "") +
+      (pulse.deployment ? ` Running build: ${pulse.deployment.commit}.` : ""),
+  );
 
   section("Where the code lives — GitHub homes", "/systems");
   for (const h of homes) {
@@ -215,7 +236,11 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   out.push(cvOptions.length ? `Available: ${cvOptions.map((o) => `${o.label} (${o.formats.join("/")})`).join("; ")}` : "No CV is published right now.");
 
   section("Contact", "/contact");
-  out.push(`Visitors reach the owner through the contact form at /contact. Every message is reviewed within ${reviewSlaHours} hours.`);
+  out.push(`Visitors reach the owner through the contact form at /contact. Every message is reviewed within ${reviewSlaHours} hours, and the sender gets a reference straight away. No account needed.`);
+  if (inquiryTypes.length) {
+    out.push("What visitors can write about (the form asks only what each needs; /contact?about=<key> opens one directly):");
+    for (const t of inquiryTypes) out.push(`- ${t.label} (key: ${t.value})${t.description ? ` — ${t.description}` : ""}`);
+  }
   if (profile?.email) out.push(`His public contact email: ${profile.email}`);
 
   section("Pages on this site", "/");
@@ -224,8 +249,22 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   return out.join("\n").trim();
 }
 
-/** The corpus, built once per request, shortened to the token budget if it has to be. */
-export const getGuideCorpus = cache(async (budgetTokens: number): Promise<GuideCorpus> => {
+// Reused across questions on the same server instance for concierge.corpusCacheSeconds
+// (Fluid Compute keeps instances warm): ~20 reads per question become one per window.
+const memo = new Map<number, { at: number; value: Promise<GuideCorpus> }>();
+
+/** The corpus, shortened to the token budget if it has to be; reused for `maxAgeSeconds`. */
+export const getGuideCorpus = cache(async (budgetTokens: number, maxAgeSeconds = 0): Promise<GuideCorpus> => {
+  const hit = memo.get(budgetTokens);
+  if (hit && Date.now() - hit.at < maxAgeSeconds * 1000) return hit.value;
+  const value = buildCorpus(budgetTokens);
+  memo.set(budgetTokens, { at: Date.now(), value });
+  // A failed build is never reused.
+  value.catch(() => memo.delete(budgetTokens));
+  return value;
+});
+
+async function buildCorpus(budgetTokens: number): Promise<GuideCorpus> {
   const data = await load();
   // Past the budget, shorten in steps: READMEs first, then case studies too.
   let text = render(data, null, null);
@@ -241,4 +280,4 @@ export const getGuideCorpus = cache(async (budgetTokens: number): Promise<GuideC
     ownerName: name,
     ownerFirstName: name.split(/\s+/)[0] ?? name,
   };
-});
+}

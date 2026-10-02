@@ -1415,10 +1415,11 @@ paths:
               type: object
               required: [messages]
               properties:
-                messages: { type: array, maxItems: 220, description: "The conversation so far: user messages (one text part) and the guide's answers (text and its own tool parts only)" }
+                messages: { type: array, maxItems: 220, description: "The conversation so far: user messages (one text part) and the guide's answers (text and its own tool parts only). Tool results are never taken from the request: search results are dropped and browser-tool results rebuilt from fixed values" }
                 lens: { type: string, maxLength: 60, nullable: true, description: "The visitor's lens key (GET /lenses)" }
+                page: { type: string, maxLength: 200, nullable: true, description: "The site path the visitor is on, e.g. /systems/xkimi-xa-mali — used only if it is one of the site's own pages ('this system' means that one)" }
       responses:
-        "200": { description: "text/event-stream — the AI SDK UI message stream" }
+        "200": { description: "text/event-stream — the AI SDK UI message stream. When the model and its fallbacks are all busy, the stream ends with a 'busy, try again in a minute' error" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "404": { description: "GUIDE_OFF — the guide is switched off" }
         "429": { description: "RATE_LIMITED, CONVERSATION_LIMIT or GUIDE_RESTING (the daily cap)" }

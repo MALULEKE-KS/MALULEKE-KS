@@ -112,8 +112,56 @@ The home-page character is the face of the **Tier 1 concierge** (PLATFORM-CONSTI
 | Standing instructions — persona, range, honesty, defences | `lib/guide/prompt.ts` |
 | Chat panel, docked launcher, hero greeting + lens chips, safe answer rendering | `components/guide/*`, `components/home/HeroGuide.tsx` |
 | Lenses as data (key/label public, framing prompt private) | `VisitorLens.sortOrder`, `PublicVisitorLens`, `GET /lenses` |
-| Settings | `concierge.model`, `.maxMessagesPerConversation`, `.maxQuestionCharacters`, `.rateLimit.*`, `.dailyMessageCap`, `.maxAnswerTokens`, `.contextBudgetTokens` |
+| Settings | `concierge.model`, `.fallbackModels`, `.maxMessagesPerConversation`, `.maxQuestionCharacters`, `.rateLimit.*`, `.dailyMessageCap`, `.maxAnswerTokens`, `.maxReasoningTokens`, `.contextBudgetTokens`, `.corpusCacheSeconds` |
 | Tests | `tests/unit/guide-request.test.ts`, `tests/unit/guide-text.test.tsx`, `tests/integration/guide-api.test.ts` (mock model, real everything else), `tests/ai-evals/guide.eval.test.ts` (30 judge-graded cases: grounding, range, "I don't know", commitments, attacks — needs `AI_GATEWAY_API_KEY`) |
+
+**Strengthened — the V1 guide audit (2026-10-02; owner: "the smartest … knows each and every corner … high reasoning … sense of humour … conscience")**
+
+*Reliability*
+- **Fallback models.** The gateway's free models each allow about 5 requests a minute for the whole team, measured in an eval run where every case failed on that limit alone. Two or three visitors at once would have broken the guide. `concierge.fallbackModels` (default: the three free general models) hands a busy model's request to the next one. When every model is busy, the visitor gets an honest "busy — try again in a minute" with a **Try again** button, not a generic failure.
+- **Reasoning budget.** A reasoning model's thinking counts as output. With `maxAnswerTokens` alone, the thinking used the budget and answers were cut mid-sentence, or never started (11 of the eval cases). `concierge.maxReasoningTokens` is its own allowance on top. If an answer is still cut short, the chat says so and offers **continue**.
+- **Speed.** The corpus is reused for `concierge.corpusCacheSeconds` per warm instance (about 20 reads per question became one per window). The gateway caches where the provider can (`caching: auto`). Calls are tagged `guide` for spend reporting.
+
+*Intelligence*
+- **The visitor's page.** The chat sends the page path. The route accepts it only if it's one of the site's own pages and tells the model as a separate system note *after* the cached instructions, so "this system" means the one on screen and the cache still hits. The opening suggestions are per page (`ai-guide.pageSuggestions`, data).
+- **More of the site in its knowledge:**
+  - the Journey chapters;
+  - every evidence claim, with what it proves, what it does *not* prove, and its links;
+  - the platform's live figures (rules enforced by the database, audited changes, last sync, running build);
+  - the kinds of message the contact form takes.
+- **Instructions rewritten:**
+  - **a reasoning method:** work out the intent, gather and connect the facts, check, then conclusion first;
+  - **date arithmetic**, never inflating a student into a senior;
+  - **"on the site" vs general knowledge**, kept separate;
+  - **the visitor's language**;
+  - **an honest self-description:** a language model on the site's data — no browsing, no memory of visitors, not conscious;
+  - **care:** no jokes when someone is in distress, and general information only for medical, legal and financial questions;
+  - **formats the chat can render.**
+- **`draft_inquiry` picks the kind of message** (a lookup key, so the draft opens the right form at `/contact?about=<key>`).
+
+*Security*
+- **Tool results are never taken from the browser.** A forged history could otherwise pose as *data*, such as a fake search result. Search results sent back are dropped, and the model searches again if needed. A browser tool's input is cut down to its fields and its output rebuilt from fixed values (`lib/guide/request.ts`).
+- **The knowledge is data, not instructions.** READMEs, commit messages and case studies may contain instruction-like text, and the prompt says so explicitly.
+- **Link allow-list.** Answers may now link a published system's live site; NDA systems never carry one (BR-1.3).
+
+*Experience*
+- **The renderer is a safe Markdown subset:**
+  - fenced code blocks with a copy button (an unclosed fence mid-stream shows as code);
+  - inline code;
+  - numbered steps;
+  - `[label](target)` links, showing just the label when the target is refused;
+  - `#section` anchors.
+
+  Still React elements only, never HTML.
+- **The panel:**
+  - the conversation survives a reload (this tab's `sessionStorage` only);
+  - **Try again** after an error;
+  - "Thinking…" while a reasoning model thinks, then "Thought for Ns";
+  - **Copy answer**.
+- **Evals:**
+  - **Coverage:** 39 cases, adding page context, date reasoning, evidence on demand, contact help, consciousness, a story-framed jailbreak, distress, humour and isiZulu.
+  - **Running them:** they run on a gateway OIDC token as well as an API key, and the judge answers with a plain PASS/FAIL line, so any model can judge.
+  - **Free-model limits:** `AI_EVAL_PACE_MS` paces calls for free-model limits, judge outages are retried, and the daily cap is lifted for the run and restored afterwards.
 
 Still to do: the learning loop (unanswered questions → admin) and running the evals in CI once a key is available there.
 
