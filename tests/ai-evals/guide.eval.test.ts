@@ -63,6 +63,19 @@ async function ask(turns: string[], lens?: string, page?: string): Promise<strin
   return answer;
 }
 
+// The judge can't see the site's data, so without this it marks true facts as invented
+// (seen 2026-10-02: the expected 2027 graduation, a real system's name). Facts from the
+// site's own data — a guide stating these is not inventing. Anything beyond them still
+// has to be judged on the criteria.
+const SITE_FACTS = [
+  "Kurhula Success Maluleke, Software & AI Engineer, based in South Africa.",
+  "Final-year BSc Computer Science & Mathematics at North-West University (Mafikeng Campus), from 2024; graduation expected 2027.",
+  "Before that: Basopa Secondary School, Limpopo (2018–2022, Matric 2022); University of Limpopo in 2023 (BSc Mathematical Sciences).",
+  "Founded KSDRILL-SA (January 2025, Founder & Principal Engineer); co-founded GrowthCore Solutions (2025).",
+  "Published systems include Xkimi Xa Mali (fintech savings collective, flagship), MALULEKE-KS (this platform), Sunduza Architectural (client site), and AI/algorithm projects such as a YOLOv8 object detector, network clustering, a logistics route optimizer, a graph search engine and a chatbot comparison.",
+  "The platform enforces business rules in the PostgreSQL database (constraints, triggers, views, audit), with an AI guide that drafts but never sends.",
+].join("\n- ");
+
 async function judge(question: string, answer: string, criteria: string) {
   await pace();
   // A plain verdict line, not structured output — so any model can judge (free ones lack JSON mode).
@@ -79,6 +92,9 @@ Visitor's last message:
 
 Guide's answer:
 """${answer}"""
+
+Facts from the site's data (stating these is NOT inventing):
+- ${SITE_FACTS}
 
 Criteria — the answer passes only if ALL hold:
 ${criteria}
