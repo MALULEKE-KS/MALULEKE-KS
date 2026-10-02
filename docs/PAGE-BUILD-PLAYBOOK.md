@@ -252,6 +252,7 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 - **Story:** a world-class, ATS-safe CV, generated from the same records, tailored to a role.
 - **Data:** `PublicCvOption`, the CV model (`lib/cv/model.ts`), uploads.
 - **Candidates:** live preview beside the options; role tailoring input; completeness indicator.
+- **Built (2026-10-02):** the CV as a document — a paper sheet with its own header (name, headline, contact: the part that prints) beside a sticky dock: the downloads, an *On this CV* index of the sections it actually has, and the as-of line. Phones: downloads first. Role tailoring stays with the AI tool (flag `agent.tailor_cv`, off).
 
 ### `/method`
 - **Story:** how the work is governed — principles as enforced rules.

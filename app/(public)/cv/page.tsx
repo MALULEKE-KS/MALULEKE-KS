@@ -222,7 +222,17 @@ export default async function CvPage() {
   const showGenerated = options.some((o) => o.kind === "generated");
   // The generated CV is only built (and shown) while that option is offered (BR-7.5).
   const cv = showGenerated ? await buildCvModel({ targetRole: null, siteUrl: siteUrl() }) : null;
-  const heroName = cv?.name;
+  // "On this CV": only the sections it actually has.
+  const index = cv
+    ? [
+        cv.experience.length > 0 && { id: "experience", label: "Experience" },
+        cv.projects.length > 0 && { id: "projects", label: "Projects" },
+        cv.education.length > 0 && { id: "education", label: "Education" },
+        cv.certifications.length > 0 && { id: "certifications", label: "Certifications" },
+        cv.skills.length > 0 && { id: "skills", label: "Skills" },
+      ].filter((x): x is { id: string; label: string } => Boolean(x))
+    : [];
+  const asOf = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
   return (
     <>
@@ -230,69 +240,69 @@ export default async function CvPage() {
         <PageHero
           icon={FileText}
           eyebrow="CV"
-          title={heroName ?? "CV"}
-          description={
-            cv
-              ? [cv.headline, cv.qualificationLine].filter(Boolean).join(" · ") || undefined
-              : "Download the CV below."
-          }
-        >
-          {cv && (
-            <ul className="text-mist flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              {cv.location && (
-                <li className="inline-flex items-center gap-2">
-                  <MapPin aria-hidden="true" className="text-line size-4" />
-                  {cv.location}
-                </li>
-              )}
-              <li className="inline-flex items-center gap-2">
-                <Mail aria-hidden="true" className="text-line size-4" />
-                <a href={`mailto:${cv.email}`} className="hover:text-paper">
-                  {cv.email}
-                </a>
-              </li>
-              {cv.links.map((l) => (
-                <li key={l.url} className="inline-flex items-center gap-2">
-                  <Link2 aria-hidden="true" className="text-line size-4" />
-                  <a
-                    href={l.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-paper"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </PageHero>
+          title="The CV."
+          description={cv ? "Read it here, or take it with you — generated from the same records as everything else on this site." : "Download the CV below."}
+        />
       </div>
 
       <section className="bg-paper py-12 md:py-16">
-        <Container className="grid gap-12 lg:grid-cols-12">
-          <aside className="no-print lg:order-2 lg:col-span-4">
-            <div className="lg:sticky lg:top-24">
+        <Container className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+          {/* The dock: downloads first on phones, sticky beside the sheet on wide screens. */}
+          <aside className="no-print min-w-0 lg:order-2 lg:col-span-4">
+            <div className="space-y-5 lg:sticky lg:top-28">
               <DownloadCvButton options={options} />
+              {cv && index.length > 1 && (
+                <nav aria-label="On this CV" className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
+                  <p className="text-slate text-xs font-medium tracking-wide uppercase">On this CV</p>
+                  <ol className="-mx-1 mt-3 flex flex-wrap gap-1.5 lg:flex-col lg:gap-0.5">
+                    {index.map((x, i) => (
+                      <li key={x.id}>
+                        <a href={`#${x.id}`} className="text-ink hover:bg-ink/[0.04] focus-visible:outline-ember flex items-baseline gap-2 rounded-lg px-2 py-1.5 text-sm focus-visible:outline-2">
+                          <span className="text-accent font-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
+                          {x.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
               {cv && (
-                <p className="text-slate mt-4 font-mono text-xs">
-                  Formatted for print — use Download PDF for the cleanest copy.
+                <p className="text-slate font-mono text-xs leading-relaxed">
+                  Built from live data, as of {asOf}. The PDF and Word files come from this same record — what you read is what you download.
                 </p>
               )}
             </div>
           </aside>
 
           {cv && (
-            <article className="cv-page lg:order-1 lg:col-span-8">
-              {/* Print-only header: the graphite hero doesn't print (DESIGN-SYSTEM §9). */}
+            // The sheet: the CV as a document, with its own header — the part that prints.
+            <article className="cv-page border-ink/10 bg-sheet shadow-lift min-w-0 rounded-[1.75rem] border p-6 sm:p-10 md:p-14 lg:order-1 lg:col-span-8 print:rounded-none print:border-0 print:p-0">
               {/* A div, not <header>: the print stylesheet hides every header element. */}
-              <div className="mb-8 hidden print:block">
-                <h1 className="text-2xl font-semibold">{cv.name}</h1>
-                <p>
-                  {[cv.headline, cv.location, cv.email, ...cv.links.map((l) => l.url)]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
+              <div className="border-ink/10 mb-10 border-b pb-8">
+                <h2 className="text-ink font-sans text-3xl font-semibold tracking-tight md:text-4xl">{cv.name}</h2>
+                {(cv.headline || cv.qualificationLine) && <p className="text-slate mt-2 text-lg">{[cv.headline, cv.qualificationLine].filter(Boolean).join(" · ")}</p>}
+                <ul className="text-slate mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                  {cv.location && (
+                    <li className="inline-flex items-center gap-1.5">
+                      <MapPin aria-hidden="true" className="no-print text-accent size-4" />
+                      {cv.location}
+                    </li>
+                  )}
+                  <li className="inline-flex items-center gap-1.5">
+                    <Mail aria-hidden="true" className="no-print text-accent size-4" />
+                    <a href={`mailto:${cv.email}`} className="hover:text-ink break-all">
+                      {cv.email}
+                    </a>
+                  </li>
+                  {cv.links.map((l) => (
+                    <li key={l.url} className="inline-flex items-center gap-1.5">
+                      <Link2 aria-hidden="true" className="no-print text-accent size-4" />
+                      <a href={l.url} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
               <CvBody cv={cv} />
             </article>
