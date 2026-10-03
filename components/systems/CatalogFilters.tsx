@@ -1,13 +1,15 @@
 // components/systems/CatalogFilters.tsx
 // The /systems filters (PAGE-SPECIFICATIONS: filters write to the URL — a
-// filtered view is a shareable link). Chips with counts per facet — home,
-// status, technology, domain — and a sort; each chip is a plain link, so it
-// works without JavaScript and every combination is linkable. A facet with a
+// filtered view is a shareable link). A dropdown per facet — home, status,
+// technology, domain — with counts, and a sort; every option is a plain link
+// inside a <details>, so it works without JavaScript and every combination is
+// linkable. A facet with a
 // single option (nothing to choose) isn't shown. Options come from the data
 // (lib/queries/catalog.ts), never a list in code.
 
 import Link from "next/link";
 import { X } from "lucide-react";
+import { FilterDropdown } from "@/components/systems/FilterDropdown";
 import { cn } from "@/lib/utils";
 import type { Catalog } from "@/lib/queries/catalog";
 
@@ -20,45 +22,21 @@ function href(params: Params, change: Params) {
   return q ? `/systems?${q}` : "/systems";
 }
 
-function Facet({ name, param, options, params }: { name: string; param: string; options: { key: string; label: string; count: number }[]; params: Params }) {
+/** One facet as a dropdown; nothing to choose (a single option) → not shown. */
+function Facet({ name, hint, param, options, params, marks = false }: { name: string; hint?: string; param: string; options: { key: string; label: string; count: number }[]; params: Params; marks?: boolean }) {
   if (options.length < 2 && !params[param]) return null;
-  const current = params[param];
   return (
-    <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-      <span className="text-slate w-24 shrink-0 font-mono text-[11px] tracking-wide uppercase">{name}</span>
-      <ul className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible md:pb-0">
-        <li>
-          <Link
-            href={href(params, { [param]: undefined })}
-            aria-current={!current ? "true" : undefined}
-            className={cn(
-              "inline-flex h-8 items-center rounded-full border px-3 text-[13px] whitespace-nowrap transition-colors",
-              !current ? "border-ink bg-ink text-paper" : "border-ink/12 bg-sheet text-slate hover:border-ink/30 hover:text-ink",
-            )}
-          >
-            All
-          </Link>
-        </li>
-        {options.map((o) => {
-          const on = current?.toLowerCase() === o.key.toLowerCase();
-          return (
-            <li key={o.key}>
-              <Link
-                href={href(params, { [param]: on ? undefined : o.key })}
-                aria-current={on ? "true" : undefined}
-                className={cn(
-                  "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] whitespace-nowrap transition-colors",
-                  on ? "border-ink bg-ink text-paper" : "border-ink/12 bg-sheet text-ink hover:border-ink/30",
-                )}
-              >
-                {o.label}
-                <span className={cn("type-data text-[11px]", on ? "text-mist" : "text-slate")}>{o.count}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <FilterDropdown
+      name={name}
+      hint={hint}
+      marks={marks}
+      current={params[param] ?? null}
+      allHref={href(params, { [param]: undefined })}
+      options={options.map((o) => {
+        const on = params[param]?.toLowerCase() === o.key.toLowerCase();
+        return { ...o, href: href(params, { [param]: on ? undefined : o.key }) };
+      })}
+    />
   );
 }
 
@@ -66,13 +44,16 @@ export function CatalogFilters({ facets, params, total }: { facets: Catalog["fac
   const filtered = Boolean(params.home || params.status || params.tech || params.domain);
   const sort = params.sort === "active" ? "active" : "featured";
   return (
-    <div className="border-ink/10 mb-10 space-y-3 border-b pb-8">
-      <Facet name="Home" param="home" options={facets.homes} params={params} />
-      <Facet name="Status" param="status" options={facets.statuses} params={params} />
-      <Facet name="Built with" param="tech" options={facets.tech} params={params} />
-      <Facet name="Domain" param="domain" options={facets.domains} params={params} />
+    <div className="border-ink/10 mb-10 border-b pb-8">
+      {/* Every facet a dropdown (owner, 2026-10-03): the rows of chips were the page's noise. */}
+      <div className="flex flex-wrap gap-2">
+        <Facet name="Home" param="home" options={facets.homes} params={params} />
+        <Facet name="Status" param="status" options={facets.statuses} params={params} />
+        <Facet name="Built with" hint="Most used first" param="tech" options={facets.tech} params={params} marks />
+        <Facet name="Domain" param="domain" options={facets.domains} params={params} />
+      </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-5">
         <p className="text-slate text-sm" aria-live="polite">
           <span className="type-data text-ink font-semibold">{total}</span> {total === 1 ? "system" : "systems"}
           {filtered && (

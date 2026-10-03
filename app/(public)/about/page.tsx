@@ -20,7 +20,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Building2, CalendarDays, FileText, GraduationCap, MapPin, Rocket, type LucideIcon } from "lucide-react";
+import { ArrowRight, BadgeCheck, Boxes, Building2, CalendarDays, FileText, GraduationCap, Hammer, MapPin, Rocket, type LucideIcon } from "lucide-react";
+import { StatCards, type Stat } from "@/components/shared/StatCards";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
 import { Accent } from "@/components/shared/Accent";
@@ -29,7 +30,6 @@ import { JsonLd } from "@/components/shared/JsonLd";
 import { MagicCard } from "@/components/ui/magic-card";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { NumberTicker } from "@/components/ui/number-ticker";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { GuideInvite } from "@/components/about/GuideInvite";
 import { SkillOrbit } from "@/components/about/SkillOrbit";
@@ -130,11 +130,11 @@ export default async function AboutPage() {
   // Live counters — computed, never typed.
   const thisYear = new Date().getUTCFullYear();
   const counters = [
-    row?.buildingSinceYear && { value: Math.max(1, thisYear - row.buildingSinceYear), label: "years building" },
-    { value: published, label: "published systems" },
-    { value: provenSkills.length, label: "skills proven in code" },
-    companies.length > 0 && { value: companies.length, label: companies.length === 1 ? "company" : "companies" },
-  ].filter((c): c is { value: number; label: string } => Boolean(c));
+    row?.buildingSinceYear && { value: Math.max(1, thisYear - row.buildingSinceYear), label: "years building", icon: Hammer },
+    { value: published, label: "published systems", icon: Boxes },
+    { value: provenSkills.length, label: "skills proven in code", icon: BadgeCheck },
+    companies.length > 0 && { value: companies.length, label: companies.length === 1 ? "company" : "companies", icon: Building2 },
+  ].filter((c): c is Stat => Boolean(c));
 
   // Structured data: this page is his profile (#101) — the same facts it shows.
   const profileLd = {
@@ -204,17 +204,7 @@ export default async function AboutPage() {
 
         {counters.length > 0 && (
           <Container className="relative pb-16 md:pb-20">
-            <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {counters.map((c, i) => (
-                // Label first in the markup (axe definition-list); the number shows on top.
-                <div key={c.label} className="rise-in flex flex-col-reverse rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md" style={{ "--rise-delay": `${360 + i * 70}ms` } as React.CSSProperties}>
-                  <dt className="text-mist mt-1 text-sm">{c.label}</dt>
-                  <dd className="type-data text-paper text-4xl font-semibold tracking-tight md:text-5xl">
-                    <NumberTicker value={c.value} />
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <StatCards stats={counters} delay={360} />
           </Container>
         )}
       </section>

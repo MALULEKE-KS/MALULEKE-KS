@@ -382,13 +382,14 @@ html {
 /* Magic UI OrbitingCircles: each orbiter circles at --radius from --angle.
    The base transform is the first frame, so with reduced motion (no
    animation) the orbiters still sit spread round the ring. */
+/* --orbit-unit scales a whole orbit with its box (e.g. calc(100cqw / 640)); 1px by default. */
 .orbit-ring {
-  transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+  transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * var(--orbit-unit, 1px))) rotate(calc(var(--angle) * -1deg));
   animation: orbit-ring calc(var(--duration) * 1s) linear infinite;
 }
 @keyframes orbit-ring {
-  from { transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg)); }
-  to { transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg - 360deg)); }
+  from { transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * var(--orbit-unit, 1px))) rotate(calc(var(--angle) * -1deg)); }
+  to { transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * var(--orbit-unit, 1px))) rotate(calc(var(--angle) * -1deg - 360deg)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .orbit-ring { animation: none; }
@@ -410,6 +411,18 @@ html {
   15%, 35% { transform: translateZ(0) rotate(90deg); }
   65%, 85% { transform: translateZ(0) rotate(270deg); }
   100% { transform: translateZ(0) rotate(360deg); }
+}
+
+/* FilterDropdown: the panel drops in from its trigger. */
+@keyframes dd-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* StatCards: the ember line under a hero number draws in from the left. */
+@keyframes stat-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 /* Let's Talk's steps: a light travelling the line from the first to the last. */
