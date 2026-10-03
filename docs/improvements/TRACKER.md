@@ -6,7 +6,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 **Next up: WP-001**
 
-> Then the WP-110 investigation (step 1 only, no code), then WP-101 — but only after the owner approves the WP-001 baseline (spec Appendix A).
+> V1 is closed and released (2026-10-03, build c0eb952 — see the last handoff entry). V2 starts here: WP-001 against that build, then the WP-110 investigation (step 1 only, no code), then WP-101 — but only after the owner approves the WP-001 baseline (spec Appendix A).
 
 ## Status values
 
@@ -101,3 +101,22 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Done:** Journey and About rebuilt at showcase level; the AI guide's thinking orb (real state, never timed labels); case-study share images served (they 404'd — route-group hash); the system map's caps moved to `home.map.*` settings with nothing dropped; the sync reads conventional monorepo workspaces (JS and Python); write-ups fall back across the free models and read public repos anonymously. Logged in ROADMAP-V2 Part 2.
 - **Owner, after deploy:** Admin → Jobs → run `github.sync`, then `systems.writeups` — FundsLink Academy and Governova then get their stack and a generated case study (on the free models until a paid model is chosen, V2 #14).
 - **Next step:** Let's Talk at showcase level, the systems coverflow; then WP-001.
+
+### 2026-10-03 · V1 closed — final releases #152 (5bed0dd) and #154 (c0eb952)
+- **Done (V1, not V2 work):**
+  - #152: Journey, About and Let's Talk at showcase level; the systems spotlight (coverflow); the AI guide's thinking orb; case-study share images fixed (they 404'd — route-group hash); the system map's and catalog's caps moved to settings, nothing dropped; monorepo manifests read; write-ups fall back across the free models and read public repos anonymously.
+  - #154: one map of real brand marks (`components/shared/TechChip.tsx`, official SVGs in `public/brands`); the whole stack as data (migrations `20261003120000`, `20261003121000`: platform packages, design tools, hosting); About's orbit carries every skill in use; hero numbers as Magic Card stat cards; /systems filters as dropdowns; the ranking ("most used first") said where it applies.
+  - Logged in ROADMAP-V2 Part 2, components in PUBLIC-REDESIGN-PLAN §7a.
+- **Verified:** CI green on both (unit 175, integration 411, e2e incl. phone, axe and share images). The integration sweep on production after c0eb952 covered every public route and all 12 case studies at 360 and 1280 px, with no overflow, page errors, hydration warnings, failed requests or broken images. All 106 internal links resolved.
+- **Owner, still to do:**
+  - Run Admin → Jobs → `github.sync` once more, so the new package aliases prove Motion, Radix UI, the AI SDK, Lucide and the rest from this repo.
+  - Then run `systems.writeups` for FundsLink Academy and Governova.
+- **Open questions for the owner** (log answers in DECISIONS.md):
+  - Any hosting platforms beyond Vercel, Neon, GitHub and Railway?
+  - Should AI coding tools (Claude Code, Gemini Canvas, ChatGPT) be listed as skills, given the no-AI-references rule for commits, PRs and issues?
+  - The README (the owner's GitHub profile README): owner wants to discuss improvements together. **Never edit README.md without the owner's go-ahead.**
+- **Notes for whoever picks up:**
+  - The local machine has little RAM. Run one dev server at a time, and make it the only heavy process. The dev server is slow (5–70 s per page), so wait for hydration before driving the UI.
+  - CI is the gate for e2e.
+  - 21st.dev's `search_logo` MCP returned nothing on 2026-10-03; `https://api.svgl.app?search=` works directly.
+- **Next step:** V2 starts fresh with **WP-001** (the baseline), exactly as the spec orders.

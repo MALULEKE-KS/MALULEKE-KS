@@ -59,23 +59,30 @@ maluleke-ks/
 │   ├── security/                      # csrf.ts (BR-3.9), keyed-hash.ts, client-ip.ts
 │   └── settings/                      # registry.ts — every admin-editable tunable, typed with bounds; index.ts
 │
+├── public/                            # brand/ — the K-S marks; brands/ — official SVG marks Simple Icons lacks (masks, TechChip);
+│                                      # character/ — the AI guide's art
+│
 ├── hooks/                             # usePrefersReducedMotion, useTypewriterLines
 │
 ├── components/
-│   ├── ui/                            # shadcn/ui + Magic UI primitives, converted to the tokens
+│   ├── ui/                            # shadcn/ui + Magic UI + 21st.dev primitives, converted to the tokens
+│   │                                  # (README.md lists the vendored ones; PUBLIC-REDESIGN-PLAN §7a why)
 │   ├── shared/                        # cross-page: PublicShell, SiteHeader + HeaderFrame + NavLinks, SiteFooter +
-│   │                                  # DitheredWordmark, SearchPalette, SystemCard, PageHero, Consent, SocialLinks, …
-│   ├── home/                          # home-page sections (being rebuilt in F5c)
+│   │                                  # DitheredWordmark, SearchPalette, PageHero, Consent, SocialLinks, StatCards,
+│   │                                  # TechChip (THE one map of brand marks — brandMark/techMark), Prose, …
+│   ├── home/                          # home-page sections (hero, AI guide, work showcase, system map, control room)
+│   ├── systems/                       # catalog: CatalogCard, CatalogFilters + FilterDropdown, SystemsSpotlight
+│   ├── journey/, about/               # ChapterTimeline + ChapterNav; SkillOrbit, skill-icons, GuideInvite
+│   ├── guide/                         # the AI guide: provider, panel (ThinkingOrb lit by real state), character
 │   └── admin/                         # AdminNav, ui.tsx (the admin kit), ConfirmDelete, ActivityLogTable
 │
 ├── app/
 │   ├── layout.tsx, not-found.tsx, globals.css
-│   ├── sitemap.ts, robots.ts, icon.svg, opengraph-image.tsx
+│   ├── sitemap.ts, robots.ts, icon.svg, opengraph-image.tsx, .well-known/security.txt
 │   ├── (public)/                      # visitor-facing — no auth
 │   │   ├── page.tsx                   # /
 │   │   ├── systems/page.tsx, systems/[slug]/page.tsx
-│   │   ├── journey/, cv/, method/, about/, contact/     # /method was /how-i-build (redirect)
-│   │   └── (planned, F5c) now/, organizations/[slug]/
+│   │   ├── journey/, about/, contact/ # /how-i-build → /about#method (redirect); no /cv page (the CV is a file)
 │   ├── (admin)/admin/
 │   │   ├── login/                     # outside the panel — two-step sign-in
 │   │   └── (panel)/                   # layout re-checks the session; one page per admin capability:
@@ -91,8 +98,8 @@ maluleke-ks/
 └── tests/
     ├── unit/                          # pure logic (session, CV engine, migration guard, display names, vercel config)
     ├── integration/                   # route handlers + the real local test database (.env.test.local)
-    ├── e2e/                           # Playwright — reserved
-    ├── ai-evals/                      # the AI guide's evals (Constitution §6) — to be filled in F5c
+    ├── e2e/                           # Playwright, in CI: mobile.spec (360/390 px), a11y.spec (axe), share-images.spec
+    ├── ai-evals/                      # the AI guide's evals (Constitution §6)
     └── helpers/
 ```
 

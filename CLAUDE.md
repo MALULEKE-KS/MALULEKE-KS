@@ -62,7 +62,15 @@ Deliberately NOT extensible, per the constitution's own exception: `ClientVisibi
 
 ## Current phase — do not build ahead of this
 
-**V1 is complete and live in production (2026-10-02):** systems catalog synced from GitHub, the uploaded CV (generation switched off, code kept), Let's Talk intake and management, admin panel with 2FA, activity logging, scheduled jobs, the redesigned public site (F5c — Home, Systems, Journey, About, Let's talk) and the AI guide. See `/docs/DEPLOYMENT.md` and the update log in `/docs/ROADMAP-V2.md`.
+**V1 is complete, closed and live in production (final release 2026-10-03, build `c0eb952`, PRs #152 and #154):**
+- the systems catalog synced from GitHub, with monorepo manifests, skill evidence and real brand marks;
+- the uploaded CV (generation switched off, code kept);
+- Let's Talk intake and management;
+- the admin panel with 2FA, activity logging, scheduled jobs and generated write-ups;
+- the redesigned public site (F5c: Home, Systems with its spotlight and dropdown filters, Journey, About, Let's talk);
+- the AI guide.
+
+See `/docs/DEPLOYMENT.md`, the update log in `/docs/ROADMAP-V2.md`, and the last handoff entry in `/docs/improvements/TRACKER.md` (owner to-dos and open questions). **README.md is the owner's profile README; any change to it is discussed with the owner first.**
 
 **V2 is in progress, one work package at a time:** `/docs/V2-IMPROVEMENT-SPEC.md`, tracked in `/docs/improvements/TRACKER.md` (see "Start here" above).
 
