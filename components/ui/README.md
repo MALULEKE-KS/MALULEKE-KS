@@ -9,4 +9,5 @@ from the Magic UI registry's published source because the CLI couldn't reach
 magicui.design from the build sandbox; each is recorded in
 docs/PUBLIC-REDESIGN-PLAN.md §7a.
 `orbiting-circles` (Magic UI) and `thinking-orb` (21st.dev's MorphOrb, the orb
-only) followed on 2026-10-03, adapted the same way.
+only), `shimmer-button` (Magic UI) and `coverflow-carousel` (21st.dev)
+followed on 2026-10-03, adapted the same way.

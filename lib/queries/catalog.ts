@@ -11,6 +11,7 @@
 
 import { dbPublic } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
+import { withScreenshots } from "@/lib/queries/systems";
 import { getPublicHomes } from "@/lib/queries/profile";
 import { ago } from "@/lib/queries/work";
 
@@ -63,6 +64,10 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
   const start = monday(now);
   const weekKeys = Array.from({ length: WEEKS }, (_, i) => new Date(start.getTime() - (WEEKS - 1 - i) * 7 * DAY).toISOString().slice(0, 10));
 
+  // Each system's stored screenshot (BR-1.18) where it has one — the spotlight shows it.
+  const shots = await withScreenshots(systems.map((s) => ({ slug: s.slug, screenshotUrl: s.screenshotUrl })));
+  const shotOf = new Map(shots.map((s) => [s.slug, s.screenshotUrl]));
+
   const rows = systems.map((s) => {
     const repo = repos.find((r) => r.slug === s.slug);
     const counts = new Map(activity.filter((a) => a.slug === s.slug).map((a) => [a.weekStart.toISOString().slice(0, 10), a.commits]));
@@ -93,6 +98,7 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
       tech,
       weeks,
       commitsLast4Weeks: weeks.slice(-4).reduce((a, b) => a + b, 0),
+      screenshotUrl: shotOf.get(s.slug) ?? null,
       pushedAt: repo?.pushedAt ?? s.githubPushedAt ?? null,
       lastPush: ago(repo?.pushedAt ?? s.githubPushedAt ?? null, now),
     };
