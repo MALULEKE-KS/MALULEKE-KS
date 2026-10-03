@@ -192,6 +192,31 @@ describe("the sync (#95)", () => {
     expect(await byRepo(30)).toMatchObject({ contentStatus: "PUBLISHED" });
   });
 
+  it("an account that refuses the token still has its public repos synced — read anonymously, public data only", async () => {
+    const REFUSING = `${RUN}-refusing2`;
+    await db.organization.create({ data: { name: `${RUN} Refusing`, slug: `${RUN}-refusing-org`, githubLogins: [REFUSING] } });
+    const pub = repo(70, REFUSING, `${RUN}-public-in-refusing`);
+    const priv = repo(71, REFUSING, `${RUN}-private-in-refusing`, { private: true });
+    const authorized: string[] = [];
+    const base = fakeGithub([repo(72, OWNER, `${RUN}-owner-repo`)], { refusingOrg: REFUSING });
+    const fetch: FetchLike = async (url, init) => {
+      const path = new URL(url).pathname;
+      const auth = new Headers(init?.headers).get("authorization");
+      if (path === `/users/${REFUSING}/repos`) {
+        authorized.push(`list:${auth ? "token" : "anonymous"}`);
+        return new Response(JSON.stringify(new URL(url).searchParams.get("page") === "1" ? [pub, priv] : []), { status: 200 });
+      }
+      if (path.startsWith(`/repos/${REFUSING}/`)) authorized.push(auth ? "token" : "anonymous");
+      return base(url, init);
+    };
+    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [REFUSING, OWNER], fetch });
+    expect(summary.accountErrors.map((e) => e.account)).toEqual([REFUSING]);
+    expect(await byRepo(70)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: false });
+    expect(await byRepo(71)).toBeNull(); // a private repo is never read anonymously
+    expect(authorized).toContain("list:anonymous");
+    expect(authorized.filter((a) => a === "token")).toEqual([]); // every read of that account's repos was anonymous
+  });
+
   it("a live system whose repo is gone from GitHub leaves the site — hidden and flagged, never deleted; nothing else is touched", async () => {
     const goneRepo = repo(40, OWNER, `${RUN}-deleted-later`);
     const stillThere = repo(41, OWNER, `${RUN}-not-listed-but-exists`);

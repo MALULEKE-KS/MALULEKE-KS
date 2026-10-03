@@ -158,7 +158,8 @@ export class GithubClient {
   async request(path: string, accept = "application/vnd.github+json"): Promise<Response> {
     const res = await this.fetchImpl(`${GITHUB_API}${path}`, {
       headers: {
-        Authorization: `Bearer ${this.token}`,
+        // No token = an anonymous client: public data only (the fallback below).
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
         Accept: accept,
         "X-GitHub-Api-Version": "2022-11-28",
       },
@@ -373,6 +374,11 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   // and skipped, not fatal: the other accounts still sync. A rate limit, or the
   // token's own listing failing (a revoked token), still stops the run.
   const accountErrors = new Map<string, string>();
+  // An owned account that refuses the token (e.g. an organisation's policy against
+  // long-lived classic tokens) still has public repos anyone can read: those are listed
+  // and read anonymously — public data only — so its public work still reaches the site.
+  const anonymous = new GithubClient("", config.fetch ?? fetch);
+  const anonymouslyListed = new Set<string>();
   for (const client of clients) {
     add(await client.listRepos("/user/repos?affiliation=owner,collaborator,organization_member&visibility=all"), client);
     for (const login of config.ownedLogins) {
@@ -385,6 +391,20 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
       } catch (err) {
         if (err instanceof GithubRateLimitError) throw err;
         accountErrors.set(login, err instanceof Error ? err.message.slice(0, 300) : String(err));
+        if (!anonymouslyListed.has(login.toLowerCase())) {
+          anonymouslyListed.add(login.toLowerCase());
+          try {
+            const pub = await anonymous.listRepos(`/users/${encodeURIComponent(login)}/repos?type=owner`);
+            // The token is refused for this account, so its public repos are read anonymously.
+            for (const r of (pub ?? []).filter((x) => !x.private)) {
+              found.set(r.id, r);
+              clientFor.set(r.id, anonymous);
+            }
+          } catch (anonErr) {
+            if (anonErr instanceof GithubRateLimitError) throw anonErr;
+            // Nothing public to add; the account error above already says why.
+          }
+        }
       }
     }
   }
