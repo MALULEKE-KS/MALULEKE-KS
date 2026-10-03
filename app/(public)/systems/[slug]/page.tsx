@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { Container } from "@/components/shared/Container";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { EvidenceList } from "@/components/shared/Evidence";
 import { claimsFor, getEvidence } from "@/lib/evidence";
 import { markdownSections, Prose } from "@/components/shared/Prose";
@@ -82,14 +83,15 @@ export async function generateMetadata({ params }: SystemDetailPageProps): Promi
   const { slug } = await params;
   const cs = await load(slug);
   if (!cs) return {};
-  const description = (summary(cs) ?? `${cs.system.name} — a system by the site's owner.`).slice(0, 160);
-  return {
+  const description = summary(cs) ?? cs.system.name;
+  return pageMetadata({
     title: cs.system.name,
     description,
-    alternates: { canonical: `/systems/${cs.system.slug}` },
-    openGraph: { title: cs.system.name, description, type: "article", url: `/systems/${cs.system.slug}` },
-    twitter: { title: cs.system.name, description },
-  };
+    path: `/systems/${cs.system.slug}`,
+    image: `/systems/${cs.system.slug}/opengraph-image/card`,
+    imageAlt: `${cs.system.name} — ${description}`.slice(0, 200),
+    type: "article",
+  });
 }
 
 export default async function SystemDetailPage({ params }: SystemDetailPageProps) {
@@ -227,10 +229,10 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                   <p className="border-ink/10 bg-sheet text-slate mb-8 flex items-start gap-2 rounded-2xl border px-3 py-2 text-xs sm:inline-flex sm:items-center sm:rounded-full sm:py-1.5">
                     <Sparkles aria-hidden="true" className="text-accent mt-px size-3.5 shrink-0 sm:mt-0" />
                     <span>
-                      Written by AI from {repo ? <a href={repo.url} target="_blank" rel="noopener noreferrer" className="text-ink underline-offset-2 hover:underline">the repository</a> : "the repository"}
+                      Written by AI from {repo ? <a href={repo.url} target="_blank" rel="noopener noreferrer" className="text-ink decoration-ink/30 hover:decoration-ink underline underline-offset-2">the repository</a> : "the repository"}
                       {cs.writeUp.writtenAgo && ` · updated ${cs.writeUp.writtenAgo}`}
                     </span>
-                    <span className="border-ember/30 bg-ember/10 text-accent shrink-0 rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+                    <span className="bg-ink text-paper shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
                   </p>
                 )}
                 <Prose markdown={cs.writeUp.markdown} />
@@ -263,31 +265,32 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                 At a glance
               </h2>
               <dl className="mt-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <Building2 aria-hidden="true" className="text-slate mt-0.5 size-4 shrink-0" />
-                  <div>
-                    <dt className="text-slate font-mono text-xs">{home ? "Home" : "Organization"}</dt>
-                    <dd className="text-ink font-medium">
-                      {home ? home.name : system.organization}
-                      {home?.role && <span className="text-slate block text-sm font-normal">{home.role}</span>}
-                    </dd>
-                  </div>
+                {/* Each group is <div><dt/><dd/></div> directly in the <dl> (WCAG: dl structure); the icon sits in the term. */}
+                <div>
+                  <dt className="text-slate flex items-center gap-2 font-mono text-xs">
+                    <Building2 aria-hidden="true" className="size-4 shrink-0" />
+                    {home ? "Home" : "Organization"}
+                  </dt>
+                  <dd className="text-ink mt-1 pl-6 font-medium">
+                    {home ? home.name : system.organization}
+                    {home?.role && <span className="text-slate block text-sm font-normal">{home.role}</span>}
+                  </dd>
                 </div>
                 {system.domain && (
-                  <div className="flex items-start gap-3">
-                    <Tag aria-hidden="true" className="text-slate mt-0.5 size-4 shrink-0" />
-                    <div>
-                      <dt className="text-slate font-mono text-xs">Domain</dt>
-                      <dd className="text-ink font-medium">{system.domain}</dd>
-                    </div>
+                  <div>
+                    <dt className="text-slate flex items-center gap-2 font-mono text-xs">
+                      <Tag aria-hidden="true" className="size-4 shrink-0" />
+                      Domain
+                    </dt>
+                    <dd className="text-ink mt-1 pl-6 font-medium">{system.domain}</dd>
                   </div>
                 )}
-                <div className="flex items-start gap-3">
-                  <span aria-hidden="true" className="mt-1.5 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: `var(--color-${system.statusColorToken})` }} />
-                  <div>
-                    <dt className="text-slate font-mono text-xs">Status</dt>
-                    <dd className="text-ink font-medium">{system.status}</dd>
-                  </div>
+                <div>
+                  <dt className="text-slate flex items-center gap-2 font-mono text-xs">
+                    <span aria-hidden="true" className="mx-[3px] size-2.5 shrink-0 rounded-full" style={{ backgroundColor: `var(--color-${system.statusColorToken})` }} />
+                    Status
+                  </dt>
+                  <dd className="text-ink mt-1 pl-6 font-medium">{system.status}</dd>
                 </div>
               </dl>
 
@@ -354,7 +357,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       {(moving || cs.commits.length > 0) && (
         <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-16 md:py-24">
           <Container>
-            <SectionHeader icon={Activity} eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
+            <SectionHeader copyKey="system.activity" icon={Activity} eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
               {moving && (
                 <div className="min-w-0 lg:col-span-7">
@@ -396,7 +399,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       {cs.skills.length > 0 && (
         <section aria-labelledby="proves-title" className="bg-paper py-16 md:py-24">
           <Container>
-            <SectionHeader icon={Award} eyebrow="Skills" id="proves-title" title="What it proves." />
+            <SectionHeader copyKey="system.proves" icon={Award} eyebrow="Skills" id="proves-title" title="What it proves." />
             {/* Evidence, not self-rating (FRONTEND-DATA-GUIDE "/systems/[slug]"). */}
             <ul className="flex flex-wrap gap-3">
               {cs.skills.map((s) => (
@@ -420,7 +423,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         // Only rendered when there are impacts — never an empty placeholder (spec).
         <section aria-labelledby="impact-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
           <Container>
-            <SectionHeader icon={Star} eyebrow="Impact" id="impact-title" title="What it changed." />
+            <SectionHeader copyKey="system.impact" icon={Star} eyebrow="Impact" id="impact-title" title="What it changed." />
             <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {system.impacts.map((impact, i) => (
                 <Reveal key={impact.label} delay={i * 80}>
@@ -439,7 +442,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         // Only testimonials with permission are ever queried (BR-6.1).
         <section aria-labelledby="words-title" className="hero-field text-paper py-16 md:py-24">
           <Container>
-            <SectionHeader icon={Quote} eyebrow="In their words" id="words-title" title="From the people it was built for." tone="dark" />
+            <SectionHeader copyKey="system.words" icon={Quote} eyebrow="In their words" id="words-title" title="From the people it was built for." tone="dark" />
             <div className="grid gap-5 md:grid-cols-2">
               {system.testimonials.map((t, i) => (
                 <Reveal key={i} delay={i * 80}>
@@ -463,7 +466,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         <section aria-labelledby="more-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
           <Container>
             {/* No "All systems" action here — the hero's back link already is one (no duplicates). */}
-            <SectionHeader icon={Boxes} eyebrow="More systems" id="more-title" title="Related work." />
+            <SectionHeader copyKey="system.more" icon={Boxes} eyebrow="More systems" id="more-title" title="Related work." />
             <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {cs.related.map((r, i) => (
                 <li key={r.slug}>

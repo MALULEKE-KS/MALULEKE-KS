@@ -36,5 +36,24 @@ export const JourneyBlock = z
     reviewed: z.boolean().default(false),
   });
 
-export const JSON_BLOCKS = { evidence: EvidenceBlock, journey: JourneyBlock } as const;
+/**
+ * Every page's section copy (owner, 2026-10-02: "everything shouldn't be
+ * hardcoded"): eyebrows, titles, descriptions and short lists, keyed by
+ * section ("home.map", "about.skills", "contact.steps"…). *Word* marks the
+ * accent. {reviewSlaHours} and {owner} are filled in from settings and the
+ * profile. Interface labels (buttons, form fields) stay in code.
+ */
+export const PageCopyBlock = z.record(
+  z.string().regex(/^[a-z]+(-[a-z]+)*\.[a-z]+(-[a-z]+)*$/, "keys look like page.section"),
+  z
+    .object({
+      eyebrow: Text(60).optional(),
+      title: Text(160).optional(),
+      description: Text(400).optional(),
+      items: z.array(z.object({ title: Text(80), body: Text(200).optional() })).max(8).optional(),
+    })
+    .strict(),
+);
+
+export const JSON_BLOCKS = { evidence: EvidenceBlock, journey: JourneyBlock, "page-copy": PageCopyBlock } as const;
 export type JsonBlockKey = keyof typeof JSON_BLOCKS;

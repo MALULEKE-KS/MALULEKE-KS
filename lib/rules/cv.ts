@@ -111,6 +111,7 @@ export function toSkillEntry(skill: SkillWithCategory) {
     name: skill.name,
     category: skill.category.label,
     yearsExperience: skill.yearsExperience,
+    aliases: skill.aliases,
   };
 }
 

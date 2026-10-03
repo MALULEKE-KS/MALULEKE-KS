@@ -28,6 +28,18 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "heading", label: "Heading", max: 120, kind: "line" },
     { name: "lede", label: "Introduction", max: 500, kind: "text" },
     { name: "suggestions", label: "Example questions", max: 140, kind: "list", maxItems: 6 },
+    {
+      name: "pageSuggestions",
+      label: "Questions per page",
+      kind: "json",
+      hint: 'The chat opens with these on a page, before the example questions. A list of { "page": "/systems/", "questions": ["…"] } — a page ending in "/" covers everything under it; up to 3 questions each.',
+    },
+  ],
+  release: [
+    { name: "current", label: "Version the site is on", max: 20, kind: "line", hint: "e.g. V1" },
+    { name: "next", label: "Next version", max: 20, kind: "line", hint: "e.g. V2 — leave empty when nothing's planned" },
+    { name: "nextNote", label: "About the next version", max: 60, kind: "line", hint: "e.g. on the way" },
+    { name: "link", label: "Where it links", max: 120, kind: "line", hint: "A site path, e.g. /systems/maluleke-ks — or empty" },
   ],
 };
 
@@ -52,7 +64,7 @@ export default async function AdminContentPage() {
                 key={row?.updatedAt.toISOString() ?? "new"}
                 blockKey={key}
                 fields={FIELDS[key]!}
-                initial={body.success ? (body.data as Record<string, string | string[]>) : null}
+                initial={body.success ? (body.data as Record<string, unknown>) : null}
               />
             </Panel>
           );

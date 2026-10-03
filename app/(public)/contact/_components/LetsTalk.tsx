@@ -35,10 +35,12 @@ interface Props {
   reviewSlaHours: number;
   retentionMonths: number;
   documents: { maxFiles: number; maxMegabytes: number };
+  /** The picker's heading — page copy, from data. */
+  picker: { title: string; description: string | null };
   aside: React.ReactNode;
 }
 
-export function LetsTalk({ categories, initialCategory, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, aside }: Props) {
+export function LetsTalk({ categories, initialCategory, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, picker, aside }: Props) {
   const uid = useId();
   const reduced = useReducedMotion();
   const top = useRef<HTMLDivElement>(null);
@@ -64,7 +66,7 @@ export function LetsTalk({ categories, initialCategory, email, ownerFirstName, r
 
   let body: React.ReactNode;
   if (f.state.kind === "sent") body = <Sent reference={f.state.reference} reviewSlaHours={reviewSlaHours} email={email} />;
-  else if (!f.chosen) body = <CategoryPicker categories={categories} fromGuide={f.fromGuide} onChoose={choose} />;
+  else if (!f.chosen) body = <CategoryPicker categories={categories} fromGuide={f.fromGuide} onChoose={choose} title={picker.title} description={picker.description} />;
   else {
     const Icon = CATEGORY_ICON[f.form];
     body = (

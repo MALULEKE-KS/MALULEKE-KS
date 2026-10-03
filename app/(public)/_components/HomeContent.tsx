@@ -113,7 +113,7 @@ export async function HomeContent() {
       <SystemMap data={systemMap} />
       <ControlRoom pulse={pulse} numbers={numbers} evidence={evidence} />
       <PrinciplesBand content={howIBuild} evidence={evidence} />
-      <ContactBand profile={profile} inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
+      <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
     </>
   );
 }

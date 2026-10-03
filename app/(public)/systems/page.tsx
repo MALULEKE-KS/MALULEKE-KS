@@ -9,6 +9,7 @@
 // rather than a loading.tsx — see SystemsGridSkeleton.tsx for why.
 
 import { Suspense } from "react";
+import { pageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 import { Boxes } from "lucide-react";
 import { Container } from "@/components/shared/Container";
@@ -21,8 +22,7 @@ import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
 
 export async function generateMetadata(): Promise<Metadata> {
   const intro = await getContentBlock("systems-page").catch(() => null);
-  const description = intro ? plainAccent(intro.lede) : "Every system — case studies and the work in each GitHub home.";
-  return { title: "Systems", description, alternates: { canonical: "/systems" }, openGraph: { description } };
+  return pageMetadata({ title: "Systems", description: intro ? plainAccent(intro.lede) : null, path: "/systems", imageAlt: "Systems — MALULEKE-KS" });
 }
 
 interface SystemsPageProps {

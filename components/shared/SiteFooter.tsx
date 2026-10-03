@@ -7,6 +7,12 @@
 // of dithered ember dots. Everything here is data, never typed-in copy. The
 // mission isn't repeated here: it has its own band on the home page and
 // /method (owner's rule: no duplicates, 2026-10-01).
+//
+// V1 finalization (owner, 2026-10-02): no typed-in "Built on …" stack — the
+// platform's own case study shows its stack, from data; no raw email or
+// WhatsApp number on every page (spec WP-105, D-006) — the form is the way
+// in, and /contact keeps the alternatives; and the version the site is on,
+// with what's next, from the "release" content block.
 
 import Link from "next/link";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
@@ -16,7 +22,6 @@ import { Container } from "@/components/shared/Container";
 import { DitheredWordmark } from "@/components/shared/DitheredWordmark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { PrivacyChoicesButton } from "@/components/shared/Consent";
-import { PLATFORM_STACK } from "@/lib/content/sheets";
 import type { SiteProfile } from "@/lib/queries/site";
 
 export interface FooterHome {
@@ -26,6 +31,13 @@ export interface FooterHome {
   kind: string | null;
   publishedSystems: number;
   github: { login: string; url: string }[];
+}
+
+export interface FooterRelease {
+  current: string;
+  next: string | null;
+  nextNote: string | null;
+  link: string | null;
 }
 
 export interface FooterPulse {
@@ -50,11 +62,13 @@ export function SiteFooter({
   reviewSlaHours,
   homes,
   pulse,
+  release,
 }: {
   profile: SiteProfile;
   reviewSlaHours: number;
   homes: FooterHome[];
   pulse: FooterPulse;
+  release: FooterRelease | null;
 }) {
   const now = new Date();
   return (
@@ -67,7 +81,7 @@ export function SiteFooter({
             <BrandMark className="h-8 text-paper" />
             <Wordmark className="font-mono text-sm font-medium" />
           </Link>
-          <SocialLinks links={profile.links} email={profile.email} className="mt-8" />
+          <SocialLinks links={profile.links.filter((l) => !l.url.includes("wa.me"))} className="mt-8" />
         </div>
 
         {homes.length > 0 && (
@@ -102,14 +116,8 @@ export function SiteFooter({
         )}
 
         <div className="md:col-span-3">
-          <h2 className="font-mono text-xs text-line">Write to me</h2>
-          <a
-            href={`mailto:${profile.email}`}
-            className="mt-4 inline-block break-all font-sans text-base text-paper underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-ember"
-          >
-            {profile.email}
-          </a>
-          <p className="mt-3 text-sm text-mist">Every inquiry is reviewed within {reviewSlaHours} hours.</p>
+          <h2 className="font-mono text-xs text-line">Let&rsquo;s talk</h2>
+          <p className="mt-4 text-sm text-mist">Every inquiry is reviewed within {reviewSlaHours} hours.</p>
           <Link href="/contact" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ember hover:underline">
             Start a conversation <ArrowUpRight aria-hidden="true" className="size-4" />
           </Link>
@@ -127,6 +135,22 @@ export function SiteFooter({
           </span>
           {pulse.lastGithubSyncAt && <span>· synced with GitHub {ago(pulse.lastGithubSyncAt, now)}</span>}
           {pulse.deployment && <span>· build {pulse.deployment.commit}</span>}
+          {release && (
+            <span>
+              ·{" "}
+              {release.link ? (
+                <Link href={release.link} className="underline-offset-4 transition-colors hover:text-paper hover:underline">
+                  {release.current}
+                  {release.next && ` · ${release.next}${release.nextNote ? ` ${release.nextNote}` : ""}`}
+                </Link>
+              ) : (
+                <>
+                  {release.current}
+                  {release.next && ` · ${release.next}${release.nextNote ? ` ${release.nextNote}` : ""}`}
+                </>
+              )}
+            </span>
+          )}
         </p>
       </Container>
 
@@ -139,7 +163,6 @@ export function SiteFooter({
           </p>
           <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <PrivacyChoicesButton className="underline-offset-4 transition-colors hover:text-paper hover:underline" />
-            <span>Built on {PLATFORM_STACK.join(" / ")}</span>
             <a href="#main" className="inline-flex items-center gap-1 transition-colors hover:text-paper">
               Back to top <ArrowUp aria-hidden="true" className="size-3" />
             </a>

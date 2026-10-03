@@ -24,5 +24,3 @@ export const SHEETS: Sheet[] = [
   // No Method page: it's a section of About (/method redirects there).
 ];
 
-// The stack this platform itself runs on — real, from CLAUDE.md "Stack".
-export const PLATFORM_STACK = ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Vercel"];

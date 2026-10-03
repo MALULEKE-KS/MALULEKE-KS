@@ -1851,6 +1851,7 @@ components:
         organization: { type: string }
         status: { type: string }
         statusColorToken: { type: string, description: "CSS custom-property/Tailwind token name (e.g. signal-finished) — status color is data (EXT-1), not a client-side hardcoded map" }
+        stage: { type: string, description: "The status's pipeline stage — shipped, building or queued (Status.stage, data). Cards show recency only for building work or recent commits" }
         domain: { type: string, nullable: true }
         description: { type: string }
         repoUrl: { type: string, nullable: true, description: "Null when clientVisibility = NDA_RESTRICTED (BR-1.3) or the repo is private (BR-1.7)" }
@@ -2113,6 +2114,7 @@ components:
         name: { type: string }
         category: { type: string }
         yearsExperience: { type: number, nullable: true }
+        aliases: { type: array, items: { type: string }, description: "Package names that prove the skill in a repo's manifests (WP-103)" }
 
     SkillInput:
       type: object
@@ -2121,6 +2123,7 @@ components:
         name: { type: string, minLength: 1 }
         categoryId: { type: string }
         yearsExperience: { type: number, nullable: true }
+        aliases: { type: array, maxItems: 12, items: { type: string, maxLength: 214 }, description: "Package names (npm or PyPI) that prove the skill when a repo's package.json, requirements.txt or pyproject.toml lists one. Omitted = unchanged" }
 
     FlagEntry:
       type: object

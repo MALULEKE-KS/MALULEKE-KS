@@ -38,7 +38,10 @@ function repo(n: number, owner: string, name: string, extra: Repo = {}): Repo {
 // Sunday 2026-09-20 00:00 UTC: GitHub's week. Sunday belongs to the ISO week of Monday 09-14.
 const SUNDAY = Date.UTC(2026, 8, 20) / 1000;
 
-function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string; gone?: string[] } = {}): FetchLike {
+function fakeGithub(
+  repos: Repo[],
+  options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string; gone?: string[]; manifests?: Record<string, Record<string, string>> } = {},
+): FetchLike {
   return async (url) => {
     const path = new URL(url).pathname + new URL(url).search;
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -52,6 +55,12 @@ function fakeGithub(repos: Repo[], options: { pendingStats?: string[]; rateLimit
     if (path.startsWith("/user/repos")) return json(new URL(url).searchParams.get("page") === "1" ? repos : []);
     if (path.startsWith("/orgs/")) return json({ message: "Not Found" }, 404);
     if (path.startsWith("/users/")) return json([]);
+    // Manifests (WP-103): the raw file when the test supplies one, otherwise "not found".
+    const manifest = /^\/repos\/([^/]+\/[^/]+)\/contents\/(.+)$/.exec(path);
+    if (manifest) {
+      const body = options.manifests?.[manifest[1]!]?.[manifest[2]!];
+      return body === undefined ? json({ message: "Not Found" }, 404) : new Response(body, { status: 200 });
+    }
     const lang = /^\/repos\/(.+)\/languages$/.exec(path);
     if (lang) return json({ TypeScript: 1200, CSS: 300 });
     const stats = /^\/repos\/(.+)\/stats\/commit_activity$/.exec(path);
@@ -74,6 +83,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await db.skillOnSystem.deleteMany({ where: { skill: { name: { startsWith: RUN } } } });
+  await db.skill.deleteMany({ where: { name: { startsWith: RUN } } });
   await db.system.updateMany({ where: { githubOwnerLogin: { startsWith: RUN } }, data: { contentStatus: "ARCHIVED" } });
 });
 
@@ -132,7 +143,8 @@ describe("the sync (#95)", () => {
 
   it("a second run updates facts, never curated fields, and creates no duplicates (BR-8.2)", async () => {
     const pub = await byRepo(1);
-    await db.system.update({ where: { id: pub!.id }, data: { description: "Curated by the owner.", liveUrl: "https://curated.example.com", name: "Curated Name" } });
+    // As the admin's edit does (app/api/v1/admin/systems/[id]): curating clears needsCuration.
+    await db.system.update({ where: { id: pub!.id }, data: { description: "Curated by the owner.", liveUrl: "https://curated.example.com", name: "Curated Name", needsCuration: false } });
 
     const summary = await sync(repos.map((r) => (r.id === baseId + 1 ? { ...r, stargazers_count: 9, description: "GitHub changed it", homepage: "https://other.example.com" } : r)));
     expect(summary.created).toBe(0);
@@ -195,6 +207,74 @@ describe("the sync (#95)", () => {
     expect(summary.removedFromGithub).toEqual([`${RUN}-deleted-later`]);
     expect(await byRepo(40)).toMatchObject({ contentStatus: "DRAFT", needsCuration: true });
     expect(await byRepo(41)).toMatchObject({ contentStatus: "PUBLISHED" });
+  });
+
+  // V1 finalization (owner, 2026-10-02): GitHub's real state, kept current.
+  it("a repo hidden only because it was private is shown once it goes public; an owner's own hide is never undone", async () => {
+    const wasPrivate = repo(50, OWNER, `${RUN}-went-public`, { private: true });
+    const ownerHid = repo(51, OWNER, `${RUN}-owner-hid`, { private: true });
+    await sync([wasPrivate, ownerHid]);
+    expect(await byRepo(50)).toMatchObject({ contentStatus: "DRAFT", repoPrivate: true });
+    // The owner reviews 51 and keeps it hidden (curated).
+    await db.system.update({ where: { githubRepoId: baseId + 51 }, data: { needsCuration: false } });
+
+    const summary = await sync([{ ...wasPrivate, private: false }, { ...ownerHid, private: false }]);
+    expect(summary.madePublic).toEqual([`${RUN}-went-public`]);
+    expect(await byRepo(50)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: false });
+    expect(await byRepo(51)).toMatchObject({ contentStatus: "DRAFT", repoPrivate: false });
+  });
+
+  it("an uncurated description follows GitHub's — never over a write-up or the owner's words", async () => {
+    const r = repo(52, OWNER, `${RUN}-described`);
+    await sync([r]);
+    await sync([{ ...r, description: "GitHub's new words" }]);
+    expect(await byRepo(52)).toMatchObject({ description: "GitHub's new words" });
+
+    await db.system.update({ where: { githubRepoId: baseId + 52 }, data: { description: "Generated from the repo.", writeupGeneratedAt: new Date() } });
+    await sync([{ ...r, description: "GitHub again" }]);
+    expect(await byRepo(52)).toMatchObject({ description: "Generated from the repo." });
+  });
+
+  it("a public repo deleted from GitHub leaves every public list — written up or not — and returns if it comes back", async () => {
+    const hidden = repo(53, OWNER, `${RUN}-never-written-up`);
+    await sync([hidden]);
+    // Not written up: the owner hid the system, but the repo is still listed among public repos.
+    await db.system.update({ where: { githubRepoId: baseId + 53 }, data: { contentStatus: "DRAFT", needsCuration: false } });
+    const listed = () => db.publicGithubRepo.findUnique({ where: { fullName: `${OWNER}/${RUN}-never-written-up` } });
+    expect(await listed()).not.toBeNull();
+
+    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub([], { gone: [`${OWNER}/${RUN}-never-written-up`] }) });
+    expect(summary.removedFromGithub).toContain(`${RUN}-never-written-up`);
+    expect((await byRepo(53))!.githubGoneAt).not.toBeNull();
+    expect(await byRepo(53)).toMatchObject({ contentStatus: "DRAFT" }); // never deleted (BR-1.9)
+    expect(await listed()).toBeNull();
+
+    await sync([hidden]); // listed on GitHub again
+    expect((await byRepo(53))!.githubGoneAt).toBeNull();
+    expect(await listed()).not.toBeNull();
+  });
+
+  it("a skill is proved by the repo's own manifest — and loses that proof when the dependency goes; the owner's links are never touched", async () => {
+    const r = repo(60, OWNER, `${RUN}-manifested`);
+    const full = `${OWNER}/${RUN}-manifested`;
+    const skill = await db.skill.create({ data: { name: `${RUN} Playwright`, categoryId: (await db.skillCategory.findFirstOrThrow()).id, aliases: ["@playwright/test"] } });
+    const ownerPick = await db.skill.create({ data: { name: `${RUN} Chosen`, categoryId: (await db.skillCategory.findFirstOrThrow()).id, aliases: [] } });
+
+    const withPlaywright = { [full]: { "package.json": JSON.stringify({ devDependencies: { "@playwright/test": "1.50.0" } }), "requirements.txt": "numpy==2" } };
+    const first = await sync([r], { manifests: withPlaywright });
+    const system = await byRepo(60);
+    expect(system!.githubDependencies).toEqual(["@playwright/test", "numpy"]);
+    expect(first.skillLinks.added).toBeGreaterThanOrEqual(1);
+    expect(await db.skillOnSystem.findUnique({ where: { skillId_systemId: { skillId: skill.id, systemId: system!.id } } })).toMatchObject({ source: "manifest" });
+
+    // The owner links another skill by hand.
+    await db.skillOnSystem.create({ data: { skillId: ownerPick.id, systemId: system!.id, source: "owner" } });
+
+    // The dependency is removed from the repo.
+    const second = await sync([r], { manifests: { [full]: { "package.json": JSON.stringify({ dependencies: { next: "16" } }) } } });
+    expect(second.skillLinks.removed).toBeGreaterThanOrEqual(1);
+    expect(await db.skillOnSystem.findUnique({ where: { skillId_systemId: { skillId: skill.id, systemId: system!.id } } })).toBeNull();
+    expect(await db.skillOnSystem.findUnique({ where: { skillId_systemId: { skillId: ownerPick.id, systemId: system!.id } } })).toMatchObject({ source: "owner" });
   });
 
   it("reads each repo with a token that can see it — one token per GitHub owner", async () => {

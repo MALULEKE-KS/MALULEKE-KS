@@ -30,6 +30,7 @@
 // runJob; `fetch` is injected so tests drive it without the network.
 
 import { Prisma } from "@prisma/client";
+import { MANIFEST_PATHS, MAX_WORKSPACES, dependenciesFrom, skillsProvedBy, workspacePatterns, type ManifestPath } from "@/lib/jobs/manifests";
 import { db } from "@/lib/db";
 import { isSlugAvailable } from "@/lib/rules/slugs";
 import { getSetting } from "@/lib/settings";
@@ -112,6 +113,10 @@ export interface GithubSyncSummary {
   accountErrors: { account: string; error: string }[];
   /** Live systems whose public repo is gone from GitHub — hidden this run, flagged for the owner. */
   removedFromGithub: string[];
+  /** Systems shown because their repo went from private to public (never curated since). */
+  madePublic: string[];
+  /** Skill evidence from manifests: links added and removed this run (WP-103). */
+  skillLinks: { added: number; removed: number };
 }
 
 /**
@@ -247,6 +252,39 @@ export function readmeToText(markdown: string, max = README_CHARS): string {
  * A public repo's README and recent commits (F5c, the AI guide). Best-effort:
  * a missing README (404) or an empty repo (409) simply leaves nothing.
  */
+/**
+ * The repo's dependency names, from its own manifests (spec WP-103). Best-effort:
+ * a missing file (404) or an empty repo (409) just contributes nothing; anything
+ * else unexpected leaves the last known list in place rather than erasing it.
+ */
+async function saveDependencies(gh: GithubClient, repo: GitHubRepo, systemId: string) {
+  const files: Partial<Record<ManifestPath, string>> = {};
+  for (const path of MANIFEST_PATHS) {
+    const res = await gh.request(`/repos/${repo.full_name}/contents/${path}`, "application/vnd.github.raw+json");
+    if (res.status === 404 || res.status === 409) continue;
+    if (!res.ok) return; // unknown state — keep what we had
+    files[path] = (await res.text()).slice(0, 200_000);
+  }
+  // A monorepo's real dependencies live in its workspaces (apps/*, packages/*).
+  const workspaces: string[] = [];
+  const raw = (p: string) => gh.request(`/repos/${repo.full_name}/contents/${p}`, "application/vnd.github.raw+json");
+  for (const pattern of files["package.json"] ? workspacePatterns(files["package.json"]) : []) {
+    if (workspaces.length >= MAX_WORKSPACES) break;
+    let dirs = [pattern];
+    if (pattern.endsWith("/*")) {
+      const listing = await gh.request(`/repos/${repo.full_name}/contents/${pattern.slice(0, -2)}`);
+      if (!listing.ok) continue;
+      const entries = (await listing.json()) as { type?: string; path?: string }[];
+      dirs = Array.isArray(entries) ? entries.filter((e) => e.type === "dir" && typeof e.path === "string").map((e) => e.path!) : [];
+    }
+    for (const dir of dirs.slice(0, MAX_WORKSPACES - workspaces.length)) {
+      const res = await raw(`${dir}/package.json`);
+      if (res.ok) workspaces.push((await res.text()).slice(0, 200_000));
+    }
+  }
+  await db.system.update({ where: { id: systemId }, data: { githubDependencies: dependenciesFrom(files, workspaces) } });
+}
+
 async function saveRepoKnowledge(gh: GithubClient, repo: GitHubRepo, systemId: string) {
   const readmeRes = await gh.request(`/repos/${repo.full_name}/readme`);
   let readme: string | null = null;
@@ -373,6 +411,8 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     errors: [],
     accountErrors: [...accountErrors].map(([account, error]) => ({ account, error })),
     removedFromGithub: [],
+    madePublic: [],
+    skillLinks: { added: 0, removed: 0 },
   };
   const unmapped = new Set<string>();
 
@@ -405,6 +445,8 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         githubTopics: repo.topics ?? [],
         githubStars: Math.max(0, repo.stargazers_count ?? 0),
         githubSyncedAt: new Date(),
+        // Seen on GitHub this run — not gone (it may have come back).
+        githubGoneAt: null,
         repoUrl: repo.html_url,
       };
       const relationship = owned.has(repo.owner.login.toLowerCase()) ? "owner" : "collaborator";
@@ -420,6 +462,12 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         // BR-1.14 — follow a repo rename only if the slug is still the one derived from the old name.
         const oldName = existing.githubFullName?.split("/")[1];
         const renamed = oldName !== undefined && oldName !== repo.name && existing.slug.startsWith(slugify(oldName));
+        // BR-1.6 applied again when a repo goes public (owner, 2026-10-02): a system created
+        // hidden *only* because its repo was private — never curated since — is shown once
+        // the repo is public, by the same rule a new repo gets. An owner's choice to hide it
+        // (needsCuration off) is never undone.
+        const turnedPublic =
+          existing.repoPrivate && !repo.private && existing.needsCuration && existing.contentStatus === "DRAFT" && showByDefault(visibility, false, organization.isClient, relationship);
         await db.system.update({
           where: { id: existing.id },
           data: {
@@ -430,8 +478,13 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
             ...(existing.name === repo.name && { name: displayNameFromRepo(repo.name) }),
             ...(existing.liveUrl === null && liveSite(repo.homepage) && { liveUrl: liveSite(repo.homepage) }),
             ...(existing.repoRelationshipId === null && { repoRelationshipId: relationshipId(relationship) }),
+            ...(turnedPublic && { contentStatus: "PUBLISHED" as const }),
+            // Uncurated words follow GitHub's own description until a write-up (BR-4.5) or the owner
+            // (BR-8.2) has written them — never over either.
+            ...(existing.needsCuration && existing.writeupGeneratedAt === null && repo.description?.trim() && { description: repo.description.trim() }),
           },
         });
+        if (turnedPublic) summary.madePublic.push(existing.slug);
         systemId = existing.id;
         summary.updated++;
       } else {
@@ -476,9 +529,10 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
       // The AI guide's knowledge — public repos only; a repo that turned private loses what was kept.
       if (repo.private) {
         await db.repoCommit.deleteMany({ where: { systemId } });
-        await db.system.update({ where: { id: systemId }, data: { githubReadmeExcerpt: null } });
+        await db.system.update({ where: { id: systemId }, data: { githubReadmeExcerpt: null, githubDependencies: [] } });
       } else {
         await saveRepoKnowledge(gh, repo, systemId);
+        await saveDependencies(gh, repo, systemId);
         summary.knowledgeUpdated++;
       }
     } catch (err) {
@@ -494,22 +548,49 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   // own "not found" for the repo; a private repo the token can't see is never
   // touched (it was never public on the site to begin with).
   const listedAccounts = config.ownedLogins.map((l) => l.toLowerCase()).filter((l) => !accountErrors.has(l) && ![...accountErrors.keys()].some((k) => k.toLowerCase() === l));
+  // Every public repo counts — written up or not: one that was never written up is still
+  // listed among "every public repo" (PublicGithubRepo) until it's marked gone.
   const gone = await db.system.findMany({
     where: {
       githubRepoId: { not: null, notIn: [...found.keys()] },
       githubFullName: { not: null },
       repoPrivate: false,
-      contentStatus: "PUBLISHED",
+      githubGoneAt: null,
     },
-    select: { id: true, slug: true, githubFullName: true, githubOwnerLogin: true },
+    select: { id: true, slug: true, githubFullName: true, githubOwnerLogin: true, contentStatus: true },
   });
   for (const s of gone) {
     if (!s.githubOwnerLogin || !listedAccounts.includes(s.githubOwnerLogin.toLowerCase())) continue;
     const res = await clients[0]!.request(`/repos/${s.githubFullName}`);
     if (res.status !== 404) continue;
-    await db.system.update({ where: { id: s.id }, data: { contentStatus: "DRAFT", publishAt: null, needsCuration: true } });
+    await db.system.update({
+      where: { id: s.id },
+      data: { githubGoneAt: new Date(), ...(s.contentStatus === "PUBLISHED" && { contentStatus: "DRAFT", publishAt: null, needsCuration: true }) },
+    });
     summary.removedFromGithub.push(s.slug);
   }
+
+  // Skill evidence from manifests (WP-103): link each skill to the systems whose
+  // dependencies include one of its aliases; drop manifest links whose
+  // dependency is gone. The owner's own links are never added to or removed.
+  const [skills, systemsWithDeps, manifestLinks] = await Promise.all([
+    db.skill.findMany({ where: { aliases: { isEmpty: false } }, select: { id: true, aliases: true } }),
+    db.system.findMany({ where: { repoPrivate: false, githubGoneAt: null }, select: { id: true, githubDependencies: true } }),
+    db.skillOnSystem.findMany({ where: { source: "manifest" }, select: { skillId: true, systemId: true } }),
+  ]);
+  const wanted = new Set(systemsWithDeps.flatMap((sys) => skillsProvedBy(sys.githubDependencies, skills).map((skillId) => `${skillId}|${sys.id}`)));
+  const stale = manifestLinks.filter((l) => !wanted.has(`${l.skillId}|${l.systemId}`));
+  if (stale.length) {
+    await db.skillOnSystem.deleteMany({ where: { source: "manifest", OR: stale.map((l) => ({ skillId: l.skillId, systemId: l.systemId })) } });
+  }
+  const added = await db.skillOnSystem.createMany({
+    data: [...wanted].map((key) => {
+      const [skillId, systemId] = key.split("|") as [string, string];
+      return { skillId, systemId, source: "manifest" };
+    }),
+    skipDuplicates: true, // an owner's link for the same pair stays the owner's
+  });
+  summary.skillLinks = { added: added.count, removed: stale.length };
 
   summary.unmappedOwners = [...unmapped].sort();
   summary.activityPending.sort();

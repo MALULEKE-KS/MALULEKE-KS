@@ -43,7 +43,7 @@ export interface GuideCorpus {
 }
 
 async function load() {
-  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes] =
+  const [profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes, release] =
     await Promise.all([
       dbPublic.publicProfile.findFirst(),
       dbPublic.publicProfileLink.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -66,8 +66,9 @@ async function load() {
       getEvidence(),
       getPlatformPulse(),
       getInquiryTypes(),
+      getContentBlock("release"),
     ]);
-  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes };
+  return { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes, release };
 }
 
 /** Top languages by share of code, e.g. "TypeScript 82%, CSS 11%". */
@@ -84,7 +85,7 @@ function languageShare(languages: unknown): string | null {
 }
 
 function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null): string {
-  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes } = data;
+  const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes, release } = data;
   const out: string[] = [];
   const section = (title: string, source: string) => out.push("", `## ${title} (source: ${source})`);
 
@@ -123,6 +124,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
       (pulse.lastGithubSyncAt ? ` Last GitHub sync: ${pulse.lastGithubSyncAt.slice(0, 10)}.` : "") +
       (pulse.deployment ? ` Running build: ${pulse.deployment.commit}.` : ""),
   );
+  if (release) out.push(`Version: ${release.current}${release.next ? ` — ${release.next}${release.nextNote ? ` ${release.nextNote}` : ""}` : ""}.`);
 
   section("Where the code lives — GitHub homes", "/systems");
   for (const h of homes) {

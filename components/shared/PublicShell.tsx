@@ -44,6 +44,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     lenses,
     maxQuestionCharacters,
     aiGuide,
+    release,
     cv,
     liveSites,
   ] = await Promise.all([
@@ -55,6 +56,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     getPublicLenses(),
     getSetting("concierge.maxQuestionCharacters"),
     getContentBlock("ai-guide"),
+    getContentBlock("release"),
     getUploadedCvLink(),
     // Published systems' live sites (the public view never carries an NDA system's link, BR-1.3).
     dbPublic.publicSystem.findMany({ where: { liveUrl: { not: null } }, select: { liveUrl: true } }),
@@ -86,7 +88,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           >
             Skip to content
           </a>
-          <SiteHeader links={profile.links} email={profile.email} reviewSlaHours={reviewSlaHours} cvUrl={cv?.url ?? null} />
+          <SiteHeader links={profile.links} reviewSlaHours={reviewSlaHours} cvUrl={cv?.url ?? null} />
           <main id="main" className="flex-1">
             {children}
           </main>
@@ -95,6 +97,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
             reviewSlaHours={reviewSlaHours}
             homes={homes}
             pulse={pulse}
+            release={release ? { current: release.current, next: release.next || null, nextNote: release.nextNote || null, link: release.link || null } : null}
           />
         </div>
         <GuideLauncher />

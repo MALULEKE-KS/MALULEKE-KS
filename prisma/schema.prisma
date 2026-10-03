@@ -271,6 +271,10 @@ model System {
   githubTopics        String[]     @default([])
   githubStars         Int?
   githubSyncedAt      DateTime?    @db.Timestamptz(3)
+  // GitHub answered "not found" for this repo (deleted, or no longer the owner's) — left out of every public list.
+  githubGoneAt        DateTime?    @db.Timestamptz(3)
+  // Dependency names from the repo's own manifests (package.json, requirements.txt, pyproject.toml) — WP-103.
+  githubDependencies  String[]     @default([])
   // F5c — the AI guide's GitHub knowledge; public repos only (the sync never stores a private repo's README or commits)
   githubCreatedAt     DateTime?    @db.Timestamptz(3)
   githubReadmeExcerpt String?
@@ -577,6 +581,8 @@ model Skill {
   categoryId      String
   category        SkillCategory       @relation(fields: [categoryId], references: [id])
   yearsExperience Float?
+  // The package names that prove this skill in a repo's manifests (WP-103) — data, editable.
+  aliases         String[]            @default([])
   systems         SkillOnSystem[]
   experiences     SkillOnExperience[]
   education       SkillOnEducation[]
@@ -592,6 +598,8 @@ model SkillOnSystem {
   systemId String
   skill    Skill  @relation(fields: [skillId], references: [id], onDelete: Restrict) // an in-use Skill can't be deleted, same discipline as BR-8.2
   system   System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  // owner = chosen in the admin; manifest = proved by the repo's dependencies (the sync adds and removes only these).
+  source   String @default("owner")
 
   @@id([skillId, systemId])
   @@index([systemId]) // the composite PK leads with skillId; this serves "skills of a system"

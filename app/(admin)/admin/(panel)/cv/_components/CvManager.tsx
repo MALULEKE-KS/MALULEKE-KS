@@ -53,6 +53,7 @@ interface SkillEntry {
   name: string;
   category: string;
   yearsExperience: number | null;
+  aliases: string[];
 }
 
 type SkillOption = { id: string; name: string };
@@ -480,6 +481,7 @@ function SkillForm({ entry, categories, onDone, onCancel }: { entry?: SkillEntry
   const [name, setName] = useState(entry?.name ?? "");
   const [categoryId, setCategoryId] = useState(categories.find((c) => c.label === entry?.category)?.id ?? categories[0]?.id ?? "");
   const [years, setYears] = useState(entry?.yearsExperience?.toString() ?? "");
+  const [aliases, setAliases] = useState(entry?.aliases.join(", ") ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -489,7 +491,12 @@ function SkillForm({ entry, categories, onDone, onCancel }: { entry?: SkillEntry
     setError(null);
     const res = await adminRequest(entry ? `/cv/skills/${entry.id}` : "/cv/skills", {
       method: entry ? "PATCH" : "POST",
-      body: { name: name.trim(), categoryId, yearsExperience: years ? Number(years) : null },
+      body: {
+        name: name.trim(),
+        categoryId,
+        yearsExperience: years ? Number(years) : null,
+        aliases: aliases.split(",").map((a) => a.trim()).filter(Boolean),
+      },
     });
     setSaving(false);
     if (!res.ok) return setError(res.message);
@@ -507,6 +514,11 @@ function SkillForm({ entry, categories, onDone, onCancel }: { entry?: SkillEntry
           </select>
         </div>
         <div><label htmlFor="s-years" className={adminLabel}>Years <span className="font-normal text-slate">(optional)</span></label><input id="s-years" type="number" step="0.5" min="0" className={adminInput} value={years} onChange={(e) => setYears(e.target.value)} /></div>
+      </div>
+      <div>
+        <label htmlFor="s-aliases" className={adminLabel}>Package names <span className="font-normal text-slate">(optional)</span></label>
+        <input id="s-aliases" className={adminInput} value={aliases} onChange={(e) => setAliases(e.target.value)} placeholder="@playwright/test, playwright" />
+        <p className={adminHint}>Separated by commas. When a public repo&apos;s package.json, requirements.txt or pyproject.toml lists one, the daily GitHub sync links this skill to that system as proof.</p>
       </div>
       <FormActions saving={saving} disabled={!name.trim() || !categoryId} label="Save skill" onCancel={onCancel} error={error} />
     </form>

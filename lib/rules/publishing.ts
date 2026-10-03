@@ -22,6 +22,8 @@ export function toPublicSystem(row: PublicSystem) {
     status: row.status,
     // Status colour is data, not code (EXT-1).
     statusColorToken: row.statusColorToken,
+    // The status lookup's pipeline stage (shipped | building | queued) — what cards may say about recency (WP-108).
+    stage: row.stage,
     domain: row.domain,
     description: row.description,
     repoUrl: row.repoUrl,

@@ -136,6 +136,7 @@ export const SystemPublicSchema = z.object({
   organization: z.string(),
   status: z.string(),
   statusColorToken: z.string(),
+  stage: z.string(),
   domain: z.string().nullable(),
   description: z.string(),
   // Null enforced server-side whenever clientVisibility = NDA_RESTRICTED (BR-1.3)
@@ -560,12 +561,22 @@ export const SkillEntrySchema = z.object({
   name: z.string(),
   category: z.string(),
   yearsExperience: z.number().nullable(),
+  aliases: z.array(z.string()),
 });
+
+/** A package name as it appears in a manifest (npm or PyPI) — the proof a skill is used (WP-103). */
+const PackageName = z
+  .string()
+  .trim()
+  .min(1)
+  .max(214)
+  .regex(/^[@a-z0-9][a-z0-9@/._-]*$/i, "a package name, e.g. @playwright/test or scikit-learn");
 
 export const SkillInputSchema = z.object({
   name: z.string().min(1),
   categoryId: z.string(),
   yearsExperience: z.number().nullable().optional(),
+  aliases: z.array(PackageName).max(12).optional(),
 });
 
 // ============================================================
