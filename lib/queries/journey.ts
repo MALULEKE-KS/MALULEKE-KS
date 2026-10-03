@@ -77,5 +77,15 @@ export const getJourney = cache(async () => {
 
   const first = Math.min(...chapters.map((c) => c.from));
   const last = Math.max(thisYear, ...ahead.map((m) => m.date.getUTCFullYear()));
-  return { headline: block.headline, lede: block.lede, chapters, ahead: block.ahead ? { ...block.ahead, moments: ahead } : null, span: { first, last, now: thisYear } };
+  // Whole months until the first moment ahead (e.g. the expected graduation) — the page's countdown.
+  const nextAhead = ahead[0] ?? null;
+  // Only when the date is known to the month or day — a year-only date has no honest countdown.
+  const monthsToNext = nextAhead && nextAhead.precision !== "year" ? Math.max(0, Math.round((nextAhead.date.getTime() - now.getTime()) / (30.44 * 24 * 60 * 60 * 1000))) : null;
+  return {
+    headline: block.headline,
+    lede: block.lede,
+    chapters,
+    ahead: block.ahead ? { ...block.ahead, moments: ahead, monthsToNext } : null,
+    span: { first, last, now: thisYear },
+  };
 });

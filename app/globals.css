@@ -364,6 +364,28 @@ html {
   animation: shiny-text 8s infinite;
 }
 
+/* Above the fold: content rises out of a soft blur on first paint — pure CSS,
+   so it never waits for JavaScript (a JS reveal would leave the hero blank
+   until hydration). Stagger with --rise-delay. Reduced motion: no motion. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-in { animation: none; }
+}
+
+/* Magic UI ShineBorder: the light sweeping round a card's edge. */
+@keyframes shine {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  to { background-position: 0% 0%; }
+}
+
 /* The AI guide's panel gliding in when it opens. */
 @keyframes guide-in {
   from { opacity: 0; transform: translateY(14px) scale(0.98); }
