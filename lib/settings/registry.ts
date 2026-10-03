@@ -339,10 +339,10 @@ export const SETTINGS = {
     description: "Public repos not yet written up that the system map draws per GitHub home; the rest are counted (+N more).",
     rule: "PUBLIC-REDESIGN-PLAN §3.4",
   }),
-  "home.map.languagesPerRepo": define({
+  "github.languagesPerRepo": define({
     schema: z.number().int().min(1).max(12),
     default: 6,
-    description: "GitHub languages the system map takes from each repo, largest first.",
+    description: "GitHub languages taken from each repo, largest first, beside its curated stack — on the system map and the systems catalog.",
     rule: "PUBLIC-REDESIGN-PLAN §3.4",
   }),
 } as const;

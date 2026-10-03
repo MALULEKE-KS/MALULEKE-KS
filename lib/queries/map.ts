@@ -57,7 +57,7 @@ export async function getSystemMap(): Promise<SystemMapData | null> {
     dbPublic.publicGithubRepo.findMany({ orderBy: [{ pushedAt: { sort: "desc", nulls: "last" } }] }),
     getSetting("home.map.techInGraph"),
     getSetting("home.map.reposPerHome"),
-    getSetting("home.map.languagesPerRepo"),
+    getSetting("github.languagesPerRepo"),
   ]);
   if (homes.length === 0) return null;
 

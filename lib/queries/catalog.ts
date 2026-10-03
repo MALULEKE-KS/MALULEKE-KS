@@ -10,6 +10,7 @@
 // one pass rather than in several queries; public role only (F1.8).
 
 import { dbPublic } from "@/lib/db";
+import { getSetting } from "@/lib/settings";
 import { getPublicHomes } from "@/lib/queries/profile";
 import { ago } from "@/lib/queries/work";
 
@@ -50,12 +51,13 @@ function monday(d: Date) {
 
 export async function getCatalog({ home, status, domain, tech, sort = "featured", page = 1, pageSize = 12 }: CatalogParams) {
   const now = new Date();
-  const [systems, homes, links, repos, activity] = await Promise.all([
+  const [systems, homes, links, repos, activity, languagesPerRepo] = await Promise.all([
     dbPublic.publicSystem.findMany({ orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }, { name: "asc" }, { id: "asc" }] }),
     getPublicHomes(),
     dbPublic.publicSystemHome.findMany(),
     dbPublic.publicGithubRepo.findMany({ where: { published: true } }),
     dbPublic.publicSystemActivity.findMany(),
+    getSetting("github.languagesPerRepo"),
   ]);
 
   const start = monday(now);
@@ -67,7 +69,7 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
     const weeks = weekKeys.map((k) => counts.get(k) ?? 0);
     const languages = Object.entries((repo?.languages ?? {}) as Record<string, number>)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, languagesPerRepo)
       .map(([n]) => n);
     // The technologies shown: the curated stack first, then the repo's languages.
     const tech = [...new Map([...s.techStack, ...languages].map((t) => [t.toLowerCase(), t])).values()];
@@ -112,7 +114,8 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
     homes: homes.filter((h) => homeCounts.has(h.slug)).map((h) => ({ key: h.slug, label: h.name, count: homeCounts.get(h.slug)! })),
     statuses: [...statusCounts].map(([key, n]) => ({ key, label: rows.find((r) => r.statusKey === key)!.status, count: n })).sort((a, b) => b.count - a.count),
     domains: [...domainCounts].map(([key, n]) => ({ key, label: rows.find((r) => r.domainKey === key)!.domain ?? key, count: n })).sort((a, b) => b.count - a.count),
-    tech: [...techCounts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 12).map(([key, n]) => ({ key, label: techSpelling.get(key) ?? key, count: n })),
+    // Every technology the catalog's work uses — a filter never hides one.
+    tech: [...techCounts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([key, n]) => ({ key, label: techSpelling.get(key) ?? key, count: n })),
   };
 
   let filtered = rows.filter(
