@@ -379,6 +379,21 @@ html {
   .rise-in { animation: none; }
 }
 
+/* Magic UI OrbitingCircles: each orbiter circles at --radius from --angle.
+   The base transform is the first frame, so with reduced motion (no
+   animation) the orbiters still sit spread round the ring. */
+.orbit-ring {
+  transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+  animation: orbit-ring calc(var(--duration) * 1s) linear infinite;
+}
+@keyframes orbit-ring {
+  from { transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg)); }
+  to { transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg - 360deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring { animation: none; }
+}
+
 /* Magic UI ShineBorder: the light sweeping round a card's edge. */
 @keyframes shine {
   0% { background-position: 0% 0%; }
