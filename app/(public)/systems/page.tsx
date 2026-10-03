@@ -19,6 +19,7 @@ import { getContentBlock } from "@/lib/content/blocks";
 import { getCatalog } from "@/lib/queries/catalog";
 import { SystemsResults } from "./_components/SystemsResults";
 import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
+import { SystemsSpotlight } from "@/components/systems/SystemsSpotlight";
 
 export async function generateMetadata(): Promise<Metadata> {
   const intro = await getContentBlock("systems-page").catch(() => null);
@@ -50,6 +51,16 @@ async function HeroStats() {
   );
 }
 
+/** Every published system on a ring, in featured order — the unfiltered first view only. */
+async function Spotlight() {
+  const { systems } = await getCatalog({ pageSize: 100 });
+  return (
+    <div className="mt-10 -mx-4 sm:mx-0">
+      <SystemsSpotlight systems={systems} />
+    </div>
+  );
+}
+
 export default async function SystemsPage({ searchParams }: SystemsPageProps) {
   const [params, intro] = await Promise.all([searchParams, getContentBlock("systems-page")]);
 
@@ -65,6 +76,11 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
         <Suspense fallback={null}>
           <HeroStats />
         </Suspense>
+        {!(params.home || params.status || params.domain || params.tech || (params.page && params.page !== "1")) && (
+          <Suspense fallback={null}>
+            <Spotlight />
+          </Suspense>
+        )}
       </PageHero>
       <section className="bg-paper py-12 md:py-16">
         <Container>

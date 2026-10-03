@@ -324,6 +324,27 @@ export const SETTINGS = {
     description: "A generated write-up is rewritten after its repo changes, but no more often than every this many days.",
     rule: "BR-4.5",
   }),
+  // Home — the system map (PUBLIC-REDESIGN-PLAN §3.4). How much of the real
+  // data the graph draws; nothing past these limits is dropped — the rest of
+  // the technologies are listed under the graph, the rest of the repos counted.
+  "home.map.techInGraph": define({
+    schema: z.number().int().min(4).max(30),
+    default: 12,
+    description: "Technologies drawn as nodes in the home page's system map (the most used first); the rest are listed beneath it.",
+    rule: "PUBLIC-REDESIGN-PLAN §3.4",
+  }),
+  "home.map.reposPerHome": define({
+    schema: z.number().int().min(0).max(12),
+    default: 4,
+    description: "Public repos not yet written up that the system map draws per GitHub home; the rest are counted (+N more).",
+    rule: "PUBLIC-REDESIGN-PLAN §3.4",
+  }),
+  "github.languagesPerRepo": define({
+    schema: z.number().int().min(1).max(12),
+    default: 6,
+    description: "GitHub languages taken from each repo, largest first, beside its curated stack — on the system map and the systems catalog.",
+    rule: "PUBLIC-REDESIGN-PLAN §3.4",
+  }),
 } as const;
 
 export type SettingKey = keyof typeof SETTINGS;

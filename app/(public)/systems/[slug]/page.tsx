@@ -88,7 +88,8 @@ export async function generateMetadata({ params }: SystemDetailPageProps): Promi
     title: cs.system.name,
     description,
     path: `/systems/${cs.system.slug}`,
-    image: `/systems/${cs.system.slug}/opengraph-image/card`,
+    // Its own card, from ./opengraph-image.tsx — Next writes the (hashed) URL.
+    image: null,
     imageAlt: `${cs.system.name} — ${description}`.slice(0, 200),
     type: "article",
   });
@@ -244,7 +245,10 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                 <p className="type-eyebrow text-slate inline-flex items-center gap-2">
                   <FaGithub aria-hidden="true" className="size-3.5" /> From its README
                 </p>
-                <div className="text-ink mt-4 max-w-prose font-serif text-lg leading-relaxed whitespace-pre-line">{readmeBody}</div>
+                {/* The same reading type as a case study — paragraphs and lists, not one block of text. */}
+                <div className="mt-2">
+                  <Prose markdown={readmeBody} />
+                </div>
                 <a
                   href={`${repo.url}#readme`}
                   target="_blank"

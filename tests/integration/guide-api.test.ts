@@ -21,7 +21,7 @@ import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { db } from "@/lib/db";
 
 const FLAG_KEYS = ["concierge.enabled", "agent.open_page", "agent.search_systems", "agent.draft_inquiry"];
-const SETTING_KEYS = ["concierge.rateLimit.maxPerWindow", "concierge.dailyMessageCap"];
+const SETTING_KEYS = ["concierge.rateLimit.maxPerWindow", "concierge.dailyMessageCap", "concierge.corpusCacheSeconds"];
 let savedFlags: { key: string; enabled: boolean }[] = [];
 
 // What the mock model was called with, per request.
@@ -126,17 +126,22 @@ describe("POST /api/v1/guide — switched on", () => {
   });
 
   it("grounds the model in public data only (BR-4.3)", async () => {
+    // Other test files publish and hide systems in the same database while this
+    // runs: read the site fresh, and judge only systems whose state was the same
+    // before and after the question (a system that changed mid-way proves nothing).
+    await db.platformSetting.upsert({ where: { key: "concierge.corpusCacheSeconds" }, create: { key: "concierge.corpusCacheSeconds", value: 0 }, update: { value: 0 } });
+    const publishedNow = async () => new Set((await db.publicSystem.findMany({ select: { slug: true } })).map((s) => s.slug));
+    const allSlugs = async () => (await db.system.findMany({ select: { slug: true } })).map((s) => s.slug);
+    const [publishedBefore, slugsBefore] = await Promise.all([publishedNow(), allSlugs()]);
     await (await ask(question("Tell me everything"))).text();
     const system = systemText(calls[0]!);
+    const publishedAfter = await publishedNow();
 
-    // Every published system is known…
-    const published = await db.publicSystem.findMany({ select: { name: true, slug: true } });
-    for (const s of published) expect(system).toContain(`/systems/${s.slug}`);
+    // Every system published throughout is known…
+    for (const slug of publishedBefore) if (publishedAfter.has(slug)) expect(system).toContain(`/systems/${slug}`);
 
-    // …and nothing unpublished, private or instructional leaks in.
-    const publishedIds = new Set((await db.publicSystem.findMany({ select: { id: true } })).map((s) => s.id));
-    const hidden = await db.system.findMany({ where: { id: { notIn: [...publishedIds] } }, select: { slug: true } });
-    for (const s of hidden) expect(system).not.toContain(`/systems/${s.slug})`);
+    // …and nothing unpublished throughout, private or instructional leaks in.
+    for (const slug of slugsBefore) if (!publishedBefore.has(slug) && !publishedAfter.has(slug)) expect(system).not.toContain(`/systems/${slug})`);
     const profile = await db.profile.findFirst({ select: { phone: true } });
     if (profile?.phone) expect(system).not.toContain(profile.phone);
     const lenses = await db.visitorLens.findMany({ select: { aiFramingPrompt: true } });

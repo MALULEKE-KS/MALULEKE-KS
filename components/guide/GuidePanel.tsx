@@ -32,6 +32,7 @@ import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { ThinkingOrb, type OrbMode } from "@/components/ui/thinking-orb";
 import { TypingAnimation } from "@/components/ui/typing-animation";
 import { readSessionLens, useGuide } from "@/components/guide/GuideProvider";
 import { GuideText } from "@/components/guide/GuideText";
@@ -52,6 +53,22 @@ function readError(error: Error | undefined): string | null {
 
 function textOf(message: UIMessage) {
   return message.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
+}
+
+/** What the guide is really doing before its first word — never a timer cycling labels. */
+const RUNNING: Record<string, { mode: OrbMode; label: string }> = {
+  "tool-search_systems": { mode: "search", label: "Searching the site" },
+  "tool-open_page": { mode: "navigate", label: "Opening a page" },
+  "tool-draft_inquiry": { mode: "compose", label: "Drafting your message" },
+};
+function activityOf(last: UIMessage | undefined): { mode: OrbMode; label: string } {
+  if (last?.role === "assistant") {
+    for (const p of [...last.parts].reverse()) {
+      const state = (p as { state?: string }).state;
+      if (RUNNING[p.type] && (state === "input-streaming" || state === "input-available")) return RUNNING[p.type]!;
+    }
+  }
+  return { mode: "think", label: "Thinking" };
 }
 
 const CHAT_KEY = "mks.guide.chat";
@@ -214,8 +231,10 @@ export function GuidePanel({
   const tooLong = input.length > maxQuestionCharacters;
   // This page's questions first, then the general ones — never more than four.
   const opening = [...new Set([...questionsFor(pathname, pageSuggestions), ...suggestions])].slice(0, 4);
-  // A reasoning model thinks before its first word: say so.
-  const reasoning = status === "streaming" && last?.role === "assistant" && !lastText && last.parts.some((p) => p.type === "reasoning");
+  // Before the first word — waiting, reasoning or running a tool — the orb
+  // shows it, lit by what is actually happening.
+  const working = status === "submitted" || (status === "streaming" && !lastText);
+  const activity = activityOf(status === "submitted" ? undefined : last);
 
   function submit() {
     const text = input.trim();
@@ -264,7 +283,7 @@ export function GuidePanel({
             </h2>
             <p className="mt-0.5 truncate text-[11px]">
               {busy ? (
-                <AnimatedShinyText className="text-[11px]">{status === "submitted" ? "Thinking…" : "Answering…"}</AnimatedShinyText>
+                <AnimatedShinyText className="text-[11px]">{working ? `${activity.label}…` : "Answering…"}</AnimatedShinyText>
               ) : ready ? (
                 <AnimatedShinyText className="text-[11px]">Answers from this site&apos;s live data</AnimatedShinyText>
               ) : (
@@ -398,15 +417,11 @@ export function GuidePanel({
             ),
           )}
 
-          {(status === "submitted" || reasoning) && (
+          {working && (
             <GuideRow>
-              <p className="inline-flex items-center gap-2 text-[13px]" aria-label="Thinking">
-                <AnimatedShinyText>Thinking</AnimatedShinyText>
-                <span className="flex gap-1" aria-hidden="true">
-                  <span className="size-1 animate-bounce rounded-full bg-ember [animation-delay:-0.3s]" />
-                  <span className="size-1 animate-bounce rounded-full bg-ember [animation-delay:-0.15s]" />
-                  <span className="size-1 animate-bounce rounded-full bg-ember" />
-                </span>
+              <p className="inline-flex items-center gap-3 text-[13px]">
+                <ThinkingOrb mode={activity.mode} size={56} className="-my-2 -ml-1.5" />
+                <AnimatedShinyText>{activity.label}</AnimatedShinyText>
               </p>
             </GuideRow>
           )}

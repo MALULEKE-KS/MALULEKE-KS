@@ -30,7 +30,7 @@
 // runJob; `fetch` is injected so tests drive it without the network.
 
 import { Prisma } from "@prisma/client";
-import { MANIFEST_PATHS, MAX_WORKSPACES, dependenciesFrom, skillsProvedBy, workspacePatterns, type ManifestPath } from "@/lib/jobs/manifests";
+import { CONVENTIONAL_WORKSPACES, MANIFEST_PATHS, MAX_WORKSPACES, dependenciesFrom, skillsProvedBy, workspacePatterns, type ManifestFiles } from "@/lib/jobs/manifests";
 import { db } from "@/lib/db";
 import { isSlugAvailable } from "@/lib/rules/slugs";
 import { getSetting } from "@/lib/settings";
@@ -259,17 +259,25 @@ export function readmeToText(markdown: string, max = README_CHARS): string {
  * else unexpected leaves the last known list in place rather than erasing it.
  */
 async function saveDependencies(gh: GithubClient, repo: GitHubRepo, systemId: string) {
-  const files: Partial<Record<ManifestPath, string>> = {};
-  for (const path of MANIFEST_PATHS) {
-    const res = await gh.request(`/repos/${repo.full_name}/contents/${path}`, "application/vnd.github.raw+json");
-    if (res.status === 404 || res.status === 409) continue;
-    if (!res.ok) return; // unknown state — keep what we had
-    files[path] = (await res.text()).slice(0, 200_000);
-  }
-  // A monorepo's real dependencies live in its workspaces (apps/*, packages/*).
-  const workspaces: string[] = [];
   const raw = (p: string) => gh.request(`/repos/${repo.full_name}/contents/${p}`, "application/vnd.github.raw+json");
-  for (const pattern of files["package.json"] ? workspacePatterns(files["package.json"]) : []) {
+  // A folder's manifests; null when GitHub answers something unexpected.
+  const read = async (dir: string): Promise<ManifestFiles | null> => {
+    const files: ManifestFiles = {};
+    for (const path of MANIFEST_PATHS) {
+      const res = await raw(dir ? `${dir}/${path}` : path);
+      if (res.status === 404 || res.status === 409) continue;
+      if (!res.ok) return null;
+      files[path] = (await res.text()).slice(0, 200_000);
+    }
+    return files;
+  };
+  const files = await read("");
+  if (!files) return; // unknown state — keep what we had
+  // A monorepo's real dependencies live in its workspaces: the ones its root
+  // package.json declares, else the conventional apps/*, packages/*, services/*.
+  const declared = files["package.json"] ? workspacePatterns(files["package.json"]) : [];
+  const workspaces: ManifestFiles[] = [];
+  for (const pattern of declared.length > 0 ? declared : CONVENTIONAL_WORKSPACES) {
     if (workspaces.length >= MAX_WORKSPACES) break;
     let dirs = [pattern];
     if (pattern.endsWith("/*")) {
@@ -279,8 +287,8 @@ async function saveDependencies(gh: GithubClient, repo: GitHubRepo, systemId: st
       dirs = Array.isArray(entries) ? entries.filter((e) => e.type === "dir" && typeof e.path === "string").map((e) => e.path!) : [];
     }
     for (const dir of dirs.slice(0, MAX_WORKSPACES - workspaces.length)) {
-      const res = await raw(`${dir}/package.json`);
-      if (res.ok) workspaces.push((await res.text()).slice(0, 200_000));
+      const ws = await read(dir);
+      if (ws && Object.keys(ws).length > 0) workspaces.push(ws);
     }
   }
   await db.system.update({ where: { id: systemId }, data: { githubDependencies: dependenciesFrom(files, workspaces) } });

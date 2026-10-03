@@ -20,6 +20,7 @@ import { getSetting } from "@/lib/settings";
 import { Accent } from "@/components/shared/Accent";
 import { sectionCopy } from "@/lib/content/copy";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { LetsTalk } from "./_components/LetsTalk";
 
 export const dynamic = "force-dynamic";
@@ -88,7 +89,8 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
               {hero.description && <p className="type-lede text-mist mt-5 max-w-xl">{hero.description}</p>}
             </div>
             <div className="min-w-0 lg:col-span-5">
-              <div className="flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
+              <div className="relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
+                <ShineBorder borderWidth={1.5} duration={14} />
                 <span className="relative shrink-0">
                   <Image src={face.url} alt={face.alt} width={64} height={64} unoptimized className="size-16 rounded-2xl object-cover object-top" />
                   <span aria-hidden="true" className="ring-night absolute -right-1 -bottom-1 grid size-4 place-items-center rounded-full ring-2">
@@ -104,9 +106,11 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             </div>
           </div>
 
-          {/* How it goes: four steps on one line. */}
+          {/* How it goes: four steps on one line, a light travelling through them from you to him. */}
           <ol className="relative mt-8 grid grid-cols-2 gap-x-4 gap-y-4 sm:mt-12 sm:gap-y-6 md:grid-cols-4">
-            <span aria-hidden="true" className="from-ember/70 absolute top-4 right-[12.5%] left-[12.5%] hidden h-px bg-gradient-to-r via-white/20 to-white/10 md:block" />
+            <span aria-hidden="true" className="from-ember/70 absolute top-4 right-[12.5%] left-[12.5%] hidden h-px overflow-hidden bg-gradient-to-r via-white/20 to-white/10 md:block">
+              <span className="absolute inset-y-0 left-0 w-1/4 bg-[linear-gradient(90deg,transparent,#ff5b1f,#ffb547,transparent)] motion-safe:animate-[flow-light_3.2s_cubic-bezier(0.65,0,0.35,1)_infinite] motion-reduce:hidden" />
+            </span>
             {steps.map((s, i) => (
               <li key={s.title} className="relative md:text-center">
                 <span className={`relative mx-0 grid size-8 place-items-center rounded-full font-mono text-xs font-semibold md:mx-auto ${i === 0 ? "bg-ember text-ink shadow-glow-ember" : "bg-night border border-white/20 text-paper"}`}>{String(i + 1).padStart(2, "0")}</span>
@@ -129,6 +133,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             retentionMonths={retentionMonths}
             documents={{ maxFiles, maxMegabytes }}
             picker={{ title: picker.title ?? "", description: picker.description ?? null }}
+            steps={steps}
             aside={
               <>
                 <div className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-6">

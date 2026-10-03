@@ -60,8 +60,19 @@ export function fromPyproject(text: string): string[] {
   return out;
 }
 
-/** At most this many workspace manifests are read per repo. */
+/** At most this many workspace folders are read per repo. */
 export const MAX_WORKSPACES = 16;
+
+/**
+ * Where a monorepo keeps its parts when its root doesn't declare workspaces —
+ * a Makefile- or uv-run repo (FundsLink Academy: apps/web, apps/api,
+ * packages/contracts, no root package.json). The convention, not a guess about
+ * any one repo; a folder that isn't there simply contributes nothing.
+ */
+export const CONVENTIONAL_WORKSPACES = ["apps/*", "packages/*", "services/*"] as const;
+
+/** A workspace folder's own manifests, the same files the root is read for. */
+export type ManifestFiles = Partial<Record<ManifestPath, string>>;
 
 /**
  * A monorepo's workspace folders from its root package.json ("workspaces":
@@ -84,14 +95,17 @@ export function workspacePatterns(packageJson: string): string[] {
     .slice(0, MAX_WORKSPACES);
 }
 
-/** Every dependency named in the manifests found, normalised, unique, capped. */
-export function dependenciesFrom(files: Partial<Record<ManifestPath, string>>, workspaces: string[] = []): string[] {
-  const names = [
+function namesIn(files: ManifestFiles): string[] {
+  return [
     ...(files["package.json"] ? fromPackageJson(files["package.json"]) : []),
-    ...workspaces.flatMap(fromPackageJson),
     ...(files["requirements.txt"] ? fromRequirements(files["requirements.txt"]) : []),
     ...(files["pyproject.toml"] ? fromPyproject(files["pyproject.toml"]) : []),
   ];
+}
+
+/** Every dependency named in the root's and the workspaces' manifests, normalised, unique, capped. */
+export function dependenciesFrom(files: ManifestFiles, workspaces: ManifestFiles[] = []): string[] {
+  const names = [...namesIn(files), ...workspaces.flatMap(namesIn)];
   return [...new Set(names.filter(ok).map(normaliseDependency))].sort().slice(0, MAX_NAMES);
 }
 

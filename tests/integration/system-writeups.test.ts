@@ -221,3 +221,20 @@ describe("withoutPersonalDetails", () => {
     );
   });
 });
+
+describe("reading the evidence", () => {
+  it("reads a public repo anonymously when the account refuses the token (KSDRILL-SA, 2026-10-03)", async () => {
+    const s = await system();
+    // Every request carrying the token is refused, as GitHub does for an
+    // organisation that blocks classic tokens; the same request without one works.
+    const refusing: FetchLike = async (url, init) => {
+      const auth = new Headers(init?.headers).get("authorization");
+      if (auth) return new Response(JSON.stringify({ message: "forbids access via a personal access token (classic)" }), { status: 403 });
+      return fakeGithub(url, init);
+    };
+    const summary = await run({ systemId: s.id, fetch: refusing });
+    expect(summary.errors).toEqual([]);
+    expect(summary.written).toEqual([s.slug]);
+    expect((await read(s.id)).caseStudyBody).toMatch(/^## The problem/);
+  });
+});

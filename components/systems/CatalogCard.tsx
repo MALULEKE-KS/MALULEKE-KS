@@ -78,6 +78,12 @@ export function CatalogCard({ s, showHome = true }: { s: CatalogSystem; showHome
             {s.tech.slice(0, 4).map((t) => (
               <TechChip key={t} name={t} />
             ))}
+            {/* The card shows four; the rest are counted, never silently dropped (all on the case study). */}
+            {s.tech.length > 4 && (
+              <span title={s.tech.slice(4).join(", ")} className="text-slate border-ink/10 inline-flex h-7 items-center rounded-full border px-2 font-mono text-[11px]">
+                +{s.tech.length - 4}
+              </span>
+            )}
           </span>
         )}
 

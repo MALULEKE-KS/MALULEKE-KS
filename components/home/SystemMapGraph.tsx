@@ -137,7 +137,37 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
         </Column>
         <Column title="Built with">
           {data.tech.length > 0 ? (
-            data.tech.map((n) => <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />)
+            <>
+              {data.tech.slice(0, data.techInGraph).map((n) => (
+                <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />
+              ))}
+              {data.tech.length > data.techInGraph && (
+                // Every other technology the work uses — listed, never dropped.
+                // Hover or focus lights its work, like a node does.
+                <div className="mt-2">
+                  <p className="text-line mb-2 text-[11px]">and {data.tech.length - data.techInGraph} more</p>
+                  <ul className="flex flex-wrap gap-1.5">
+                    {data.tech.slice(data.techInGraph).map((t) => (
+                      <li key={t.id}>
+                        <span
+                          tabIndex={0}
+                          title={t.sub}
+                          {...hover(t.id)}
+                          className={cn(
+                            "focus-visible:outline-ember inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] transition-[opacity,border-color] duration-300 focus-visible:outline-2",
+                            active === t.id ? "border-ember/60 text-paper" : "text-mist border-white/10",
+                            lit !== null && !lit.has(t.id) && "opacity-35",
+                          )}
+                        >
+                          {techMark(t.label)}
+                          {t.label}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
           ) : (
             <p className="text-mist text-sm">Technologies appear here as systems are curated.</p>
           )}
