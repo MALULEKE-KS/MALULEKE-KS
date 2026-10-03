@@ -40,7 +40,10 @@ const SEARCH_FROM = 9;
 export function FilterDropdown({ name, hint, options, allHref, current, marks = false }: Props) {
   const ref = useRef<HTMLDetailsElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  // How far the panel moves sideways to stay on screen (a trigger near the edge of a phone).
+  const [shift, setShift] = useState(0);
   const [query, setQuery] = useState("");
   const id = useId();
   const selected = options.find((o) => o.key.toLowerCase() === current?.toLowerCase()) ?? null;
@@ -48,6 +51,15 @@ export function FilterDropdown({ name, hint, options, allHref, current, marks = 
 
   useEffect(() => {
     if (!open) return;
+    // Measured from the trigger, where the panel starts before any shift.
+    const panel = panelRef.current;
+    const trigger = ref.current?.querySelector("summary");
+    if (panel && trigger) {
+      const margin = 16;
+      const left = trigger.getBoundingClientRect().left;
+      const over = left + panel.offsetWidth - (window.innerWidth - margin);
+      setShift(over > 0 ? -Math.min(over, Math.max(0, left - margin)) : 0);
+    }
     const onDown = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) ref.current.open = false;
     };
@@ -106,10 +118,13 @@ export function FilterDropdown({ name, hint, options, allHref, current, marks = 
         <ChevronDown aria-hidden="true" className="size-3.5 shrink-0 transition-transform duration-200 group-open/dd:rotate-180" />
       </summary>
 
+      {/* No box at all while closed (display: none), so nothing hangs off a phone's edge. */}
       <div
         id={id}
+        ref={panelRef}
         onKeyDown={onListKey}
-        className="bg-sheet/95 border-ink/10 shadow-lift absolute top-full left-0 z-40 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border p-2 backdrop-blur-xl motion-safe:animate-[dd-in_160ms_cubic-bezier(0.2,0.8,0.2,1)]"
+        style={{ translate: `${shift}px 0` }}
+        className="bg-sheet/95 border-ink/10 shadow-lift absolute top-full left-0 z-40 mt-2 hidden w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border p-2 backdrop-blur-xl group-open/dd:block motion-safe:animate-[dd-in_160ms_cubic-bezier(0.2,0.8,0.2,1)]"
       >
         <div className="flex items-baseline justify-between gap-3 px-2 pt-1 pb-2">
           <span className="text-ink text-sm font-semibold">{name}</span>
