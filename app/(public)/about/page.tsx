@@ -206,11 +206,12 @@ export default async function AboutPage() {
           <Container className="relative pb-16 md:pb-20">
             <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
               {counters.map((c, i) => (
-                <div key={c.label} className="rise-in rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md" style={{ "--rise-delay": `${360 + i * 70}ms` } as React.CSSProperties}>
+                // Label first in the markup (axe definition-list); the number shows on top.
+                <div key={c.label} className="rise-in flex flex-col-reverse rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md" style={{ "--rise-delay": `${360 + i * 70}ms` } as React.CSSProperties}>
+                  <dt className="text-mist mt-1 text-sm">{c.label}</dt>
                   <dd className="type-data text-paper text-4xl font-semibold tracking-tight md:text-5xl">
                     <NumberTicker value={c.value} />
                   </dd>
-                  <dt className="text-mist mt-1 text-sm">{c.label}</dt>
                 </div>
               ))}
             </dl>

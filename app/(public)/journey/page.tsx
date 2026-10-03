@@ -100,13 +100,13 @@ export default async function JourneyPage() {
           </p>
           <dl className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4">
             {stats.map((s, i) => (
-              <div key={s.label} className="rise-in" style={{ "--rise-delay": `${240 + i * 70}ms` } as React.CSSProperties}>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md">
-                  <dd className="type-data text-paper text-4xl font-semibold tracking-tight md:text-5xl">
-                    <NumberTicker value={s.value} />
-                  </dd>
-                  <dt className="text-mist mt-1 text-sm">{s.label}</dt>
-                </div>
+              // One <div> per group, directly in the <dl>, label first (axe definition-list);
+              // the number shows on top.
+              <div key={s.label} className="rise-in flex flex-col-reverse rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md" style={{ "--rise-delay": `${240 + i * 70}ms` } as React.CSSProperties}>
+                <dt className="text-mist mt-1 text-sm">{s.label}</dt>
+                <dd className="type-data text-paper text-4xl font-semibold tracking-tight md:text-5xl">
+                  <NumberTicker value={s.value} />
+                </dd>
               </div>
             ))}
           </dl>
