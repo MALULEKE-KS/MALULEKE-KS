@@ -8,8 +8,11 @@ import { getPublicSystemBySlug } from "@/lib/queries/systems";
 
 // One image per system, with alt text that says which system it is (spec
 // WP-101 — not a generic "A system on …"). Served at …/opengraph-image/card.
-export async function generateImageMetadata({ params }: { params: { slug: string } }) {
-  const system = await getPublicSystemBySlug(params.slug);
+// params may arrive as a promise (Next 16) or be empty while the build collects page
+// data — await it, and fall back to the site's card when there's no slug yet.
+export async function generateImageMetadata({ params }: { params: Promise<{ slug?: string }> | { slug?: string } }) {
+  const { slug } = await params;
+  const system = slug ? await getPublicSystemBySlug(slug) : null;
   const alt = system ? `${system.name} — ${system.description}`.slice(0, 200) : "The systems — MALULEKE-KS";
   return [{ id: "card", alt, size: OG_SIZE, contentType: "image/png" }];
 }
