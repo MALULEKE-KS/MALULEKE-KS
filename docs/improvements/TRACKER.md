@@ -91,3 +91,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Left:** each row's Remaining note.
 - **Next step:** WP-001 (baseline) — unchanged; measure after this batch is deployed so the baseline reflects V1 final.
 - **Blockers:** D-004, D-005; the owner input register (spec Section 9).
+
+### 2026-10-03 · V1 final released (PR #148, build 8d703cd) + follow-up
+- **Verified on production:** every core page reports `8d703cd` (smoke check); FundsLink-Academy live as In progress; the deleted portfolios are gone from the repo list; the release line and `security.txt` are served. CI on PR #148: unit 173, integration 409, e2e 24/24 (13 phone + 11 axe).
+- **Found on production:** Governova was missing — KSDRILL-SA refuses the sync's classic token, so production never listed its new repos. **Follow-up:** the sync now lists a refusing account's public repos anonymously (D-016, tested), and a migration creates Governova as In progress.
+- **Next step:** unchanged — WP-001.
