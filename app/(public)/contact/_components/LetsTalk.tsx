@@ -15,7 +15,8 @@
 import { useId, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { ShineBorder } from "@/components/ui/shine-border";
 import type { InquiryTypeOption } from "@/lib/queries/site";
 import { cn } from "@/lib/utils";
 import { CATEGORY_ICON, CategoryPicker } from "./CategoryPicker";
@@ -37,10 +38,12 @@ interface Props {
   documents: { maxFiles: number; maxMegabytes: number };
   /** The picker's heading — page copy, from data. */
   picker: { title: string; description: string | null };
+  /** How it goes from here — the hero's steps (page copy), shown again once sent. */
+  steps: { title: string; body?: string }[];
   aside: React.ReactNode;
 }
 
-export function LetsTalk({ categories, initialCategory, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, picker, aside }: Props) {
+export function LetsTalk({ categories, initialCategory, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, picker, steps: journey, aside }: Props) {
   const uid = useId();
   const reduced = useReducedMotion();
   const top = useRef<HTMLDivElement>(null);
@@ -62,10 +65,11 @@ export function LetsTalk({ categories, initialCategory, email, ownerFirstName, r
   const stepOf = (key: string) => steps.findIndex((s) => s.key === key) + 1;
   const required = f.progress;
   const ready = required.filter((s) => s.done).length;
+  const allReady = required.length > 0 && ready === required.length;
   const filling = f.chosen && f.state.kind !== "sent";
 
   let body: React.ReactNode;
-  if (f.state.kind === "sent") body = <Sent reference={f.state.reference} reviewSlaHours={reviewSlaHours} email={email} />;
+  if (f.state.kind === "sent") body = <Sent reference={f.state.reference} reviewSlaHours={reviewSlaHours} email={email} steps={journey} />;
   else if (!f.chosen) body = <CategoryPicker categories={categories} fromGuide={f.fromGuide} onChoose={choose} title={picker.title} description={picker.description} />;
   else {
     const Icon = CATEGORY_ICON[f.form];
@@ -116,19 +120,20 @@ export function LetsTalk({ categories, initialCategory, email, ownerFirstName, r
                 . No account is created.
               </p>
               <div aria-live="polite">{f.state.kind === "problem" && <p className="text-critical text-sm">{f.state.message}</p>}</div>
-              <Button type="submit" variant="accent" size="lg" disabled={f.state.kind === "sending"} className="w-full sm:w-auto">
+              {/* The page's one primary action — the only shimmer on it. */}
+              <ShimmerButton type="submit" disabled={f.state.kind === "sending"} className="w-full sm:w-auto sm:min-w-44">
                 {f.state.kind === "sending" ? (
                   <>
-                    <Loader2 className="animate-spin" />
+                    <Loader2 aria-hidden="true" className="animate-spin" />
                     Sending…
                   </>
                 ) : (
                   <>
                     Send
-                    <ArrowRight />
+                    <ArrowRight aria-hidden="true" />
                   </>
                 )}
-              </Button>
+              </ShimmerButton>
             </div>
           </motion.form>
         </AnimatePresence>
@@ -143,15 +148,18 @@ export function LetsTalk({ categories, initialCategory, email, ownerFirstName, r
       </div>
       <aside className="min-w-0 space-y-5 lg:sticky lg:top-24 lg:col-span-4">
         {filling && (
-          <nav aria-label="Your progress" className="bg-night text-paper shadow-lift rounded-2xl border border-white/10 p-6">
+          <nav aria-label="Your progress" className="bg-night text-paper shadow-lift relative overflow-hidden rounded-2xl border border-white/10 p-6">
+            {/* Everything it needs is there: the card lights up. */}
+            {allReady && <ShineBorder borderWidth={1.5} duration={10} />}
             <p className="flex items-baseline justify-between gap-3">
               <span className="font-sans text-base font-semibold">Your message</span>
-              <span className="text-mist font-mono text-xs">
-                {ready} / {required.length} ready
-              </span>
+              <span className={cn("font-mono text-xs", allReady ? "text-ember" : "text-mist")}>{allReady ? "Ready to send" : `${ready} / ${required.length} ready`}</span>
             </p>
             <div aria-hidden="true" className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
-              <div className="bg-ember h-full rounded-full transition-[width] duration-500" style={{ width: `${(ready / required.length) * 100}%` }} />
+              <div
+                className={cn("h-full rounded-full transition-[width] duration-500", allReady ? "bg-[linear-gradient(90deg,var(--color-ember),#ffb547)] shadow-[0_0_12px_rgb(255_91_31/0.7)]" : "bg-ember")}
+                style={{ width: `${(ready / required.length) * 100}%` }}
+              />
             </div>
             <ol className="mt-5 space-y-1">
               {steps.map((s, i) => (

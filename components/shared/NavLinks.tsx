@@ -38,7 +38,8 @@ export function NavLinks() {
                   onFocus={() => setHovered(s.href)}
                   onBlur={() => setHovered(null)}
                   className={cn(
-                    "relative inline-flex h-9 items-center rounded-full px-3.5 text-sm transition-colors focus-visible:outline-none",
+                    // Never wraps: in the gathered capsule a label broke mid-word ("System s").
+                    "relative inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-sm whitespace-nowrap transition-colors focus-visible:outline-none",
                     active ? "text-paper" : "text-mist hover:text-paper",
                   )}
                 >

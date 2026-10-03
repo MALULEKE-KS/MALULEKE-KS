@@ -401,6 +401,34 @@ html {
   to { background-position: 0% 0%; }
 }
 
+/* Magic UI ShimmerButton: the spark sliding along the button and round its edge. */
+@keyframes shimmer-slide {
+  to { transform: translate(calc(100cqw - 100%), 0); }
+}
+@keyframes spin-around {
+  0% { transform: translateZ(0) rotate(0); }
+  15%, 35% { transform: translateZ(0) rotate(90deg); }
+  65%, 85% { transform: translateZ(0) rotate(270deg); }
+  100% { transform: translateZ(0) rotate(360deg); }
+}
+
+/* Let's Talk's steps: a light travelling the line from the first to the last. */
+@keyframes flow-light {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
+}
+
+/* Let's Talk, sent: the check draws itself, then a few embers rise from it. */
+@keyframes draw-check {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ember-rise {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); }
+}
+
 /* The AI guide's panel gliding in when it opens. */
 @keyframes guide-in {
   from { opacity: 0; transform: translateY(14px) scale(0.98); }
