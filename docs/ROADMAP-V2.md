@@ -30,6 +30,14 @@
 
 ## Part 2 — Update log (newest first)
 
+### V1 polish — real logos, dropdown filters, the whole stack, stat cards (2026-10-03)
+- **Every technology with its real mark:** one map of brand marks (`components/shared/TechChip.tsx`, used by chips, the map, filters and the About orbit — the About orbit kept a second list, now gone). Simple Icons where it has the mark; official marks it lacks vendored in `public/brands` (Playwright, MATLAB, Motion and Magic UI from svgl.app; Matplotlib, NetworkX, Chroma, Inngest, 21st.dev and Tk from each project's own repo or site), drawn single-colour so they match; concepts with no brand (SQL, VLANs) get an honest icon of the idea.
+- **The whole stack, as data:** a migration adds what this platform is built with — proven by its own `package.json` (Motion, Radix UI, Vercel AI SDK, Sharp, React PDF, axe, ESLint, Lucide, Neon) or by the owner's word (Figma, Magic UI, 21st.dev, Vercel AI Gateway, GitHub Actions, Node.js, SQL) — a "Design & UI" category, and hosting from each system's own addresses (GitHub for every repo there, Vercel for every vercel.app site).
+- **About's orbit:** every skill a published system uses, on as many rings as it takes (27 today, was 16), scaled with container units so phone and desktop show the same orbit; skills not yet in a system stay in the list below, never in the orbit.
+- **Hero numbers as cards:** Journey and About counters are Magic Card stat cards — a mark per number, a ticking value, an ember line drawing in, a live dot for what's happening now.
+- **Systems filters:** Home, Status, Built with and Domain are dropdowns, links underneath, logos and search for technologies; the ranking (most used first) is said in the panel and on the home map.
+- **Hydration:** Light Rays placed its rays with Math.sin, whose last digits differ between server and browser — an integer hash now.
+
 ### V1 showcase — Journey and About at showcase level; real data everywhere (2026-10-03)
 - **Journey:** light-rays hero with live counters; a sticky chapter bar (scroll-spy); a scroll-driven ember beam down the timeline with Magic Card chapters, Shine Border on the current one, and an honest "what's next" (a countdown only when the date is known to the month).
 - **About:** shine-framed portrait with live counters (years building, published systems, skills proven in code, companies); a story bento whose fact cards always fill their rows; dark method cards with a Border Beam; skills orbiting the K-S mark (Orbiting Circles), proven chips linked to the systems that use them.

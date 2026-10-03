@@ -30,7 +30,7 @@
 
 ### `/systems` — Catalog
 
-1. **Filter bar** — Organization, Domain, Status, each pulled live from its lookup table (mono labels, not icons standing in for text).
+1. **Filter bar** — Home, Status, Built with, Domain, each pulled live from the data, each a dropdown (owner, 2026-10-03: the chip rows were noise) built on `<details>` so it works without JavaScript; options are links with counts, technologies with their real brand marks and a search box, ordered most used first (said in the panel).
 2. **Results grid** — `SystemCard` throughout, corner-bracket interaction intact.
 3. **Pagination** — a plain "3 / 5" mono indicator with prev/next, not decorative dots.
 

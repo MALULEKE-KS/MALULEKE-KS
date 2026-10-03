@@ -18,6 +18,9 @@ import { techMark } from "@/components/shared/TechChip";
 import type { MapNode, SystemMapData } from "@/lib/queries/map";
 import { cn } from "@/lib/utils";
 
+/** How the technologies are ordered (owner, 2026-10-03: say how the ranking works). */
+const RANKING = "Most used first — by how many projects on the map use it.";
+
 interface Path {
   from: string;
   to: string;
@@ -135,7 +138,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
             <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />
           ))}
         </Column>
-        <Column title="Built with">
+        <Column title="Built with" note={RANKING}>
           {data.tech.length > 0 ? (
             <>
               {data.tech.slice(0, data.techInGraph).map((n) => (
@@ -216,7 +219,8 @@ function PhoneMap({ data }: { data: SystemMapData }) {
     <div ref={box} className="lg:hidden">
       {data.tech.length > 0 && (
         <div className="mb-6">
-          <p className="text-mist mb-2 font-mono text-[11px] tracking-[0.14em] uppercase">Built with — tap to trace</p>
+          <p className="text-mist font-mono text-[11px] tracking-[0.14em] uppercase">Built with — tap to trace</p>
+          <p className="text-line mt-1 mb-2 text-[11px]">{RANKING}</p>
           <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
             {data.tech.map((t) => {
               const on = tech === t.id;
@@ -291,10 +295,11 @@ function PhoneMap({ data }: { data: SystemMapData }) {
   );
 }
 
-function Column({ title, children }: { title: string; children: React.ReactNode }) {
+function Column({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
     <div className="relative flex flex-col justify-center gap-3">
       <p className="text-mist mb-1 font-mono text-[11px] tracking-[0.14em] uppercase">{title}</p>
+      {note && <p className="text-line -mt-3 mb-1 text-[11px]">{note}</p>}
       {children}
     </div>
   );

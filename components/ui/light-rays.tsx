@@ -21,10 +21,17 @@ interface LightRaysProps extends React.HTMLAttributes<HTMLDivElement> {
   length?: string
 }
 
-/** A stable pseudo-random sequence, so every render places the same rays. */
+/**
+ * A stable pseudo-random sequence, so every render places the same rays.
+ * Integer arithmetic only (a mulberry32-style hash): Math.sin differs in its
+ * last digits between the server's engine and a browser's, and scaled up that
+ * moved a ray — a hydration mismatch (2026-10-03).
+ */
 function seeded(i: number, salt: number) {
-  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453
-  return x - Math.floor(x)
+  let t = (Math.imul(i + 1, 0x9e3779b1) ^ Math.imul(salt + 1, 0x85ebca6b)) >>> 0
+  t = Math.imul(t ^ (t >>> 15), t | 1)
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
 }
 
 export function LightRays({ className, style, count = 6, color = "rgb(255 91 31 / 0.22)", blur = 36, speed = 14, length = "70vh", ...props }: LightRaysProps) {

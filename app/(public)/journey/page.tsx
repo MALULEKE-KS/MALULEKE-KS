@@ -17,7 +17,8 @@
 // computed. No GitHub entries — the systems live on /systems.
 
 import Link from "next/link";
-import { ArrowRight, FileText } from "lucide-react";
+import { Activity, ArrowRight, BookOpen, CalendarRange, FileText, Flag } from "lucide-react";
+import { StatCards, type Stat } from "@/components/shared/StatCards";
 import { Container } from "@/components/shared/Container";
 import { Accent } from "@/components/shared/Accent";
 import { LightRays } from "@/components/ui/light-rays";
@@ -68,11 +69,11 @@ export default async function JourneyPage() {
 
   // Live counters — computed, never typed.
   const stats = [
-    { value: Math.max(1, span.now - span.first), label: "years on the journey" },
-    { value: chapters.length, label: chapters.length === 1 ? "chapter" : "chapters" },
-    { value: chapters.reduce((n, c) => n + c.moments.length, 0) + (ahead?.moments.length ?? 0), label: "milestones" },
-    { value: chapters.filter((c) => c.current).length, label: "happening now" },
-  ];
+    { value: Math.max(1, span.now - span.first), label: "years on the journey", icon: CalendarRange },
+    { value: chapters.length, label: chapters.length === 1 ? "chapter" : "chapters", icon: BookOpen },
+    { value: chapters.reduce((n, c) => n + c.moments.length, 0) + (ahead?.moments.length ?? 0), label: "milestones", icon: Flag },
+    { value: chapters.filter((c) => c.current).length, label: "happening now", icon: Activity, live: true },
+  ] satisfies Stat[];
 
   // What's next, counted down from his own milestone (computed in getJourney).
   const next = ahead?.moments[0] ?? null;
@@ -98,18 +99,7 @@ export default async function JourneyPage() {
           <p className="type-lede text-mist rise-in mt-6 max-w-2xl" style={{ "--rise-delay": "160ms" } as React.CSSProperties}>
             {journey.lede}
           </p>
-          <dl className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4">
-            {stats.map((s, i) => (
-              // One <div> per group, directly in the <dl>, label first (axe definition-list);
-              // the number shows on top.
-              <div key={s.label} className="rise-in flex flex-col-reverse rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md" style={{ "--rise-delay": `${240 + i * 70}ms` } as React.CSSProperties}>
-                <dt className="text-mist mt-1 text-sm">{s.label}</dt>
-                <dd className="type-data text-paper text-4xl font-semibold tracking-tight md:text-5xl">
-                  <NumberTicker value={s.value} />
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <StatCards stats={stats} delay={240} className="mt-12" />
         </Container>
       </section>
 
