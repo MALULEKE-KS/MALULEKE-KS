@@ -114,7 +114,7 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Open questions for the owner** (log answers in DECISIONS.md):
   - Any hosting platforms beyond Vercel, Neon, GitHub and Railway?
   - Should AI coding tools (Claude Code, Gemini Canvas, ChatGPT) be listed as skills, given the no-AI-references rule for commits, PRs and issues?
-  - The README (the owner's GitHub profile README): owner wants to discuss improvements together. **Never edit README.md without the owner's go-ahead.**
+  - The README (the owner's GitHub profile README) was refreshed with the owner on 2026-10-03 (#158, 115a074): the platform first, live API badges, Mermaid diagrams. **Never edit README.md without the owner's go-ahead.**
 - **Notes for whoever picks up:**
   - The local machine has little RAM. Run one dev server at a time, and make it the only heavy process. The dev server is slow (5–70 s per page), so wait for hydration before driving the UI.
   - CI is the gate for e2e.
