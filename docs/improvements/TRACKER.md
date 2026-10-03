@@ -96,3 +96,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Verified on production:** every core page reports `8d703cd` (smoke check); FundsLink-Academy live as In progress; the deleted portfolios are gone from the repo list; the release line and `security.txt` are served. CI on PR #148: unit 173, integration 409, e2e 24/24 (13 phone + 11 axe).
 - **Found on production:** Governova was missing — KSDRILL-SA refuses the sync's classic token, so production never listed its new repos. **Follow-up:** the sync now lists a refusing account's public repos anonymously (D-016, tested), and a migration creates Governova as In progress.
 - **Next step:** unchanged — WP-001.
+
+### 2026-10-03 · V1 showcase batch (branch release/v1-showcase)
+- **Done:** Journey and About rebuilt at showcase level; the AI guide's thinking orb (real state, never timed labels); case-study share images served (they 404'd — route-group hash); the system map's caps moved to `home.map.*` settings with nothing dropped; the sync reads conventional monorepo workspaces (JS and Python); write-ups fall back across the free models and read public repos anonymously. Logged in ROADMAP-V2 Part 2.
+- **Owner, after deploy:** Admin → Jobs → run `github.sync`, then `systems.writeups` — FundsLink Academy and Governova then get their stack and a generated case study (on the free models until a paid model is chosen, V2 #14).
+- **Next step:** Let's Talk at showcase level, the systems coverflow; then WP-001.

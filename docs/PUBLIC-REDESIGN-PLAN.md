@@ -216,6 +216,9 @@ Still to do: the learning loop (unanswered questions → admin) and running the 
 | Journey | Magic UI **Blur Fade** (visible without JS) | Year-by-year reveal. |
 | Screenshots | Magic UI **Safari** / **iPhone** mockups | Real captures of each live system. |
 | Buttons | Our pill buttons + Magic UI **Shimmer Button** for the single primary CTA only | One accent, one moment of motion. |
+| Journey (2026-10-03) | Magic UI **Light Rays**, **Shine Border**, **Text Animate**, **Magic Card**, **Number Ticker**; 21st.dev **Growth Story Timeline** (pattern only, searched not retrieved) | Rays seeded so server and client draw the same; the beam is scroll-driven and hidden under reduced motion, where a full static beam shows instead. |
+| About (2026-10-03) | Magic UI **Orbiting Circles**, **Shine Border**, **Border Beam**, **Magic Card**, **Number Ticker** | Skills proven in code orbit the K-S mark; each orbiter starts where it is going, so reduced motion shows them spread round the ring. Decorative — the same skills are listed and linked beside it. |
+| AI guide thinking state (2026-10-03) | 21st.dev **AI thinking orb and input** (MorphOrb) — the orb only | The dotted canvas sphere and its light programs, recoloured from tokens read off computed style; the program follows the chat's real state. The pill-to-card morph and timed labels were left out: the guide streams long answers in its own panel, and labels must be true. |
 
 ## 8. Delivery
 

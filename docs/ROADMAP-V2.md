@@ -30,6 +30,15 @@
 
 ## Part 2 — Update log (newest first)
 
+### V1 showcase — Journey and About at showcase level; real data everywhere (2026-10-03)
+- **Journey:** light-rays hero with live counters; a sticky chapter bar (scroll-spy); a scroll-driven ember beam down the timeline with Magic Card chapters, Shine Border on the current one, and an honest "what's next" (a countdown only when the date is known to the month).
+- **About:** shine-framed portrait with live counters (years building, published systems, skills proven in code, companies); a story bento whose fact cards always fill their rows; dark method cards with a Border Beam; skills orbiting the K-S mark (Orbiting Circles), proven chips linked to the systems that use them.
+- **AI guide:** a dotted thinking orb (21st.dev MorphOrb's orb, adapted) lit by what the guide is really doing — thinking, searching the site, opening a page, drafting — never labels cycling on a timer.
+- **Share images fixed:** every case study's og:image 404'd — the URL was hand-built, and a file in the `(public)` route group is served as `opengraph-image-<hash>`. Next writes the URL now; `tests/e2e/share-images.spec.ts` fails CI on any share image that isn't served.
+- **System map, nothing dropped:** the 10-technology cap, 3 languages per repo and 4 repos per home were constants — now `home.map.techInGraph`, `home.map.languagesPerRepo`, `home.map.reposPerHome` (Admin → Settings). The graph draws the most used; every other technology is listed beneath and still traces its work.
+- **GitHub sync, monorepos:** when the root declares no workspaces, `apps/*`, `packages/*` and `services/*` are read, each for package.json, requirements.txt and pyproject.toml (FundsLink Academy has no root package.json).
+- **Write-ups that run:** the job falls back across `concierge.fallbackModels` when `writeups.model` is refused (the free credit doesn't serve Claude), and reads a public repo anonymously when its account refuses the token (KSDRILL-SA). The README fallback renders as styled prose.
+
 ### V1 final — the finalization batch; the V2 plan locked (2026-10-02/03)
 - **V2 plan locked:** `docs/V2-IMPROVEMENT-SPEC.md` (the owner's improvement spec, verified against the repo and production, with revision 3) is the V2 plan, built as a relay: `docs/improvements/TRACKER.md` (status, Next up, handoff log) and `DECISIONS.md`, read first by every session (CLAUDE.md "Start here"); `tests/unit/v2-tracker.test.ts` keeps the tracker complete.
 - **About and Journey redesigned:**
