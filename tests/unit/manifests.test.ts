@@ -1,7 +1,7 @@
 // Skill evidence from a repo's own manifests (spec WP-103): the parsing.
 
 import { describe, expect, it } from "vitest";
-import { dependenciesFrom, fromPackageJson, fromPyproject, fromRequirements, normaliseDependency, skillsProvedBy, workspacePatterns } from "@/lib/jobs/manifests";
+import { CONVENTIONAL_WORKSPACES, dependenciesFrom, fromPackageJson, fromPyproject, fromRequirements, normaliseDependency, skillsProvedBy, workspacePatterns } from "@/lib/jobs/manifests";
 
 describe("manifest parsing", () => {
   it("reads every dependency group in package.json", () => {
@@ -42,7 +42,7 @@ describe("workspacePatterns", () => {
     expect(workspacePatterns("not json")).toEqual([]);
   });
   it("workspace dependencies count like the root's", () => {
-    expect(dependenciesFrom({ "package.json": JSON.stringify({ devDependencies: { turbo: "2" } }) }, [JSON.stringify({ dependencies: { next: "16" } })])).toEqual(["next", "turbo"]);
+    expect(dependenciesFrom({ "package.json": JSON.stringify({ devDependencies: { turbo: "2" } }) }, [{ "package.json": JSON.stringify({ dependencies: { next: "16" } }) }])).toEqual(["next", "turbo"]);
   });
 });
 
@@ -58,5 +58,17 @@ describe("skillsProvedBy", () => {
   });
   it("a skill with no aliases is never proved by manifests", () => {
     expect(skillsProvedBy(["docker"], skills)).toEqual([]);
+  });
+});
+
+describe("monorepo workspaces without a root package.json", () => {
+  it("reads each workspace's own manifests, JavaScript and Python alike", () => {
+    // FundsLink Academy's shape: a Makefile at the root, apps/web and apps/api.
+    const web = { "package.json": JSON.stringify({ dependencies: { "@angular/core": "19", rxjs: "7" } }) };
+    const api = { "pyproject.toml": ["[project]", 'name = "api"', 'dependencies = ["fastapi>=0.110", "SQLAlchemy"]'].join("\n") };
+    expect(dependenciesFrom({}, [web, api])).toEqual(["@angular/core", "fastapi", "rxjs", "sqlalchemy"]);
+  });
+  it("names the conventional folders, never a path outside the repo", () => {
+    for (const p of CONVENTIONAL_WORKSPACES) expect(workspacePatterns(JSON.stringify({ workspaces: [p] }))).toEqual([p]);
   });
 });

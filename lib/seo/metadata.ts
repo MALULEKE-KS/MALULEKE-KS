@@ -29,8 +29,12 @@ export function pageMetadata({
   description?: string | null;
   /** The canonical site path, e.g. "/about". */
   path: string;
-  /** The share image route (file-based opengraph-image). */
-  image?: string;
+  /**
+   * The share image route. `null` when the page's own segment has an
+   * opengraph-image file: Next then writes its URL — inside a route group that
+   * URL carries a hash suffix (opengraph-image-<hash>), so a hand-built one 404s.
+   */
+  image?: string | null;
   imageAlt: string;
   type?: "website" | "article" | "profile";
   /** Use the title as-is in the tab (the homepage), not inside the template. */
@@ -38,12 +42,12 @@ export function pageMetadata({
 }): Metadata {
   const desc = description ? clip(description) : undefined;
   const shareTitle = title ?? SITE_NAME;
-  const images = [{ url: image, width: OG_SIZE.width, height: OG_SIZE.height, alt: imageAlt }];
+  const images = image ? [{ url: image, width: OG_SIZE.width, height: OG_SIZE.height, alt: imageAlt }] : null;
   return {
     ...(title && { title: absoluteTitle ? { absolute: title } : title }),
     ...(desc && { description: desc }),
     alternates: { canonical: path },
-    openGraph: { type, siteName: SITE_NAME, locale: SITE_LOCALE, url: path, title: shareTitle, ...(desc && { description: desc }), images },
-    twitter: { card: "summary_large_image", title: shareTitle, ...(desc && { description: desc }), images: images.map((i) => ({ url: i.url, alt: i.alt })) },
+    openGraph: { type, siteName: SITE_NAME, locale: SITE_LOCALE, url: path, title: shareTitle, ...(desc && { description: desc }), ...(images && { images }) },
+    twitter: { card: "summary_large_image", title: shareTitle, ...(desc && { description: desc }), ...(images && { images: images.map((i) => ({ url: i.url, alt: i.alt })) }) },
   };
 }

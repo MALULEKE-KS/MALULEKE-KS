@@ -12,12 +12,11 @@
 import { dbPublic } from "@/lib/db";
 import { getPublicHomes } from "@/lib/queries/profile";
 import { getSkillEvidence } from "@/lib/queries/evidence";
+import { getSetting } from "@/lib/settings";
 
-/** Public repos shown per home beside its systems; the rest are counted. */
-const REPOS_PER_HOME = 4;
-/** Technologies shown: the most used across the work on the map. */
-const TECH_SHOWN = 10;
-const LANGS_PER_REPO = 3;
+// How much the graph draws is admin data (home.map.* settings), never a
+// constant here — and nothing past those limits is dropped: every technology
+// is returned, the graph draws the most used and lists the rest.
 
 export type MapNodeKind = "home" | "work" | "tech";
 
@@ -37,7 +36,10 @@ export interface MapNode {
 export interface SystemMapData {
   homes: MapNode[];
   work: MapNode[];
+  /** Every technology on the map, the most used first. */
   tech: MapNode[];
+  /** How many of `tech` the desktop graph draws as nodes; the rest are listed beneath. */
+  techInGraph: number;
   edges: [string, string][];
 }
 
@@ -48,11 +50,14 @@ const topLanguages = (languages: unknown, n: number) =>
     .map(([name]) => name);
 
 export async function getSystemMap(): Promise<SystemMapData | null> {
-  const [homes, systems, skills, repos] = await Promise.all([
+  const [homes, systems, skills, repos, techInGraph, reposPerHome, langsPerRepo] = await Promise.all([
     getPublicHomes(),
     dbPublic.publicSystem.findMany({ select: { slug: true, name: true, status: true, statusColorToken: true, techStack: true } }),
     getSkillEvidence(),
     dbPublic.publicGithubRepo.findMany({ orderBy: [{ pushedAt: { sort: "desc", nulls: "last" } }] }),
+    getSetting("home.map.techInGraph"),
+    getSetting("home.map.reposPerHome"),
+    getSetting("home.map.languagesPerRepo"),
   ]);
   if (homes.length === 0) return null;
 
@@ -75,7 +80,7 @@ export async function getSystemMap(): Promise<SystemMapData | null> {
     const homeId = `home:${h.slug}`;
     const own = h.systems.map((slug) => systems.find((s) => s.slug === slug)).filter((s) => s !== undefined);
     const homeRepos = repos.filter((r) => r.homeSlug === h.slug && !r.published);
-    const shownRepos = homeRepos.slice(0, REPOS_PER_HOME);
+    const shownRepos = homeRepos.slice(0, reposPerHome);
     const moreRepos = homeRepos.length - shownRepos.length;
 
     homeNodes.push({
@@ -101,14 +106,14 @@ export async function getSystemMap(): Promise<SystemMapData | null> {
       addTech(id, [
         ...s.techStack,
         ...skills.filter((k) => k.systemSlugs.includes(s.slug)).map((k) => k.name),
-        ...topLanguages(publicRepo?.languages, LANGS_PER_REPO),
+        ...topLanguages(publicRepo?.languages, langsPerRepo),
       ]);
     }
     for (const r of shownRepos) {
       const id = `repo:${r.fullName}`;
       work.push({ id, kind: "work", label: r.name, sub: "On GitHub", href: `https://github.com/${r.fullName}`, external: true, faint: true });
       edges.push([homeId, id]);
-      addTech(id, topLanguages(r.languages, LANGS_PER_REPO));
+      addTech(id, topLanguages(r.languages, langsPerRepo));
     }
     if (moreRepos > 0 && h.github[0]) {
       const id = `more:${h.slug}`;
@@ -117,14 +122,13 @@ export async function getSystemMap(): Promise<SystemMapData | null> {
     }
   }
 
-  // The most used technologies across the map.
+  // Every technology across the map, the most used first.
   const counts = new Map<string, number>();
   for (const keys of techOf.values()) for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1);
-  const shown = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, TECH_SHOWN);
-  const tech: MapNode[] = shown.map(([k, n]) => ({ id: `tech:${k}`, kind: "tech", label: spelling.get(k) ?? k, sub: `${n} ${n === 1 ? "project" : "projects"}` }));
-  const shownKeys = new Set(shown.map(([k]) => k));
-  for (const [workId, keys] of techOf) for (const k of keys) if (shownKeys.has(k)) edges.push([workId, `tech:${k}`]);
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const tech: MapNode[] = ranked.map(([k, n]) => ({ id: `tech:${k}`, kind: "tech", label: spelling.get(k) ?? k, sub: `${n} ${n === 1 ? "project" : "projects"}` }));
+  for (const [workId, keys] of techOf) for (const k of keys) edges.push([workId, `tech:${k}`]);
 
   if (work.length === 0) return null;
-  return { homes: homeNodes, work, tech, edges };
+  return { homes: homeNodes, work, tech, techInGraph, edges };
 }
