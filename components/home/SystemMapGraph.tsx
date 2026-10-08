@@ -12,15 +12,15 @@
 // with; a technology, the work using it and the homes that work lives in — while
 // the rest dims. A second click on the same thing opens its link (a technology
 // lets go instead); a click anywhere else, Clear or Escape goes back to normal.
-// A mouse previews on hover; the keyboard opens links with Enter as usual. The
+// The lines stay hidden until something is selected (owner, 2026-10-08); a mouse
+// hovering only names the node in the bar. The keyboard opens links with Enter. The
 // bar above the drawing says what's selected, what it connects to, and opens it.
 //
-// Wide screens: three columns, every beam drawn. Phones get their own layout,
+// Wide screens: three columns. Phones get their own layout,
 // not the wide one squeezed (owner, same day: "poor and noisy"): three bands —
 // homes two by two, the work two by two, the most used technologies with the
-// rest a tap away — every connection drawn at rest, fainter, through to what
-// it's built with. A selection draws just its own beams down the bands, and its
-// technologies join the cluster. Every beam ends on a dot exactly at its node,
+// rest a tap away. A selection draws its own beams down the bands, through to
+// what it's built with, and its technologies join the cluster. Every beam ends on a dot exactly at its node,
 // nodes are opaque so no line shows through a neighbour, and the beams are
 // re-measured whenever anything moves (owner: lines must go exactly where each
 // connection goes). Under
@@ -86,22 +86,28 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
 
   const byId = useMemo(() => new Map([...data.homes, ...data.work, ...data.tech].map((n) => [n.id, n])), [data]);
 
-  // The active node's chain: its neighbours both ways; a home through its work
-  // to the technologies; a technology through its work to the homes.
-  const lit = useMemo(() => {
-    if (!active) return null;
-    const on = new Set<string>([active]);
-    for (const [a, b] of data.edges) {
-      if (a === active) on.add(b);
-      if (b === active) on.add(a);
-    }
-    if (active.startsWith("home:")) {
-      for (const [a, b] of data.edges) if (on.has(a) && a !== active) on.add(b);
-    } else if (active.startsWith("tech:")) {
-      for (const [a, b] of data.edges) if (on.has(b) && byId.get(a)?.kind === "home") on.add(a);
-    }
-    return on;
-  }, [active, data.edges, byId]);
+  // A node's chain: its neighbours both ways; a home through its work to the
+  // technologies; a technology through its work to the homes.
+  const chain = useCallback(
+    (id: string) => {
+      const on = new Set<string>([id]);
+      for (const [a, b] of data.edges) {
+        if (a === id) on.add(b);
+        if (b === id) on.add(a);
+      }
+      if (id.startsWith("home:")) {
+        for (const [a, b] of data.edges) if (on.has(a) && a !== id) on.add(b);
+      } else if (id.startsWith("tech:")) {
+        for (const [a, b] of data.edges) if (on.has(b) && byId.get(a)?.kind === "home") on.add(a);
+      }
+      return on;
+    },
+    [data.edges, byId],
+  );
+  // Only a click or tap traces (owner, 2026-10-08): the lines stay hidden until then.
+  // Hover just names the node in the bar.
+  const lit = useMemo(() => (pinned ? chain(pinned) : null), [pinned, chain]);
+  const preview = useMemo(() => (active ? chain(active) : null), [active, chain]);
 
   // A selection lets go on a click elsewhere or Escape.
   useEffect(() => {
@@ -198,16 +204,14 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
     };
   }, [data.edges, shownKey]);
 
-  // Every connection is drawn at rest, through to what it's built with; a phone draws them
-  // fainter, and while tracing only the selection's own beams.
-  const drawn = wide || !lit ? paths : paths.filter((p) => lit.has(p.from) && lit.has(p.to));
-  const restOpacity = wide ? 1 : 0.55;
+  // No lines at rest; a selection draws exactly its own, all the way through.
+  const drawn = lit ? paths.filter((p) => lit.has(p.from) && lit.has(p.to)) : [];
 
   return (
     <>
       <SelectionBar
         node={active ? (byId.get(active) ?? null) : null}
-        lit={lit}
+        lit={preview}
         byId={byId}
         pinned={pinned !== null}
         wide={wide}
@@ -225,7 +229,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
           {drawn.map((p, i) => {
             const on = !lit || (lit.has(p.from) && lit.has(p.to));
             return (
-              <g key={`${p.from}>${p.to}`} className="transition-opacity duration-300" style={{ opacity: !on ? 0.1 : lit ? 1 : restOpacity }}>
+              <g key={`${p.from}>${p.to}`} className="transition-opacity duration-300" style={{ opacity: on ? 1 : 0.1 }}>
                 <path d={p.d} fill="none" stroke="rgb(255 255 255 / 0.12)" strokeWidth={1.25} />
                 <path
                   d={p.d}
