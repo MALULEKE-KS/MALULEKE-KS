@@ -30,6 +30,11 @@
 
 ## Part 2 — Update log (newest first)
 
+### The map traced by click, a phone map of its own, every repo in every home (2026-10-08, second batch)
+- **Map (owner):** a click or tap selects and traces (homes now show their connections instead of opening GitHub); a second click opens the link; a click elsewhere, Clear or Escape returns to normal. A selection bar names what's traced and its counts, with Open and Clear. Phones: homes and work two by two, the most used technologies with "Show all", only the homes' beams at rest, only the selection's beams when tracing.
+- **Every repo in every GitHub home (owner):** `github.sync.newRepoVisibility` is now public-and-private, and a hidden, never-curated system is shown as soon as that rule allows — private ones as private (never linked, never read for the AI guide), as FundsLink Academy and Governova. What the owner hid stays hidden; client and collaborated work still waits for approval. The sync reports each home where no token sees a private repo (`noPrivateAccess`, in Admin → Jobs) — the last run saw none anywhere, so private work needs a read-only token with access to each home (a fine-grained one for KSDRILL-SA).
+- **Guide on phones:** its head and eye motion is scaled to the size it's drawn at (a phone draws it about half as wide, so a turn was ~1.5 px); a tap is a firmer, held glance, and a tap on the guide gets a blink and a nod.
+
 ### Home guide: one still pose, a head that turns to clicks and taps (2026-10-08)
 - **Owner:** the hero character no longer waves or switches poses; it keeps the master pose and turns its head toward wherever the visitor points, clicks or taps, on desktop and on phones (taps, and a finger dragging even while it scrolls the page).
 - **How it moves (`components/guide/rig.ts`):** the eyes jump first; the head follows a beat later on a spring and the eyes ease back as it arrives; the shoulders follow a little; a large deliberate turn often comes with a blink; a tapped point is held about 5 s, then the gaze eases back to the visitor; there's a faint postural sway. All rigid — no warping of the drawing.

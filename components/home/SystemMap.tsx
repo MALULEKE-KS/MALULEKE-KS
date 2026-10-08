@@ -2,7 +2,7 @@
 // Home — the system map (PUBLIC-REDESIGN-PLAN §3.4), on graphite after the
 // selected work: the owner's three GitHub homes → the work in each → what
 // it's built with, drawn live from the data (lib/queries/map.ts) and traced
-// by hover (SystemMapGraph). Replaces the old stick-figure blueprint.
+// by a click or tap (SystemMapGraph). Replaces the old stick-figure blueprint.
 
 import { Network } from "lucide-react";
 import { Container } from "@/components/shared/Container";

@@ -113,8 +113,10 @@ export interface GithubSyncSummary {
   accountErrors: { account: string; error: string }[];
   /** Live systems whose public repo is gone from GitHub — hidden this run, flagged for the owner. */
   removedFromGithub: string[];
-  /** Systems shown because their repo went from private to public (never curated since). */
+  /** Systems shown this run because the visibility rule now allows them — a repo gone public, or private repos switched on (never curated since). */
   madePublic: string[];
+  /** Your own GitHub homes where no token sees a private repo — their private work can't reach the site until a token with access is added. */
+  noPrivateAccess: string[];
   /** Systems whose repo stopped answering publicly where the token can't see private repos — kept, now shown as private (BR-1.7). */
   madePrivate: string[];
   /** Skill evidence from manifests: links added and removed this run (WP-103). */
@@ -443,6 +445,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     removedFromGithub: [],
     madePublic: [],
     madePrivate: [],
+    noPrivateAccess: [],
     skillLinks: { added: 0, removed: 0 },
   };
   const unmapped = new Set<string>();
@@ -493,12 +496,13 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         // BR-1.14 — follow a repo rename only if the slug is still the one derived from the old name.
         const oldName = existing.githubFullName?.split("/")[1];
         const renamed = oldName !== undefined && oldName !== repo.name && existing.slug.startsWith(slugify(oldName));
-        // BR-1.6 applied again when a repo goes public (owner, 2026-10-02): a system created
-        // hidden *only* because its repo was private — never curated since — is shown once
-        // the repo is public, by the same rule a new repo gets. An owner's choice to hide it
-        // (needsCuration off) is never undone.
+        // BR-1.6 applied again every run (owner, 2026-10-02 and 2026-10-08): a system that is
+        // hidden but never curated — created hidden because its repo was private, say — is
+        // shown as soon as the same rule a new repo gets allows it: the repo went public, or
+        // private repos were switched on (github.sync.newRepoVisibility). An owner's choice to
+        // hide it (needsCuration off) is never undone, and a repo gone from GitHub isn't here.
         const turnedPublic =
-          existing.repoPrivate && !repo.private && existing.needsCuration && existing.contentStatus === "DRAFT" && showByDefault(visibility, false, organization.isClient, relationship);
+          existing.needsCuration && existing.contentStatus === "DRAFT" && existing.githubGoneAt === null && showByDefault(visibility, repo.private, organization.isClient, relationship);
         await db.system.update({
           where: { id: existing.id },
           data: {
@@ -595,6 +599,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     select: { id: true, slug: true, githubFullName: true, githubOwnerLogin: true, contentStatus: true },
   });
   const seesPrivate = new Set([...found.values()].filter((r) => r.private).map((r) => r.owner.login.toLowerCase()));
+  summary.noPrivateAccess = config.ownedLogins.filter((l) => !seesPrivate.has(l.toLowerCase()));
   for (const s of gone) {
     if (!s.githubOwnerLogin || !listedAccounts.includes(s.githubOwnerLogin.toLowerCase())) continue;
     const res = await clients[0]!.request(`/repos/${s.githubFullName}`);
