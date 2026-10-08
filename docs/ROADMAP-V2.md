@@ -30,6 +30,11 @@
 
 ## Part 2 — Update log (newest first)
 
+### Vercel Functions Storage over the free limit — found, freed, trimmed (2026-10-08)
+- **Found (Vercel → Usage):** Functions Storage 13.08 GB of Hobby's 10 GB — every kept deployment stores ~280 functions of ~43 MB, and 10 deployments shipped in one day. The database was not the cause (no Neon charge on Vercel); Neon stays as it is.
+- **Freed:** 8 superseded deployments deleted (owner-approved); the live one and one rollback point kept.
+- **Trimmed:** `outputFileTracingExcludes` drops Prisma's unused WebAssembly engines and source maps from every function (`@prisma/client` 60 MB → 2.6 MB per function, measured on a local build). DEPLOYMENT.md has the rule.
+
 ### The guide's mouth stops with the answer; a provider outage reads as "busy" (2026-10-08)
 - **Limits say exactly what ran out (owner):** "This device has used all 60 answers it can have for now — that's the limit. Try again on Thu 9 Oct, 14:30" (the time in the visitor's own zone); the daily cap says it's across everyone and when it's back. The per-device limit counts by connection (a keyed hash of the IP, never the address).
 - **The AI section folds again (owner):** closed by default so visitors who didn't come for the AI scroll freely — the bar carries the character's live bust, the heading and three questions; opening it or asking unfolds the console in place (its code loads on first open).
