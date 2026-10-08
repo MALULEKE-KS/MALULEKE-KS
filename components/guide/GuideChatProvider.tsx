@@ -36,11 +36,23 @@ export interface GuideFailure {
   resting: boolean;
 }
 
+/** "Thu 9 Oct, 14:30" — in the visitor's own time zone. */
+const when = (iso: string) => new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+
 function readError(error: Error | undefined): GuideFailure | null {
   if (!error) return null;
   try {
-    const parsed = JSON.parse(error.message) as { error?: { code?: string; message?: string } };
-    if (parsed.error?.message) return { text: parsed.error.message, resting: RESTING.has(parsed.error.code ?? "") };
+    const parsed = JSON.parse(error.message) as { error?: { code?: string; message?: string; details?: { limit?: number; resetsAt?: string } | null } };
+    const e = parsed.error;
+    const at = e?.details?.resetsAt && !Number.isNaN(Date.parse(e.details.resetsAt)) ? when(e.details.resetsAt) : null;
+    // A limit says exactly what was used up, and when answers come back (owner, 2026-10-08).
+    if (e?.code === "RATE_LIMITED" && at) {
+      return { text: `This device has used all ${e.details?.limit ?? "its"} answers it can have for now — that's the limit. Try again on ${at}.`, resting: true };
+    }
+    if (e?.code === "GUIDE_RESTING" && at) {
+      return { text: `The guide has given every answer it has for today, across everyone. It's back on ${at}.`, resting: true };
+    }
+    if (e?.message) return { text: e.message, resting: RESTING.has(e.code ?? "") };
   } catch {
     // Not a JSON error body.
   }
@@ -94,7 +106,7 @@ export function GuideChatProvider({
   siteIndex: GuideSiteIndex;
   children: React.ReactNode;
 }) {
-  const { open, pending, clearPending, setMood, speak, setLens } = useGuide();
+  const { open, pending, clearPending, setMood, speak, hush, setLens } = useGuide();
   const router = useRouter();
   const pathname = usePathname();
   const transport = useMemo(
@@ -188,10 +200,11 @@ export function GuideChatProvider({
     setThoughtFor((t) => (t[lastId] ? t : { ...t, [lastId]: seconds }));
   }, [lastId, answering]);
 
-  // The mouth follows the newest text as it streams in.
+  // The mouth follows the newest text as it streams in — and closes the moment the answer ends.
   const spoken = useRef(0);
   useEffect(() => {
     if (status !== "streaming") {
+      if (spoken.current > 0) hush();
       spoken.current = 0;
       return;
     }
@@ -199,7 +212,7 @@ export function GuideChatProvider({
       speak(lastText.slice(spoken.current));
       spoken.current = lastText.length;
     }
-  }, [lastText, status, speak]);
+  }, [lastText, status, speak, hush]);
 
   const [askedAt, setAskedAt] = useState<number | null>(null);
   const send = useCallback(

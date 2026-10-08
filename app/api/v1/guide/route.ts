@@ -34,11 +34,12 @@ export const maxDuration = 60;
 
 const BUSY_MESSAGE = "A lot of people are talking to the guide right now — give it a minute and try again.";
 
-/** The model (and every fallback) is rate-limited or overloaded — not a fault, just busy. */
+/** The model (and every fallback) is rate-limited, overloaded or briefly down (503) — not a fault, just busy. */
 function isBusy(error: unknown): boolean {
   for (let e: unknown = error, depth = 0; e && depth < 4; depth++) {
     const x = e as { name?: string; statusCode?: number; type?: string; lastError?: unknown; cause?: unknown };
-    if (x.statusCode === 429 || x.statusCode === 529 || /RateLimit/i.test(x.name ?? "") || /rate_limit|overloaded/i.test(x.type ?? "")) return true;
+    if (x.statusCode === 429 || x.statusCode === 503 || x.statusCode === 529 || /RateLimit/i.test(x.name ?? "") || /rate_limit|overloaded/i.test(x.type ?? "")) return true;
+    // A retry error carries every attempt; busy if the last one was.
     e = x.lastError ?? x.cause;
   }
   return false;
@@ -89,9 +90,10 @@ export async function POST(request: Request) {
     if (!visitor.allowed) {
       return errorResponse(
         "RATE_LIMITED",
-        `You've used all your questions for now, so the guide is resting. Your questions come back ${backIn(visitor.retryAfterMs ?? windowHours * 60 * 60 * 1000)} — meanwhile the contact form reaches him directly.`,
+        `This device has used all ${perVisitor} of its answers for now — that's the limit. Answers come back ${backIn(visitor.retryAfterMs ?? windowHours * 60 * 60 * 1000)}; meanwhile the contact form reaches him directly.`,
         429,
-        { retryAfterMs: visitor.retryAfterMs },
+        // The browser says *when*, in the visitor's own time zone.
+        { retryAfterMs: visitor.retryAfterMs, limit: perVisitor, resetsAt: new Date(Date.now() + (visitor.retryAfterMs ?? windowHours * 60 * 60 * 1000)).toISOString() },
       );
     }
   }
@@ -101,7 +103,7 @@ export async function POST(request: Request) {
       "GUIDE_RESTING",
       `The guide has given every answer it has for today and is resting. Answers are available again ${backIn(everyone.retryAfterMs ?? 24 * 60 * 60 * 1000)} — meanwhile the contact form reaches him directly.`,
       429,
-      { retryAfterMs: everyone.retryAfterMs },
+      { retryAfterMs: everyone.retryAfterMs, limit: dailyCap, resetsAt: new Date(Date.now() + (everyone.retryAfterMs ?? 24 * 60 * 60 * 1000)).toISOString() },
     );
   }
 

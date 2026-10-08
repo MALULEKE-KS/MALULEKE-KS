@@ -30,6 +30,12 @@
 
 ## Part 2 — Update log (newest first)
 
+### The guide's mouth stops with the answer; a provider outage reads as "busy" (2026-10-08)
+- **Limits say exactly what ran out (owner):** "This device has used all 60 answers it can have for now — that's the limit. Try again on Thu 9 Oct, 14:30" (the time in the visitor's own zone); the daily cap says it's across everyone and when it's back. The per-device limit counts by connection (a keyed hash of the IP, never the address).
+- **The AI section folds again (owner):** closed by default so visitors who didn't come for the AI scroll freely — the bar carries the character's live bust, the heading and three questions; opening it or asking unfolds the console in place (its code loads on first open).
+- **Mouth (owner):** text streams in far faster than the mouth "says" it, so it kept talking for minutes after an answer. The rig now keeps only the newest ~45 letters (at most ~3 s behind) and every mouth closes the moment the answer ends or is stopped (`hush`).
+- **Outages:** when the free models are briefly down (the gateway's 503, seen in production 2026-10-08 for both free models), the guide says it's busy and to try again in a minute, instead of "lost its train of thought".
+
 ### The guide stopped answering: a retired fallback model (2026-10-08)
 - **Found in the production logs:** `inclusionai/ling-3.0-flash-sante-free` — one of the guide's default fallbacks — was retired by the AI Gateway ("free tier has ended", 404). Whenever the main free model was busy, the answer fell through to it and failed with "The guide couldn't answer just now".
 - **Fixed:** the default fallbacks are now `inclusionai/ling-3.1-flash-free, poolside/laguna-s-2.1-free` (both live, free, tool-use and reasoning); and before every answer the route keeps only models that are on the gateway's live list (`lib/guide/gateway-models.ts`, read at most hourly), promoting a live fallback if the main model itself is retired. Tested.

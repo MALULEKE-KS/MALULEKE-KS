@@ -77,10 +77,11 @@ export function GuideConsole({ variant, onClose, onNavigate }: { variant: "inlin
     };
   }, [full]);
   // On a phone, asking opens the console full screen — room to read the answer. Only a
-  // question just asked does this, never a conversation restored on reload.
+  // question just asked does this — never a conversation restored on reload, nor
+  // reopening the section later.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the visitor just asked; give the answer the screen
-    if (variant === "inline" && askedAt !== null && !window.matchMedia("(min-width: 64rem)").matches) setFull(true);
+    if (variant === "inline" && askedAt !== null && Date.now() - askedAt < 4000 && !window.matchMedia("(min-width: 64rem)").matches) setFull(true);
   }, [askedAt, variant]);
 
   const chat = (

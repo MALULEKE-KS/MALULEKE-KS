@@ -43,6 +43,8 @@ interface GuideState {
   setMood: (mood: GuideMood) => void;
   /** The chat streams text here; the mouth follows it. */
   speak: (text: string) => void;
+  /** The answer is over: every mouth closes now. */
+  hush: () => void;
   registerRig: (rig: Rig, box: () => DOMRect | null) => () => void;
   /** Every character on screen looks at this element (the composer while the visitor writes). */
   lookAt: (el: Element) => void;
@@ -109,6 +111,7 @@ export function GuideProvider({
   }, []);
 
   const speak = useCallback((text: string) => rigs.current.forEach((_, r) => r.speak(text)), []);
+  const hush = useCallback(() => rigs.current.forEach((_, r) => r.hush()), []);
 
   const lookAt = useCallback((el: Element) => {
     const t = el.getBoundingClientRect();
@@ -136,10 +139,10 @@ export function GuideProvider({
 
   const value = useMemo(
     () => ({
-      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, speak, registerRig, lookAt,
+      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, speak, hush, registerRig, lookAt,
       heroInView, setHeroInView, lens, setLens, pending, ask, clearPending,
     }),
-    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, speak, registerRig, lookAt, heroInView, lens, setLens, pending, ask, clearPending],
+    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, speak, hush, registerRig, lookAt, heroInView, lens, setLens, pending, ask, clearPending],
   );
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
 }
