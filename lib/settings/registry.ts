@@ -210,7 +210,8 @@ export const SETTINGS = {
       .regex(/^([a-z0-9-]+\/[a-z0-9.-]+(\s*,\s*[a-z0-9-]+\/[a-z0-9.-]+){0,3})?$/, "provider/model ids separated by commas — at most 4"),
     // The gateway's free models each allow about 5 requests a minute for the whole team
     // (measured 2026-10-02) — a list of them multiplies what the guide can take at once.
-    default: "inclusionai/ling-3.1-flash-free, poolside/laguna-s-2.1-free, inclusionai/ling-3.0-flash-sante-free",
+    // ling-3.0-flash-sante's free tier ended 2026-10-08; the route also skips any model the gateway has retired.
+    default: "inclusionai/ling-3.1-flash-free, poolside/laguna-s-2.1-free",
     description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
     rule: "Constitution §6",
   }),

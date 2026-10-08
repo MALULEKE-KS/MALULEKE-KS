@@ -28,6 +28,7 @@ import { backIn, parseGuideRequest } from "@/lib/guide/request";
 import { searchPublic } from "@/lib/queries/search";
 import { getInquiryTypes } from "@/lib/queries/site";
 import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
+import { liveGatewayModels, pickModels } from "@/lib/guide/gateway-models";
 
 export const maxDuration = 60;
 
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
   if (flags[FLAGS.concierge] !== true) return errorResponse("GUIDE_OFF", "The AI guide is switched off.", 404);
   if (!guideProviderConfigured()) return errorResponse("GUIDE_UNAVAILABLE", "The AI guide is resting right now.", 503);
 
-  const [model, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens] = await Promise.all([
+  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens] = await Promise.all([
     getSetting("concierge.model"),
     getSetting("concierge.maxMessagesPerConversation"),
     getSetting("concierge.maxQuestionCharacters"),
@@ -65,10 +66,15 @@ export async function POST(request: Request) {
     getSetting("concierge.fallbackModels"),
     getSetting("concierge.maxReasoningTokens"),
   ]);
-  const fallbacks = fallbackSetting
-    .split(",")
-    .map((m) => m.trim())
-    .filter((m) => m && m !== model);
+  // Never a model the gateway has retired (a free tier ending broke every fallback answer, 2026-10-08).
+  const { model, fallbacks } = pickModels(
+    configuredModel,
+    fallbackSetting
+      .split(",")
+      .map((m) => m.trim())
+      .filter((m) => m && m !== configuredModel),
+    await liveGatewayModels(),
+  );
 
   const body = await request.json().catch(() => null);
   const parsed = parseGuideRequest(body, { maxMessagesPerConversation, maxQuestionCharacters });
