@@ -224,14 +224,26 @@ describe("the sync (#95)", () => {
     expect(await byRepo(40)).toMatchObject({ contentStatus: "PUBLISHED" });
 
     // Next run: neither is listed; GitHub says one is gone, the other answers otherwise.
+    // The token sees a private repo in the account, so "not found" means deleted.
     const summary = await syncGithub({
       tokens: ["test-token"],
       ownedLogins: [OWNER],
-      fetch: fakeGithub([], { gone: [`${OWNER}/${RUN}-deleted-later`] }),
+      fetch: fakeGithub([repo(49, OWNER, `${RUN}-private-sentinel`, { private: true })], { gone: [`${OWNER}/${RUN}-deleted-later`] }),
     });
     expect(summary.removedFromGithub).toEqual([`${RUN}-deleted-later`]);
     expect(await byRepo(40)).toMatchObject({ contentStatus: "DRAFT", needsCuration: true });
     expect(await byRepo(41)).toMatchObject({ contentStatus: "PUBLISHED" });
+  });
+
+  it("where the token sees no private repos, a repo that stops answering went private — kept on the site as private, never hidden as gone (D-021)", async () => {
+    const r = repo(48, OWNER, `${RUN}-went-private-unseen`);
+    await sync([r]);
+    expect(await byRepo(48)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: false });
+
+    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub([], { gone: [`${OWNER}/${RUN}-went-private-unseen`] }) });
+    expect(summary.madePrivate).toContain(`${RUN}-went-private-unseen`);
+    expect(summary.removedFromGithub).not.toContain(`${RUN}-went-private-unseen`);
+    expect(await byRepo(48)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: true, needsCuration: true, githubGoneAt: null });
   });
 
   // V1 finalization (owner, 2026-10-02): GitHub's real state, kept current.
@@ -268,7 +280,7 @@ describe("the sync (#95)", () => {
     const listed = () => db.publicGithubRepo.findUnique({ where: { fullName: `${OWNER}/${RUN}-never-written-up` } });
     expect(await listed()).not.toBeNull();
 
-    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub([], { gone: [`${OWNER}/${RUN}-never-written-up`] }) });
+    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub([repo(49, OWNER, `${RUN}-private-sentinel`, { private: true })], { gone: [`${OWNER}/${RUN}-never-written-up`] }) });
     expect(summary.removedFromGithub).toContain(`${RUN}-never-written-up`);
     expect((await byRepo(53))!.githubGoneAt).not.toBeNull();
     expect(await byRepo(53)).toMatchObject({ contentStatus: "DRAFT" }); // never deleted (BR-1.9)

@@ -3,7 +3,7 @@
 // with curl — can and can't get through to the model.
 
 import { describe, expect, it } from "vitest";
-import { parseGuideRequest } from "@/lib/guide/request";
+import { backIn, parseGuideRequest } from "@/lib/guide/request";
 
 const limits = { maxQuestionCharacters: 1000, maxMessagesPerConversation: 3 };
 const user = (text: string, id = Math.random().toString(36).slice(2)) => ({ id, role: "user", parts: [{ type: "text", text }] });
@@ -162,5 +162,13 @@ describe("parseGuideRequest", () => {
     const r = parseGuideRequest(body, limits);
     expect(r.ok && r.messages[0]!.role).toBe("user");
     expect(({} as Record<string, unknown>).role).toBeUndefined();
+  });
+});
+
+describe("backIn — when the guide's answers come back", () => {
+  it("says minutes under an hour and hours after", () => {
+    expect(backIn(0)).toBe("in about 1 minute");
+    expect(backIn(20 * 60000)).toBe("in about 20 minutes");
+    expect(backIn(3 * 60 * 60000 + 10 * 60000)).toBe("in about 3 hours");
   });
 });

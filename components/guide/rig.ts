@@ -5,8 +5,11 @@
 // chest rises with each breath, the irises follow the cursor inside the eyes,
 // the head leans a little after them as one rigid piece (no warping — a
 // flat drawing can't turn), eyelids close for blinks and the mouth opens in
-// time with the guide's words. Motion runs on springs (eyes quick, head slower with a slight
-// overshoot) so it reacts like a person, not a sprite. Every feature point below is measured on the
+// time with the guide's words. Motion follows how people actually orient: the
+// eyes jump to a target first, the head turns a beat later on a spring (with a
+// slight overshoot) while the eyes ease back as it arrives, the shoulders
+// follow a little, and a big glance often comes with a blink. It never rests
+// perfectly still. So it reacts like a person, not a sprite. Every feature point below is measured on the
 // 1024×1536 master (design/character/master-anime-2d.png); if the master is
 // replaced, re-measure them.
 //
@@ -17,8 +20,11 @@ export type GuideMood = "idle" | "attentive" | "thinking" | "speaking";
 
 export interface Rig {
   setMood(mood: GuideMood): void;
-  /** Where the visitor is looking/pointing, relative to the character: -1…1 on each axis. */
-  setLook(x: number, y: number): void;
+  /**
+   * Where the visitor is pointing, relative to the character: -1…1 on each axis.
+   * `glance` marks a click or tap — a deliberate turn toward it, held a little longer.
+   */
+  setLook(x: number, y: number, glance?: boolean): void;
   /** Queue text to be "spoken": the mouth follows its letters. */
   speak(text: string): void;
   setRunning(running: boolean): void;
@@ -31,8 +37,12 @@ const RES = [1024, 1536] as const;
  * cursor mostly with their eyes. A warp that "turns" a flat drawing reads as
  * stretching (owner, 2026-09-30); a real turn is the 3D model (ROADMAP-V2 #1).
  */
-const HEAD_SHIFT = [3.5, 2.5] as const; // px at full look
-const HEAD_TILT = 0.018; // radians at full look
+const HEAD_SHIFT = [6.5, 4] as const; // px at full look
+const HEAD_TILT = 0.034; // radians at full look
+/** The shoulders follow the head this far (px at full look), slower. */
+const BODY_SHIFT = [2, 0.8] as const;
+/** The head starts turning this long (s, time constant) after the eyes. */
+const HEAD_LAG = 0.09;
 
 const VERT = `#version 300 es
 in vec2 aPos;
@@ -50,6 +60,7 @@ uniform sampler2D uTex;
 uniform vec2 uRes;
 uniform float uBreath;
 uniform vec2 uHead;
+uniform vec2 uBody;
 uniform float uTilt;
 uniform vec2 uGaze;
 uniform float uBlink;
@@ -90,6 +101,10 @@ void main() {
   // Breathing: the chest and shoulders rise gently; nothing moves below the torso.
   float chest = smoothstep(430.0, 540.0, p.y) * (1.0 - smoothstep(700.0, 1250.0, p.y));
   s.y += uBreath * 2.0 * chest;
+
+  // The shoulders follow the head a little, as one piece that fades out down the torso.
+  float body = smoothstep(380.0, 470.0, p.y) * (1.0 - smoothstep(650.0, 1150.0, p.y));
+  s -= uBody * max(body, ellipse(p, HEAD, HEAD_R, 0.45));
 
   // The head moves as one rigid piece (a small shift and tilt about the neck);
   // the neck blends over a long band so the joint never stretches.
@@ -185,7 +200,7 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
 
   const u = (name: string) => gl.getUniformLocation(program, name);
   const loc = {
-    res: u("uRes"), breath: u("uBreath"), head: u("uHead"), tilt: u("uTilt"), 
+    res: u("uRes"), breath: u("uBreath"), head: u("uHead"), body: u("uBody"), tilt: u("uTilt"),
     gaze: u("uGaze"), blink: u("uBlink"), mouth: u("uMouth"), wide: u("uWide"),
   };
   gl.uniform2f(loc.res, RES[0], RES[1]);
@@ -196,7 +211,11 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
   // When the cursor rests, the guide looks back at the visitor after a moment.
   let lookedAt = -Infinity;
   const LOOK_BACK_AFTER = 3.5;
-  const cur = { hx: 0, hy: 0, tilt: 0, gx: 0, gy: 0, mouth: 0, wide: 0 };
+  const GLANCE_HOLD = 5;
+  let hold = LOOK_BACK_AFTER;
+  // The eyes' target as the head sees it — a beat late (HEAD_LAG).
+  const lead = { x: 0, y: 0 };
+  const cur = { hx: 0, hy: 0, bx: 0, by: 0, tilt: 0, gx: 0, gy: 0, mouth: 0, wide: 0 };
   // Springs: velocity per channel. stiffness/damping per group — eyes snap,
   // the head follows with a slight overshoot, the body lags.
   const vel: Record<string, number> = {};
@@ -229,6 +248,7 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
     gl!.clear(gl!.COLOR_BUFFER_BIT);
     gl!.uniform1f(loc.breath, breath);
     gl!.uniform2f(loc.head, cur.hx, cur.hy);
+    gl!.uniform2f(loc.body, cur.bx, cur.by);
     gl!.uniform1f(loc.tilt, cur.tilt);
     gl!.uniform2f(loc.gaze, cur.gx, cur.gy);
     gl!.uniform1f(loc.blink, blink);
@@ -243,17 +263,24 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
     t += dt;
 
     // Where the head and eyes want to be for this mood.
-    let tx = 0, ty = 0, tTilt = 0, tgx = 0, tgy = 0;
-    // Cursor resting for a while: ease the look back toward the visitor (the centre).
-    const resting = t - lookedAt > LOOK_BACK_AFTER;
-    const lx = resting ? lookX * Math.max(0, 1 - (t - lookedAt - LOOK_BACK_AFTER) / 1.2) : lookX;
-    const ly = resting ? lookY * Math.max(0, 1 - (t - lookedAt - LOOK_BACK_AFTER) / 1.2) : lookY;
+    let tx = 0, ty = 0, tTilt = 0, tgx = 0, tgy = 0, tbx = 0, tby = 0;
+    // Pointer resting for a while: ease the look back toward the visitor (the centre), smoothly.
+    const back = Math.min(1, Math.max(0, (t - lookedAt - hold) / 1.4));
+    const keep = 1 - back * back * (3 - 2 * back);
+    const lx = lookX * keep, ly = lookY * keep;
     if (mood === "attentive" || mood === "speaking") {
       // Soft saturation: quick to respond near the face, never snapping past its limits.
       const sx = Math.tanh(lx * 1.6), sy = Math.tanh(ly * 1.8);
-      // The head leans after the eyes, a little, as one piece.
-      tx = sx * HEAD_SHIFT[0]; ty = sy * HEAD_SHIFT[1]; tTilt = sx * HEAD_TILT;
-      tgx = sx * 12 + saccade.x; tgy = sy * 4 + saccade.y;
+      // The head turns a beat after the eyes, as one piece; the shoulders follow it a little.
+      const f = 1 - Math.exp(-dt / HEAD_LAG);
+      lead.x += (sx - lead.x) * f; lead.y += (sy - lead.y) * f;
+      tx = lead.x * HEAD_SHIFT[0]; ty = lead.y * HEAD_SHIFT[1]; tTilt = lead.x * HEAD_TILT;
+      tbx = lead.x * BODY_SHIFT[0]; tby = lead.y * BODY_SHIFT[1];
+      // Never perfectly still: a faint postural sway under the turn.
+      tx += Math.sin(t * 0.9) * 0.35; ty += Math.sin(t * 0.67 + 1) * 0.25;
+      // The eyes get there first, then ease back as the head arrives (they counter-rotate, as in people).
+      tgx = sx * 10 + (sx * HEAD_SHIFT[0] - cur.hx) * 0.9 + saccade.x;
+      tgy = sy * 3.5 + (sy * HEAD_SHIFT[1] - cur.hy) * 0.5 + saccade.y;
       // Tiny eye flicks every second or two, the way eyes never quite rest.
       if (t > saccade.at) saccade = { x: (Math.random() - 0.5) * 1.6, y: (Math.random() - 0.5) * 1, at: t + 0.8 + Math.random() * 1.8 };
     } else if (mood === "thinking") {
@@ -262,6 +289,9 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
       // Idle: a slow, natural drift.
       tx = Math.sin(t * 0.45) * 1.5; ty = Math.sin(t * 0.31) * 0.8; tTilt = Math.sin(t * 0.27) * 0.008;
       tgx = Math.sin(t * 0.6) * 2; tgy = Math.sin(t * 0.43) * 1;
+    }
+    if (mood !== "attentive" && mood !== "speaking") {
+      lead.x = cur.hx / HEAD_SHIFT[0]; lead.y = cur.hy / HEAD_SHIFT[1];
     }
     if (mood === "speaking") ty += Math.sin(t * 7) * 0.6; // small nods while talking
 
@@ -282,6 +312,7 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
     // Eyes first, the head after with a slight overshoot.
     spring("gx", tgx, dt, 320, 30); spring("gy", tgy, dt, 320, 30);
     spring("hx", tx, dt, 55, 11); spring("hy", ty, dt, 55, 11); spring("tilt", tTilt, dt, 50, 11);
+    spring("bx", tbx, dt, 18, 8); spring("by", tby, dt, 18, 8);
     cur.mouth = lerp(cur.mouth, tMouth, 1 - Math.exp(-dt * 22)); cur.wide = lerp(cur.wide, tWide, k);
 
     // Blinks every 2.8–6 s, sometimes twice — and often with a big glance, as in people.
@@ -322,10 +353,15 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
     setMood(next) {
       mood = next;
     },
-    setLook(x, y) {
-      lookX = Math.max(-1, Math.min(1, x));
-      lookY = Math.max(-1, Math.min(1, y));
+    setLook(x, y, glance = false) {
+      const nx = Math.max(-1, Math.min(1, x));
+      const ny = Math.max(-1, Math.min(1, y));
+      // A deliberate turn to somewhere new often comes with a blink (gaze-evoked), as in people.
+      if (glance && blinkStart < 0 && Math.hypot(nx - lookX, ny - lookY) > 0.5 && Math.random() < 0.7) nextBlinkAt = t;
+      lookX = nx;
+      lookY = ny;
       lookedAt = t;
+      hold = glance ? GLANCE_HOLD : LOOK_BACK_AFTER;
     },
     speak(text) {
       speech += text;

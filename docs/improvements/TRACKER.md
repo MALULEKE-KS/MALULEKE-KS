@@ -120,3 +120,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
   - CI is the gate for e2e.
   - 21st.dev's `search_logo` MCP returned nothing on 2026-10-03; `https://api.svgl.app?search=` works directly.
 - **Next step:** V2 starts fresh with **WP-001** (the baseline), exactly as the spec orders.
+
+### 2026-10-08 · Home guide: one still pose, head turns to clicks and taps (owner request, not a WP)
+- **Done:** the hero character keeps the master pose (no greeting wave, idle pose cycle, welcome-back wave, point or thinking frame); its head and eyes turn toward the pointer and toward any click or tap, on phones too (a dragging finger is followed even while it scrolls). The rig orients like a person — eyes first, the head a beat later, shoulders after, a blink with big turns. `flashPose` / `GuidePose` removed from the guide's state. D-020; ROADMAP-V2 Part 2; PUBLIC-REDESIGN-PLAN §3a.
+- **Also (owner, same batch):** More work = Tshimo Agri Network, FundsLink Academy, Governova (home order on unfeatured systems); FundsLink and Governova restored as private, in progress, after the sync hid them as "gone" (D-021, sync fixed and tested); the system map's technologies as one wide connected cluster that fits on one screen, and the same drawing on phones; the guide's caps raised (500/day, 60/visitor, 40/conversation — free model) with a "resting, back in about N hours" message.
+- **Next step:** unchanged — WP-001.

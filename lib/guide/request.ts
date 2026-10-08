@@ -104,6 +104,14 @@ export interface GuideLimits {
   maxMessagesPerConversation: number;
 }
 
+/** When the guide's answers come back, in words a visitor reads: "in about 3 hours", "in about 20 minutes". */
+export function backIn(ms: number): string {
+  const minutes = Math.max(1, Math.ceil(ms / 60000));
+  if (minutes < 60) return `in about ${minutes} minute${minutes === 1 ? "" : "s"}`;
+  const hours = Math.round(minutes / 60);
+  return `in about ${hours} hour${hours === 1 ? "" : "s"}`;
+}
+
 /** Parse and bound a request. Returns the clean messages, or the reason it was refused. */
 export function parseGuideRequest(
   body: unknown,

@@ -1,7 +1,8 @@
 // components/guide/GuideProvider.tsx
 // The AI guide's shared state (PUBLIC-REDESIGN-PLAN §3a): whether the chat is
-// open, the character's mood (idle / attentive / thinking / speaking) and
-// pose (none / wave / point), and a way for the chat to make it speak. The
+// open, the character's mood (idle / attentive / thinking / speaking), and a
+// way for the chat to make it speak. The character holds one still pose and
+// only turns its head and eyes (owner, 2026-10-08: no pose changes). The
 // hero character, the docked launcher and the chat panel all read this —
 // the state machine is the only interface between the body and the brain,
 // so a Live2D rig can replace the body later without touching the chat.
@@ -15,11 +16,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { GuideMood, Rig } from "@/components/guide/rig";
 import type { PublicLens } from "@/lib/queries/lenses";
 
-export type GuidePose = "none" | "wave" | "point" | "thinking";
-
 const LENS_KEY = "mks.lens";
-/** How long a pose holds before the character returns to its rig. */
-export const POSE_MS = 5000;
 
 /** The visitor's lens as saved for this session — read at send time by the chat. */
 export function readSessionLens(): string | null {
@@ -44,9 +41,6 @@ interface GuideState {
   setOpen: (open: boolean) => void;
   mood: GuideMood;
   setMood: (mood: GuideMood) => void;
-  pose: GuidePose;
-  /** Show a pose for a moment, then return to the rig. */
-  flashPose: (pose: Exclude<GuidePose, "none">, ms?: number) => void;
   /** The chat streams text here; the mouth follows it. */
   speak: (text: string) => void;
   registerRig: (rig: Rig) => () => void;
@@ -81,12 +75,10 @@ export function GuideProvider({
 }) {
   const [open, setOpen] = useState(false);
   const [mood, setMoodState] = useState<GuideMood>("idle");
-  const [pose, setPose] = useState<GuidePose>("none");
   const [heroInView, setHeroInView] = useState(false);
   const [lens, setLensState] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
   const rigs = useRef(new Set<Rig>());
-  const poseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // The lens lasts the session — no login, no cookie (Constitution §4).
   useEffect(() => {
@@ -114,28 +106,6 @@ export function GuideProvider({
     rigs.current.forEach((r) => r.setMood(next));
   }, []);
 
-  // A pose holds for POSE_MS (owner, 2026-10-01: "at least 5 sec") — unless the
-  // visitor clicks or presses a key, which hands the character back to the rig.
-  const flashPose = useCallback((next: Exclude<GuidePose, "none">, ms = POSE_MS) => {
-    if (poseTimer.current) clearTimeout(poseTimer.current);
-    setPose(next);
-    poseTimer.current = setTimeout(() => setPose("none"), ms);
-  }, []);
-
-  useEffect(() => {
-    if (pose === "none") return;
-    const end = () => {
-      if (poseTimer.current) clearTimeout(poseTimer.current);
-      setPose("none");
-    };
-    window.addEventListener("pointerdown", end);
-    window.addEventListener("keydown", end);
-    return () => {
-      window.removeEventListener("pointerdown", end);
-      window.removeEventListener("keydown", end);
-    };
-  }, [pose]);
-
   const speak = useCallback((text: string) => rigs.current.forEach((r) => r.speak(text)), []);
 
   const registerRig = useCallback((rig: Rig) => {
@@ -154,10 +124,10 @@ export function GuideProvider({
 
   const value = useMemo(
     () => ({
-      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, pose, flashPose, speak, registerRig,
+      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, speak, registerRig,
       heroInView, setHeroInView, lens, setLens, pending, ask, clearPending,
     }),
-    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, pose, flashPose, speak, registerRig, heroInView, lens, setLens, pending, ask, clearPending],
+    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, speak, registerRig, heroInView, lens, setLens, pending, ask, clearPending],
   );
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
 }

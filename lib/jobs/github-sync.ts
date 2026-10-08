@@ -115,6 +115,8 @@ export interface GithubSyncSummary {
   removedFromGithub: string[];
   /** Systems shown because their repo went from private to public (never curated since). */
   madePublic: string[];
+  /** Systems whose repo stopped answering publicly where the token can't see private repos — kept, now shown as private (BR-1.7). */
+  madePrivate: string[];
   /** Skill evidence from manifests: links added and removed this run (WP-103). */
   skillLinks: { added: number; removed: number };
 }
@@ -440,6 +442,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     accountErrors: [...accountErrors].map(([account, error]) => ({ account, error })),
     removedFromGithub: [],
     madePublic: [],
+    madePrivate: [],
     skillLinks: { added: 0, removed: 0 },
   };
   const unmapped = new Set<string>();
@@ -573,8 +576,12 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   // GitHub (deleted, or no longer the owner's) leaves the site: hidden as a
   // draft and flagged for the owner — never deleted (BR-1.9), never guessed.
   // Only when that account was listed in full this run, and only on GitHub's
-  // own "not found" for the repo; a private repo the token can't see is never
-  // touched (it was never public on the site to begin with).
+  // own "not found" for the repo. GitHub answers "not found" for a private repo
+  // the token can't see too, so that answer only means "deleted" in an account
+  // where the token sees private repos this run. Elsewhere it means "no longer
+  // public": the system stays, shown as private (BR-1.7), its public knowledge
+  // wiped and flagged for the owner (FundsLink and Governova were hidden as
+  // "gone" on 2026-10-08 when they went private — D-021).
   const listedAccounts = config.ownedLogins.map((l) => l.toLowerCase()).filter((l) => !accountErrors.has(l) && ![...accountErrors.keys()].some((k) => k.toLowerCase() === l));
   // Every public repo counts — written up or not: one that was never written up is still
   // listed among "every public repo" (PublicGithubRepo) until it's marked gone.
@@ -587,10 +594,17 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
     },
     select: { id: true, slug: true, githubFullName: true, githubOwnerLogin: true, contentStatus: true },
   });
+  const seesPrivate = new Set([...found.values()].filter((r) => r.private).map((r) => r.owner.login.toLowerCase()));
   for (const s of gone) {
     if (!s.githubOwnerLogin || !listedAccounts.includes(s.githubOwnerLogin.toLowerCase())) continue;
     const res = await clients[0]!.request(`/repos/${s.githubFullName}`);
     if (res.status !== 404) continue;
+    if (!seesPrivate.has(s.githubOwnerLogin.toLowerCase())) {
+      await db.repoCommit.deleteMany({ where: { systemId: s.id } });
+      await db.system.update({ where: { id: s.id }, data: { repoPrivate: true, needsCuration: true, githubReadmeExcerpt: null, githubDependencies: [] } });
+      summary.madePrivate.push(s.slug);
+      continue;
+    }
     await db.system.update({
       where: { id: s.id },
       data: { githubGoneAt: new Date(), ...(s.contentStatus === "PUBLISHED" && { contentStatus: "DRAFT", publishAt: null, needsCuration: true }) },

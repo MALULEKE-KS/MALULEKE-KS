@@ -23,7 +23,7 @@ import { getSetting } from "@/lib/settings";
 import { hitRateLimit, hitRateLimitKey } from "@/lib/auth/rate-limit";
 import { getGuideCorpus } from "@/lib/guide/corpus";
 import { buildInstructions } from "@/lib/guide/prompt";
-import { parseGuideRequest } from "@/lib/guide/request";
+import { backIn, parseGuideRequest } from "@/lib/guide/request";
 import { searchPublic } from "@/lib/queries/search";
 import { getInquiryTypes } from "@/lib/queries/site";
 import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
@@ -80,12 +80,22 @@ export async function POST(request: Request) {
   if (parsed.isNewQuestion) {
     const visitor = await hitRateLimit("guide", request, perVisitor, windowHours * 60 * 60 * 1000);
     if (!visitor.allowed) {
-      return errorResponse("RATE_LIMITED", "That's a lot of questions — the guide needs a breather. Try again later, or write to him directly.", 429, { retryAfterMs: visitor.retryAfterMs });
+      return errorResponse(
+        "RATE_LIMITED",
+        `You've used all your questions for now, so the guide is resting. Your questions come back ${backIn(visitor.retryAfterMs ?? windowHours * 60 * 60 * 1000)} — meanwhile the contact form reaches him directly.`,
+        429,
+        { retryAfterMs: visitor.retryAfterMs },
+      );
     }
   }
   const everyone = await hitRateLimitKey("guide:all", dailyCap, 24 * 60 * 60 * 1000);
   if (!everyone.allowed) {
-    return errorResponse("GUIDE_RESTING", "The guide is resting until tomorrow — the contact form reaches him directly.", 429, { retryAfterMs: everyone.retryAfterMs });
+    return errorResponse(
+      "GUIDE_RESTING",
+      `The guide has given every answer it has for today and is resting. Answers are available again ${backIn(everyone.retryAfterMs ?? 24 * 60 * 60 * 1000)} — meanwhile the contact form reaches him directly.`,
+      429,
+      { retryAfterMs: everyone.retryAfterMs },
+    );
   }
 
   const [corpus, inquiryTypes] = await Promise.all([getGuideCorpus(budget, cacheSeconds), getInquiryTypes()]);
