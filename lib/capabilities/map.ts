@@ -115,13 +115,14 @@ export const CAPABILITIES: Capability[] = [
     id: "guide",
     title: "The AI guide",
     audience: "public",
-    summary: "The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a).",
-    db: ["PublicFlag", "VisitorLens"],
+    summary: "The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, shows live cards of systems, journey, skills and the site's pulse read from the public views, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a, docs/AI-GUIDE-PHASE1-PLAN.md).",
+    db: ["PublicFlag", "VisitorLens", "PublicSystem", "PublicTimeline", "SkillEvidence", "PublicPlatformPulse"],
     endpoints: ["POST /guide"],
     rules: ["BR-2.4", "BR-4.1", "BR-4.2", "BR-4.3", "BR-4.4", "BR-4.6"],
     frontend: [
       { page: "/", section: "Hero: the character, greeting and lens chips" },
-      { page: "(every page)", section: "Docked launcher and the chat panel" },
+      { page: "/", section: "The AI guide's console: the character at work, the trail, live cards and sources" },
+      { page: "(every page)", section: "Docked launcher and the chat panel (the same console and conversation)" },
       { page: "/contact", section: "A draft from the guide, for the visitor to review and send" },
     ],
     notes: [

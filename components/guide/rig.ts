@@ -31,6 +31,17 @@ export interface Rig {
   destroy(): void;
 }
 
+/**
+ * Where a point on the screen is, as the guide drawn in `rect` sees it: -1…1 on each axis
+ * from its face (about 18% down the drawing). Up and down count as much as left and right —
+ * the vertical span is the face-to-screen-edge distance.
+ */
+export function lookFrom(rect: DOMRect, x: number, y: number): [number, number] {
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height * 0.18;
+  return [(x - cx) / (rect.width * 1.1), (y - cy) / Math.max(rect.height * 0.45, 160)];
+}
+
 const RES = [1024, 1536] as const;
 /**
  * The head moves as one rigid piece, and only a little: people follow a

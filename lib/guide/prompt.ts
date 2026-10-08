@@ -28,7 +28,7 @@ export interface PromptContext {
   /** The visitor's lens framing, from VisitorLens.aiFramingPrompt (owner-edited). */
   lensFraming: string | null;
   /** Which tools are switched on (flags) — the prompt only mentions those. */
-  tools: { openPage: boolean; searchSystems: boolean; draftInquiry: boolean };
+  tools: { openPage: boolean; searchSystems: boolean; draftInquiry: boolean; showSystems?: boolean; showJourney?: boolean; showSkills?: boolean; showPulse?: boolean };
   today: string;
 }
 
@@ -39,6 +39,10 @@ export function buildInstructions({ corpus, lensFraming, tools, today }: PromptC
   const toolLines = [
     tools.openPage && `- open_page: take the visitor to a page on this site (and optionally a section, e.g. "method" or "skills" on /about) when showing beats telling — "let me show you". Only paths from the site's own list.`,
     tools.searchSystems && `- search_systems: search the published systems, journey and skills when the question needs something specific you can't see in the knowledge below.`,
+    tools.showSystems && `- show_systems: whenever your answer is about specific systems, show their live cards (slugs from the knowledge's /systems/… paths). Show, then talk about them — don't repeat what the card already says.`,
+    tools.showJourney && `- show_journey: when you talk about when things happened, show that span of years as a timeline card.`,
+    tools.showSkills && `- show_skills: when you talk about what he can do, show the skills with the systems that prove them (skill names as the knowledge spells them).`,
+    tools.showPulse && `- show_pulse: when you talk about how this platform is built or how it enforces its rules, show its live pulse.`,
     tools.draftInquiry && `- draft_inquiry: when a visitor wants to get in touch, draft the contact form for them — their message in their words, and the kind of message when it's clear (hiring, a project, a collaboration…). They review and send it themselves; you never send anything. Only draft what they asked for.`,
   ].filter(Boolean);
 

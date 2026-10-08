@@ -26,10 +26,8 @@ import { siteUrl } from "@/lib/site-url";
 import { getPlatformPulse, getPublicTitles } from "@/lib/queries/profile";
 import { FLAGS, getFlags } from "@/lib/flags";
 import { getSetting } from "@/lib/settings";
-import { guideProviderConfigured } from "@/lib/guide/model";
 import { AiGuideSection } from "@/components/home/AiGuideSection";
 import { getUploadedCvLink } from "@/lib/cv/options";
-import { dbPublic } from "@/lib/db";
 import {
   countPublishedSystems,
   getHomepageStats,
@@ -50,7 +48,6 @@ export async function HomeContent() {
     intro,
     aiGuide,
     cv,
-    githubRepos,
     systemMap,
     pulse,
   ] = await Promise.all([
@@ -67,7 +64,6 @@ export async function HomeContent() {
     getContentBlock("home-intro"),
     getContentBlock("ai-guide"),
     getUploadedCvLink(),
-    dbPublic.publicGithubRepo.count(),
     getSystemMap(),
     getPlatformPulse(),
   ]);
@@ -98,16 +94,7 @@ export async function HomeContent() {
         cvUrl={cv?.url ?? null}
       />
       {guideEnabled && aiGuide && (
-        <AiGuideSection
-          content={aiGuide}
-          tools={{
-            openPage: flags[FLAGS.openPage] === true,
-            searchSystems: flags[FLAGS.searchSystems] === true,
-            draftInquiry: flags[FLAGS.draftInquiry] === true,
-          }}
-          ready={guideProviderConfigured()}
-          githubRepos={githubRepos}
-        />
+        <AiGuideSection content={aiGuide} />
       )}
       <WorkShowcase {...selectedWork} totalPublished={totalPublished} />
       <SystemMap data={systemMap} />

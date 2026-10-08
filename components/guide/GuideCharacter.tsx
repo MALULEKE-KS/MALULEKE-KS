@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { createRig, type Rig } from "@/components/guide/rig";
+import { createRig, lookFrom, type Rig } from "@/components/guide/rig";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
@@ -52,7 +52,7 @@ export function GuideCharacter({
         rig = r;
         rigRef.current = r;
         r.setMood(mood);
-        unregister = registerRig(r);
+        unregister = registerRig(r, () => box.current?.getBoundingClientRect() ?? null);
         setReady(true);
         r.setRunning(document.visibilityState === "visible");
       });
@@ -109,15 +109,8 @@ export function GuideCharacter({
     const lookAt = (e: { clientX: number; clientY: number }, glance: boolean) => {
       const el = box.current;
       if (!el) return;
-      const r = el.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height * 0.18; // the face, not the middle of the body
-      // Up and down count as much as left and right: the vertical span is the face-to-screen-edge distance.
-      rigRef.current?.setLook(
-        (e.clientX - cx) / (r.width * 1.1),
-        (e.clientY - cy) / Math.max(r.height * 0.45, 160),
-        glance
-      );
+      const [x, y] = lookFrom(el.getBoundingClientRect(), e.clientX, e.clientY);
+      rigRef.current?.setLook(x, y, glance);
       if (mood === "idle") rigRef.current?.setMood("attentive");
     };
     const onMove = (e: PointerEvent) => e.isPrimary && lookAt(e, false);
