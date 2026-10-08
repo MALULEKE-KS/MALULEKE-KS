@@ -246,6 +246,20 @@ describe("the sync (#95)", () => {
     expect(await byRepo(48)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: true, needsCuration: true, githubGoneAt: null });
   });
 
+  it("switching private repos on shows the private work already synced and never curated — never what the owner hid; homes with no private access are reported", async () => {
+    const waiting = repo(46, OWNER, `${RUN}-private-waiting`, { private: true });
+    const ownerHid = repo(47, OWNER, `${RUN}-private-owner-hid`, { private: true });
+    await sync([waiting, ownerHid]);
+    expect(await byRepo(46)).toMatchObject({ contentStatus: "DRAFT", repoPrivate: true });
+    await db.system.update({ where: { githubRepoId: baseId + 47 }, data: { needsCuration: false } });
+
+    const summary = await syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER, `${RUN}-no-private`], newRepoVisibility: "public-and-private", fetch: fakeGithub([waiting, ownerHid]) });
+    expect(summary.madePublic).toContain(`${RUN}-private-waiting`);
+    expect(await byRepo(46)).toMatchObject({ contentStatus: "PUBLISHED", repoPrivate: true });
+    expect(await byRepo(47)).toMatchObject({ contentStatus: "DRAFT" });
+    expect(summary.noPrivateAccess).toEqual([`${RUN}-no-private`]);
+  });
+
   // V1 finalization (owner, 2026-10-02): GitHub's real state, kept current.
   it("a repo hidden only because it was private is shown once it goes public; an owner's own hide is never undone", async () => {
     const wasPrivate = repo(50, OWNER, `${RUN}-went-public`, { private: true });

@@ -131,8 +131,8 @@ export const SETTINGS = {
   "github.sync.newRepoVisibility": define({
     // The owner's rule (2026-10-01): the catalog comes from GitHub — shown by default, hidden by choice.
     schema: z.enum(["public-and-private", "public-only", "hidden"]),
-    // Public repos only to start (owner, 2026-10-01): private ones wait in the admin for review.
-    default: "public-only" as "public-and-private" | "public-only" | "hidden",
+    // Every repo, public and private (owner, 2026-10-08); private ones show as private, never linked.
+    default: "public-and-private" as "public-and-private" | "public-only" | "hidden",
     description: "Which new repos from your own GitHub homes appear on the site by default (public-and-private, public-only or hidden). Private ones show as private, never linked; client and collaborated work always waits for approval.",
     rule: "BR-1.6",
   }),

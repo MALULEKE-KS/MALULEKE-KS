@@ -213,6 +213,10 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
   const LOOK_BACK_AFTER = 3.5;
   const GLANCE_HOLD = 5;
   let hold = LOOK_BACK_AFTER;
+  // A click or tap is a deliberate look: a firmer turn while it's held.
+  let emphasis = 1;
+  // A tap on the guide itself: a small nod back.
+  let nodAt = -Infinity;
   // The eyes' target as the head sees it — a beat late (HEAD_LAG).
   const lead = { x: 0, y: 0 };
   const cur = { hx: 0, hy: 0, bx: 0, by: 0, tilt: 0, gx: 0, gy: 0, mouth: 0, wide: 0 };
@@ -268,19 +272,23 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
     const back = Math.min(1, Math.max(0, (t - lookedAt - hold) / 1.4));
     const keep = 1 - back * back * (3 - 2 * back);
     const lx = lookX * keep, ly = lookY * keep;
+    // The same turn reads the same at any size: a phone draws the guide at about half the
+    // width of a desktop, so the motion (in the drawing's pixels) grows to match.
+    const gain = Math.min(1.9, Math.max(1, 420 / Math.max(canvas.clientWidth, 1)));
+    emphasis += ((t - lookedAt < hold ? emphasis : 1) - emphasis) * (1 - Math.exp(-dt * 1.5));
     if (mood === "attentive" || mood === "speaking") {
       // Soft saturation: quick to respond near the face, never snapping past its limits.
-      const sx = Math.tanh(lx * 1.6), sy = Math.tanh(ly * 1.8);
+      const sx = Math.tanh(lx * 1.6) * emphasis, sy = Math.tanh(ly * 1.8) * emphasis;
       // The head turns a beat after the eyes, as one piece; the shoulders follow it a little.
       const f = 1 - Math.exp(-dt / HEAD_LAG);
       lead.x += (sx - lead.x) * f; lead.y += (sy - lead.y) * f;
-      tx = lead.x * HEAD_SHIFT[0]; ty = lead.y * HEAD_SHIFT[1]; tTilt = lead.x * HEAD_TILT;
-      tbx = lead.x * BODY_SHIFT[0]; tby = lead.y * BODY_SHIFT[1];
+      tx = lead.x * HEAD_SHIFT[0] * gain; ty = lead.y * HEAD_SHIFT[1] * gain; tTilt = lead.x * HEAD_TILT * gain;
+      tbx = lead.x * BODY_SHIFT[0] * gain; tby = lead.y * BODY_SHIFT[1] * gain;
       // Never perfectly still: a faint postural sway under the turn.
       tx += Math.sin(t * 0.9) * 0.35; ty += Math.sin(t * 0.67 + 1) * 0.25;
       // The eyes get there first, then ease back as the head arrives (they counter-rotate, as in people).
-      tgx = sx * 10 + (sx * HEAD_SHIFT[0] - cur.hx) * 0.9 + saccade.x;
-      tgy = sy * 3.5 + (sy * HEAD_SHIFT[1] - cur.hy) * 0.5 + saccade.y;
+      tgx = sx * 10 * gain + (sx * HEAD_SHIFT[0] * gain - cur.hx) * 0.9 + saccade.x;
+      tgy = sy * 3.5 * gain + (sy * HEAD_SHIFT[1] * gain - cur.hy) * 0.5 + saccade.y;
       // Tiny eye flicks every second or two, the way eyes never quite rest.
       if (t > saccade.at) saccade = { x: (Math.random() - 0.5) * 1.6, y: (Math.random() - 0.5) * 1, at: t + 0.8 + Math.random() * 1.8 };
     } else if (mood === "thinking") {
@@ -291,8 +299,11 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
       tgx = Math.sin(t * 0.6) * 2; tgy = Math.sin(t * 0.43) * 1;
     }
     if (mood !== "attentive" && mood !== "speaking") {
-      lead.x = cur.hx / HEAD_SHIFT[0]; lead.y = cur.hy / HEAD_SHIFT[1];
+      lead.x = cur.hx / (HEAD_SHIFT[0] * gain); lead.y = cur.hy / (HEAD_SHIFT[1] * gain);
     }
+    // The nod: down and back up over ~0.5 s.
+    const nod = (t - nodAt) / 0.5;
+    if (nod >= 0 && nod < 1) ty += Math.sin(nod * Math.PI) * 3 * gain;
     if (mood === "speaking") ty += Math.sin(t * 7) * 0.6; // small nods while talking
 
     // Mouth: follow the queued text at ~15 letters a second.
@@ -358,10 +369,16 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
       const ny = Math.max(-1, Math.min(1, y));
       // A deliberate turn to somewhere new often comes with a blink (gaze-evoked), as in people.
       if (glance && blinkStart < 0 && Math.hypot(nx - lookX, ny - lookY) > 0.5 && Math.random() < 0.7) nextBlinkAt = t;
+      // A tap on the guide itself: it looks back at you and nods.
+      if (glance && Math.hypot(nx, ny) < 0.3) {
+        nodAt = t;
+        if (blinkStart < 0) nextBlinkAt = t + 0.05;
+      }
       lookX = nx;
       lookY = ny;
       lookedAt = t;
       hold = glance ? GLANCE_HOLD : LOOK_BACK_AFTER;
+      if (glance) emphasis = 1.3;
     },
     speak(text) {
       speech += text;
