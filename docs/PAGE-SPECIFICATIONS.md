@@ -14,19 +14,15 @@
 
 - **Header:** floating graphite glass pills over the page — logo; nav Systems · Journey · CV · Method · About (current page marked with an ember dot and `aria-current`); search (⌘K); **Let's talk** → `/contact`, the only contact entry (Contact is no longer a nav item). Below `lg`, a Menu pill opens a glass sheet. DESIGN-SYSTEM §6a.
 - **Footer:** the mission (method content block), social links (`ProfileLink`), the three GitHub homes with live published-system counts (`GET /homes`), email + the review promise (setting `inquiry.reviewSlaHours`) + *Start a conversation*, a status line from `GET /platform/pulse` (business rules enforced by the database, last GitHub sync, build), the dithered MALULEKE-KS wordmark, privacy choices, colophon, back to top. No page list.
-- **AI guide launcher (F5c, planned):** a docked button with the guide's face on every page, opening the chat (PUBLIC-REDESIGN-PLAN §3a).
+- **AI guide launcher:** a docked button with the guide's face on every page but home, opening the same console and conversation as the home section (docs/AI-GUIDE-PHASE1-PLAN.md).
 
-### `/` — Home
+### `/` — Home (as live, 2026-10-08)
 
-*Being rebuilt — target: PUBLIC-REDESIGN-PLAN §3. Below: the page as shipped in F5a.*
-
-1. **LedgerHero** — already built, content evolved per Design System §7: three lines blending Kurhula's career-aggregate facts and the system's aggregate facts (never named individual systems — that's the grid below, `/systems`, `/journey`'s job), typing out as a log entry, with the `ScaleFigure` line-art self-draw synced to finish alongside the third line.
-2. **Priority systems grid** — 3–4 `SystemCard`s, ordered by the active `VisitorLens.priorityContent`, not a fixed flagship list. A recruiter and a fintech client see a different lead system on the same URL.
-3. **By the numbers** — the curated, admin-selected impact strip (Constitution §8). Brass accent, three to five numbers, nothing live or per-visitor.
-4. **Method teaser** — one paragraph of the mission statement plus a link through to `/method`. Not the full methodology here — a pointer to it.
-5. **Contact band** — one line, one button, to `/contact`.
-
-**Behavior:** on first visit, a small dismissible lens picker offers to tailor the ordering (2-tap, per Constitution §4) — never blocking, never a modal that has to be closed to read anything. `VisitorLensProvider` persists the choice for the session.
+1. **Hero** — headline, intro, titles, *See the work* / *Get my CV*, live stat cards. The AI guide's character beside it holds **one still pose** and turns its head and eyes toward the pointer, clicks and taps (phones too), eyes first, head a beat later, a blink with big turns (D-020; `components/guide/rig.ts`).
+2. **The AI guide** — a collapsible bar, **closed by default** so visitors who didn't come for the AI scroll freely: the character's live bust, the heading, three questions. Opening it or asking unfolds the console in place: the character's stage (desktop) or bust header (phone), the conversation with its working trail, live cards (`show_*` tools) and sources, the composer (docs/AI-GUIDE-PHASE1-PLAN.md, D-023). Limits name what ran out and when (per device, local time).
+3. **Selected work** — systems featured on home (admin switch, home order) as large cards beside *Now building*; then **More work**: unfeatured systems with a home order first (Tshimo Agri Network, FundsLink Academy, Governova), then catalog order.
+4. **The map** — GitHub homes → the work → Built with (every technology, most used first). No lines at rest; a click or tap traces a node's whole chain, a second click opens it, a tap elsewhere / Clear / Escape / scrolling the map away ends it — scrolling through it never does. Phones get their own layout (homes and work two by two, the most used technologies with *Show all*).
+5. **Control room**, **How I build**, **Let's talk** band — as built in F5c.
 
 ### `/systems` — Catalog
 

@@ -30,6 +30,7 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/docs/PAGE-BUILD-PLAYBOOK.md` | **How every public page is built** — the owner's rules, the stages (brief → data → structure → components → copy → build → verify → document → review), the reusable toolkit, the audit checklist, pitfalls, and a sheet per page. Follow it for every page; the home page is the reference build |
 | `/docs/EVIDENCE-SPEC.md` | Evidence Density & Proof — every claim leads to honest, inspectable evidence (EV-1…EV-8) |
 | `/docs/LETS-TALK-SPEC.md` | Let's Talk — opportunity intake & management on `Inquiry` (LT-1…LT-14), V2 accountless tracking |
+| `/docs/AI-GUIDE-PHASE1-PLAN.md` | The AI guide's phase 1 (owner request, 2026-10-08, D-023): one console and conversation, live cards, working trail and sources, the character at work — built; phase 2 candidates listed at its end |
 | `/docs/V2-IMPROVEMENT-SPEC.md` | **The locked V2 plan** — every work package (WP), in order, with acceptance and verification; the relay protocol (§0.1) |
 | `/docs/improvements/TRACKER.md`, `/docs/improvements/DECISIONS.md` | Where V2 stands (status per WP, Next up, handoff log) and why (decisions, conflicts, owner answers) — updated by every session |
 | `/docs/ROADMAP-V2.md` | V2 features that wait for a trigger (Part 1, reconciled with the spec in its §1.2.4), and the update log — add to both in the same PR as the change |
@@ -71,6 +72,8 @@ Deliberately NOT extensible, per the constitution's own exception: `ClientVisibi
 - the AI guide.
 
 See `/docs/DEPLOYMENT.md`, the update log in `/docs/ROADMAP-V2.md`, and the last handoff entry in `/docs/improvements/TRACKER.md` (owner to-dos and open questions). **README.md is the owner's profile README; any change to it is discussed with the owner first.**
+
+**Owner-requested work shipped 2026-10-08 (outside the WP list, D-020–D-023):** the still hero character that turns to clicks and taps; More work order; private systems shown as private; the map traced by click with a phone layout; AI guide phase 1; Functions Storage trimmed. See the tracker's last handoff entry for what's open.
 
 **V2 is in progress, one work package at a time:** `/docs/V2-IMPROVEMENT-SPEC.md`, tracked in `/docs/improvements/TRACKER.md` (see "Start here" above).
 

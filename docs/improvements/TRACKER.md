@@ -137,3 +137,11 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Done:** `docs/AI-GUIDE-PHASE1-PLAN.md` built: shared conversation (`GuideChatProvider`), the console (`components/guide/console/`), card tools `show_*` (flags on), trail + sources, the character's bust at work, the home section replaced, the panel rebuilt on the console.
 - **Next for the guide (phase 2 candidates, owner to choose):** a better model than the free one (cost first), role-tailored openers, "Ask the guide" in ⌘K search, rule cards once the enforcement register is data.
 - **Next step:** unchanged — WP-001 after the owner's token and phone checks.
+
+### 2026-10-08 · End of day — owner batch closed (owner request, not WPs; D-020–D-023)
+- **Live on production (`9050df2`):** still hero character turning to clicks/taps (#161); More work order + private systems back + guide limits (#161, #163); map traced by click, phone layout, exact beams, lines only on selection, trace survives scrolling (#163, #166, #168, #170); AI guide phase 1 — collapsible section, one console/conversation, live cards (`agent.show_*` on), trail, sources, the character at work (#172, #176); retired-model fallback fix (#174); exact per-device limit messages (#176); Functions Storage trimmed (#178).
+- **Vercel Hobby limit:** Functions Storage hit 13.08 GB / 10 GB (not Neon — Neon stays). Fixed: superseded deployments deleted (owner-approved; keep the live one + one rollback), each function 43 MB → 20 MB (`outputFileTracingExcludes`, DEPLOYMENT.md). Batch releases — today shipped ~15 deploys.
+- **Verified:** CI green on every PR; production checks in the owner's Chrome (desktop); guide answers with real cards from production after the fallback fix; the trimmed preview served every DB page, the APIs and the guide.
+- **Not verified by me:** phone layouts by eye (the owner's Chrome stays maximized — mobile e2e in CI only); the owner reports the guide works well on the phone.
+- **Owner, to do:** (1) fine-grained read-only GitHub tokens per home so private repos sync (DEPLOYMENT.md); (2) a real-phone pass of the home page; (3) choose the guide's phase 2 (paid model for reliability first — free models had a retired id and 503 outages today).
+- **Next step:** the AI guide's phase 2 (owner said "we will finish the AI phases next time"), then V2 **WP-001**.
