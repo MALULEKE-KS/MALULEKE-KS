@@ -8,6 +8,26 @@ const nextConfig: NextConfig = {
     "/opengraph-image": ["./design/brand/ks-cube-3d-og.png"],
     "/systems/[slug]/opengraph-image": ["./design/brand/ks-cube-3d-og.png"],
   },
+  // Vercel's Functions Storage (Hobby: 10 GB, exceeded 2026-10-08 at 13 GB) counts every
+  // function of every kept deployment. The tracer copies Prisma's WebAssembly engines for
+  // every database type (Postgres, MySQL, SQLite, SQL Server, CockroachDB — ~55 MB) and its
+  // source maps into each of ~280 functions, though the client only loads the native Node
+  // engine (runtime/library.js + the platform's query_engine .node). Drop the dead weight.
+  outputFileTracingExcludes: Object.fromEntries(
+    ["/*", "/**/*"].map((route) => [
+      route,
+      [
+        "./node_modules/@prisma/client/runtime/query_engine_bg.*",
+        "./node_modules/@prisma/client/runtime/query_compiler_bg.*",
+        "./node_modules/@prisma/client/runtime/wasm-*",
+        "./node_modules/@prisma/client/runtime/edge*",
+        "./node_modules/@prisma/client/runtime/react-native*",
+        "./node_modules/@prisma/client/runtime/*.map",
+        "./node_modules/.prisma/client/query_engine_bg.wasm",
+        "./node_modules/.prisma/client/*.tmp*",
+      ],
+    ]),
+  ),
   // Renamed pages keep their old addresses working (F5c, D10).
   async redirects() {
     return [{ source: "/how-i-build", destination: "/about#method", permanent: true }];

@@ -74,6 +74,14 @@ This is safe while the previous deployment is still serving because every migrat
 
 **Preview branching** (isolates every PR's database): Vercel → Project → Storage → `neon-blue-planet` → integration settings → enable *create a database branch for each preview deployment*. Each preview then gets its own Neon branch (a copy-on-write copy of production) with its own `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, so the PR's migration is tested on real data without touching production.
 
+## Functions Storage — keep deployments small and few (2026-10-08)
+
+Hobby allows **10 GB of Functions Storage**: every function of every deployment Vercel keeps. On 2026-10-08 it reached 13.08 GB — ~280 functions × ~43 MB per deployment × 10 deployments in one day. Not the database: Neon's usage is Neon's own quota (Vercel's usage page shows no Neon charge), so moving Neon off the Marketplace would not have helped.
+
+- **Trim:** `next.config.ts` → `outputFileTracingExcludes` drops Prisma's unused WebAssembly engines (every database type) and source maps from every function — `@prisma/client` per function went from 60 MB to 2.6 MB. Only `runtime/library.js` and the platform's native engine are loaded (`engineType: "library"`). If Prisma's engine type ever changes (e.g. the Rust-free query compiler), revisit this list.
+- **Keep few:** delete superseded deployments (`vercel ls`, `vercel remove <id> --yes`) and keep the live one plus one rollback point. Batch changes per release (the deploy-budget rule).
+- **Watch:** Vercel → Usage → Functions Storage; `vercel inspect <deployment-url>` shows each function's size.
+
 ## Database roles — least privilege (F1.8, #76)
 
 The application never connects as the database owner. Three roles, one job each:
