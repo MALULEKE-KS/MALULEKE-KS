@@ -30,6 +30,10 @@
 
 ## Part 2 — Update log (newest first)
 
+### The guide stopped answering: a retired fallback model (2026-10-08)
+- **Found in the production logs:** `inclusionai/ling-3.0-flash-sante-free` — one of the guide's default fallbacks — was retired by the AI Gateway ("free tier has ended", 404). Whenever the main free model was busy, the answer fell through to it and failed with "The guide couldn't answer just now".
+- **Fixed:** the default fallbacks are now `inclusionai/ling-3.1-flash-free, poolside/laguna-s-2.1-free` (both live, free, tool-use and reasoning); and before every answer the route keeps only models that are on the gateway's live list (`lib/guide/gateway-models.ts`, read at most hourly), promoting a live fallback if the main model itself is retired. Tested.
+
 ### AI guide, phase 1: one console, the character at work, live cards, the trail and sources (2026-10-08)
 - **Owner:** "it's so basic and normal". Plan: `docs/AI-GUIDE-PHASE1-PLAN.md` (D-023).
 - **One console, one conversation:** the chat moved out of the panel into `GuideChatProvider`; the home section is the console itself (the bar, the brochure and its four "what it does" cards are gone) and the docked panel on other pages shows the same conversation. Components in `components/guide/console/` (stage, conversation, answer, trail, receipts, cards, composer); the 532-line panel is a thin dialog now.

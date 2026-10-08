@@ -97,3 +97,16 @@ describe("card results are never taken from the browser (BR-4.6)", () => {
     expect(parts).toEqual(["text"]);
   });
 });
+
+describe("the guide never asks for a retired model", () => {
+  it("drops fallbacks the gateway no longer has, and promotes a live fallback if the model itself is gone", async () => {
+    const { pickModels } = await import("@/lib/guide/gateway-models");
+    const live = new Set(["a/live", "b/live"]);
+    expect(pickModels("a/live", ["x/retired", "b/live"], live)).toEqual({ model: "a/live", fallbacks: ["b/live"] });
+    expect(pickModels("x/retired", ["b/live"], live)).toEqual({ model: "b/live", fallbacks: [] });
+    // Nothing configured exists: leave it as configured (fail honestly, never pick an unvetted model).
+    expect(pickModels("x/retired", ["y/retired"], live)).toEqual({ model: "x/retired", fallbacks: ["y/retired"] });
+    // The list couldn't be read: as configured.
+    expect(pickModels("a/live", ["x/retired"], null)).toEqual({ model: "a/live", fallbacks: ["x/retired"] });
+  });
+});

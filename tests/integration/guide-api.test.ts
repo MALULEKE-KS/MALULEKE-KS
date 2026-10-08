@@ -11,6 +11,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 import { simulateReadableStream } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 
+// The gateway's live model list is never fetched in tests: the configured models are used as they are.
+vi.mock("@/lib/guide/gateway-models", () => ({
+  liveGatewayModels: vi.fn(async () => null),
+  pickModels: (model: string, fallbacks: string[]) => ({ model, fallbacks }),
+}));
 vi.mock("@/lib/guide/model", () => ({
   guideProviderConfigured: vi.fn(() => true),
   guideModel: vi.fn(),
