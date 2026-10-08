@@ -11,7 +11,8 @@
 // lights its whole chain — a home, its work and everything that work is built
 // with; a technology, the work using it and the homes that work lives in — while
 // the rest dims. A second click on the same thing opens its link (a technology
-// lets go instead); a click anywhere else, Clear or Escape goes back to normal.
+// lets go instead); a tap or click anywhere else, Clear, Escape, or scrolling the
+// whole map away goes back to normal — never a finger scrolling through it.
 // The lines stay hidden until something is selected (owner, 2026-10-08); a mouse
 // hovering only names the node in the bar. The keyboard opens links with Enter. The
 // bar above the drawing says what's selected, what it connects to, and opens it.
@@ -109,22 +110,29 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
   const lit = useMemo(() => (pinned ? chain(pinned) : null), [pinned, chain]);
   const preview = useMemo(() => (active ? chain(active) : null), [active, chain]);
 
-  // A selection lets go on a click elsewhere or Escape.
+  // A selection lasts while you study it — scrolling through the lines never ends it
+  // (owner, 2026-10-08). It lets go on a real tap or click elsewhere ("click" never
+  // fires for a scroll or a drag, unlike a finger landing), Clear, Escape, or once
+  // the whole map has scrolled off screen.
   useEffect(() => {
     if (!pinned) return;
-    const onDown = (e: PointerEvent) => {
+    const onClick = (e: MouseEvent) => {
       if (!(e.target as Element | null)?.closest?.("[data-map-node],[data-map-bar]")) setPinned(null);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setPinned(null);
     };
-    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("click", onClick);
     window.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("click", onClick);
       window.removeEventListener("keydown", onKey);
     };
   }, [pinned]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the map left the screen: the trace is over
+    if (!onScreen) setPinned(null);
+  }, [onScreen]);
 
   const interact = (node: MapNode): Interact => ({
     "data-map-node": "",

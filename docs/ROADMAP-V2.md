@@ -31,6 +31,7 @@
 ## Part 2 — Update log (newest first)
 
 ### The map traced by click, a phone map of its own, every repo in every home (2026-10-08, second batch)
+- **A trace lasts while you study it (owner):** scrolling through the lines never ends it. It ends on a real tap or click elsewhere (the browser's click, which never fires for a scroll or drag), Clear, Escape, or once the whole map has scrolled off screen.
 - **Lines only on selection (owner):** the map rests with no lines at all; a click or tap draws exactly that node's connections through to Built with, and a click away hides them. Hover only names a node in the bar. (Supersedes "phones draw every connection at rest" below.)
 - **Beams that go exactly where they connect (owner):** every beam ends on a dot exactly at its node; nodes are opaque so no line shows through a neighbour; the beams are re-measured whenever a node moves, fonts arrive or chips are shown (measured: 95 of 95 endpoints on their nodes). Phones draw every connection through to Built with at rest, fainter — no tap needed first.
 - **Map (owner):** a click or tap selects and traces (homes now show their connections instead of opening GitHub); a second click opens the link; a click elsewhere, Clear or Escape returns to normal. A selection bar names what's traced and its counts, with Open and Clear. Phones: homes and work two by two, the most used technologies with "Show all", only the homes' beams at rest, only the selection's beams when tracing.
