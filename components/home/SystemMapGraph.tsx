@@ -18,8 +18,12 @@
 // Wide screens: three columns, every beam drawn. Phones get their own layout,
 // not the wide one squeezed (owner, same day: "poor and noisy"): three bands —
 // homes two by two, the work two by two, the most used technologies with the
-// rest a tap away — and only the homes' beams at rest. A selection draws just
-// its own beams down the bands, and its technologies join the cluster. Under
+// rest a tap away — every connection drawn at rest, fainter, through to what
+// it's built with. A selection draws just its own beams down the bands, and its
+// technologies join the cluster. Every beam ends on a dot exactly at its node,
+// nodes are opaque so no line shows through a neighbour, and the beams are
+// re-measured whenever anything moves (owner: lines must go exactly where each
+// connection goes). Under
 // prefers-reduced-motion the light doesn't travel.
 
 "use client";
@@ -38,6 +42,8 @@ interface Path {
   from: string;
   to: string;
   d: string;
+  /** Where the beam lands on its node — drawn as a dot, so every line visibly ends on the right one. */
+  end: [number, number];
 }
 
 /** What a node does under the pointer, the finger and the keyboard. */
@@ -77,48 +83,6 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
     if (el) nodes.current.set(id, el);
     else nodes.current.delete(id);
   }, []);
-
-  // Measure every node once per layout change and draw all the connections.
-  useEffect(() => {
-    const box = container.current;
-    if (!box) return;
-    const measure = () => {
-      const c = box.getBoundingClientRect();
-      if (c.width === 0) return;
-      // Columns side by side from lg (Tailwind's 64rem); stacked bands below it.
-      const isWide = window.matchMedia("(min-width: 64rem)").matches;
-      const next: Path[] = [];
-      for (const [from, to] of data.edges) {
-        const a = nodes.current.get(from)?.getBoundingClientRect();
-        const b = nodes.current.get(to)?.getBoundingClientRect();
-        if (!a || !b || a.width === 0 || b.width === 0) continue;
-        if (isWide) {
-          // Side by side: right edge to left edge.
-          const sx = a.right - c.left;
-          const sy = a.top + a.height / 2 - c.top;
-          const ex = b.left - c.left;
-          const ey = b.top + b.height / 2 - c.top;
-          const mx = (sx + ex) / 2;
-          next.push({ from, to, d: `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}` });
-        } else {
-          // Stacked: bottom edge to top edge.
-          const sx = a.left + a.width / 2 - c.left;
-          const sy = a.bottom - c.top;
-          const ex = b.left + b.width / 2 - c.left;
-          const ey = b.top - c.top;
-          const my = (sy + ey) / 2;
-          next.push({ from, to, d: `M${sx},${sy} C${sx},${my} ${ex},${my} ${ex},${ey}` });
-        }
-      }
-      setWide(isWide);
-      setSize({ w: c.width, h: c.height });
-      setPaths(next);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(box);
-    return () => ro.disconnect();
-  }, [data.edges]);
 
   const byId = useMemo(() => new Map([...data.homes, ...data.work, ...data.tech].map((n) => [n.id, n])), [data]);
 
@@ -182,8 +146,62 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
   const dim = (id: string) => lit !== null && !lit.has(id);
   const techShown = data.tech.filter((t, i) => wide || allTech || i < data.techInGraph || lit?.has(t.id));
   const hiddenTech = data.tech.length - techShown.length;
-  // At rest a phone draws only the homes' beams; a selection draws its own.
-  const drawn = wide ? paths : paths.filter((p) => (lit ? lit.has(p.from) && lit.has(p.to) : p.from.startsWith("home:")));
+  const shownKey = techShown.map((t) => t.id).join("|");
+
+  // Measure every node once per layout change and draw all the connections.
+  useEffect(() => {
+    const box = container.current;
+    if (!box) return;
+    const measure = () => {
+      const c = box.getBoundingClientRect();
+      if (c.width === 0) return;
+      // Columns side by side from lg (Tailwind's 64rem); stacked bands below it.
+      const isWide = window.matchMedia("(min-width: 64rem)").matches;
+      const next: Path[] = [];
+      for (const [from, to] of data.edges) {
+        const a = nodes.current.get(from)?.getBoundingClientRect();
+        const b = nodes.current.get(to)?.getBoundingClientRect();
+        if (!a || !b || a.width === 0 || b.width === 0) continue;
+        if (isWide) {
+          // Side by side: right edge to left edge.
+          const sx = a.right - c.left;
+          const sy = a.top + a.height / 2 - c.top;
+          const ex = b.left - c.left;
+          const ey = b.top + b.height / 2 - c.top;
+          const mx = (sx + ex) / 2;
+          next.push({ from, to, d: `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}`, end: [ex, ey] });
+        } else {
+          // Stacked: bottom edge to top edge.
+          const sx = a.left + a.width / 2 - c.left;
+          const sy = a.bottom - c.top;
+          const ex = b.left + b.width / 2 - c.left;
+          const ey = b.top - c.top;
+          const my = (sy + ey) / 2;
+          next.push({ from, to, d: `M${sx},${sy} C${sx},${my} ${ex},${my} ${ex},${ey}`, end: [ex, ey] });
+        }
+      }
+      setWide(isWide);
+      setSize({ w: c.width, h: c.height });
+      setPaths(next);
+    };
+    measure();
+    // Re-measure whenever anything could have moved — the map, any node, the fonts
+    // arriving — so a beam never points at where a node used to be.
+    const ro = new ResizeObserver(measure);
+    ro.observe(box);
+    for (const el of nodes.current.values()) ro.observe(el);
+    let live = true;
+    void document.fonts?.ready.then(() => live && measure());
+    return () => {
+      live = false;
+      ro.disconnect();
+    };
+  }, [data.edges, shownKey]);
+
+  // Every connection is drawn at rest, through to what it's built with; a phone draws them
+  // fainter, and while tracing only the selection's own beams.
+  const drawn = wide || !lit ? paths : paths.filter((p) => lit.has(p.from) && lit.has(p.to));
+  const restOpacity = wide ? 1 : 0.55;
 
   return (
     <>
@@ -207,7 +225,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
           {drawn.map((p, i) => {
             const on = !lit || (lit.has(p.from) && lit.has(p.to));
             return (
-              <g key={`${p.from}>${p.to}`} className="transition-opacity duration-300" style={{ opacity: on ? 1 : 0.1 }}>
+              <g key={`${p.from}>${p.to}`} className="transition-opacity duration-300" style={{ opacity: !on ? 0.1 : lit ? 1 : restOpacity }}>
                 <path d={p.d} fill="none" stroke="rgb(255 255 255 / 0.12)" strokeWidth={1.25} />
                 <path
                   d={p.d}
@@ -220,6 +238,8 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                   className="motion-safe:animate-[beam-travel_4.5s_linear_infinite] motion-reduce:[stroke-dasharray:none] motion-reduce:opacity-40"
                   style={{ animationDelay: `${(i % 9) * -0.5}s` }}
                 />
+                {/* Where it lands: exactly on its node. */}
+                <circle cx={p.end[0]} cy={p.end[1]} r={lit && on ? 2.5 : 1.75} fill={lit && on ? "var(--color-ember)" : "#ffb547"} />
               </g>
             );
           })}
@@ -258,7 +278,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                         aria-pressed={pinned === t.id}
                         {...interact(t)}
                         className={cn(
-                          "focus-visible:outline-ember bg-night/85 relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
+                          "focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
                           lead ? "text-paper px-3 py-1.5 text-[13px] font-medium" : "text-mist px-2.5 py-1 text-[11.5px]",
                           pinned === t.id ? "border-ember bg-ember/15" : on ? "border-ember/70" : lead ? "border-white/15 hover:border-ember/50" : "border-white/10 hover:border-ember/50",
                           dim(t.id) && "opacity-30",
@@ -421,7 +441,7 @@ function NodeCard({
   const cls = cn(
     "group/n relative z-10 flex min-w-0 items-center gap-2.5 rounded-xl border px-3.5 transition-[opacity,border-color,background-color,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember max-lg:min-h-12 max-lg:px-3",
     node.kind === "home" ? "py-3.5 max-lg:py-2.5" : "py-2.5 max-lg:py-2",
-    node.faint ? "border-dashed border-white/12 bg-night/60" : "border-white/10 bg-night/85 hover:border-ember/50",
+    node.faint ? "border-dashed border-white/12 bg-night" : "border-white/10 bg-night hover:border-ember/50",
     selected && "border-ember bg-ember/10 shadow-[0_0_0_3px_rgb(255_91_31/0.15)]",
     dim && "opacity-30",
   );
