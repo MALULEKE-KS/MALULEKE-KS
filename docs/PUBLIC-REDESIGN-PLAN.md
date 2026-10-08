@@ -62,6 +62,8 @@ Sections, top to bottom — each names its data source:
 
 ### 3a. The guide — an animated AI character (finalised with the owner, 2026-09-30)
 
+> **Phase 1 redesign (owner, 2026-10-08) — `docs/AI-GUIDE-PHASE1-PLAN.md` supersedes the console parts below:** the home section *is* the console (no bar, no brochure, no panel there); one conversation shared with the docked panel (`GuideChatProvider`); every answer shows its working trail, live cards (`show_systems`, `show_journey`, `show_skills`, `show_pulse` — read from the public views) and its sources; the character's live bust is on screen whenever the guide works (stage on desktop, header on phones, a corner bust when the console is out of view).
+
 The home-page character is the face of the **Tier 1 concierge** (PLATFORM-CONSTITUTION §6; V1.1, in scope by the owner's direction now that V1 is live). It greets visitors, answers questions about the owner's work, and takes them through the site.
 
 **Owner decisions (2026-09-30)**

@@ -13,7 +13,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { GuideMood, Rig } from "@/components/guide/rig";
+import { lookFrom, type GuideMood, type Rig } from "@/components/guide/rig";
 import type { PublicLens } from "@/lib/queries/lenses";
 
 const LENS_KEY = "mks.lens";
@@ -43,7 +43,9 @@ interface GuideState {
   setMood: (mood: GuideMood) => void;
   /** The chat streams text here; the mouth follows it. */
   speak: (text: string) => void;
-  registerRig: (rig: Rig) => () => void;
+  registerRig: (rig: Rig, box: () => DOMRect | null) => () => void;
+  /** Every character on screen looks at this element (the composer while the visitor writes). */
+  lookAt: (el: Element) => void;
   /** The hero character is on screen — the docked launcher steps aside. */
   heroInView: boolean;
   setHeroInView: (inView: boolean) => void;
@@ -78,7 +80,7 @@ export function GuideProvider({
   const [heroInView, setHeroInView] = useState(false);
   const [lens, setLensState] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
-  const rigs = useRef(new Set<Rig>());
+  const rigs = useRef(new Map<Rig, () => DOMRect | null>());
 
   // The lens lasts the session — no login, no cookie (Constitution §4).
   useEffect(() => {
@@ -103,13 +105,23 @@ export function GuideProvider({
 
   const setMood = useCallback((next: GuideMood) => {
     setMoodState(next);
-    rigs.current.forEach((r) => r.setMood(next));
+    rigs.current.forEach((_, r) => r.setMood(next));
   }, []);
 
-  const speak = useCallback((text: string) => rigs.current.forEach((r) => r.speak(text)), []);
+  const speak = useCallback((text: string) => rigs.current.forEach((_, r) => r.speak(text)), []);
 
-  const registerRig = useCallback((rig: Rig) => {
-    rigs.current.add(rig);
+  const lookAt = useCallback((el: Element) => {
+    const t = el.getBoundingClientRect();
+    rigs.current.forEach((box, r) => {
+      const rect = box();
+      if (!rect) return;
+      const [x, y] = lookFrom(rect, t.left + t.width / 2, t.top + t.height / 2);
+      r.setLook(x, y);
+    });
+  }, []);
+
+  const registerRig = useCallback((rig: Rig, box: () => DOMRect | null) => {
+    rigs.current.set(rig, box);
     return () => {
       rigs.current.delete(rig);
     };
@@ -124,10 +136,10 @@ export function GuideProvider({
 
   const value = useMemo(
     () => ({
-      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, speak, registerRig,
+      enabled, ready, ownerFirstName, lenses, linkHosts, open, setOpen, mood, setMood, speak, registerRig, lookAt,
       heroInView, setHeroInView, lens, setLens, pending, ask, clearPending,
     }),
-    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, speak, registerRig, heroInView, lens, setLens, pending, ask, clearPending],
+    [enabled, ready, ownerFirstName, lenses, linkHosts, open, mood, setMood, speak, registerRig, lookAt, heroInView, lens, setLens, pending, ask, clearPending],
   );
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
 }

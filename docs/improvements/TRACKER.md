@@ -132,3 +132,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Why private repos don't show yet (as of 2026-10-08):** the production token is a *classic* token without the `repo` scope — classic tokens have no read-only private scope — so the sync sees 11 public repos and no private ones in any home. FundsLink Academy and Governova are on the site only because migration `20261008090000` restored their rows; once a token can see them, the sync keeps them current itself.
 - **Owner, to do (agreed for next time):** in GitHub → Settings → Developer settings → Fine-grained tokens, create one token per home (MALULEKE-KS, KSDRILL-SA, GrowthCore-Solutions): Repository access → All repositories; Contents → Read-only (Metadata follows). Allow/approve fine-grained tokens in each org's Settings → Personal access tokens. Put them all in Vercel `GITHUB_SYNC_TOKEN` (Production), comma-separated; redeploy; run Admin → Jobs → `github.sync`; check `noPrivateAccess` is empty in that run.
 - **Next step:** after the token check, V2 starts with **WP-001** as the spec orders.
+
+### 2026-10-08 · AI guide phase 1 (owner request, not a WP — D-023)
+- **Done:** `docs/AI-GUIDE-PHASE1-PLAN.md` built: shared conversation (`GuideChatProvider`), the console (`components/guide/console/`), card tools `show_*` (flags on), trail + sources, the character's bust at work, the home section replaced, the panel rebuilt on the console.
+- **Next for the guide (phase 2 candidates, owner to choose):** a better model than the free one (cost first), role-tailored openers, "Ask the guide" in ⌘K search, rule cards once the enforcement register is data.
+- **Next step:** unchanged — WP-001 after the owner's token and phone checks.

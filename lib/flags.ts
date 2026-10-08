@@ -12,6 +12,11 @@ export const FLAGS = {
   openPage: "agent.open_page",
   draftInquiry: "agent.draft_inquiry",
   searchSystems: "agent.search_systems",
+  // The guide's card tools (docs/AI-GUIDE-PHASE1-PLAN.md §7): read-only, server-executed.
+  showSystems: "agent.show_systems",
+  showJourney: "agent.show_journey",
+  showSkills: "agent.show_skills",
+  showPulse: "agent.show_pulse",
   tailorCv: "agent.tailor_cv",
   writeups: "writeups.enabled",
   // LT-9: confirmations to applicants — off until a sending domain is verified (Resend only delivers to the owner without one).

@@ -30,6 +30,14 @@
 
 ## Part 2 — Update log (newest first)
 
+### AI guide, phase 1: one console, the character at work, live cards, the trail and sources (2026-10-08)
+- **Owner:** "it's so basic and normal". Plan: `docs/AI-GUIDE-PHASE1-PLAN.md` (D-023).
+- **One console, one conversation:** the chat moved out of the panel into `GuideChatProvider`; the home section is the console itself (the bar, the brochure and its four "what it does" cards are gone) and the docked panel on other pages shows the same conversation. Components in `components/guide/console/` (stage, conversation, answer, trail, receipts, cards, composer); the 532-line panel is a thin dialog now.
+- **Live cards:** four read-only tools — `show_systems` (real slugs only), `show_journey`, `show_skills`, `show_pulse` — read from the public views; the model only picks which. Flags `agent.show_*`, switched on at the owner's word.
+- **Working trail and sources:** the real steps behind each answer, live while they run (from the message's parts, never timers); under each answer the records it used, checked against the site's index — a link to something that doesn't exist is never shown.
+- **The character at work:** its live bust — the same rig as the hero — on a stage beside the conversation on desktop, in the console's header on phones and on the panel, looking at the composer while you write, thinking while it works, speaking while it answers; a corner bust ("Still answering…") when the console is out of view. Shine Border (Magic UI) lights the stage while it works.
+- **Phone:** the console fits the screen with the composer at thumb reach; asking opens it full screen; cards swipe in one row.
+
 ### The map traced by click, a phone map of its own, every repo in every home (2026-10-08, second batch)
 - **A trace lasts while you study it (owner):** scrolling through the lines never ends it. It ends on a real tap or click elsewhere (the browser's click, which never fires for a scroll or drag), Clear, Escape, or once the whole map has scrolled off screen.
 - **Lines only on selection (owner):** the map rests with no lines at all; a click or tap draws exactly that node's connections through to Built with, and a click away hides them. Hover only names a node in the bar. (Supersedes "phones draw every connection at rest" below.)

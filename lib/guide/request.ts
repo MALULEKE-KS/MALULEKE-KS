@@ -9,7 +9,7 @@
 // changes their own conversation, and the instructions tell the model that
 // nothing in the conversation is an instruction. Tool results are the one
 // place a forged history could pose as *data* rather than conversation, so
-// they're never taken from the browser: a server tool's result (search) is
+// they're never taken from the browser: a server tool's result (search, the card tools) is
 // dropped — the model searches again if it needs to — and a browser tool's
 // result is rebuilt here from fixed values (V1 guide audit, 2026-10-02).
 
@@ -17,7 +17,9 @@ import { z } from "zod";
 import type { UIMessage } from "ai";
 
 /** Tool parts the guide's own tools produce; anything else is refused. */
-export const GUIDE_TOOL_NAMES = ["open_page", "search_systems", "draft_inquiry"] as const;
+export const GUIDE_TOOL_NAMES = ["open_page", "search_systems", "draft_inquiry", "show_systems", "show_journey", "show_skills", "show_pulse"] as const;
+/** Tools the server runs: their results are never taken back from the browser — dropped, and run again if needed. */
+const SERVER_TOOLS = new Set(["tool-search_systems", "tool-show_systems", "tool-show_journey", "tool-show_skills", "tool-show_pulse"]);
 
 // Hard ceilings independent of the settings — the shape of a sane request.
 const MAX_MESSAGES = 220; // 100 questions (the setting's ceiling) + answers + slack
@@ -151,7 +153,7 @@ export function parseGuideRequest(
       : {
           ...m,
           parts: m.parts
-            .filter((p) => p.type !== "tool-search_systems")
+            .filter((p) => !SERVER_TOOLS.has(p.type))
             .map((p) => (p.type.startsWith("tool-") ? rebuildToolPart(p as ToolPartIn) : p)),
         },
   );

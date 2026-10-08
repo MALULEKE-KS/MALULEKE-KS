@@ -34,7 +34,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /github/commits`
 - The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
 
-**The AI guide** — Docked launcher and the chat panel
+**The AI guide** — Docked launcher and the chat panel (the same console and conversation)
 
 - Call `POST /guide`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
@@ -79,7 +79,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /activity`
 - Only systems that are live on the site; no commit content, no authors.
 
-**The AI guide** — Hero: the character, greeting and lens chips
+**The AI guide** — Hero: the character, greeting and lens chips; The AI guide's console: the character at work, the trail, live cards and sources
 
 - Call `POST /guide`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.

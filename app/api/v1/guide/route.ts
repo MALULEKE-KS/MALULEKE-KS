@@ -23,6 +23,7 @@ import { getSetting } from "@/lib/settings";
 import { hitRateLimit, hitRateLimitKey } from "@/lib/auth/rate-limit";
 import { getGuideCorpus } from "@/lib/guide/corpus";
 import { buildInstructions } from "@/lib/guide/prompt";
+import { showJourney, showPulse, showSkills, showSystems } from "@/lib/guide/show-tools";
 import { backIn, parseGuideRequest } from "@/lib/guide/request";
 import { searchPublic } from "@/lib/queries/search";
 import { getInquiryTypes } from "@/lib/queries/site";
@@ -108,8 +109,44 @@ export async function POST(request: Request) {
     openPage: flags[FLAGS.openPage] === true,
     searchSystems: flags[FLAGS.searchSystems] === true,
     draftInquiry: flags[FLAGS.draftInquiry] === true,
+    showSystems: flags[FLAGS.showSystems] === true,
+    showJourney: flags[FLAGS.showJourney] === true,
+    showSkills: flags[FLAGS.showSkills] === true,
+    showPulse: flags[FLAGS.showPulse] === true,
   };
   const tools: ToolSet = {};
+  // The card tools (docs/AI-GUIDE-PHASE1-PLAN.md §7): the model picks which records; the cards are read
+  // from the public views here, so they show exactly what the site does. Unknown keys are dropped.
+  const systemSlugs = corpus.paths.flatMap((p) => (/^\/systems\/[a-z0-9-]+$/.test(p) ? [p.slice("/systems/".length)] : []));
+  if (on.showSystems && systemSlugs.length > 0) {
+    tools.show_systems = {
+      description: "Show live cards for 1–4 of his published systems (status, stack, last activity) beside your answer, whenever you talk about specific systems.",
+      inputSchema: z.object({ slugs: z.array(z.enum(systemSlugs as [string, ...string[]])).min(1).max(4) }),
+      execute: async ({ slugs }: { slugs: string[] }) => showSystems(slugs),
+    };
+  }
+  if (on.showJourney) {
+    const year = z.number().int().min(1990).max(2100);
+    tools.show_journey = {
+      description: "Show his journey between two years (inclusive) as a timeline card, when you talk about when things happened.",
+      inputSchema: z.object({ from: year, to: year }),
+      execute: async ({ from, to }: { from: number; to: number }) => showJourney(from, to),
+    };
+  }
+  if (on.showSkills) {
+    tools.show_skills = {
+      description: "Show 1–6 skills, each with the published systems that prove it, when you talk about what he can do.",
+      inputSchema: z.object({ names: z.array(z.string().min(1).max(60)).min(1).max(6) }),
+      execute: async ({ names }: { names: string[] }) => showSkills(names),
+    };
+  }
+  if (on.showPulse) {
+    tools.show_pulse = {
+      description: "Show this site's live pulse — business rules enforced by its database, audited changes, the last GitHub sync — when you talk about how this platform is built or enforced.",
+      inputSchema: z.object({}),
+      execute: async () => showPulse(),
+    };
+  }
   if (on.openPage) {
     tools.open_page = {
       description: "Open a page on this site for the visitor, optionally scrolling to a section. Only the site's own paths.",

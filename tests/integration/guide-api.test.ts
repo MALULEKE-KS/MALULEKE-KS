@@ -20,7 +20,8 @@ import { POST } from "@/app/api/v1/guide/route";
 import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { db } from "@/lib/db";
 
-const FLAG_KEYS = ["concierge.enabled", "agent.open_page", "agent.search_systems", "agent.draft_inquiry"];
+const CARD_TOOLS = ["agent.show_systems", "agent.show_journey", "agent.show_skills", "agent.show_pulse"];
+const FLAG_KEYS = ["concierge.enabled", "agent.open_page", "agent.search_systems", "agent.draft_inquiry", ...CARD_TOOLS];
 const SETTING_KEYS = ["concierge.rateLimit.maxPerWindow", "concierge.dailyMessageCap", "concierge.corpusCacheSeconds"];
 let savedFlags: { key: string; enabled: boolean }[] = [];
 
@@ -100,7 +101,7 @@ describe("POST /api/v1/guide — switched off", () => {
 describe("POST /api/v1/guide — switched on", () => {
   beforeAll(async () => {
     await setFlag("concierge.enabled", true);
-    for (const k of ["agent.open_page", "agent.search_systems", "agent.draft_inquiry"]) await setFlag(k, false);
+    for (const k of ["agent.open_page", "agent.search_systems", "agent.draft_inquiry", ...CARD_TOOLS]) await setFlag(k, false);
   });
 
   it("rests politely when no model provider is configured", async () => {
@@ -172,6 +173,20 @@ describe("POST /api/v1/guide — switched on", () => {
   it("offers no tools while their flags are off (BR-4.4)", async () => {
     await (await ask(question("show me his systems"))).text();
     expect(calls[0]!.tools ?? []).toHaveLength(0);
+  });
+
+  it("offers the card tools only while their flags are on — read-only, the model picks real slugs only", async () => {
+    for (const k of CARD_TOOLS) await setFlag(k, true);
+    try {
+      await (await ask(question("what has he built?"))).text();
+      const names = (calls[0]!.tools ?? []).map((t) => t.name).sort();
+      expect(names).toEqual(["show_journey", "show_pulse", "show_skills", "show_systems"]);
+      const schema = calls[0]!.tools!.find((t) => t.name === "show_systems")!.inputSchema as { properties: { slugs: { items: { enum: string[] } } } };
+      expect(schema.properties.slugs.items.enum.length).toBeGreaterThan(0);
+      expect(schema.properties.slugs.items.enum.every((s) => /^[a-z0-9-]+$/.test(s))).toBe(true);
+    } finally {
+      for (const k of CARD_TOOLS) await setFlag(k, false);
+    }
   });
 
   it("offers exactly the tools whose flags are on — and never a submit tool (BR-4.1)", async () => {

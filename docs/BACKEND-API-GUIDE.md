@@ -126,7 +126,7 @@ Commits per week for each published system over the last 26 weeks — counts onl
 
 `guide` · public
 
-The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a).
+The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, shows live cards of systems, journey, skills and the site's pulse read from the public views, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a, docs/AI-GUIDE-PHASE1-PLAN.md).
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -136,6 +136,10 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 
 - `PublicFlag`
 - `VisitorLens`
+- `PublicSystem`
+- `PublicTimeline`
+- `SkillEvidence`
+- `PublicPlatformPulse`
 
 **Rules:** BR-2.4, BR-4.1, BR-4.2, BR-4.3, BR-4.4, BR-4.6
 
@@ -972,7 +976,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `PublicLedger` | home, admin.overview |
 | `PublicMetric` | home, metrics |
 | `PublicOrganization` | systems.catalog |
-| `PublicPlatformPulse` | platform.pulse |
+| `PublicPlatformPulse` | guide, platform.pulse |
 | `PublicProfile` | profile, cv |
 | `PublicProfileLink` | profile, cv |
 | `PublicProfilePhoto` | profile |
@@ -980,12 +984,12 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `PublicRepoCommit` | github |
 | `PublicSiteContent` | content |
 | `PublicSlugRedirect` | systems.caseStudy |
-| `PublicSystem` | home, systems.catalog, systems.caseStudy |
+| `PublicSystem` | guide, home, systems.catalog, systems.caseStudy |
 | `PublicSystemActivity` | activity |
 | `PublicSystemHome` | homes |
 | `PublicSystemScreenshot` | systems.caseStudy |
 | `PublicTestimonial` | systems.caseStudy |
-| `PublicTimeline` | journey |
+| `PublicTimeline` | guide, journey |
 | `PublicVisitorLens` | lenses |
 | `rate_limit_hit` | search, cv, inquiries.submit, admin.auth |
 | `RateLimitEntry` | admin.auth, admin.jobs |
@@ -995,7 +999,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `SiteContent` | admin.content |
 | `Skill` | skills, admin.cv |
 | `SkillCategory` | skills, lookups |
-| `SkillEvidence` | skills, cv |
+| `SkillEvidence` | guide, skills, cv |
 | `SkillOnEducation` | admin.cv |
 | `SkillOnExperience` | admin.cv |
 | `SkillOnSystem` | admin.systems |
