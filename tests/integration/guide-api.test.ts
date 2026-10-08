@@ -221,7 +221,12 @@ describe("POST /api/v1/guide — switched on", () => {
       expect((await ask(question("two"), ip)).status).toBe(200);
       const third = await ask(question("three"), ip);
       expect(third.status).toBe(429);
-      expect((await third.json()).error.code).toBe("RATE_LIMITED");
+      const limited = (await third.json()).error;
+      expect(limited.code).toBe("RATE_LIMITED");
+      // It says exactly what ran out and when it comes back (the browser shows the time in the visitor's zone).
+      expect(limited.details.limit).toBe(2);
+      expect(Date.parse(limited.details.resetsAt)).toBeGreaterThan(Date.now());
+      expect(limited.message).toMatch(/This device has used all 2/);
       // Another visitor is unaffected.
       expect((await ask(question("hello"), "10.9.9.10")).status).toBe(200);
     } finally {

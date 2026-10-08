@@ -42,7 +42,7 @@ lib/guide/cards.ts      tool outputs → card props (pure, unit-tested)
 
 ## 4. A — One console, in place (home)
 
-No collapsed bar, no brochure, no separate panel on the home page. The section opens **as the console**.
+No brochure and no separate panel on the home page. *(Amended by the owner the same day: the section stays a collapsible bar, closed by default, so visitors who didn't come for the AI scroll freely; opening it or asking unfolds this console in place.)*
 
 **Desktop (≥ lg):**
 ```

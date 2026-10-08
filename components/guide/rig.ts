@@ -27,6 +27,8 @@ export interface Rig {
   setLook(x: number, y: number, glance?: boolean): void;
   /** Queue text to be "spoken": the mouth follows its letters. */
   speak(text: string): void;
+  /** Stop speaking now: the queue is dropped and the mouth closes. */
+  hush(): void;
   setRunning(running: boolean): void;
   destroy(): void;
 }
@@ -169,6 +171,8 @@ function loadImage(url: string) {
   });
 }
 
+/** At ~15 letters a second, the mouth is never more than ~3 s behind the text. */
+const SPEECH_LAG_CHARS = 45;
 const VOWELS = new Set("aeiouAEIOU");
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -392,7 +396,13 @@ export async function createRig(canvas: HTMLCanvasElement, imageUrl: string, red
       if (glance) emphasis = 1.3;
     },
     speak(text) {
-      speech += text;
+      // Text streams in far faster than a mouth can say it: keep only the newest words,
+      // so the mouth stays with what's appearing instead of talking on for minutes after.
+      speech = (speech + text).slice(-SPEECH_LAG_CHARS);
+    },
+    hush() {
+      speech = "";
+      speechClock = 0;
     },
     setRunning,
     destroy() {
