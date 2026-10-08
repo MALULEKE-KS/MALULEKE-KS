@@ -6,8 +6,14 @@
 // measures once and draws every connection in one SVG, and the travelling
 // light is a CSS dash (the `beam-travel` keyframes in globals.css), not an
 // animated gradient per path. Hover or focus any node and its connections
-// light up in ember while the rest dims. Below lg the beams give way to a
-// grouped list; under prefers-reduced-motion the light doesn't travel.
+// light up in ember while the rest dims. The technologies are one wide,
+// wrapping cluster — every one of them a beam's end, the most used set larger
+// (home.map.techInGraph) — so the whole map fits on one screen instead of a
+// tall column (owner, 2026-10-08). A phone gets the same drawing, not a
+// different one (owner, same day): the three columns become three bands —
+// homes, the work, the technologies — and the beams run down between them.
+// Taps light a node's connections the way hover does. Under
+// prefers-reduced-motion the light doesn't travel.
 
 "use client";
 
@@ -56,16 +62,29 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
       const c = box.getBoundingClientRect();
       if (c.width === 0) return;
       const next: Path[] = [];
+      // Columns side by side from lg (Tailwind's 64rem); stacked bands below it.
+      const wide = window.matchMedia("(min-width: 64rem)").matches;
       for (const [from, to] of data.edges) {
         const a = nodes.current.get(from)?.getBoundingClientRect();
         const b = nodes.current.get(to)?.getBoundingClientRect();
         if (!a || !b || a.width === 0 || b.width === 0) continue;
-        const sx = a.right - c.left;
-        const sy = a.top + a.height / 2 - c.top;
-        const ex = b.left - c.left;
-        const ey = b.top + b.height / 2 - c.top;
-        const mx = (sx + ex) / 2;
-        next.push({ from, to, d: `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}` });
+        if (wide) {
+          // Side by side (wide screens): right edge to left edge.
+          const sx = a.right - c.left;
+          const sy = a.top + a.height / 2 - c.top;
+          const ex = b.left - c.left;
+          const ey = b.top + b.height / 2 - c.top;
+          const mx = (sx + ex) / 2;
+          next.push({ from, to, d: `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}` });
+        } else {
+          // Stacked (phones): bottom edge to top edge.
+          const sx = a.left + a.width / 2 - c.left;
+          const sy = a.bottom - c.top;
+          const ex = b.left + b.width / 2 - c.left;
+          const ey = b.top - c.top;
+          const my = (sy + ey) / 2;
+          next.push({ from, to, d: `M${sx},${sy} C${sx},${my} ${ex},${my} ${ex},${ey}` });
+        }
       }
       setSize({ w: c.width, h: c.height });
       setPaths(next);
@@ -98,8 +117,8 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
 
   return (
     <>
-      {/* lg and up: the drawing. */}
-      <div ref={container} className="relative hidden lg:grid lg:grid-cols-[1fr_1.25fr_0.9fr] lg:gap-x-20">
+      {/* The drawing: three bands on a phone, three columns from lg. */}
+      <div ref={container} className="relative grid grid-cols-1 gap-y-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.55fr)] lg:gap-x-14 lg:gap-y-0 xl:gap-x-20">
         <svg aria-hidden="true" width={size.w} height={size.h} className={cn("pointer-events-none absolute inset-0 overflow-visible", !onScreen && "[&_path]:[animation-play-state:paused]")}>
           {paths.map((p, i) => {
             const on = !lit || (lit.has(p.from) && lit.has(p.to));
@@ -128,178 +147,58 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
           </defs>
         </svg>
 
-        <Column title="GitHub homes">
+        <Column title="GitHub homes" className="max-lg:grid max-lg:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] max-lg:gap-2">
           {data.homes.map((n) => (
             <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />
           ))}
         </Column>
-        <Column title="The work">
+        <Column title="The work" className="max-lg:grid max-lg:grid-cols-2 max-lg:gap-2">
           {data.work.map((n) => (
-            <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />
+            <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} compactBelowLg {...hover(n.id)} />
           ))}
         </Column>
         <Column title="Built with" note={RANKING}>
           {data.tech.length > 0 ? (
-            <>
-              {data.tech.slice(0, data.techInGraph).map((n) => (
-                <NodeCard key={n.id} node={n} register={register} dim={lit !== null && !lit.has(n.id)} {...hover(n.id)} />
-              ))}
-              {data.tech.length > data.techInGraph && (
-                // Every other technology the work uses — listed, never dropped.
-                // Hover or focus lights its work, like a node does.
-                <div className="mt-2">
-                  <p className="text-line mb-2 text-[11px]">and {data.tech.length - data.techInGraph} more</p>
-                  <ul className="flex flex-wrap gap-1.5">
-                    {data.tech.slice(data.techInGraph).map((t) => (
-                      <li key={t.id}>
-                        <span
-                          tabIndex={0}
-                          title={t.sub}
-                          {...hover(t.id)}
-                          className={cn(
-                            "focus-visible:outline-ember inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] transition-[opacity,border-color] duration-300 focus-visible:outline-2",
-                            active === t.id ? "border-ember/60 text-paper" : "text-mist border-white/10",
-                            lit !== null && !lit.has(t.id) && "opacity-35",
-                          )}
-                        >
-                          {techMark(t.label)}
-                          {t.label}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </>
+            // Every technology the work uses — never dropped, every one joined to its work.
+            <ul className="flex flex-wrap content-center items-center gap-1.5">
+              {data.tech.map((t, i) => {
+                const lead = i < data.techInGraph;
+                return (
+                  <li key={t.id}>
+                    <span
+                      ref={register(t.id)}
+                      tabIndex={0}
+                      title={t.sub}
+                      {...hover(t.id)}
+                      className={cn(
+                        "focus-visible:outline-ember bg-night/85 relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color] duration-300 focus-visible:outline-2",
+                        lead ? "text-paper px-3 py-1.5 text-[13px] font-medium" : "text-mist px-2.5 py-1 text-[11.5px]",
+                        active === t.id ? "border-ember/70" : lead ? "border-white/15 hover:border-ember/50" : "border-white/10 hover:border-ember/50",
+                        lit !== null && !lit.has(t.id) && "opacity-30",
+                      )}
+                    >
+                      {techMark(t.label)}
+                      {t.label}
+                      <span className={cn("type-data text-[10.5px]", active === t.id ? "text-ember" : "text-line")}>{t.sub?.split(" ")[0]}</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
             <p className="text-mist text-sm">Technologies appear here as systems are curated.</p>
           )}
         </Column>
       </div>
-
-      {/* Below lg: the same map, drawn for a phone (owner, 2026-10-01: "the map doesn't show on mobile as it shows on a PC"). */}
-      <PhoneMap data={data} />
     </>
   );
 }
 
-/**
- * The map on a phone — a vertical tree, not a list: each GitHub home is a trunk
- * with a light running down it, each system branches off it carrying the
- * technologies it's built with. Tapping a technology (the phone's hover)
- * traces every system and home that uses it while the rest dims; tap it again,
- * or another, to change. System names stay links into their case studies, so
- * tracing never fights navigation. The light pauses off screen and stands
- * still under reduced motion.
- */
-function PhoneMap({ data }: { data: SystemMapData }) {
-  const box = useRef<HTMLDivElement>(null);
-  const [onScreen, setOnScreen] = useState(false);
-  const [tech, setTech] = useState<string | null>(null);
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setOnScreen(!!e?.isIntersecting), { rootMargin: "80px" });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  const techOf = useMemo(() => {
-    const m = new Map<string, MapNode[]>();
-    const byId = new Map(data.tech.map((t) => [t.id, t]));
-    for (const [a, b] of data.edges) {
-      const t = byId.get(b);
-      if (t) m.set(a, [...(m.get(a) ?? []), t]);
-    }
-    return m;
-  }, [data.edges, data.tech]);
-  const uses = (workId: string) => !tech || (techOf.get(workId) ?? []).some((t) => t.id === tech);
-
+function Column({ title, note, className, children }: { title: string; note?: string; className?: string; children: React.ReactNode }) {
   return (
-    <div ref={box} className="lg:hidden">
-      {data.tech.length > 0 && (
-        <div className="mb-6">
-          <p className="text-mist font-mono text-[11px] tracking-[0.14em] uppercase">Built with — tap to trace</p>
-          <p className="text-line mt-1 mb-2 text-[11px]">{RANKING}</p>
-          <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-            {data.tech.map((t) => {
-              const on = tech === t.id;
-              const mark = techMark(t.label);
-              return (
-                <li key={t.id} className="shrink-0">
-                  <button
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => setTech(on ? null : t.id)}
-                    className={cn(
-                      "focus-visible:outline-ember inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] whitespace-nowrap transition-colors focus-visible:outline-2",
-                      on ? "border-ember bg-ember/15 text-paper" : "text-mist border-white/12 bg-white/[0.04]",
-                    )}
-                  >
-                    {mark}
-                    {t.label}
-                    <span className={cn("type-data text-[11px]", on ? "text-ember" : "text-line")}>{t.sub?.split(" ")[0]}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      <div className="grid gap-5">
-        {data.homes.map((h) => {
-          const ids = new Set(data.edges.filter(([a]) => a === h.id).map(([, b]) => b));
-          const work = data.work.filter((w) => ids.has(w.id));
-          const homeLit = work.some((w) => uses(w.id));
-          return (
-            <div key={h.id} className={cn("rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-opacity duration-300", !homeLit && "opacity-35")}>
-              <NodeCard node={h} />
-              {/* The trunk: a hairline with a light running down it. */}
-              <ul className="relative mt-3 ml-[11px] grid gap-3 pl-6">
-                <span aria-hidden="true" className="absolute top-0 bottom-3 left-0 w-px overflow-hidden bg-white/12">
-                  <span
-                    className={cn(
-                      "absolute inset-x-0 h-16 bg-[linear-gradient(180deg,transparent,#ff5b1f,#ffb547,transparent)] motion-safe:animate-[trunk-light_3.6s_linear_infinite] motion-reduce:hidden",
-                      !onScreen && "[animation-play-state:paused]",
-                    )}
-                  />
-                </span>
-                {work.map((w) => {
-                  const lit = uses(w.id);
-                  const techs = techOf.get(w.id) ?? [];
-                  return (
-                    <li key={w.id} className={cn("relative transition-opacity duration-300", !lit && "opacity-30")}>
-                      {/* The branch from the trunk to this system. */}
-                      <span aria-hidden="true" className={cn("absolute top-5 -left-6 h-px w-5", lit && tech ? "bg-ember" : "bg-white/15")} />
-                      <NodeCard node={w} compact />
-                      {techs.length > 0 && (
-                        <ul className="mt-2 flex flex-wrap gap-1.5 pl-1">
-                          {techs.map((t) => (
-                            <li key={t.id} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]", tech === t.id ? "border-ember/60 text-paper" : "text-mist border-white/10")}>
-                              {techMark(t.label)}
-                              {t.label}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function Column({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
-  return (
-    <div className="relative flex flex-col justify-center gap-3">
-      <p className="text-mist mb-1 font-mono text-[11px] tracking-[0.14em] uppercase">{title}</p>
-      {note && <p className="text-line -mt-3 mb-1 text-[11px]">{note}</p>}
+    <div className={cn("relative flex flex-col justify-center gap-3", className)}>
+      <p className="text-mist mb-1 font-mono text-[11px] tracking-[0.14em] uppercase max-lg:col-span-full max-lg:mb-0">{title}</p>
+      {note && <p className="text-line -mt-3 mb-1 text-[11px] max-lg:col-span-full max-lg:-mt-1">{note}</p>}
       {children}
     </div>
   );
@@ -310,12 +209,15 @@ function NodeCard({
   register,
   dim = false,
   compact = false,
+  compactBelowLg = false,
   ...events
 }: {
   node: MapNode;
   register?: (id: string) => (el: HTMLElement | null) => void;
   dim?: boolean;
   compact?: boolean;
+  /** Two to a row on a phone: the second line waits for wide screens. */
+  compactBelowLg?: boolean;
 } & Partial<Record<"onMouseEnter" | "onMouseLeave" | "onFocus" | "onBlur", () => void>>) {
   const mark = node.kind === "tech" ? techMark(node.label) : null;
   const icon =
@@ -328,7 +230,7 @@ function NodeCard({
       {icon}
       <span className="min-w-0 flex-1">
         <span className={cn("block truncate", node.kind === "home" ? "text-paper text-[15px] font-semibold" : node.faint ? "text-mist text-sm" : "text-paper text-sm font-medium")}>{node.label}</span>
-        {node.sub && !compact && <span className="text-line block truncate text-[11px]">{node.sub}</span>}
+        {node.sub && !compact && <span className={cn("text-line truncate text-[11px]", compactBelowLg ? "hidden lg:block" : "block")}>{node.sub}</span>}
       </span>
       {node.href && <ArrowUpRight aria-hidden="true" className="text-line group-hover/n:text-ember size-3.5 shrink-0 transition-colors" />}
     </>

@@ -403,8 +403,8 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
             <div className="space-y-3">
               <Toggle checked={f.featuredOnHome} onChange={(v) => set("featuredOnHome", v)} label="On the home page" />
               <div>
-                <label htmlFor="homeOrder" className={adminLabel}>Home order</label>
-                <input id="homeOrder" type="number" min={0} className={adminInput} value={f.homeOrder} disabled={!f.featuredOnHome} onChange={(e) => set("homeOrder", Math.max(0, Math.trunc(Number(e.target.value)) || 0))} />
+                <label htmlFor="homeOrder" className={adminLabel} title="Featured: the order of the large cards. Not featured: above 0 puts it in the home page's More work, in this order.">Home order</label>
+                <input id="homeOrder" type="number" min={0} className={adminInput} value={f.homeOrder} onChange={(e) => set("homeOrder", Math.max(0, Math.trunc(Number(e.target.value)) || 0))} />
               </div>
             </div>
             <div className="space-y-3">

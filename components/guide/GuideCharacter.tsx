@@ -1,11 +1,12 @@
 // components/guide/GuideCharacter.tsx
 // The AI guide's body on the page (PUBLIC-REDESIGN-PLAN §3a). The static
 // master image renders first — the page never waits for the rig — then the
-// WebGL rig takes over once it has loaded. It follows the pointer while the
-// visitor is near, renders only while visible, and holds still for
-// prefers-reduced-motion. Pose frames (wave, point) cross-fade over the rig
-// for a moment when the guide greets or shows something. Decorative for
-// assistive tech: the chat is the accessible interface.
+// WebGL rig takes over once it has loaded. It holds one still pose (owner,
+// 2026-10-08: no pose changes) and turns its head and eyes toward the pointer,
+// and toward wherever the visitor clicks or taps — on a phone, a tap or a drag
+// (even one that scrolls the page) is how it gets looked at. It renders only while visible and holds still for
+// prefers-reduced-motion. Decorative for assistive tech: the chat is the
+// accessible interface.
 
 "use client";
 
@@ -17,11 +18,6 @@ import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 const MASTER = "/character/guide-master.webp";
-const POSES = {
-  wave: "/character/guide-wave.webp",
-  point: "/character/guide-point.webp",
-  thinking: "/character/guide-thinking.webp",
-} as const;
 
 export function GuideCharacter({
   className,
@@ -33,15 +29,13 @@ export function GuideCharacter({
   /** The hero instance tells the provider when it is on screen, so the docked launcher steps aside. */
   reportInView?: boolean;
 }) {
-  const { registerRig, mood, pose, setHeroInView } = useGuide();
+  const { registerRig, mood, setHeroInView } = useGuide();
   const reducedMotion = usePrefersReducedMotion();
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const rigRef = useRef<Rig | null>(null);
   const img = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
-  // Poses load on first use or once the page is idle — not with the first view (spec WP-102).
-  const [posesWanted, setPosesWanted] = useState(false);
 
   // Build the rig once the page is interactive; keep the static image if WebGL2 isn't there.
   useEffect(() => {
@@ -108,10 +102,11 @@ export function GuideCharacter({
     };
   }, [ready]);
 
-  // Follow the pointer: head and eyes turn toward it, most strongly when it's near.
+  // Follow the visitor: the head and eyes turn toward the pointer as it moves,
+  // and turn deliberately toward a click or a tap anywhere on the page.
   useEffect(() => {
     if (!ready || reducedMotion) return;
-    const onMove = (e: PointerEvent) => {
+    const lookAt = (e: { clientX: number; clientY: number }, glance: boolean) => {
       const el = box.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
@@ -120,37 +115,29 @@ export function GuideCharacter({
       // Up and down count as much as left and right: the vertical span is the face-to-screen-edge distance.
       rigRef.current?.setLook(
         (e.clientX - cx) / (r.width * 1.1),
-        (e.clientY - cy) / Math.max(r.height * 0.45, 160)
+        (e.clientY - cy) / Math.max(r.height * 0.45, 160),
+        glance
       );
       if (mood === "idle") rigRef.current?.setMood("attentive");
     };
+    const onMove = (e: PointerEvent) => e.isPrimary && lookAt(e, false);
+    const onDown = (e: PointerEvent) => e.isPrimary && lookAt(e, true);
+    // On a phone a drag scrolls the page, which cancels pointer events — follow the finger anyway.
+    const onTouch = (e: TouchEvent) => e.touches[0] && lookAt(e.touches[0], false);
     const onLeave = () => {
       if (mood === "idle") rigRef.current?.setMood("idle");
     };
     window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("touchmove", onTouch, { passive: true });
     document.addEventListener("pointerleave", onLeave);
     return () => {
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("touchmove", onTouch);
       document.removeEventListener("pointerleave", onLeave);
     };
   }, [ready, reducedMotion, mood]);
-
-  // A flashed pose (wave, point) wins; otherwise the thinking frame shows for as long as the guide is thinking.
-  const shown: keyof typeof POSES | null = reducedMotion
-    ? null
-    : pose !== "none"
-      ? pose
-      : mood === "thinking"
-        ? "thinking"
-        : null;
-  const posing = shown !== null;
-  useEffect(() => {
-    if (reducedMotion || posesWanted) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- a pose is needed now; mount the frames
-    if (shown) return setPosesWanted(true);
-    const t = window.setTimeout(() => setPosesWanted(true), 6000);
-    return () => window.clearTimeout(t);
-  }, [shown, posesWanted, reducedMotion]);
 
   return (
     <div
@@ -174,23 +161,9 @@ export function GuideCharacter({
         ref={canvas}
         className={cn(
           "absolute inset-0 size-full transition-opacity duration-300",
-          ready && !posing ? "opacity-100" : "opacity-0"
+          ready ? "opacity-100" : "opacity-0"
         )}
       />
-      {posesWanted &&
-        (Object.keys(POSES) as (keyof typeof POSES)[]).map((key) => (
-          <Image
-            key={key}
-            src={POSES[key]}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 420px, 60vw"
-            className={cn(
-              "object-contain transition-opacity duration-300",
-              shown === key ? "opacity-100" : "opacity-0"
-            )}
-          />
-        ))}
     </div>
   );
 }

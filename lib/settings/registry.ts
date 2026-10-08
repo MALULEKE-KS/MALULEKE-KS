@@ -148,13 +148,13 @@ export const SETTINGS = {
   }),
   "concierge.maxMessagesPerConversation": define({
     schema: z.number().int().min(2).max(100),
-    default: 20,
+    default: 40,
     description: "Questions a visitor can ask in one conversation with the AI guide.",
     rule: "Constitution §6",
   }),
   "concierge.rateLimit.maxPerWindow": define({
     schema: z.number().int().min(1).max(500),
-    default: 40,
+    default: 60,
     description: "Questions one visitor can ask the AI guide per window.",
     rule: "BR-2.4",
   }),
@@ -173,7 +173,7 @@ export const SETTINGS = {
   "concierge.dailyMessageCap": define({
     // The spend cap: past it the guide rests until tomorrow and offers the contact form.
     schema: z.number().int().min(10).max(20000),
-    default: 30,
+    default: 500,
     description: "Questions the AI guide answers per day across every visitor — the spending cap.",
     rule: "Constitution §6",
   }),
@@ -330,7 +330,7 @@ export const SETTINGS = {
   "home.map.techInGraph": define({
     schema: z.number().int().min(4).max(30),
     default: 12,
-    description: "Technologies drawn as nodes in the home page's system map (the most used first); the rest are listed beneath it.",
+    description: "Technologies set larger in the home page's system map (the most used first); every other one is still drawn and joined to its work, smaller.",
     rule: "PUBLIC-REDESIGN-PLAN §3.4",
   }),
   "home.map.reposPerHome": define({

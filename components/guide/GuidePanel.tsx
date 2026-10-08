@@ -40,15 +40,18 @@ import { INQUIRY_DRAFT_KEY } from "@/lib/guide/keys";
 import { cn } from "@/lib/utils";
 
 
-function readError(error: Error | undefined): string | null {
+/** A limit the visitor can't retry past right away — the message says when answers come back. */
+const RESTING = new Set(["RATE_LIMITED", "GUIDE_RESTING", "CONVERSATION_LIMIT"]);
+
+function readError(error: Error | undefined): { text: string; resting: boolean } | null {
   if (!error) return null;
   try {
-    const parsed = JSON.parse(error.message) as { error?: { message?: string } };
-    if (parsed.error?.message) return parsed.error.message;
+    const parsed = JSON.parse(error.message) as { error?: { code?: string; message?: string } };
+    if (parsed.error?.message) return { text: parsed.error.message, resting: RESTING.has(parsed.error.code ?? "") };
   } catch {
     // Not a JSON error body.
   }
-  return "The guide couldn't answer just now — try again in a moment.";
+  return { text: "The guide couldn't answer just now — try again in a moment.", resting: false };
 }
 
 function textOf(message: UIMessage) {
@@ -86,7 +89,7 @@ export function GuidePanel({
   /** Questions for particular pages, shown first there (the same block). */
   pageSuggestions?: PageSuggestions[];
 }) {
-  const { enabled, ready, linkHosts, open, setOpen, ownerFirstName, lenses, lens, setLens, pending, clearPending, setMood, speak, flashPose } = useGuide();
+  const { enabled, ready, linkHosts, open, setOpen, ownerFirstName, lenses, lens, setLens, pending, clearPending, setMood, speak } = useGuide();
   const router = useRouter();
   const pathname = usePathname();
   const [input, setInput] = useState("");
@@ -117,7 +120,6 @@ export function GuidePanel({
           return;
         }
         const hash = section ? `#${section.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}` : "";
-        flashPose("point");
         router.push(`${path}${hash}`);
         addToolOutput({ tool: "open_page", toolCallId: toolCall.toolCallId, output: { opened: path } });
       }
@@ -227,7 +229,7 @@ export function GuidePanel({
 
   if (!enabled) return null;
 
-  const errorText = readError(error);
+  const failure = readError(error);
   const tooLong = input.length > maxQuestionCharacters;
   // This page's questions first, then the general ones — never more than four.
   const opening = [...new Set([...questionsFor(pathname, pageSuggestions), ...suggestions])].slice(0, 4);
@@ -425,19 +427,23 @@ export function GuidePanel({
               </p>
             </GuideRow>
           )}
-          {errorText && (
-            <p role="alert" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs">
-              {errorText}{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  clearError();
-                  void regenerate();
-                }}
-                className="text-paper inline-flex items-center gap-1 underline underline-offset-2"
-              >
-                <RefreshCw aria-hidden="true" className="size-3" /> Try again
-              </button>{" "}
+          {failure && (
+            <p role="alert" className={cn("rounded-xl border px-3 py-2 text-xs", failure.resting ? "border-ember/30 bg-ember/10" : "border-white/10 bg-white/5")}>
+              {failure.text}{" "}
+              {!failure.resting && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearError();
+                      void regenerate();
+                    }}
+                    className="text-paper inline-flex items-center gap-1 underline underline-offset-2"
+                  >
+                    <RefreshCw aria-hidden="true" className="size-3" /> Try again
+                  </button>{" "}
+                </>
+              )}
               {pathname !== "/contact" && (
                 <a href="/contact" className="text-ember underline underline-offset-2">
                   Write to {ownerFirstName}
