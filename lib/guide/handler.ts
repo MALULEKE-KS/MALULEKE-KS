@@ -305,9 +305,12 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   const verifyOnce = (): Verification => {
     if (verification) return verification;
     verification = verifyAnswer({ answer: answerText, question: lastQuestion, corpus, maxFlagged: verifierMaxFlagged });
-    // A question the site couldn't answer (or the guide answered beyond the site's data) is kept for the owner — scrubbed, if allowed.
-    if (looksUnanswered(answerText)) waitUntil(recordGap({ question: lastQuestion, reason: "unanswered", page }));
-    else if (verification.flagged.length > 0) waitUntil(recordGap({ question: lastQuestion, reason: "unverified", page }));
+    // A question the site couldn't answer (or the guide answered beyond the site's data) is kept for the owner — scrubbed, if
+    // allowed. The nightly self-check's own fixed questions are not visitors' and never go in that log.
+    if (source === "visitor") {
+      if (looksUnanswered(answerText)) waitUntil(recordGap({ question: lastQuestion, reason: "unanswered", page }));
+      else if (verification.flagged.length > 0) waitUntil(recordGap({ question: lastQuestion, reason: "unverified", page }));
+    }
     return verification;
   };
 
