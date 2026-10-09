@@ -19,4 +19,6 @@ jobs:
         with:
           node-version: "24"
       - name: Every core page reports the deployed build
-        run: node scripts/smoke-build.mjs "${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}" "${{ github.event.deployment.sha }}"
+        # The production domain (repository variable PRODUCTION_URL): a deployment's own address is behind
+        # Vercel's login, so it can't be read. Falls back to it if the variable isn't set.
+        run: node scripts/smoke-build.mjs "${{ vars.PRODUCTION_URL || github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}" "${{ github.event.deployment.sha }}"
