@@ -19,5 +19,9 @@ export const config: VercelConfig = {
   // Literals on purpose: Vercel evaluates this file on its own, without the
   // app's modules — tests/unit/vercel-config.test.ts keeps them equal to
   // DAILY_CRON_PATH / DAILY_CRON_SCHEDULE.
-  crons: [{ path: "/api/cron/daily", schedule: "0 3 * * *" }],
+  // The AI guide's canary has its own entry so it keeps its own time budget (lib/jobs/schedule.ts).
+  crons: [
+    { path: "/api/cron/daily", schedule: "0 3 * * *" },
+    { path: "/api/cron/guide.canary", schedule: "30 1 * * *" },
+  ],
 };

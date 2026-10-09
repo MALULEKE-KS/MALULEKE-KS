@@ -37,8 +37,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 **The AI guide** — Docked launcher and the chat panel (the same console and conversation)
 
 - Call `POST /guide`
+- Call `POST /guide/warm`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Platform pulse** — Footer status line
 
@@ -82,8 +84,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 **The AI guide** — Hero: the character, greeting and lens chips; The AI guide's console: the character at work, the trail, live cards and sources
 
 - Call `POST /guide`
+- Call `POST /guide/warm`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Platform pulse** — Control room
 
@@ -198,8 +202,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 **The AI guide** — A draft from the guide, for the visitor to review and send
 
 - Call `POST /guide`
+- Call `POST /guide/warm`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Let's Talk — send a message** — What brings you here? — the category tiles (GET /inquiries/types); The form shaped to the category, and the confirmation with its reference
 
@@ -412,6 +418,15 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/freshness/{kind}/{id}/reviewed`
 - Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
 - The threshold is the setting content.freshnessDays (default 90).
+
+### /admin/guide
+
+**AI guide health** — Guide health: daily self-check, questions, failures, timings, models, per-day chart, latest turns
+
+- Call `GET /admin/guide/health`
+- The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.
+- The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.
 
 ### /admin/inquiries
 
@@ -626,6 +641,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /github/commits` | Public GitHub work | public |
 | `GET /activity` | Weekly build activity | public |
 | `POST /guide` | The AI guide | public |
+| `POST /guide/warm` | The AI guide | public |
 | `GET /platform/pulse` | Platform pulse | public |
 | `GET /home` | Homepage | public |
 | `GET /content/{key}` | Page content blocks | public |
@@ -754,3 +770,4 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
 | `GET /admin/jobs` | Scheduled jobs and their runs | admin |
 | `POST /admin/jobs/{job}/run` | Scheduled jobs and their runs | admin |
+| `GET /admin/guide/health` | AI guide health | admin |

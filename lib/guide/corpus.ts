@@ -25,6 +25,7 @@ import { getPlatformPulse } from "@/lib/queries/profile";
 import { getEvidence } from "@/lib/evidence";
 import { SHEETS } from "@/lib/content/sheets";
 import { formatMilestoneDate } from "@/lib/rules/timeline";
+import { dateWithAgo, periodWords, relativeTo, sinceYearWords, spanWords } from "@/lib/guide/time";
 
 /** Rough token estimate — about four characters a token for English prose. */
 export const estimateTokens = (text: string) => Math.ceil(text.length / 4);
@@ -33,6 +34,19 @@ const day = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 10) : 
 const month = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 7) : null);
 const list = (xs: (string | null | undefined)[]) => xs.filter(Boolean).join(", ");
 
+/**
+ * Facts the guide's instant lane answers from without asking a model
+ * (lib/guide/instant.ts) — the same data, structured, that the knowledge text is
+ * written from, so the two can never disagree.
+ */
+export interface GuideFacts {
+  email: string | null;
+  reviewSlaHours: number;
+  cv: { label: string; formats: string[] }[];
+  systems: { total: number; privateCount: number; byStatus: { status: string; count: number }[] };
+  pulse: { rulesEnforcedByDatabase: number; auditEventsLast7Days: number; auditEventsTotal: number };
+}
+
 export interface GuideCorpus {
   text: string;
   tokens: number;
@@ -40,6 +54,7 @@ export interface GuideCorpus {
   paths: string[];
   ownerName: string;
   ownerFirstName: string;
+  facts: GuideFacts;
 }
 
 async function load() {
@@ -84,7 +99,7 @@ function languageShare(languages: unknown): string | null {
     .join(", ");
 }
 
-function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null): string {
+function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number | null, readmeChars: number | null, now: Date): string {
   const { profile, links, titles, homes, systems, impacts, experience, education, achievements, timeline, metrics, skills, method, reviewSlaHours, cvOptions, repos, commits, journey, evidence, pulse, inquiryTypes, release } = data;
   const out: string[] = [];
   const section = (title: string, source: string) => out.push("", `## ${title} (source: ${source})`);
@@ -95,7 +110,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
     if (profile.headline) out.push(`Headline: ${profile.headline}`);
     out.push(`Role: ${profile.role}`);
     if (profile.location) out.push(`Location: ${profile.location}`);
-    if (profile.buildingSinceYear) out.push(`Building software since: ${profile.buildingSinceYear}`);
+    if (profile.buildingSinceYear) out.push(`Building software: ${sinceYearWords(profile.buildingSinceYear, now)}`);
     if (profile.availability) out.push(`Availability: ${profile.availability}`);
     if (profile.summary) out.push(`Summary: ${profile.summary}`);
     if (profile.bio) out.push(`Bio: ${profile.bio}`);
@@ -121,7 +136,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   section("This platform, live", "/");
   out.push(
     `This site is itself one of his published systems (its stack and case study are in its entry under Systems), and its rules are enforced in the database, not just the UI. Right now: ${pulse.rulesEnforcedByDatabase} business rules enforced by the database; ${pulse.auditEventsLast7Days} audited changes in the last 7 days (${pulse.auditEventsTotal} in all).` +
-      (pulse.lastGithubSyncAt ? ` Last GitHub sync: ${pulse.lastGithubSyncAt.slice(0, 10)}.` : "") +
+      (pulse.lastGithubSyncAt ? ` Last GitHub sync: ${dateWithAgo(new Date(pulse.lastGithubSyncAt), now)}.` : "") +
       (pulse.deployment ? ` Running build: ${pulse.deployment.commit}.` : ""),
   );
   if (release) out.push(`Version: ${release.current}${release.next ? ` — ${release.next}${release.nextNote ? ` ${release.nextNote}` : ""}` : ""}.`);
@@ -132,8 +147,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   }
 
   if (repos.length) {
-    const now = Date.now();
-    const recent = (days: number) => commits.filter((c) => now - c.committedAt.getTime() <= days * 86_400_000).length;
+    const recent = (days: number) => commits.filter((c) => now.getTime() - c.committedAt.getTime() <= days * 86_400_000).length;
     section("GitHub — every public repo, from the first to the latest", "GitHub");
     out.push(
       `${repos.length} public repositories across his homes. Commits seen in the last 7 days: ${recent(7)}; last 30 days: ${recent(30)}. ` +
@@ -145,7 +159,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
         "",
         `### ${r.fullName} — ${r.name} (source: ${r.published && r.slug ? `/systems/${r.slug}` : `https://github.com/${r.fullName}`})`,
         `Home: ${r.home}. ${r.published ? "Written up on the site." : "Not written up on the site yet."} GitHub: https://github.com/${r.fullName}`,
-        `Started: ${day(r.createdAt) ?? "unknown"}. Last push: ${day(r.pushedAt) ?? "unknown"}. Commits in the last 4 weeks: ${r.commitsLast4Weeks}; last year: ${r.commitsLastYear}.${r.stars ? ` Stars: ${r.stars}.` : ""}`,
+        `Started: ${r.createdAt ? dateWithAgo(r.createdAt, now) : "unknown"}. Last push: ${r.pushedAt ? dateWithAgo(r.pushedAt, now) : "unknown"}. Commits in the last 4 weeks: ${r.commitsLast4Weeks}; last year: ${r.commitsLastYear}.${r.stars ? ` Stars: ${r.stars}.` : ""}`,
         `About: ${r.description}`,
       );
       const langs = languageShare(r.languages);
@@ -157,12 +171,23 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
       }
       if (own.length) {
         out.push("Recent changes:");
-        for (const c of own) out.push(`  - ${day(c.committedAt)}: ${c.message}`);
+        for (const c of own) out.push(`  - ${dateWithAgo(c.committedAt, now)}: ${c.message}`);
       }
     }
   }
 
   section("Systems — every published system", "/systems");
+  {
+    // Counted here, in code, so the guide quotes a total rather than counting by eye.
+    const byStatus = new Map<string, number>();
+    for (const s of systems) byStatus.set(s.status, (byStatus.get(s.status) ?? 0) + 1);
+    const privateCount = systems.filter((s) => s.repoPrivate).length;
+    out.push(
+      `Counts (computed): ${systems.length} published system${systems.length === 1 ? "" : "s"}` +
+        (byStatus.size ? ` — ${[...byStatus].map(([status, n]) => `${n} ${status}`).join(", ")}` : "") +
+        `; ${privateCount} with a private repository.`,
+    );
+  }
   for (const s of systems) {
     const own = impacts.filter((i) => i.systemId === s.id).map((i) => `${i.label}: ${i.value}`);
     out.push(
@@ -184,7 +209,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
   if (experience.length) {
     section("Experience", "/journey");
     for (const e of experience) {
-      out.push(`- ${e.title}, ${e.organization}${e.location ? `, ${e.location}` : ""} — ${month(e.startDate)} to ${month(e.endDate) ?? "present"}. ${e.description}`);
+      out.push(`- ${e.title}, ${e.organization}${e.location ? `, ${e.location}` : ""} — ${periodWords(e.startDate, e.endDate, now)}. ${e.description}`);
       for (const h of e.highlights) out.push(`  - ${h}`);
       if (e.skills.length) out.push(`  Skills: ${e.skills.join(", ")}`);
     }
@@ -194,7 +219,7 @@ function render(data: Awaited<ReturnType<typeof load>>, caseStudyChars: number |
     section("Education", "/journey");
     for (const e of education) {
       out.push(
-        `- ${e.qualification}${e.fieldOfStudy ? ` in ${e.fieldOfStudy}` : ""}, ${e.institution} — from ${month(e.startDate)}${e.endDate ? ` to ${month(e.endDate)}` : e.expectedGraduation ? `, expected ${month(e.expectedGraduation)}` : ", in progress"}.${e.honors ? ` ${e.honors}.` : ""}${e.description ? ` ${e.description}` : ""}`,
+        `- ${e.qualification}${e.fieldOfStudy ? ` in ${e.fieldOfStudy}` : ""}, ${e.institution} — from ${month(e.startDate)}${e.endDate ? ` to ${month(e.endDate)}` : e.expectedGraduation ? `, expected ${month(e.expectedGraduation)} (${relativeTo(e.expectedGraduation, now)}); studying for ${spanWords(e.startDate, now)} so far` : ", in progress"}.${e.honors ? ` ${e.honors}.` : ""}${e.description ? ` ${e.description}` : ""}`,
       );
       if (e.coursework.length) out.push(`  Coursework: ${e.coursework.join(", ")}`);
     }
@@ -266,13 +291,34 @@ export const getGuideCorpus = cache(async (budgetTokens: number, maxAgeSeconds =
   return value;
 });
 
+function factsOf(data: Awaited<ReturnType<typeof load>>): GuideFacts {
+  const byStatus = new Map<string, number>();
+  for (const s of data.systems) byStatus.set(s.status, (byStatus.get(s.status) ?? 0) + 1);
+  return {
+    email: data.profile?.email ?? null,
+    reviewSlaHours: data.reviewSlaHours,
+    cv: data.cvOptions.map((o) => ({ label: o.label, formats: o.formats })),
+    systems: {
+      total: data.systems.length,
+      privateCount: data.systems.filter((s) => s.repoPrivate).length,
+      byStatus: [...byStatus].map(([status, count]) => ({ status, count })),
+    },
+    pulse: {
+      rulesEnforcedByDatabase: data.pulse.rulesEnforcedByDatabase,
+      auditEventsLast7Days: data.pulse.auditEventsLast7Days,
+      auditEventsTotal: data.pulse.auditEventsTotal,
+    },
+  };
+}
+
 async function buildCorpus(budgetTokens: number): Promise<GuideCorpus> {
   const data = await load();
   // Past the budget, shorten in steps: READMEs first, then case studies too.
-  let text = render(data, null, null);
+  const now = new Date();
+  let text = render(data, null, null, now);
   for (const [caseChars, readmeChars] of [[null, 1200], [2000, 600], [800, 300], [300, 0]] as const) {
     if (estimateTokens(text) <= budgetTokens) break;
-    text = render(data, caseChars, readmeChars);
+    text = render(data, caseChars, readmeChars, now);
   }
   const name = data.profile?.displayName ?? "the owner";
   return {
@@ -281,5 +327,6 @@ async function buildCorpus(budgetTokens: number): Promise<GuideCorpus> {
     paths: [...SHEETS.map((s) => s.href), ...data.systems.map((s) => `/systems/${s.slug}`)],
     ownerName: name,
     ownerFirstName: name.split(/\s+/)[0] ?? name,
+    facts: factsOf(data),
   };
 }

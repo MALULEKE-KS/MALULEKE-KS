@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**33 capabilities · 136 endpoints.**
+**34 capabilities · 138 endpoints.**
 
 ## Public
 
@@ -131,6 +131,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `POST /guide`
+- `POST /guide/warm`
 
 **Database**
 
@@ -140,6 +141,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 - `PublicTimeline`
 - `SkillEvidence`
 - `PublicPlatformPulse`
+- `PublicSiteContent`
 
 **Rules:** BR-2.4, BR-4.1, BR-4.2, BR-4.3, BR-4.4, BR-4.6
 
@@ -147,6 +149,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 ### Platform pulse
 
@@ -922,6 +925,30 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
 - github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
+### AI guide health
+
+`admin.guide-health` · admin
+
+How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns; plus the nightly self-check (a few fixed questions put through the live guide and checked by plain rules). Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1, §4 B4).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /admin/guide/health`
+
+**Database**
+
+- `GuideTurn`
+- `GuideEvalRun`
+- `prune_guide_logs`
+
+**Rules:** BR-4.3, BR-4.6, BR-5.2
+
+**Notes**
+
+- The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.
+- The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.
+
 ## Database objects → capabilities
 
 | Object | Used by |
@@ -938,6 +965,8 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `Education` | admin.cv, admin.freshness |
 | `Experience` | admin.cv, admin.freshness |
 | `Flag` | admin.settings |
+| `GuideEvalRun` | admin.guide-health |
+| `GuideTurn` | admin.guide-health |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
 | `InquiryDocument` | inquiries.submit, admin.inquiries |
@@ -963,6 +992,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `ProfileTitle` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `prune_expired` | admin.jobs |
+| `prune_guide_logs` | admin.guide-health |
 | `PublicAchievement` | achievements, cv |
 | `PublicAffiliation` | profile |
 | `PublicCvOption` | cv |
@@ -982,7 +1012,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `PublicProfilePhoto` | profile |
 | `PublicProfileTitle` | profile |
 | `PublicRepoCommit` | github |
-| `PublicSiteContent` | content |
+| `PublicSiteContent` | guide, content |
 | `PublicSlugRedirect` | systems.caseStudy |
 | `PublicSystem` | guide, home, systems.catalog, systems.caseStudy |
 | `PublicSystemActivity` | activity |

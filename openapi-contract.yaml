@@ -1419,11 +1419,17 @@ paths:
                 lens: { type: string, maxLength: 60, nullable: true, description: "The visitor's lens key (GET /lenses)" }
                 page: { type: string, maxLength: 200, nullable: true, description: "The site path the visitor is on, e.g. /systems/xkimi-xa-mali — used only if it is one of the site's own pages ('this system' means that one)" }
       responses:
-        "200": { description: "text/event-stream — the AI SDK UI message stream. When the model and its fallbacks are all busy, the stream ends with a 'busy, try again in a minute' error" }
+        "200": { description: "text/event-stream — the AI SDK UI message stream. When the model and its fallbacks are all busy, the stream ends with a 'busy, try again in a minute' error. Questions that are pure site data (how to contact him, the CV, how many systems, the platform's live numbers) are answered from the data with no model, before any limit is spent and even with no model configured — the same stream, from the guide-instant wording (flag concierge.instant_lane)" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "404": { description: "GUIDE_OFF — the guide is switched off" }
         "429": { description: "RATE_LIMITED, CONVERSATION_LIMIT or GUIDE_RESTING (the daily cap)" }
         "503": { description: "GUIDE_UNAVAILABLE — no model provider configured" }
+  /guide/warm:
+    post:
+      tags: [Home (Public)]
+      summary: "Get the AI guide ready before the first question — reads what it knows into the server's short-lived memory and checks the model list. No model work, no limit spent, no body; does nothing while the guide is off"
+      responses:
+        "204": { description: "Done (or nothing to do)" }
   /lenses:
     get: { tags: [Home (Public)], summary: "The visitor lenses the home page and the AI guide open with, in the owner's order — key and label only (Constitution §4)", responses: { "200": { description: "{ data: [{ key, label }] }" } } }
   /platform/pulse:
@@ -1615,6 +1621,8 @@ paths:
     post: { tags: [Overview (Admin)], summary: "Mark content reviewed — still accurate; its clock restarts (BR-1.16)", security: [{ adminSession: [] }], parameters: [{ name: kind, in: path, required: true, schema: { type: string, enum: [system, experience, education, profile] } }, { name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ kind, id, reviewedAt }" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/jobs:
     get: { tags: [Jobs (Admin)], summary: "List registered jobs (with schedule) and recent runs (with what started each)", security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: "{ jobs: [{ name, description, rules, schedule }], data: [{ id, job, status, startedAt, finishedAt, durationMs, summary, error, trigger, adminUserId }] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+  /admin/guide/health:
+    get: { tags: [AI guide (Admin)], summary: "AI guide speed and reliability over 1, 7 or 30 days — from GuideTurn metrics (no visitor text)", security: [{ adminSession: [] }], parameters: [{ name: days, in: query, schema: { type: integer, enum: [1, 7, 30], default: 7 } }], responses: { "200": { description: "{ days, summary: { turns, answered, instant, busy, errors, aborted, limited, resting, fallbackRate, failureRate, firstTokenMs: { p50, p95 }, totalMs: { p50, p95 }, avgInputTokens, avgOutputTokens, cacheShare, models: [{ model, turns }] }, perDay: [{ day, turns, failed }], recent: [{ id, at, outcome, servedModel, fallbackUsed, firstTokenMs, totalMs, tools, finishReason }], canary: [{ id, at, model, total, passed, failed, unavailable, results: [{ id, category, pass, problems }] }] } — visitors only; the canary is listed separately" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
   /admin/jobs/{job}/run:
     post: { tags: [Jobs (Admin)], summary: "Run a registered job now (#94) — same runner and lock as the schedule, recorded as started by this admin", security: [{ adminSession: [] }], parameters: [{ name: job, in: path, required: true, schema: { type: string, enum: [maintenance.daily, metrics.compute, github.sync] } }], responses: { "200": { description: "{ status: succeeded, runId, result }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "ALREADY_RUNNING" }, "500": { description: "{ status: failed, runId, error } — the run is recorded with its error" } } }
 

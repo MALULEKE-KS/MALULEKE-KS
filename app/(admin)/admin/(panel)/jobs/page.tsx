@@ -7,7 +7,7 @@ import { ListChecks } from "lucide-react";
 import { AdminPageHeader, EmptyState, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { db } from "@/lib/db";
 import { JOBS } from "@/lib/jobs/registry";
-import { DAILY_CRON_SCHEDULE, DAILY_JOBS } from "@/lib/jobs/schedule";
+import { DAILY_CRON_SCHEDULE, scheduleFor } from "@/lib/jobs/schedule";
 import { RunNowButton } from "./_components/RunNowButton";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export default async function AdminJobsPage({ searchParams }: { searchParams: Pr
         {Object.entries(JOBS).map(([name, def]) => {
           const last = lastByJob.get(name);
           return (
-            <Panel key={name} title={name} description={(DAILY_JOBS as readonly string[]).includes(name) ? "Daily" : "On demand"}>
+            <Panel key={name} title={name} description={scheduleFor(name) ? (name === "guide.canary" ? "Daily, own schedule" : "Daily") : "On demand"}>
               <p className="text-sm text-slate">{def.description}</p>
               <p className="mt-2 font-mono text-xs text-slate">{def.rules.join(" · ")}</p>
               <div className="mt-4 flex items-center justify-between gap-3">

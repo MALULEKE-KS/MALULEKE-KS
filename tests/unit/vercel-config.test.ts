@@ -5,11 +5,14 @@
 
 import { describe, expect, it } from "vitest";
 import { config } from "@/vercel";
-import { DAILY_CRON_PATH, DAILY_CRON_SCHEDULE } from "@/lib/jobs/schedule";
+import { CANARY_CRON_PATH, CANARY_CRON_SCHEDULE, DAILY_CRON_PATH, DAILY_CRON_SCHEDULE } from "@/lib/jobs/schedule";
 
 describe("vercel.ts", () => {
-  it("schedules exactly the daily cron the scheduler defines", () => {
-    expect(config.crons).toEqual([{ path: DAILY_CRON_PATH, schedule: DAILY_CRON_SCHEDULE }]);
+  it("schedules exactly the crons the scheduler defines: the daily batch and the AI guide's canary", () => {
+    expect(config.crons).toEqual([
+      { path: DAILY_CRON_PATH, schedule: DAILY_CRON_SCHEDULE },
+      { path: CANARY_CRON_PATH, schedule: CANARY_CRON_SCHEDULE },
+    ]);
   });
 
   it("imports nothing from the application", async () => {

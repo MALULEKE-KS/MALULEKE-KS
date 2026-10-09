@@ -116,8 +116,8 @@ export const CAPABILITIES: Capability[] = [
     title: "The AI guide",
     audience: "public",
     summary: "The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, shows live cards of systems, journey, skills and the site's pulse read from the public views, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a, docs/AI-GUIDE-PHASE1-PLAN.md).",
-    db: ["PublicFlag", "VisitorLens", "PublicSystem", "PublicTimeline", "SkillEvidence", "PublicPlatformPulse"],
-    endpoints: ["POST /guide"],
+    db: ["PublicFlag", "VisitorLens", "PublicSystem", "PublicTimeline", "SkillEvidence", "PublicPlatformPulse", "PublicSiteContent"],
+    endpoints: ["POST /guide", "POST /guide/warm"],
     rules: ["BR-2.4", "BR-4.1", "BR-4.2", "BR-4.3", "BR-4.4", "BR-4.6"],
     frontend: [
       { page: "/", section: "Hero: the character, greeting and lens chips" },
@@ -128,6 +128,7 @@ export const CAPABILITIES: Capability[] = [
     notes: [
       "Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.",
       "Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.",
+      "The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.",
     ],
   },
   {
@@ -628,6 +629,22 @@ export const CAPABILITIES: Capability[] = [
     notes: [
       "Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.",
       "github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).",
+    ],
+  },
+  {
+    id: "admin.guide-health",
+    title: "AI guide health",
+    audience: "admin",
+    summary:
+      "How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns; plus the nightly self-check (a few fixed questions put through the live guide and checked by plain rules). Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1, §4 B4).",
+    db: ["GuideTurn", "GuideEvalRun", "prune_guide_logs"],
+    endpoints: ["GET /admin/guide/health"],
+    rules: ["BR-4.3", "BR-4.6", "BR-5.2"],
+    frontend: [{ page: "/admin/guide", section: "Guide health: daily self-check, questions, failures, timings, models, per-day chart, latest turns" }],
+    notes: [
+      "The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).",
+      "outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.",
+      "The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.",
     ],
   },
 ];

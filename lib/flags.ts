@@ -9,6 +9,8 @@ import { dbPublic } from "@/lib/db";
 
 export const FLAGS = {
   concierge: "concierge.enabled",
+  // Questions that are pure site data (contact, CV, counts, the platform pulse) answered from the data with no model (docs/AI-GUIDE-PHASE2-PLAN.md §3 A3).
+  instantLane: "concierge.instant_lane",
   openPage: "agent.open_page",
   draftInquiry: "agent.draft_inquiry",
   searchSystems: "agent.search_systems",

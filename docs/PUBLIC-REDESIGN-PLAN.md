@@ -64,6 +64,8 @@ Sections, top to bottom — each names its data source:
 
 > **Phase 1 redesign (owner, 2026-10-08) — `docs/AI-GUIDE-PHASE1-PLAN.md` supersedes the console parts below:** the home section stays a **collapsible bar, closed by default** (owner, same day: free scrolling for visitors who didn't come for the AI) that unfolds into the console — no brochure, no panel there; one conversation shared with the docked panel (`GuideChatProvider`); every answer shows its working trail, live cards (`show_systems`, `show_journey`, `show_skills`, `show_pulse` — read from the public views) and its sources; the character's live bust is on screen whenever the guide works (stage on desktop, header on phones, a corner bust when the console is out of view).
 
+> **Phase 2 (owner, 2026-10-09) — `docs/AI-GUIDE-PHASE2-PLAN.md`:** speed, accuracy that is built in and checked, a humor governor decided by the server, question playbooks and computing tools, Fit Check, a guided tour, public proof of reliability. Release 1 (live with it): per-question metrics and Admin → Guide health; the evals as data with a CI gate and a nightly canary; durations computed in code; the **instant lane** (pure-data questions answered with no model, from the owner-edited "guide-instant" wording); a first-word deadline (off by default); a warm-up call.
+
 The home-page character is the face of the **Tier 1 concierge** (PLATFORM-CONSTITUTION §6; V1.1, in scope by the owner's direction now that V1 is live). It greets visitors, answers questions about the owner's work, and takes them through the site.
 
 **Owner decisions (2026-09-30)**

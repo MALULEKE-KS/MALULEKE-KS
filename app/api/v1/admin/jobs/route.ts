@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { JOBS } from "@/lib/jobs/registry";
-import { DAILY_CRON_SCHEDULE, DAILY_JOBS } from "@/lib/jobs/schedule";
+import { scheduleFor } from "@/lib/jobs/schedule";
 
 const PAGE = 50;
 
@@ -23,7 +23,7 @@ export const GET = withAdmin(async (request) => {
       name,
       description: def.description,
       rules: def.rules,
-      schedule: (DAILY_JOBS as readonly string[]).includes(name) ? DAILY_CRON_SCHEDULE : null,
+      schedule: scheduleFor(name),
     })),
     data: runs.map((r) => ({
       id: r.id,

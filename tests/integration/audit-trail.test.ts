@@ -38,6 +38,8 @@ const EXEMPT = new Set([
   "RepoCommit", // mirror of GitHub commits for the AI guide, refreshed and pruned by the sync (JobRun)
   "ContentChunk", // AI index (V1.1)
   "InquiryStatusChange", // append-only history, written by the database itself (LT-6)
+  "GuideTurn", // AI guide metrics, written by the guide itself — no admin edits (P2-0)
+  "GuideEvalRun", // the AI guide's nightly canary results, written by the job itself — no admin edits (P2-1)
   "Notification", // the email outbox — its own state is its history (LT-10)
 ]);
 

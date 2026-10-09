@@ -30,6 +30,14 @@
 
 ## Part 2 — Update log (newest first)
 
+### AI guide, phase 2, release 1: it measures itself, tests itself, and answers the plain questions at once (2026-10-09)
+- **Plan:** `docs/AI-GUIDE-PHASE2-PLAN.md` (D-024). Owner: free models for now, nothing to rebuild when Claude is paid for; question log yes; public eval scoreboard yes; voice later.
+- **Measured:** `GuideTurn` — one metrics row per question (outcome, time to first word and to the full answer, serving model, tokens; no IP, no visitor text) pruned by the daily job; Admin → Guide health (p50/p95, failure and fallback rates, models, per-day chart, latest turns); `scripts/guide-benchmark.mjs` for a controlled before/after.
+- **Tested:** the evals became data (`tests/ai-evals/cases.ts`, 111 cases) checked first by plain rules (`lib/guide/answer-rules.ts`), then by a judge; their own workflow (`.github/workflows/ai-evals.yml`: the content-free gate tier on every guide pull request and nightly — needs the repo secret `AI_GATEWAY_API_KEY`, says so loudly without it); the old placeholder job, which watched paths that don't exist, is gone. A nightly canary (`guide.canary`, its own cron entry) puts nine fixed questions through the live guide and fails the job on a broken check (`GuideEvalRun`).
+- **Faster:** durations are computed in code and written beside every date in the guide's knowledge (no more date arithmetic by the model); the instant lane answers pure-data questions (contact, CV, how many systems, the platform's numbers) with no model, before any limit is spent and even with no model available — wording is the owner's (Admin → Page content → "AI guide — instant answers"), flag `concierge.instant_lane`; a first-word deadline that drops a silent model for the next one in sequence (`concierge.firstTokenDeadlineMs`, off until Guide health says what to set); `POST /guide/warm` primes the server when a visitor focuses the chat.
+- **Decided against, for now — retrieval (Part 1 #3):** the corpus measured ~10.5k tokens on the dev database (instructions add ~2.7k; the system and repo detail sections are ~6.3k of it), so retrieval would save at most about a third while adding a recall risk to a guide whose first duty is accuracy. Revisit when Guide health's input-token and first-word numbers say it's the bottleneck, or the corpus passes ~25k tokens.
+- **Tests:** guide integration files now run one at a time (a vitest project) because they share the concierge flag, the rate-limit buckets and the daily cap.
+
 ### Vercel Functions Storage over the free limit — found, freed, trimmed (2026-10-08)
 - **Found (Vercel → Usage):** Functions Storage 13.08 GB of Hobby's 10 GB — every kept deployment stores ~280 functions of ~43 MB, and 10 deployments shipped in one day. The database was not the cause (no Neon charge on Vercel); Neon stays as it is.
 - **Freed:** 8 superseded deployments deleted (owner-approved); the live one and one rollback point kept.
