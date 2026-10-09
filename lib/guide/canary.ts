@@ -66,14 +66,22 @@ export interface RunCanaryOptions {
   paceMs?: number;
   /** Don't start a new question past this many ms (concierge.canary.timeBudgetSeconds). */
   timeBudgetMs?: number;
+  /** Case ids to ask first — the ones the last run couldn't ask, so every question gets its turn across nights. */
+  priority?: string[];
   now?: () => number;
   sleep?: (ms: number) => Promise<void>;
+}
+
+/** The cases with the priority ids first; everything else keeps its order. */
+export function orderCases(cases: CanaryCase[], priority: string[] = []): CanaryCase[] {
+  const first = cases.filter((c) => priority.includes(c.id));
+  return [...first, ...cases.filter((c) => !priority.includes(c.id))];
 }
 
 /** Run the canary cases and return one result each. Pure of the database except the system names it reads. */
 export async function runCanaryCases(options: RunCanaryOptions = {}): Promise<{ results: CanaryResult[]; ranOutOfTime: boolean }> {
   const ask = options.ask ?? askLive;
-  const cases = options.cases ?? CANARY_CASES;
+  const cases = orderCases(options.cases ?? CANARY_CASES, options.priority);
   const now = options.now ?? Date.now;
   const sleep = options.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const paceMs = options.paceMs ?? (await getSetting("concierge.canary.paceSeconds")) * 1000;
@@ -118,6 +126,13 @@ export function summariseCanary(results: CanaryResult[]): { total: number; passe
   return { total: passed + failed, passed, failed, unavailable: results.length - passed - failed };
 }
 
+/** The ids the latest canary run couldn't ask (out of time, busy) — asked first next time. */
+async function unaskedLastTime(): Promise<string[]> {
+  const last = await db.guideEvalRun.findFirst({ where: { kind: "canary" }, orderBy: { createdAt: "desc" }, select: { results: true } });
+  if (!Array.isArray(last?.results)) return [];
+  return (last.results as unknown as CanaryResult[]).filter((r) => r && r.pass === null && typeof r.id === "string").map((r) => r.id);
+}
+
 /** The job: run the canary against the live guide and record the run. */
 export async function runGuideCanary(trigger: "schedule" | "admin" | "script" = "schedule", options: RunCanaryOptions = {}): Promise<CanarySummary> {
   const flag = await db.flag.findUnique({ where: { key: "concierge.enabled" }, select: { enabled: true } });
@@ -125,7 +140,8 @@ export async function runGuideCanary(trigger: "schedule" | "admin" | "script" = 
 
   const t0 = Date.now();
   const model = await getSetting("concierge.model");
-  const { results } = await runCanaryCases(options);
+  const priority = options.priority ?? (await unaskedLastTime());
+  const { results } = await runCanaryCases({ ...options, priority });
   const counts = summariseCanary(results);
   const { unavailable, ...stored } = counts;
   await db.guideEvalRun.create({

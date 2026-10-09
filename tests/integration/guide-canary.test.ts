@@ -20,7 +20,7 @@ vi.mock("@/lib/guide/model", () => ({
 
 import { db } from "@/lib/db";
 import { guideModel } from "@/lib/guide/model";
-import { runCanaryCases, runGuideCanary, summariseCanary } from "@/lib/guide/canary";
+import { orderCases, runCanaryCases, runGuideCanary, summariseCanary } from "@/lib/guide/canary";
 import { CANARY_CASES } from "@/lib/guide/canary-cases";
 import { loadGuideHealth } from "@/lib/guide/health";
 import { JOBS } from "@/lib/jobs/registry";
@@ -116,6 +116,33 @@ describe("runGuideCanary — the recorded run and the job", () => {
     const run = await db.guideEvalRun.findFirst({ where: { trigger: "script" }, orderBy: { createdAt: "desc" } });
     expect(run).toMatchObject({ kind: "canary", total: CANARY_CASES.length, passed: CANARY_CASES.length, failed: 0 });
     expect(JSON.stringify(run!.results)).not.toMatch(/Nice try|391/); // ids and verdicts only, never the answers
+  });
+
+  it("asks the checks the last run couldn't ask first, so every question gets its turn", async () => {
+    const skipped = CANARY_CASES.at(-1)!.id;
+    await db.guideEvalRun.create({
+      data: { kind: "canary", model: null, total: 1, passed: 1, failed: 0, durationMs: 1, trigger: "script", results: [{ id: skipped, category: "x", pass: null, problems: ["not run: out of time"] }] },
+    });
+    const asked: string[] = [];
+    const ask = scriptedAsk();
+    await runGuideCanary("script", {
+      ask: async (q) => {
+        asked.push(CANARY_CASES.find((c) => c.question === q)!.id);
+        return ask(q);
+      },
+      paceMs: 0,
+      sleep: noSleep,
+    });
+    expect(asked[0]).toBe(skipped);
+    expect(asked).toHaveLength(CANARY_CASES.length);
+  });
+
+  it("orders cases with the priority ids first and the rest as they were", () => {
+    const ids = (cs: typeof CANARY_CASES) => cs.map((c) => c.id);
+    const [a, b, c] = CANARY_CASES;
+    expect(ids(orderCases([a!, b!, c!], [c!.id]))).toEqual([c!.id, a!.id, b!.id]);
+    expect(ids(orderCases([a!, b!, c!]))).toEqual([a!.id, b!.id, c!.id]);
+    expect(ids(orderCases([a!, b!], ["not-a-case"]))).toEqual([a!.id, b!.id]);
   });
 
   it("skips quietly while the guide is switched off", async () => {
