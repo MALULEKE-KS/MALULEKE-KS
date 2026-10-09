@@ -116,8 +116,8 @@ export const CAPABILITIES: Capability[] = [
     title: "The AI guide",
     audience: "public",
     summary: "The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, shows live cards of systems, journey, skills and the site's pulse read from the public views, and can open a page, search the site or draft the contact form for the visitor to send — each tool behind its own flag (Constitution §6, PUBLIC-REDESIGN-PLAN §3a, docs/AI-GUIDE-PHASE1-PLAN.md).",
-    db: ["PublicFlag", "VisitorLens", "PublicSystem", "PublicTimeline", "SkillEvidence", "PublicPlatformPulse"],
-    endpoints: ["POST /guide"],
+    db: ["PublicFlag", "VisitorLens", "PublicSystem", "PublicTimeline", "SkillEvidence", "PublicPlatformPulse", "PublicSiteContent"],
+    endpoints: ["POST /guide", "POST /guide/warm"],
     rules: ["BR-2.4", "BR-4.1", "BR-4.2", "BR-4.3", "BR-4.4", "BR-4.6"],
     frontend: [
       { page: "/", section: "Hero: the character, greeting and lens chips" },
@@ -128,6 +128,7 @@ export const CAPABILITIES: Capability[] = [
     notes: [
       "Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.",
       "Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.",
+      "The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.",
     ],
   },
   {

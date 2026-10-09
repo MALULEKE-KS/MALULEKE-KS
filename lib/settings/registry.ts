@@ -215,6 +215,12 @@ export const SETTINGS = {
     description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
     rule: "Constitution §6",
   }),
+  "concierge.firstTokenDeadlineMs": define({
+    schema: z.number().int().min(0).max(30000),
+    default: 0,
+    description: "How long a model has to start answering before the guide gives up on it and asks the next model on the fallback list, in milliseconds (0 = wait; the default). Set it from Guide health's p95 first-word time — too low drops a model that was about to answer.",
+    rule: "Constitution §6",
+  }),
   "concierge.metricsRetentionDays": define({
     schema: z.number().int().min(7).max(730),
     default: 180,

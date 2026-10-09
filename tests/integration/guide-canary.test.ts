@@ -42,6 +42,7 @@ afterAll(async () => {
   await db.guideEvalRun.deleteMany({ where: { trigger: "script" } });
   await db.guideTurn.deleteMany({ where: { source: "canary" } });
   await db.rateLimitEntry.deleteMany({ where: { bucketKey: { startsWith: "guide" } } });
+  await db.$disconnect();
 });
 
 /** A guide that answers each canary question correctly (or wrongly, for the ids given). */

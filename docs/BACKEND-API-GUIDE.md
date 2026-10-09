@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**34 capabilities · 137 endpoints.**
+**34 capabilities · 138 endpoints.**
 
 ## Public
 
@@ -131,6 +131,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
 - `POST /guide`
+- `POST /guide/warm`
 
 **Database**
 
@@ -140,6 +141,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 - `PublicTimeline`
 - `SkillEvidence`
 - `PublicPlatformPulse`
+- `PublicSiteContent`
 
 **Rules:** BR-2.4, BR-4.1, BR-4.2, BR-4.3, BR-4.4, BR-4.6
 
@@ -147,6 +149,7 @@ The owner's AI guide: answers visitors from the site's public data, cites the pa
 
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 ### Platform pulse
 
@@ -1009,7 +1012,7 @@ How fast and reliable the AI guide is: one metrics row per question — outcome,
 | `PublicProfilePhoto` | profile |
 | `PublicProfileTitle` | profile |
 | `PublicRepoCommit` | github |
-| `PublicSiteContent` | content |
+| `PublicSiteContent` | guide, content |
 | `PublicSlugRedirect` | systems.caseStudy |
 | `PublicSystem` | guide, home, systems.catalog, systems.caseStudy |
 | `PublicSystemActivity` | activity |

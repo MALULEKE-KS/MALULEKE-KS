@@ -34,6 +34,19 @@ const day = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 10) : 
 const month = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 7) : null);
 const list = (xs: (string | null | undefined)[]) => xs.filter(Boolean).join(", ");
 
+/**
+ * Facts the guide's instant lane answers from without asking a model
+ * (lib/guide/instant.ts) — the same data, structured, that the knowledge text is
+ * written from, so the two can never disagree.
+ */
+export interface GuideFacts {
+  email: string | null;
+  reviewSlaHours: number;
+  cv: { label: string; formats: string[] }[];
+  systems: { total: number; privateCount: number; byStatus: { status: string; count: number }[] };
+  pulse: { rulesEnforcedByDatabase: number; auditEventsLast7Days: number; auditEventsTotal: number };
+}
+
 export interface GuideCorpus {
   text: string;
   tokens: number;
@@ -41,6 +54,7 @@ export interface GuideCorpus {
   paths: string[];
   ownerName: string;
   ownerFirstName: string;
+  facts: GuideFacts;
 }
 
 async function load() {
@@ -277,6 +291,26 @@ export const getGuideCorpus = cache(async (budgetTokens: number, maxAgeSeconds =
   return value;
 });
 
+function factsOf(data: Awaited<ReturnType<typeof load>>): GuideFacts {
+  const byStatus = new Map<string, number>();
+  for (const s of data.systems) byStatus.set(s.status, (byStatus.get(s.status) ?? 0) + 1);
+  return {
+    email: data.profile?.email ?? null,
+    reviewSlaHours: data.reviewSlaHours,
+    cv: data.cvOptions.map((o) => ({ label: o.label, formats: o.formats })),
+    systems: {
+      total: data.systems.length,
+      privateCount: data.systems.filter((s) => s.repoPrivate).length,
+      byStatus: [...byStatus].map(([status, count]) => ({ status, count })),
+    },
+    pulse: {
+      rulesEnforcedByDatabase: data.pulse.rulesEnforcedByDatabase,
+      auditEventsLast7Days: data.pulse.auditEventsLast7Days,
+      auditEventsTotal: data.pulse.auditEventsTotal,
+    },
+  };
+}
+
 async function buildCorpus(budgetTokens: number): Promise<GuideCorpus> {
   const data = await load();
   // Past the budget, shorten in steps: READMEs first, then case studies too.
@@ -293,5 +327,6 @@ async function buildCorpus(budgetTokens: number): Promise<GuideCorpus> {
     paths: [...SHEETS.map((s) => s.href), ...data.systems.map((s) => `/systems/${s.slug}`)],
     ownerName: name,
     ownerFirstName: name.split(/\s+/)[0] ?? name,
+    facts: factsOf(data),
   };
 }

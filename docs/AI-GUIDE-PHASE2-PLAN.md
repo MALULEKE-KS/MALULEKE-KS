@@ -1,6 +1,6 @@
 # AI guide — Phase 2 plan: fast, grounded, reasoned, funny on purpose, and unlike any other portfolio guide
 
-**Status:** owner answers recorded 2026-10-09 (§11) — model stays **free for now**, built so that paying for Claude later is a settings change, not a rebuild. Release 1 is next; nothing below is built yet.
+**Status:** owner answers recorded 2026-10-09 (§11) — model stays **free for now**, built so that paying for Claude later is a settings change, not a rebuild. **Release 1 built 2026-10-09 (P2-0, P2-1, P2-2 — see §12); releases 2 and 3 are next.**
 **Owner's brief (2026-10-09):** phase 2 is the guide's *logical thinking and system interaction* and its *speed* "throughout the system". It has to be fast, accurate, reliable and must not hallucinate. It needs a sense of humor, and it must **know when humor is right** — "calculated". Recommend what to strengthen and what features would make it outstanding and unique: "the best guide ever for a portfolio".
 **Out of the locked V2 spec** — an owner request, logged as D-024 (proposed). The guide's laws do not move: read-only (BR-4.1), drafts never sent (BR-4.2), nothing about the owner that isn't in the site's data, always labelled AI, third person (BR-4.3), every tool behind a flag (BR-4.4), nothing a visitor sends changes what it is (BR-4.6).
 
@@ -41,11 +41,7 @@
 
 **A1. Measure first (P2-0).** A `GuideTurn` table (additive migration): time to first token, total time, model used, fallback position, tokens in/out, cache hit, tools run, finish reason, verifier result, `instantLane` yes/no — **metrics only, no IP, no visitor text** (see §9 for question text). Admin → Guide health shows p50/p95, busy rate, model mix and cost per day against the cap. A benchmark script (30 fixed questions) gives a before/after number for every change in this plan.
 
-**A2. Retrieve, then answer (the biggest lever).** Replace "the whole site in every prompt" with:
-- a **core brief** that is always in (~3–4k tokens: the owner, the system list as one line each, skills, the claims and what they do/don't prove, contact, pages), plus
-- **the records the question needs, fetched by the server before the model is called** — the system(s) named or implied, the page the visitor is on, the skills/years asked about — through the same public views and `searchPublic()`, and
-- lookup tools (`get_system`, `get_repo`, `get_case_study`) for anything beyond that, in parallel, one step.
-Smaller prompt → faster first token, lower cost per question, and fewer places for a fact to get blended. This is the retrieval step ROADMAP-V2 §3 already specified (it names `ContentChunk`); the trigger there was corpus *size*, this plan's trigger is speed and accuracy — the roadmap entry is updated in the same PR. Postgres full-text search first; embeddings only if evals show recall gaps (no new library without a use).
+**A2. Retrieve, then answer — DEFERRED (measured 2026-10-09).** The idea: a small always-present core brief plus only the records the question needs, fetched by the server before the model is called, with lookup tools for the rest. Measuring the real corpus changed the call: on the dev database it is ~10.5k tokens (the instructions add ~2.7k), of which the system and repo detail sections are ~6.3k. Retrieval would save at most about a third of the prompt while adding a recall risk — a missed record becomes a wrong "I don't know" — to a guide whose first duty is accuracy. It returns to the plan when Guide health shows input tokens or first-word time to be the bottleneck, or when the corpus passes ~25k tokens (ROADMAP-V2 Part 1 #3, whose trigger is unchanged). Until then the whole site stays in the prompt.
 
 **A3. The instant lane.** Questions that are pure data — how to contact him, the CV, how many systems/repos, what's new, the platform pulse, "what is the status of X" — are recognised by a deterministic router and answered from the public views with a card and one templated sentence: no model, no cost, no hallucination, under 300 ms, and it still works when every model is busy. Anything ambiguous goes to the model.
 
@@ -180,3 +176,19 @@ Each step: phone first (`tests/e2e/mobile.spec.ts` at 360/390), a11y/axe, no new
 3. **Public eval scoreboard — yes**, written by the test job, never by hand.
 4. **Voice — later**, as the optional last step (P2-8).
 5. **Release 1 scope** — as §10 (not objected to; ordered measure → evals → speed so every change has a before/after).
+
+---
+
+## 12. Release 1 — what was built (2026-10-09)
+
+| Step | Built | Where |
+|---|---|---|
+| P2-0 | `GuideTurn` metrics (no IP, no visitor text, pruned by `concierge.metricsRetentionDays`), Admin → Guide health, `GET /admin/guide/health`, `scripts/guide-benchmark.mjs` | `lib/guide/telemetry.ts`, `health.ts`, `app/(admin)/admin/(panel)/guide` |
+| P2-1 | 111 eval cases as data with plain-rule checks, tiers (`gate` needs no site content), their own workflow + nightly run, an integrity test that needs no model; the daily canary job (`GuideEvalRun`) on its own cron entry | `tests/ai-evals/`, `.github/workflows/ai-evals.yml`, `lib/guide/canary.ts` |
+| B1 | Durations and counts computed in code beside every date in the knowledge | `lib/guide/time.ts`, `corpus.ts` |
+| A3 | The instant lane: strict matcher, owner-edited wording (`guide-instant` block), live figures, the same stream (cards included), before any limit, works with no model | `lib/guide/instant.ts`, `handler.ts` |
+| A4 | First-word deadline, sequential fallback, off by default (`concierge.firstTokenDeadlineMs`) | `lib/guide/first-token.ts`, `model.ts` |
+| A5 | `POST /guide/warm`, fired once when the visitor focuses the chat | `app/api/v1/guide/warm`, `warm-client.ts` |
+| — | A2 deferred (see §3); the handler moved out of the route so the canary runs the very same pipeline | `lib/guide/handler.ts` |
+
+**Not done by me, and why:** nothing was run against a live model — this machine has no gateway credential (the local OIDC token expired 2026-09-19) and the production endpoint was not used for benchmarking (it spends the live guide's quota). The evals and the benchmark are written, structurally tested and wired to CI; their first real run needs `AI_GATEWAY_API_KEY` (a repository secret for CI; a local env value for a local run).

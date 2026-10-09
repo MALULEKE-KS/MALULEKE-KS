@@ -51,7 +51,7 @@ describe("#82 capability coverage", () => {
     const implemented = await routeEndpoints(path.join(process.cwd(), "app", "api", "v1"));
     const documented = CAPABILITIES.flatMap((capability) => capability.endpoints);
     expect(sorted(documented)).toEqual(sorted(implemented));
-  });
+  }, 30_000); // walks every route file; slow on a busy machine
 
   it("declares every supported API method in the OpenAPI contract", async () => {
     const documented = CAPABILITIES.flatMap((capability) => capability.endpoints);

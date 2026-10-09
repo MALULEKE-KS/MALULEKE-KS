@@ -1419,11 +1419,17 @@ paths:
                 lens: { type: string, maxLength: 60, nullable: true, description: "The visitor's lens key (GET /lenses)" }
                 page: { type: string, maxLength: 200, nullable: true, description: "The site path the visitor is on, e.g. /systems/xkimi-xa-mali — used only if it is one of the site's own pages ('this system' means that one)" }
       responses:
-        "200": { description: "text/event-stream — the AI SDK UI message stream. When the model and its fallbacks are all busy, the stream ends with a 'busy, try again in a minute' error" }
+        "200": { description: "text/event-stream — the AI SDK UI message stream. When the model and its fallbacks are all busy, the stream ends with a 'busy, try again in a minute' error. Questions that are pure site data (how to contact him, the CV, how many systems, the platform's live numbers) are answered from the data with no model, before any limit is spent and even with no model configured — the same stream, from the guide-instant wording (flag concierge.instant_lane)" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "404": { description: "GUIDE_OFF — the guide is switched off" }
         "429": { description: "RATE_LIMITED, CONVERSATION_LIMIT or GUIDE_RESTING (the daily cap)" }
         "503": { description: "GUIDE_UNAVAILABLE — no model provider configured" }
+  /guide/warm:
+    post:
+      tags: [Home (Public)]
+      summary: "Get the AI guide ready before the first question — reads what it knows into the server's short-lived memory and checks the model list. No model work, no limit spent, no body; does nothing while the guide is off"
+      responses:
+        "204": { description: "Done (or nothing to do)" }
   /lenses:
     get: { tags: [Home (Public)], summary: "The visitor lenses the home page and the AI guide open with, in the owner's order — key and label only (Constitution §4)", responses: { "200": { description: "{ data: [{ key, label }] }" } } }
   /platform/pulse:

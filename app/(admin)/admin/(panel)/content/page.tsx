@@ -35,6 +35,14 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
       hint: 'The chat opens with these on a page, before the example questions. A list of { "page": "/systems/", "questions": ["…"] } — a page ending in "/" covers everything under it; up to 3 questions each.',
     },
   ],
+  "guide-instant": [
+    { name: "contact", label: "How to contact you (no email shown)", max: 500, kind: "text", hint: "Fill-ins: {owner} {reviewSlaHours}" },
+    { name: "contactEmail", label: "How to contact you (with your public email)", max: 500, kind: "text", hint: "Fill-ins: {owner} {reviewSlaHours} {email} — used when an email is published" },
+    { name: "cv", label: "Where the CV is", max: 400, kind: "text", hint: "Fill-ins: {owner} {cvOptions}" },
+    { name: "cvNone", label: "When no CV is published", max: 400, kind: "text", hint: "Fill-in: {owner}" },
+    { name: "counts", label: "How many systems", max: 500, kind: "text", hint: "Fill-ins: {owner} {systems} {breakdown} {privateNote}" },
+    { name: "pulse", label: "The platform's live numbers", max: 500, kind: "text", hint: "Fill-ins: {owner} {rules} {audited7} {auditedTotal}" },
+  ],
   release: [
     { name: "current", label: "Version the site is on", max: 20, kind: "line", hint: "e.g. V1" },
     { name: "next", label: "Next version", max: 20, kind: "line", hint: "e.g. V2 — leave empty when nothing's planned" },

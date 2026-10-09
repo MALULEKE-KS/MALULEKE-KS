@@ -5,7 +5,7 @@
 // into a local env file rests instead).
 
 import { afterEach, describe, expect, it } from "vitest";
-import { guideProviderConfigured } from "@/lib/guide/model";
+import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 
 const saved = { key: process.env.AI_GATEWAY_API_KEY, oidc: process.env.VERCEL_OIDC_TOKEN, vercel: process.env.VERCEL };
 const jwt = (exp: number) => `h.${Buffer.from(JSON.stringify({ exp })).toString("base64url")}.s`;
@@ -43,5 +43,19 @@ describe("guideProviderConfigured", () => {
     expect(guideProviderConfigured(now)).toBe(true);
     process.env.VERCEL_OIDC_TOKEN = jwt(now / 1000 - 3600);
     expect(guideProviderConfigured(now)).toBe(false);
+  });
+});
+
+describe("guideModel", () => {
+  it("is the plain gateway id with no deadline or no fallback, so the gateway alone handles failures", () => {
+    expect(guideModel("vendor/model-a")).toBe("vendor/model-a");
+    expect(guideModel("vendor/model-a", { fallbacks: ["vendor/model-b"], firstTokenDeadlineMs: 0 })).toBe("vendor/model-a");
+    expect(guideModel("vendor/model-a", { fallbacks: [], firstTokenDeadlineMs: 4000 })).toBe("vendor/model-a");
+  });
+
+  it("is a wrapped model once a deadline and a fallback are set — same model, now with a first-word deadline", () => {
+    const wrapped = guideModel("vendor/model-a", { fallbacks: ["vendor/model-b"], firstTokenDeadlineMs: 4000 });
+    expect(typeof wrapped).toBe("object");
+    expect((wrapped as { modelId: string }).modelId).toBe("vendor/model-a");
   });
 });

@@ -10,6 +10,7 @@ import { ArrowUp, ShieldCheck, Square } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import { cn } from "@/lib/utils";
+import { warmGuide } from "@/lib/guide/warm-client";
 
 export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function Composer({ id }, ref) {
   const { ownerFirstName, lookAt, setMood, mood } = useGuide();
@@ -46,7 +47,10 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function
             ref={ref}
             rows={1}
             value={input}
-            onFocus={(e) => watch(e.currentTarget)}
+            onFocus={(e) => {
+              watch(e.currentTarget);
+              warmGuide();
+            }}
             onChange={(e) => {
               setInput(e.target.value);
               watch(e.currentTarget);

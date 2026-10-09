@@ -13,6 +13,13 @@ import { JourneyBlock, PageCopyBlock } from "@/lib/content/json-blocks";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 
+/** A template for a guide reply that may use only these {placeholders} — anything else is refused on save. */
+export const instantTemplate = (max: number, allowed: string[]) =>
+  Text(max).refine(
+    (t) => [...t.matchAll(/\{(\w+)\}/g)].every((m) => allowed.includes(m[1]!)),
+    `can only use ${allowed.map((a) => `{${a}}`).join(", ")}`,
+  );
+
 export const CONTENT_BLOCKS = {
   "how-i-build": {
     title: "How I build — mission and principles",
@@ -54,6 +61,19 @@ export const CONTENT_BLOCKS = {
         .array(z.object({ page: z.string().trim().regex(/^\/[a-z0-9\-/]*$/, "a site path, e.g. /systems/"), questions: z.array(Text(140)).min(1).max(3) }))
         .max(12)
         .optional(),
+    }),
+  },
+  "guide-instant": {
+    title: "AI guide — instant answers",
+    description:
+      "What the guide says, with no model and no wait, to questions that are pure site data: how to contact you, the CV, how many systems, the platform's live numbers. Each reply is filled in with the live figures. Switch the whole lane off in Admin → Flags (concierge.instant_lane).",
+    schema: z.object({
+      contact: instantTemplate(500, ["owner", "reviewSlaHours"]),
+      contactEmail: instantTemplate(500, ["owner", "reviewSlaHours", "email"]),
+      cv: instantTemplate(400, ["owner", "cvOptions"]),
+      cvNone: instantTemplate(400, ["owner"]),
+      counts: instantTemplate(500, ["owner", "systems", "breakdown", "privateNote"]),
+      pulse: instantTemplate(500, ["owner", "rules", "audited7", "auditedTotal"]),
     }),
   },
   evidence: {

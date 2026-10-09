@@ -19,7 +19,7 @@
 //      visitor to send (BR-4.1/4.2).
 
 import { NextResponse } from "next/server";
-import { convertToModelMessages, createUIMessageStreamResponse, isStepCount, streamText, toUIMessageStream, type ToolSet } from "ai";
+import { convertToModelMessages, createUIMessageStreamResponse, isStepCount, streamText, toUIMessageStream, type ToolSet, type UIMessageChunk } from "ai";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { FLAGS, getFlags } from "@/lib/flags";
@@ -34,6 +34,8 @@ import { getInquiryTypes } from "@/lib/queries/site";
 import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { liveGatewayModels, pickModels } from "@/lib/guide/gateway-models";
 import { recordGuideTurn, startTurnTimer, type GuideTurnRecord } from "@/lib/guide/telemetry";
+import { buildInstant, instantChunks, matchInstant } from "@/lib/guide/instant";
+import { getContentBlock } from "@/lib/content/blocks";
 import { waitUntil } from "@vercel/functions";
 
 const BUSY_MESSAGE = "A lot of people are talking to the guide right now — give it a minute and try again.";
@@ -60,12 +62,8 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   const timer = startTurnTimer();
   const flags = await getFlags();
   if (flags[FLAGS.concierge] !== true) return errorResponse("GUIDE_OFF", "The AI guide is switched off.", 404);
-  if (!guideProviderConfigured()) {
-    track({ outcome: "resting", totalMs: timer.elapsed() });
-    return errorResponse("GUIDE_UNAVAILABLE", "The AI guide is resting right now.", 503);
-  }
 
-  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens] = await Promise.all([
+  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens, firstTokenDeadlineMs] = await Promise.all([
     getSetting("concierge.model"),
     getSetting("concierge.maxMessagesPerConversation"),
     getSetting("concierge.maxQuestionCharacters"),
@@ -77,6 +75,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     getSetting("concierge.corpusCacheSeconds"),
     getSetting("concierge.fallbackModels"),
     getSetting("concierge.maxReasoningTokens"),
+    getSetting("concierge.firstTokenDeadlineMs"),
   ]);
   // Never a model the gateway has retired (a free tier ending broke every fallback answer, 2026-10-08).
   const { model, fallbacks } = pickModels(
@@ -93,6 +92,37 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   if (!parsed.ok) {
     const status = parsed.problem.code === "CONVERSATION_LIMIT" ? 429 : 400;
     return errorResponse(parsed.problem.code, parsed.problem.message, status);
+  }
+
+  // The instant lane (docs/AI-GUIDE-PHASE2-PLAN.md §3 A3): questions that are pure site data are answered from
+  // the data with no model — before any limit is spent and even while no model is available.
+  if (parsed.isNewQuestion && flags[FLAGS.instantLane] === true) {
+    const last = parsed.messages[parsed.messages.length - 1]!;
+    const question = last.parts.find((p): p is { type: "text"; text: string } => p.type === "text")?.text ?? "";
+    const intent = matchInstant(question);
+    if (intent) {
+      const [instantCorpus, templates] = await Promise.all([getGuideCorpus(budget, cacheSeconds), getContentBlock("guide-instant")]);
+      const reply = templates ? buildInstant(intent, instantCorpus.facts, instantCorpus.ownerFirstName, templates) : null;
+      if (reply) {
+        const cardOutputs = reply.cards.includes("show_pulse") && flags[FLAGS.showPulse] === true ? { show_pulse: await showPulse() } : {};
+        track({ outcome: "instant", totalMs: timer.elapsed(), firstTokenMs: timer.elapsed(), tools: Object.keys(cardOutputs), finishReason: "stop" });
+        const chunks = instantChunks(reply, cardOutputs);
+        return createUIMessageStreamResponse({
+          stream: new ReadableStream<UIMessageChunk>({
+            start(controller) {
+              for (const chunk of chunks) controller.enqueue(chunk);
+              controller.close();
+            },
+          }),
+        });
+      }
+    }
+  }
+
+  // Everything below needs a model.
+  if (!guideProviderConfigured()) {
+    track({ outcome: "resting", totalMs: timer.elapsed() });
+    return errorResponse("GUIDE_UNAVAILABLE", "The AI guide is resting right now.", 503);
   }
 
   // A new question counts against the visitor; every model call counts against the daily cap.
@@ -218,7 +248,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   };
 
   const result = streamText({
-    model: guideModel(model),
+    model: guideModel(model, { fallbacks, firstTokenDeadlineMs }),
     instructions: [
       {
         role: "system",

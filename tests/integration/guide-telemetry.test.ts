@@ -88,6 +88,7 @@ afterAll(async () => {
   await db.platformSetting.deleteMany({ where: { key: "concierge.rateLimit.maxPerWindow" } });
   await db.rateLimitEntry.deleteMany({ where: { bucketKey: { startsWith: "guide" } } });
   await db.guideTurn.deleteMany({ where: { servedModel: { startsWith: "test/" } } });
+  await db.$disconnect();
 });
 
 beforeEach(() => {
