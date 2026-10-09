@@ -146,8 +146,8 @@ describe("Guide health and pruning", () => {
   });
 
   it("prune_guide_logs removes rows past the window and keeps newer ones", async () => {
-    const old = await db.guideTurn.create({ data: { outcome: "answered", servedModel: "test/old", tools: [], createdAt: new Date(Date.now() - 400 * 86_400_000) } });
-    const fresh = await db.guideTurn.create({ data: { outcome: "answered", servedModel: "test/fresh", tools: [] } });
+    const old = await db.guideTurn.create({ data: { outcome: "answered", servedModel: "test/old", tools: [], flaggedKinds: [], createdAt: new Date(Date.now() - 400 * 86_400_000) } });
+    const fresh = await db.guideTurn.create({ data: { outcome: "answered", servedModel: "test/fresh", tools: [], flaggedKinds: [] } });
     const [pruned] = await db.$queryRaw<{ n: number }[]>`SELECT prune_guide_logs(180) AS n`;
     expect(pruned?.n).toBeGreaterThanOrEqual(1);
     expect(await db.guideTurn.findUnique({ where: { id: old.id } })).toBeNull();
@@ -155,6 +155,6 @@ describe("Guide health and pruning", () => {
   });
 
   it("refuses an outcome that isn't one of the fixed control states", async () => {
-    await expect(db.guideTurn.create({ data: { outcome: "made-up", tools: [] } })).rejects.toThrow();
+    await expect(db.guideTurn.create({ data: { outcome: "made-up", tools: [], flaggedKinds: [] } })).rejects.toThrow();
   });
 });

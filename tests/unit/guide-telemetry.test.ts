@@ -15,6 +15,8 @@ const row = (over: Partial<TurnRow> = {}): TurnRow => ({
   inputTokens: 1000,
   outputTokens: 200,
   cachedTokens: 0,
+  verifierChecked: null,
+  verifierFlagged: null,
   ...over,
 });
 
@@ -77,6 +79,21 @@ describe("summariseTurns", () => {
     expect(s.avgInputTokens).toBe(1000);
     expect(s.avgOutputTokens).toBe(200);
     expect(s.cacheShare).toBeCloseTo(0.5);
+  });
+});
+
+describe("summariseTurns — the verifier's findings", () => {
+  it("totals the claims checked and flagged, and the share of answers with a claim the data lacks", () => {
+    const s = summariseTurns([
+      row({ verifierChecked: 4, verifierFlagged: 0 }),
+      row({ verifierChecked: 5, verifierFlagged: 2 }),
+      row({ verifierChecked: 1, verifierFlagged: 1 }),
+      row({ verifierChecked: null, verifierFlagged: null }), // an answer from before the verifier existed
+      row({ outcome: "busy", verifierChecked: 9, verifierFlagged: 9 }), // not an answer: not counted
+    ]);
+    expect(s.claimsChecked).toBe(10);
+    expect(s.claimsFlagged).toBe(3);
+    expect(s.answersFlaggedShare).toBeCloseTo(2 / 4);
   });
 });
 

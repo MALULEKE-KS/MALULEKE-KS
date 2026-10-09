@@ -28,6 +28,10 @@ export interface GuideTurnRecord {
   finishReason?: string | null;
   /** The humor level the governor allowed for this reply. */
   humor?: "off" | "dry" | "playful" | null;
+  /** What the answer verifier looked up in the site's data, and what it could not find. */
+  verifierChecked?: number | null;
+  verifierFlagged?: number | null;
+  flaggedKinds?: string[];
   route?: unknown;
 }
 
@@ -65,6 +69,9 @@ export async function recordGuideTurn(rec: GuideTurnRecord): Promise<void> {
         tools: (rec.tools ?? []).slice(0, 12),
         finishReason: rec.finishReason ?? null,
         humor: rec.humor ?? null,
+        verifierChecked: whole(rec.verifierChecked),
+        verifierFlagged: whole(rec.verifierFlagged),
+        flaggedKinds: (rec.flaggedKinds ?? []).slice(0, 8),
         route: boundedRoute(rec.route),
       },
     });
@@ -111,6 +118,8 @@ export interface TurnRow {
   inputTokens: number | null;
   outputTokens: number | null;
   cachedTokens: number | null;
+  verifierChecked: number | null;
+  verifierFlagged: number | null;
 }
 
 export interface HealthSummary {
@@ -135,6 +144,11 @@ export interface HealthSummary {
   /** Share (0–1) of input tokens served from a prompt cache. */
   cacheShare: number | null;
   models: { model: string; turns: number }[];
+  /** Claims the verifier looked up across all answers, and how many it could not find in the data. */
+  claimsChecked: number;
+  claimsFlagged: number;
+  /** Share (0–1) of answers that had at least one claim the data does not contain. */
+  answersFlaggedShare: number;
 }
 
 const avg = (xs: number[]) => (xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : null);
@@ -167,6 +181,9 @@ export function summariseTurns(rows: TurnRow[]): HealthSummary {
     avgOutputTokens: avg(nums((r) => r.outputTokens, answeredByModel)),
     cacheShare: input.length && input.reduce((a, b) => a + b, 0) > 0 ? cached.reduce((a, b) => a + b, 0) / input.reduce((a, b) => a + b, 0) : null,
     models: [...byModel].map(([model, turns]) => ({ model, turns })).sort((a, b) => b.turns - a.turns),
+    claimsChecked: answeredByModel.reduce((n, r) => n + (r.verifierChecked ?? 0), 0),
+    claimsFlagged: answeredByModel.reduce((n, r) => n + (r.verifierFlagged ?? 0), 0),
+    answersFlaggedShare: answeredByModel.length ? answeredByModel.filter((r) => (r.verifierFlagged ?? 0) > 0).length / answeredByModel.length : 0,
   };
 }
 

@@ -7,6 +7,7 @@
 import { describe, expect, it } from "vitest";
 import { CASES } from "../ai-evals/cases";
 import { CANARY_CASES } from "@/lib/guide/canary-cases";
+import { GUIDE_TOOL_NAMES } from "@/lib/guide/request";
 
 const GATE = CASES.filter((c) => c.tier === "gate");
 
@@ -67,7 +68,7 @@ describe("the guide's eval cases", () => {
   });
 
   it("expect only tools the guide actually has", () => {
-    const real = new Set(["open_page", "search_systems", "draft_inquiry", "show_systems", "show_journey", "show_skills", "show_pulse"]);
+    const real = new Set<string>(GUIDE_TOOL_NAMES);
     for (const c of CASES) for (const t of [...(c.expectTools ?? []), ...(c.forbidTools ?? [])]) expect(real.has(t), `${c.id}: ${t}`).toBe(true);
   });
 

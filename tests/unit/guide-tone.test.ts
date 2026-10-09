@@ -5,8 +5,8 @@
 import { describe, expect, it } from "vitest";
 import { decideTone, toneInstruction, type Humor } from "@/lib/guide/tone";
 
-const decide = (question: string, over: Partial<{ earlier: string[]; turn: number; ceiling: Humor }> = {}) =>
-  decideTone({ question, earlier: over.earlier ?? [], turn: over.turn ?? 4, ceiling: over.ceiling ?? "playful" });
+const decide = (question: string, over: Partial<{ earlier: string[]; turn: number; ceiling: Humor; everyNthTurn: number; coolDownTurns: number }> = {}) =>
+  decideTone({ question, earlier: over.earlier ?? [], turn: over.turn ?? 4, ceiling: over.ceiling ?? "playful", everyNthTurn: over.everyNthTurn ?? 3, coolDownTurns: over.coolDownTurns ?? 2 });
 
 describe("gravity: no humor when the moment is serious", () => {
   it.each([
@@ -77,6 +77,25 @@ describe("cadence: wit is a seasoning", () => {
   });
 });
 
+describe("the owner's settings: the rhythm and the cool-down are not fixed", () => {
+  it("every second answer when the owner asks for it", () => {
+    const humors = [1, 2, 3, 4, 5, 6].map((turn) => decide("Tell me more about his work", { turn, everyNthTurn: 2 }).humor);
+    expect(humors).toEqual(["off", "dry", "off", "dry", "off", "dry"]);
+  });
+
+  it("never uninvited when the rhythm is 0 — but still plays when the visitor does", () => {
+    expect([2, 5, 8].map((turn) => decide("Tell me more about his work", { turn, everyNthTurn: 0 }).humor)).toEqual(["off", "off", "off"]);
+    expect(decide("tell me a joke lol", { turn: 3, everyNthTurn: 0 }).humor).toBe("playful");
+  });
+
+  it("a longer cool-down keeps serious for longer; none lets the next light question through", () => {
+    const earlier = ["I lost my job last week", "okay", "and then"];
+    expect(decide("tell me a joke", { earlier, turn: 4, coolDownTurns: 3 }).humor).toBe("off");
+    expect(decide("tell me a joke", { earlier, turn: 4, coolDownTurns: 1 }).humor).toBe("playful");
+    expect(decide("tell me a joke", { earlier: ["I lost my job last week"], turn: 2, coolDownTurns: 0 }).humor).toBe("playful");
+  });
+});
+
 describe("the owner's ceiling", () => {
   it("off means off, whatever the visitor does", () => {
     expect(decide("tell me a joke lol", { ceiling: "off" }).humor).toBe("off");
@@ -93,7 +112,7 @@ describe("the owner's ceiling", () => {
 
 describe("determinism", () => {
   it("gives the same decision for the same inputs", () => {
-    const input = { question: "What is his stack?", earlier: ["hi"], turn: 5, ceiling: "dry" as const };
+    const input = { question: "What is his stack?", earlier: ["hi"], turn: 5, ceiling: "dry" as const, everyNthTurn: 3, coolDownTurns: 2 };
     expect(decideTone(input)).toEqual(decideTone(input));
   });
 });

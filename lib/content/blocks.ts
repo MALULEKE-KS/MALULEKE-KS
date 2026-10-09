@@ -10,6 +10,7 @@ import { z } from "zod";
 import { dbPublic } from "@/lib/db";
 import { EvidenceBlock } from "@/lib/evidence/schema";
 import { JourneyBlock, PageCopyBlock } from "@/lib/content/json-blocks";
+import { ToursBlock } from "@/lib/guide/tour";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 
@@ -56,6 +57,17 @@ export const CONTENT_BLOCKS = {
       heading: Text(120),
       lede: Text(500),
       suggestions: z.array(Text(140)).min(1).max(6),
+      // What the guide keeps of a question it can't answer, said beside the box. {retentionDays} is filled in from the setting; not shown when nothing is kept.
+      privacyNote: z.string().trim().max(200).optional(),
+      // The guide's own nightly self-check, said beside the box. {date}, {total}, {passed}, {failed} are filled in; nothing is shown before the first run.
+      checkNote: z.string().trim().max(200).optional(),
+      checkNoteFailed: z.string().trim().max(200).optional(),
+      // The buttons under an answer. Each feature appears only when its wording is written here.
+      feedbackHelpful: z.string().trim().max(40).optional(),
+      feedbackWrong: z.string().trim().max(40).optional(),
+      feedbackThanks: z.string().trim().max(80).optional(),
+      challengeLabel: z.string().trim().max(40).optional(),
+      challengePrompt: z.string().trim().max(300).optional(),
       // The chat's opening suggestions on a particular page (the longest matching path prefix wins), shown before the general ones.
       pageSuggestions: z
         .array(z.object({ page: z.string().trim().regex(/^\/[a-z0-9\-/]*$/, "a site path, e.g. /systems/"), questions: z.array(Text(140)).min(1).max(3) }))
@@ -74,7 +86,25 @@ export const CONTENT_BLOCKS = {
       cvNone: instantTemplate(400, ["owner"]),
       counts: instantTemplate(500, ["owner", "systems", "breakdown", "privateNote"]),
       pulse: instantTemplate(500, ["owner", "rules", "audited7", "auditedTotal"]),
+      privateOne: instantTemplate(200, ["owner", "privateCount"]).optional(),
+      privateMany: instantTemplate(200, ["owner", "privateCount"]).optional(),
     }),
+  },
+  "guide-fit": {
+    title: "AI guide — Fit Check notes",
+    description:
+      "The honest notes Fit Check puts under a need: when it asks for more years than you have been building ({years}, {since}), when it asks for seniority, and when the site shows nothing yet. The matching itself is done in code from the site's data — only these words are yours. Leave one empty to say nothing there.",
+    schema: z.object({
+      yearsNote: z.union([z.literal(""), instantTemplate(200, ["years", "since"])]),
+      seniorityNote: z.union([z.literal(""), instantTemplate(200, [])]),
+      noneNote: z.union([z.literal(""), instantTemplate(200, [])]),
+    }),
+  },
+  "guide-tours": {
+    title: "AI guide — guided tours",
+    description:
+      "Walks the AI guide can take a visitor on: each tour is a few stops — a page, optionally a section on it, and one line the guide says there. The guide only chooses which tour to start; every stop and word is yours, and a stop on a page the site doesn't have is skipped. Switch the feature on in Admin → Flags (agent.tour).",
+    schema: ToursBlock,
   },
   evidence: {
     title: "Evidence — claims and their proof",

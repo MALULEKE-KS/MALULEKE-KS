@@ -6,7 +6,7 @@
 
 import type { UIMessage } from "ai";
 
-export type StepKind = "think" | "search" | "systems" | "journey" | "skills" | "pulse" | "navigate" | "compose";
+export type StepKind = "think" | "search" | "systems" | "journey" | "skills" | "pulse" | "compare" | "fit" | "tour" | "navigate" | "compose";
 export type StepState = "running" | "done" | "error";
 
 export interface TrailStep {
@@ -87,6 +87,41 @@ export function trailOf(message: UIMessage): TrailStep[] {
       case "tool-show_pulse": {
         const state = toolState(p.state);
         steps.push({ key, kind: "pulse", state, label: state === "running" ? "Reading the site's pulse" : state === "error" ? "Couldn't read the pulse" : "Read the site's live pulse" });
+        return;
+      }
+      case "tool-compare_systems": {
+        const state = toolState(p.state);
+        const out = p.output as { left?: { name: string; href: string }; right?: { name: string; href: string } } | null | undefined;
+        steps.push({
+          key,
+          kind: "compare",
+          state,
+          label: state === "running" ? "Comparing the systems" : state === "error" ? "Couldn't compare the systems" : out?.left && out.right ? `Compared ${out.left.name} and ${out.right.name}` : "Compared the systems · not both found",
+          links: out?.left && out.right ? [{ label: out.left.name, href: out.left.href }, { label: out.right.name, href: out.right.href }] : [],
+        });
+        return;
+      }
+      case "tool-fit_check": {
+        const state = toolState(p.state);
+        const out = p.output as { rows?: unknown[]; evidenced?: number } | null | undefined;
+        const total = out?.rows?.length ?? 0;
+        steps.push({
+          key,
+          kind: "fit",
+          state,
+          label: state === "running" ? "Checking the needs against the evidence" : state === "error" ? "Couldn't run the fit check" : `Checked ${total} ${total === 1 ? "need" : "needs"} against the evidence · ${out?.evidenced ?? 0} evidenced`,
+        });
+        return;
+      }
+      case "tool-start_tour": {
+        const state = toolState(p.state);
+        const out = p.output as { label?: string; stops?: unknown[] } | null | undefined;
+        steps.push({
+          key,
+          kind: "tour",
+          state,
+          label: state === "running" ? "Choosing a tour" : state === "error" ? "Couldn't start the tour" : out?.label ? `Started “${out.label}” · ${out.stops?.length ?? 0} stops` : "No tour available",
+        });
         return;
       }
       case "tool-open_page": {

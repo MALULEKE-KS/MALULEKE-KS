@@ -1430,6 +1430,34 @@ paths:
       summary: "Get the AI guide ready before the first question — reads what it knows into the server's short-lived memory and checks the model list. No model work, no limit spent, no body; does nothing while the guide is off"
       responses:
         "204": { description: "Done (or nothing to do)" }
+  /guide/feedback:
+    post:
+      tags: [Home (Public)]
+      summary: "Mark an AI guide answer helpful or wrong. The question and the answer's opening are kept without contact details and with nothing that identifies the visitor, only while concierge.logRetentionDays is above 0; rate-limited per visitor (concierge.feedback.*)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating, question, answer]
+              properties:
+                rating: { type: string, enum: [helpful, wrong] }
+                question: { type: string, maxLength: 2000 }
+                answer: { type: string, maxLength: 12000 }
+                page: { type: string, maxLength: 200, nullable: true }
+      responses:
+        "202": { description: "{ kept: boolean } — false when the owner keeps no visitor text" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: "GUIDE_OFF" }
+        "429": { description: RATE_LIMITED }
+  /guide/check:
+    get:
+      tags: [Home (Public)]
+      summary: "The AI guide's latest nightly self-check: when it ran, how many fixed questions, how many passed, failed or could not be answered, and each check's id and category with its result. Never an answer or a visitor's words"
+      responses:
+        "200": { description: "{ ranAt, total, passed, failed, unavailable, checks: [{ id, category, pass }] }" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /lenses:
     get: { tags: [Home (Public)], summary: "The visitor lenses the home page and the AI guide open with, in the owner's order — key and label only (Constitution §4)", responses: { "200": { description: "{ data: [{ key, label }] }" } } }
   /platform/pulse:
@@ -1622,7 +1650,7 @@ paths:
   /admin/jobs:
     get: { tags: [Jobs (Admin)], summary: "List registered jobs (with schedule) and recent runs (with what started each)", security: [{ adminSession: [] }], parameters: [{ name: job, in: query, schema: { type: string } }], responses: { "200": { description: "{ jobs: [{ name, description, rules, schedule }], data: [{ id, job, status, startedAt, finishedAt, durationMs, summary, error, trigger, adminUserId }] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
   /admin/guide/health:
-    get: { tags: [AI guide (Admin)], summary: "AI guide speed and reliability over 1, 7 or 30 days — from GuideTurn metrics (no visitor text)", security: [{ adminSession: [] }], parameters: [{ name: days, in: query, schema: { type: integer, enum: [1, 7, 30], default: 7 } }], responses: { "200": { description: "{ days, summary: { turns, answered, instant, busy, errors, aborted, limited, resting, fallbackRate, failureRate, firstTokenMs: { p50, p95 }, totalMs: { p50, p95 }, avgInputTokens, avgOutputTokens, cacheShare, models: [{ model, turns }] }, perDay: [{ day, turns, failed }], recent: [{ id, at, outcome, servedModel, fallbackUsed, firstTokenMs, totalMs, tools, finishReason }], canary: [{ id, at, model, total, passed, failed, unavailable, results: [{ id, category, pass, problems }] }] } — visitors only; the canary is listed separately" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    get: { tags: [AI guide (Admin)], summary: "AI guide speed and reliability over 1, 7 or 30 days — from GuideTurn metrics (no visitor text)", security: [{ adminSession: [] }], parameters: [{ name: days, in: query, schema: { type: integer, enum: [1, 7, 30], default: 7 } }], responses: { "200": { description: "{ days, summary: { turns, answered, instant, busy, errors, aborted, limited, resting, fallbackRate, failureRate, firstTokenMs: { p50, p95 }, totalMs: { p50, p95 }, avgInputTokens, avgOutputTokens, cacheShare, models: [{ model, turns }], claimsChecked, claimsFlagged, answersFlaggedShare }, perDay: [{ day, turns, failed }], recent: [{ id, at, outcome, servedModel, fallbackUsed, firstTokenMs, totalMs, tools, finishReason }], canary: [{ id, at, model, total, passed, failed, unavailable, results: [{ id, category, pass, problems }] }], gaps: [{ id, at, reason, question, page }] } — visitors only; the canary is listed separately; gaps are questions the site couldn't answer, scrubbed" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
   /admin/jobs/{job}/run:
     post: { tags: [Jobs (Admin)], summary: "Run a registered job now (#94) — same runner and lock as the schedule, recorded as started by this admin", security: [{ adminSession: [] }], parameters: [{ name: job, in: path, required: true, schema: { type: string, enum: [maintenance.daily, metrics.compute, github.sync] } }], responses: { "200": { description: "{ status: succeeded, runId, result }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "ALREADY_RUNNING" }, "500": { description: "{ status: failed, runId, error } — the run is recorded with its error" } } }
 

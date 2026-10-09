@@ -36,7 +36,10 @@ if (!process.env.CI && process.env.DATABASE_URL) {
 
 // The AI guide's integration tests share one piece of global state in the database
 // (the concierge flag, the guide's rate-limit buckets and daily cap), so they run one
-// file at a time. Everything else runs in parallel as before.
+// file at a time — and only once the rest have finished (a second group), so they
+// neither fight the other files over that state nor double the number of workers
+// competing for the machine and the database's connections. Everything else runs in
+// parallel as before.
 const GUIDE_INTEGRATION = ["tests/integration/guide-*.test.ts"];
 
 export default defineConfig({
@@ -59,6 +62,7 @@ export default defineConfig({
           env: { SCREENSHOT_SERVICE_URL: "off" },
           include: ["tests/**/*.test.{ts,tsx}"],
           exclude: ["node_modules/**", "tests/e2e/**", ".next/**", ...GUIDE_INTEGRATION],
+          sequence: { groupOrder: 1 },
         },
       },
       {
@@ -70,6 +74,7 @@ export default defineConfig({
           include: GUIDE_INTEGRATION,
           exclude: ["node_modules/**", ".next/**"],
           fileParallelism: false,
+          sequence: { groupOrder: 2 },
         },
       },
     ],

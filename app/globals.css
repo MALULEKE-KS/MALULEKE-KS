@@ -573,3 +573,24 @@ html {
   from { transform: translateY(-4rem); }
   to { transform: translateY(100vh); }
 }
+
+/* A section the AI guide's tour is showing (lib/guide/spotlight.ts) — visual only; still under reduced motion. */
+.guide-spotlight {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 8px;
+  border-radius: 1.5rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .guide-spotlight {
+    animation: guide-spotlight 1.6s ease-in-out 2;
+  }
+}
+@keyframes guide-spotlight {
+  0%,
+  100% {
+    outline-offset: 8px;
+  }
+  50% {
+    outline-offset: 14px;
+  }
+}

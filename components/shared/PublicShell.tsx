@@ -25,6 +25,8 @@ import { GuideProvider } from "@/components/guide/GuideProvider";
 import { guideProviderConfigured } from "@/lib/guide/model";
 import { GuideLauncher } from "@/components/guide/GuideLauncher";
 import { GuidePanel } from "@/components/guide/GuidePanel";
+import { getGuideCheck } from "@/lib/queries/guide-check";
+import { checkNoteOf } from "@/lib/guide/check-note";
 import { GuideChatProvider } from "@/components/guide/GuideChatProvider";
 import { getJourney } from "@/lib/queries/journey";
 import { SHEETS } from "@/lib/content/sheets";
@@ -47,6 +49,8 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     guideEnabled,
     lenses,
     maxQuestionCharacters,
+    logRetentionDays,
+    guideCheck,
     aiGuide,
     release,
     cv,
@@ -61,6 +65,8 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     isFlagOn(FLAGS.concierge),
     getPublicLenses(),
     getSetting("concierge.maxQuestionCharacters"),
+    getSetting("concierge.logRetentionDays"),
+    getGuideCheck(),
     getContentBlock("ai-guide"),
     getContentBlock("release"),
     getUploadedCvLink(),
@@ -97,6 +103,9 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
       >
         <GuideChatProvider
           maxQuestionCharacters={maxQuestionCharacters}
+          checkNote={checkNoteOf(guideCheck, aiGuide)}
+          answerTools={aiGuide ? { feedbackHelpful: aiGuide.feedbackHelpful, feedbackWrong: aiGuide.feedbackWrong, feedbackThanks: aiGuide.feedbackThanks, challengeLabel: aiGuide.challengeLabel, challengePrompt: aiGuide.challengePrompt } : null}
+          privacyNote={logRetentionDays > 0 && aiGuide?.privacyNote ? aiGuide.privacyNote.replaceAll("{retentionDays}", String(logRetentionDays)) : null}
           suggestions={aiGuide?.suggestions ?? []}
           pageSuggestions={aiGuide?.pageSuggestions ?? []}
           siteIndex={siteIndex}

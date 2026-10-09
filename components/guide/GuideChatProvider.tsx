@@ -16,6 +16,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import type { AnswerTools } from "@/components/guide/console/AnswerFeedback";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ChatStatus, type UIMessage } from "ai";
 import { readSessionLens, useGuide } from "@/components/guide/GuideProvider";
@@ -78,9 +79,18 @@ interface GuideChat {
   /** Up to four questions to start with — this page's first. */
   opening: string[];
   maxQuestionCharacters: number;
+  /** What the guide keeps of a question it can't answer, in the owner's words — shown beside the box; null when nothing is kept. */
+  privacyNote: string | null;
+  /** The guide's own nightly self-check, in the owner's words; null before the first run. */
+  checkNote: string | null;
+  /** The owner's words for the buttons under an answer (feedback, challenge); null when none are written. */
+  answerTools: AnswerTools | null;
   siteIndex: GuideSiteIndex;
   /** When the visitor last asked something (ms) — null until they do in this page view. */
   askedAt: number | null;
+  /** Where each guided tour is up to (by the tool call's id) — kept here so a tour survives the console moving between pages. */
+  tourStep: Record<string, number>;
+  setTourStep: (toolCallId: string, step: number) => void;
   send: (text: string) => void;
   /** A lens chip: remember the lens, then ask with its label. */
   pickLens: (key: string, label: string) => void;
@@ -93,12 +103,18 @@ const ChatContext = createContext<GuideChat | null>(null);
 
 export function GuideChatProvider({
   maxQuestionCharacters,
+  privacyNote = null,
+  checkNote = null,
+  answerTools = null,
   suggestions,
   pageSuggestions = [],
   siteIndex,
   children,
 }: {
   maxQuestionCharacters: number;
+  privacyNote?: string | null;
+  checkNote?: string | null;
+  answerTools?: AnswerTools | null;
   /** Example questions (the "ai-guide" content block). */
   suggestions: string[];
   /** Questions for particular pages, shown first there (the same block). */
@@ -215,6 +231,8 @@ export function GuideChatProvider({
   }, [lastText, status, speak, hush]);
 
   const [askedAt, setAskedAt] = useState<number | null>(null);
+  const [tourStep, setTourSteps] = useState<Record<string, number>>({});
+  const setTourStep = useCallback((id: string, step: number) => setTourSteps((s) => ({ ...s, [id]: step })), []);
   const send = useCallback(
     (text: string) => {
       const t = text.trim();
@@ -245,8 +263,13 @@ export function GuideChatProvider({
       thoughtFor,
       opening: [...new Set([...questionsFor(pathname, pageSuggestions), ...suggestions])].slice(0, 4),
       maxQuestionCharacters,
+      privacyNote,
+      checkNote,
+      answerTools,
       siteIndex,
       askedAt,
+      tourStep,
+      setTourStep,
       send,
       pickLens: (key, label) => {
         setLens(key);
@@ -262,9 +285,10 @@ export function GuideChatProvider({
         setMessages([]);
         clearError();
         setThoughtFor({});
+        setTourSteps({});
       },
     }),
-    [messages, status, busy, working, activity, error, thoughtFor, pathname, pageSuggestions, suggestions, maxQuestionCharacters, siteIndex, askedAt, send, setLens, stop, clearError, regenerate, setMessages],
+    [messages, status, busy, working, activity, error, thoughtFor, pathname, pageSuggestions, suggestions, maxQuestionCharacters, privacyNote, checkNote, answerTools, siteIndex, askedAt, tourStep, setTourStep, send, setLens, stop, clearError, regenerate, setMessages],
   );
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

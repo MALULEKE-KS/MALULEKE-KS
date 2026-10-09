@@ -17,9 +17,9 @@ import { z } from "zod";
 import type { UIMessage } from "ai";
 
 /** Tool parts the guide's own tools produce; anything else is refused. */
-export const GUIDE_TOOL_NAMES = ["open_page", "search_systems", "draft_inquiry", "show_systems", "show_journey", "show_skills", "show_pulse"] as const;
+export const GUIDE_TOOL_NAMES = ["open_page", "search_systems", "draft_inquiry", "show_systems", "show_journey", "show_skills", "show_pulse", "compare_systems", "fit_check", "start_tour"] as const;
 /** Tools the server runs: their results are never taken back from the browser — dropped, and run again if needed. */
-const SERVER_TOOLS = new Set(["tool-search_systems", "tool-show_systems", "tool-show_journey", "tool-show_skills", "tool-show_pulse"]);
+const SERVER_TOOLS = new Set(["tool-search_systems", "tool-show_systems", "tool-show_journey", "tool-show_skills", "tool-show_pulse", "tool-compare_systems", "tool-fit_check", "tool-start_tour"]);
 
 // Hard ceilings independent of the settings — the shape of a sane request.
 const MAX_MESSAGES = 220; // 100 questions (the setting's ceiling) + answers + slack

@@ -28,7 +28,7 @@ const OUTCOME_TONE: Record<string, "good" | "critical" | "neutral" | "attention"
 
 export default async function AdminGuideHealthPage({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   const days = parseWindow((await searchParams).days);
-  const { summary: s, perDay, recent, canary } = await loadGuideHealth(days);
+  const { summary: s, perDay, recent, canary, gaps, feedback } = await loadGuideHealth(days);
   const latest = canary[0];
   const peak = Math.max(1, ...perDay.map((d) => d.turns));
 
@@ -102,6 +102,8 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
             <Stat label="Full answer (p50 · p95)" value={`${ms(s.totalMs.p50)} · ${ms(s.totalMs.p95)}`} />
             <Stat label="Fallback model used" value={pct(s.fallbackRate)} tone={s.fallbackRate > 0.3 ? "attention" : "neutral"} />
             <Stat label="Prompt cache share" value={s.cacheShare === null ? "—" : pct(s.cacheShare)} />
+            <Stat label="Claims checked against the site" value={s.claimsChecked} />
+            <Stat label="Claims the site doesn't contain" value={`${s.claimsFlagged} · ${pct(s.answersFlaggedShare)} of answers`} tone={s.answersFlaggedShare > 0.1 ? "attention" : "neutral"} />
           </div>
 
           <div className="mb-6 grid gap-4 lg:grid-cols-3">
@@ -134,6 +136,53 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
               )}
             </Panel>
           </div>
+
+          <Panel
+            title="What the site couldn't answer"
+            description="Questions the guide couldn't answer from the site's data, or answered with something the data doesn't contain — contact details removed, nothing that says who asked. Each is a gap to close in Page content, Systems or Journey."
+            className="mb-6"
+          >
+            {gaps.length === 0 ? (
+              <p className="text-sm text-slate">None in this window — or the setting concierge.logRetentionDays is 0, which keeps no question text.</p>
+            ) : (
+              <ul className="divide-y divide-ink/[0.06]">
+                {gaps.map((g) => (
+                  <li key={g.id} className="flex flex-wrap items-start justify-between gap-2 py-2.5 first:pt-0 last:pb-0">
+                    <span className="min-w-0 max-w-2xl break-words text-sm text-ink">{g.question}</span>
+                    <span className="flex shrink-0 items-center gap-2 text-xs text-slate">
+                      <Pill tone={g.reason === "unverified" ? "attention" : "neutral"}>{g.reason === "unverified" ? "answered beyond the data" : "couldn't answer"}</Pill>
+                      {g.page && <span className="font-mono">{g.page}</span>}
+                      <span>{formatWhen(g.at)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title="What visitors said about answers"
+            description={`${feedback.wrong} marked wrong · ${feedback.helpful} helpful. Each is a visitor's own report, with the question and the answer's opening (contact details removed, nothing that says who sent it). A wrong one is a candidate for a new test case.`}
+            className="mb-6"
+          >
+            {feedback.recent.length === 0 ? (
+              <p className="text-sm text-slate">Nothing yet — or concierge.logRetentionDays is 0, which keeps no visitor text.</p>
+            ) : (
+              <ul className="divide-y divide-ink/[0.06]">
+                {feedback.recent.map((f) => (
+                  <li key={f.id} className="space-y-1 py-3 first:pt-0 last:pb-0">
+                    <p className="flex flex-wrap items-center gap-2 text-xs text-slate">
+                      <Pill tone={f.rating === "wrong" ? "critical" : "good"}>{f.rating === "wrong" ? "wrong" : "helpful"}</Pill>
+                      {f.page && <span className="font-mono">{f.page}</span>}
+                      <span>{formatWhen(f.at)}</span>
+                    </p>
+                    <p className="break-words text-sm text-ink">{f.question}</p>
+                    <p className="break-words text-xs text-slate">{f.answer}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
 
           <Panel title="Latest questions" description="Timings and tools only.">
             <div className="-m-5 overflow-x-auto">

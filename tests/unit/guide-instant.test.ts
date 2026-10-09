@@ -26,7 +26,7 @@ describe("matchInstant — takes the plain forms", () => {
     ["What is the platform status?", "pulse"],
     ["how many business rules does the platform enforce", "pulse"],
   ])("%s → %s", (question, intent) => {
-    expect(matchInstant(question)).toBe(intent);
+    expect(matchInstant(question, 90)).toBe(intent);
   });
 });
 
@@ -46,11 +46,13 @@ describe("matchInstant — leaves everything with substance to the model", () =>
     "",
     "   ",
   ])("%j goes to the model", (question) => {
-    expect(matchInstant(question)).toBeNull();
+    expect(matchInstant(question, 90)).toBeNull();
   });
 
-  it("never matches a long question, whatever it contains", () => {
-    expect(matchInstant(`how do i contact him ${"really ".repeat(30)}`)).toBeNull();
+  it("never matches a question longer than the owner's limit, whatever it contains", () => {
+    expect(matchInstant(`how do i contact him ${"really ".repeat(30)}`, 90)).toBeNull();
+    expect(matchInstant("How do I contact him?", 10)).toBeNull();
+    expect(matchInstant("How do I contact him?", 40)).toBe("contact");
   });
 });
 
@@ -77,6 +79,8 @@ const TEMPLATES: InstantTemplates = {
   cvNone: "No CV for {owner} right now.",
   counts: "{owner} has {systems} — {breakdown}. {privateNote} See /systems.",
   pulse: "{rules} rules; {audited7} audited this week; {auditedTotal} in all.",
+  privateOne: "{privateCount} of them keeps its code private.",
+  privateMany: "{privateCount} of them keep their code private.",
 };
 const FACTS: GuideFacts = {
   email: "k@example.org",
@@ -98,10 +102,17 @@ describe("buildInstant", () => {
   });
 
   it("counts: quotes computed totals and says how many are private", () => {
-    expect(buildInstant("counts", FACTS, "Kurhula", TEMPLATES)?.text).toBe("Kurhula has 5 systems — 3 live, 2 in progress. 2 systems keep their code in private repositories. See /systems.");
+    expect(buildInstant("counts", FACTS, "Kurhula", TEMPLATES)?.text).toBe("Kurhula has 5 systems — 3 live, 2 in progress. 2 of them keep their code private. See /systems.");
     const one = buildInstant("counts", { ...FACTS, systems: { total: 1, privateCount: 1, byStatus: [{ status: "Live", count: 1 }] } }, "Kurhula", TEMPLATES)?.text;
-    expect(one).toBe("Kurhula has 1 system — 1 live. 1 system keeps its code in a private repository. See /systems.");
+    expect(one).toBe("Kurhula has 1 system — 1 live. 1 of them keeps its code private. See /systems.");
     expect(buildInstant("counts", { ...FACTS, systems: { total: 2, privateCount: 0, byStatus: [{ status: "Live", count: 2 }] } }, "Kurhula", TEMPLATES)?.text).toBe("Kurhula has 2 systems — 2 live. See /systems.");
+  });
+
+  it("counts: says nothing about private repositories where the owner has written no note", () => {
+    const { privateOne, privateMany, ...bare } = TEMPLATES;
+    void privateOne;
+    void privateMany;
+    expect(buildInstant("counts", FACTS, "Kurhula", bare)?.text).toBe("Kurhula has 5 systems — 3 live, 2 in progress. See /systems.");
   });
 
   it("counts: with nothing published, leaves it to the model rather than saying 0", () => {
@@ -142,6 +153,8 @@ describe("the guide-instant content block", () => {
     cvNone: "{owner}",
     counts: "{owner} {systems} {breakdown} {privateNote}",
     pulse: "{owner} {rules} {audited7} {auditedTotal}",
+    privateOne: "{privateCount}",
+    privateMany: "{privateCount}",
   };
 
   it("accepts templates that use only their own placeholders", () => {

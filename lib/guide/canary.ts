@@ -17,8 +17,6 @@ import { CANARY_CASES, type CanaryCase } from "@/lib/guide/canary-cases";
 import { handleGuideRequest } from "@/lib/guide/handler";
 import { readGuideStream } from "@/lib/guide/read-stream";
 
-/** Don't start a new question past this many ms — the job's time budget is 300 s. */
-const TIME_BUDGET_MS = 230_000;
 const CANARY_ADDRESS = "198.18.0.7"; // benchmark address space: never a real visitor
 
 export interface CanaryResult {
@@ -66,6 +64,8 @@ export interface RunCanaryOptions {
   ask?: Ask;
   cases?: CanaryCase[];
   paceMs?: number;
+  /** Don't start a new question past this many ms (concierge.canary.timeBudgetSeconds). */
+  timeBudgetMs?: number;
   now?: () => number;
   sleep?: (ms: number) => Promise<void>;
 }
@@ -77,13 +77,14 @@ export async function runCanaryCases(options: RunCanaryOptions = {}): Promise<{ 
   const now = options.now ?? Date.now;
   const sleep = options.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const paceMs = options.paceMs ?? (await getSetting("concierge.canary.paceSeconds")) * 1000;
+  const timeBudgetMs = options.timeBudgetMs ?? (await getSetting("concierge.canary.timeBudgetSeconds")) * 1000;
   const systemNames = cases.some((c) => c.needs === "systemNames") ? (await dbPublic.publicSystem.findMany({ select: { name: true } })).map((s) => s.name) : [];
 
   const started = now();
   const results: CanaryResult[] = [];
   let ranOutOfTime = false;
   for (const [i, c] of cases.entries()) {
-    if (now() - started > TIME_BUDGET_MS) {
+    if (now() - started > timeBudgetMs) {
       ranOutOfTime = true;
       results.push({ id: c.id, category: c.category, pass: null, problems: ["not run: out of time"] });
       continue;
