@@ -84,6 +84,14 @@ describe("technologies", () => {
     expect(kinds("I don't see AWS listed anywhere in his data.")).toEqual([]);
   });
 
+  it("does not count a technology a role asks for, or a gap named against him", () => {
+    expect(kinds("This profile fits a backend role well, but the Kubernetes experience asked for here is beyond what the evidence supports.")).toEqual([]);
+    expect(kinds("The role requires Terraform, and his data shows none of it yet.")).toEqual([]);
+    expect(kinds("The gap is Ansible: he is missing that.")).toEqual([]);
+    // …while a plain claim that he has it is still checked.
+    expect(kinds("He runs his platform on Kubernetes.")).toEqual(["technology:Kubernetes"]);
+  });
+
   it("keeps Java and JavaScript apart and ignores ordinary words", () => {
     expect(techMentions("He knows JavaScript well")).toEqual(["JavaScript"]);
     expect(techMentions("Go and rust the old gate; a ruby ring")).toEqual([]);
