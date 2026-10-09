@@ -34,19 +34,44 @@ if (!process.env.CI && process.env.DATABASE_URL) {
   }
 }
 
+// The AI guide's integration tests share one piece of global state in the database
+// (the concierge flag, the guide's rate-limit buckets and daily cap), so they run one
+// file at a time. Everything else runs in parallel as before.
+const GUIDE_INTEGRATION = ["tests/integration/guide-*.test.ts"];
+
 export default defineConfig({
   plugins: [react()],
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: [],
-    // Never call the real screenshot service from a test run (lib/systems/screenshots.ts).
-    env: { SCREENSHOT_SERVICE_URL: "off" },
-    exclude: ["node_modules/**", "tests/e2e/**", ".next/**"],
-  },
   resolve: {
     alias: {
       "@": path.resolve(dirname, "."),
     },
+  },
+  test: {
+    globals: true,
+    setupFiles: [],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "default",
+          environment: "jsdom",
+          // Never call the real screenshot service from a test run (lib/systems/screenshots.ts).
+          env: { SCREENSHOT_SERVICE_URL: "off" },
+          include: ["tests/**/*.test.{ts,tsx}"],
+          exclude: ["node_modules/**", "tests/e2e/**", ".next/**", ...GUIDE_INTEGRATION],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "guide-serial",
+          environment: "jsdom",
+          env: { SCREENSHOT_SERVICE_URL: "off" },
+          include: GUIDE_INTEGRATION,
+          exclude: ["node_modules/**", ".next/**"],
+          fileParallelism: false,
+        },
+      },
+    ],
   },
 });

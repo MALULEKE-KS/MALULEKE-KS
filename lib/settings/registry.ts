@@ -221,6 +221,12 @@ export const SETTINGS = {
     description: "How long the guide keeps its speed and reliability numbers (one row per question: timings, model, tokens — never what a visitor typed or who they are).",
     rule: "Constitution §6",
   }),
+  "concierge.canary.paceSeconds": define({
+    schema: z.number().int().min(0).max(60),
+    default: 13,
+    description: "Seconds the guide's daily self-check waits between its questions — the free models allow about five requests a minute for the whole site, so it must not hurry (0 for a paid model).",
+    rule: "Constitution §6",
+  }),
   // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
   "inquiry.minFillSeconds": define({
     schema: z.number().int().min(0).max(60),

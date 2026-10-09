@@ -115,8 +115,9 @@ describe("admin: run now, and the list of jobs (#94)", () => {
   it("lists every job with its schedule, and each run's trigger", async () => {
     const res = await listJobs(new NextRequest("http://localhost/api/v1/admin/jobs", { headers: { cookie: `admin_session=${cookie}` } }));
     const body = await res.json();
-    expect(body.jobs.map((j: { name: string }) => j.name).sort()).toEqual(["github.sync", "maintenance.daily", "metrics.compute", "notifications.send", "systems.screenshots", "systems.writeups"]);
-    expect(body.jobs.every((j: { schedule: string | null }) => j.schedule === "0 3 * * *")).toBe(true);
+    expect(body.jobs.map((j: { name: string }) => j.name).sort()).toEqual(["github.sync", "guide.canary", "maintenance.daily", "metrics.compute", "notifications.send", "systems.screenshots", "systems.writeups"]);
+    // The daily batch shares one schedule; the AI guide's canary has its own cron entry.
+    for (const j of body.jobs as { name: string; schedule: string | null }[]) expect(j.schedule).toBe(j.name === "guide.canary" ? "30 1 * * *" : "0 3 * * *");
     expect(body.data[0]).toHaveProperty("trigger");
   });
 });

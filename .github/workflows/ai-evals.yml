@@ -1,0 +1,100 @@
+# The AI guide's evals (BR-4.3, BR-4.6; Constitution §6; docs/AI-GUIDE-PHASE2-PLAN.md §4 B4).
+#
+# - On a pull request that touches the guide (its prompt, grounding, tools, limits,
+#   or the evals themselves): the "gate" tier — the cases that need no site content
+#   (hallucination traps, commitments, privacy, attacks, safety, tone, honesty). A
+#   failing case fails the job.
+# - Every night: the same, so a model change on the provider's side is caught too.
+# - By hand (workflow_dispatch): any tier. The "content" tier needs the real published
+#   content, which CI's database doesn't have — run it locally against the dev
+#   database (npm run test:ai-evals with AI_EVAL_TIER=content).
+#
+# Needs the repository secret AI_GATEWAY_API_KEY. Without it the job still runs but
+# says, in an annotation and the job summary, that the evals were NOT RUN — it never
+# reports a quiet pass. The free models allow about five requests a minute for the
+# whole site (the live guide shares that), so the run paces itself (AI_EVAL_PACE_MS)
+# and the nightly run is at 22:00 UTC, midnight in South Africa.
+name: AI evals
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/guide/**"
+      - "app/api/v1/guide/**"
+      - "tests/ai-evals/**"
+      - "lib/settings/registry.ts"
+      - "lib/queries/**"
+      - "lib/content/**"
+      - "prisma/migrations/**"
+      - ".github/workflows/ai-evals.yml"
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "gate (no site content needed) or all"
+        default: "gate"
+        type: choice
+        options: [gate, all]
+      only:
+        description: "Regex over case ids, to run a few (optional)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: malulekeks_evals
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_evals
+      DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_evals
+      DATABASE_URL_PUBLIC: postgresql://ci_public:ci_public@localhost:5432/malulekeks_evals
+      NEXTAUTH_SECRET: ci-test-only-not-a-real-secret
+      TWO_FACTOR_ENCRYPTION_KEY: ci-test-only-not-a-real-key
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+      # The judge and the pace are repository variables, so they can follow the free models
+      # without a code change. A paid judge (anthropic/claude-haiku-4.5) needs paid credit.
+      AI_EVAL_JUDGE_MODEL: ${{ vars.AI_EVAL_JUDGE_MODEL || 'poolside/laguna-s-2.1-free' }}
+      AI_EVAL_PACE_MS: ${{ vars.AI_EVAL_PACE_MS || '20000' }}
+      AI_EVAL_TIER: ${{ inputs.tier || 'gate' }}
+      AI_EVAL_ONLY: ${{ inputs.only }}
+      AI_EVAL_OUT: ai-eval-results.json
+    steps:
+      - uses: actions/checkout@v4
+      - name: Say so when there is no model to test
+        if: env.AI_GATEWAY_API_KEY == ''
+        run: echo "::warning title=AI evals not run::The repository secret AI_GATEWAY_API_KEY is not set, so the guide's behaviour was NOT tested by this run. Add the secret to enable the gate."
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - name: Create the restricted public login
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d malulekeks_evals -c "CREATE ROLE ci_public LOGIN PASSWORD 'ci_public' IN ROLE platform_public;"
+      - run: npx tsx prisma/seed.ts
+      - name: Run the evals
+        run: npm run test:ai-evals
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-eval-results
+          path: ai-eval-results.json
+          if-no-files-found: ignore

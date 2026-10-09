@@ -13,6 +13,8 @@ export type GuideOutcome = (typeof GUIDE_OUTCOMES)[number];
 
 export interface GuideTurnRecord {
   outcome: GuideOutcome;
+  /** Who asked: a visitor, or the daily canary (kept out of the visitors' numbers). */
+  source?: "visitor" | "canary";
   configuredModel?: string | null;
   servedModel?: string | null;
   firstTokenMs?: number | null;
@@ -47,6 +49,7 @@ export async function recordGuideTurn(rec: GuideTurnRecord): Promise<void> {
     await db.guideTurn.create({
       data: {
         outcome: rec.outcome,
+        source: rec.source ?? "visitor",
         configuredModel: rec.configuredModel ?? null,
         servedModel: served,
         fallbackUsed: Boolean(served && rec.configuredModel && served !== rec.configuredModel),

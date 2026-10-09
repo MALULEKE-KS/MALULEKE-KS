@@ -13,6 +13,7 @@ import { runDailyMaintenance } from "@/lib/jobs/maintenance";
 import { runSystemWriteups } from "@/lib/jobs/system-writeups";
 import { runSystemScreenshots } from "@/lib/systems/screenshots";
 import { sendDue } from "@/lib/notifications";
+import { runGuideCanary } from "@/lib/guide/canary";
 import { runJob, type JobTrigger, type RunJobResult } from "@/lib/jobs/run-job";
 import { DAILY_JOBS } from "@/lib/jobs/schedule";
 
@@ -32,6 +33,15 @@ export const JOBS = {
     description: "Compute the registered numbers from public data and propose any changed value for the admin to approve (BR-5.3).",
     rules: ["BR-5.3"],
     run: () => db.$transaction((tx) => proposeComputedMetrics(tx)),
+  },
+  "guide.canary": {
+    description: "Put a few fixed questions through the live AI guide and check each answer by plain rules (no leaked instructions, no salary figure, still itself, still grounded) — a failure is the earliest sign a prompt, model or limit broke it. Records the run for Admin → Guide health.",
+    rules: ["BR-4.3", "BR-4.6"],
+    run: async () => {
+      const summary = await runGuideCanary("schedule");
+      if (summary.failed > 0) throw new Error(`The guide failed ${summary.failed} of ${summary.total} canary checks: ${summary.failedIds.join(", ")}.`);
+      return summary;
+    },
   },
   "github.sync": {
     description: "Sync every repo the owner's GitHub token can see into the curation queue, with metadata and weekly activity.",

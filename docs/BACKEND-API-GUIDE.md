@@ -926,7 +926,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 
 `admin.guide-health` · admin
 
-How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns. Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1).
+How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns; plus the nightly self-check (a few fixed questions put through the live guide and checked by plain rules). Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1, §4 B4).
 
 **Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
 
@@ -935,14 +935,16 @@ How fast and reliable the AI guide is: one metrics row per question — outcome,
 **Database**
 
 - `GuideTurn`
+- `GuideEvalRun`
 - `prune_guide_logs`
 
-**Rules:** BR-4.3, BR-5.2
+**Rules:** BR-4.3, BR-4.6, BR-5.2
 
 **Notes**
 
 - The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
-- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database.
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.
+- The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.
 
 ## Database objects → capabilities
 
@@ -960,6 +962,7 @@ How fast and reliable the AI guide is: one metrics row per question — outcome,
 | `Education` | admin.cv, admin.freshness |
 | `Experience` | admin.cv, admin.freshness |
 | `Flag` | admin.settings |
+| `GuideEvalRun` | admin.guide-health |
 | `GuideTurn` | admin.guide-health |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |

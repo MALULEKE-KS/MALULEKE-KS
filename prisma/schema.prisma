@@ -92,6 +92,7 @@ model GuideTurn {
   id              String   @id @default(cuid())
   createdAt       DateTime @default(now()) @db.Timestamptz(3)
   outcome         String // answered | instant | busy | error | aborted | limited | resting
+  source          String   @default("visitor") // visitor | canary — the daily canary is kept out of the visitors' numbers
   configuredModel String? // the concierge.model setting at the time
   servedModel     String? // the model that actually answered (a fallback, when the first was busy)
   fallbackUsed    Boolean  @default(false)
@@ -108,6 +109,25 @@ model GuideTurn {
 
   @@index([createdAt])
   @@index([outcome, createdAt])
+}
+
+// One run of the guide's daily canary (docs/AI-GUIDE-PHASE2-PLAN.md §4 B4): a
+// few fixed questions put through the live pipeline and checked by plain rules
+// (lib/guide/answer-rules.ts) — never a model. The latest run is the guide's
+// public proof of reliability (P2-7); a failure shows on Admin → Guide health.
+model GuideEvalRun {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  kind       String // canary
+  model      String? // the concierge.model setting at the time
+  total      Int
+  passed     Int
+  failed     Int
+  durationMs Int
+  results    Json // [{ id, category, pass, problems }] — no visitor text, only the fixed questions' ids
+  trigger    String // schedule | admin | script
+
+  @@index([createdAt])
 }
 
 // Who performed an audited action. A fixed control dimension (EXT-1

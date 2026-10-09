@@ -123,35 +123,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
           DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@localhost:5432/malulekeks_ci
 
-  ai-eval:
-    runs-on: ubuntu-latest
-    # Gates any change touching the concierge system prompt or grounding data.
-    # Constitution §6 — a failing eval blocks merge exactly like a failing unit test.
-    # `changed_files` is not a real Actions context field — path detection
-    # needs an actual diff, hence the paths-filter step below gating the job.
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: ai-paths
-        with:
-          filters: |
-            ai:
-              - 'lib/ai/**'
-              - 'lib/prompts/**'
-      - uses: actions/setup-node@v4
-        if: steps.ai-paths.outputs.ai == 'true'
-        with:
-          node-version: "24"
-          cache: "npm"
-      - if: steps.ai-paths.outputs.ai == 'true'
-        run: npm ci
-      # Placeholder until the EvalCase fixture set and runner exist (V1.1,
-      # Constitution §6) — wired here now so the gate is in place from day one
-      # rather than bolted on after the concierge ships.
-      - if: steps.ai-paths.outputs.ai == 'true'
-        run: npm run test:ai-evals
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+# The AI guide's evals have their own workflow: .github/workflows/ai-evals.yml
 
   build:
     needs: [lint, test, migration-check]

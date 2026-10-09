@@ -10,6 +10,7 @@ import { summariseTurns, turnsPerDay, type HealthSummary, type TurnRow } from "@
 export const HEALTH_WINDOWS = [1, 7, 30] as const;
 const MAX_ROWS = 20_000;
 const RECENT = 30;
+const CANARY_RUNS = 14;
 
 export interface RecentTurn {
   id: string;
@@ -23,11 +24,25 @@ export interface RecentTurn {
   finishReason: string | null;
 }
 
+export interface CanaryRun {
+  id: string;
+  at: string;
+  model: string | null;
+  total: number;
+  passed: number;
+  failed: number;
+  /** Questions the guide couldn't answer at all (busy, resting) — not counted against it. */
+  unavailable: number;
+  results: { id: string; category: string; pass: boolean | null; problems: string[] }[];
+}
+
 export interface GuideHealth {
   days: number;
   summary: HealthSummary;
   perDay: { day: string; turns: number; failed: number }[];
   recent: RecentTurn[];
+  /** The daily canary's latest runs, newest first. */
+  canary: CanaryRun[];
 }
 
 export function parseWindow(raw: string | null | undefined): number {
@@ -38,10 +53,11 @@ export function parseWindow(raw: string | null | undefined): number {
 export async function loadGuideHealth(days: number, now = new Date()): Promise<GuideHealth> {
   const since = new Date(now.getTime() - days * 86_400_000);
   const rows = await db.guideTurn.findMany({
-    where: { createdAt: { gte: since } },
+    where: { createdAt: { gte: since }, source: "visitor" },
     orderBy: { createdAt: "desc" },
     take: MAX_ROWS,
   });
+  const runs = await db.guideEvalRun.findMany({ where: { kind: "canary" }, orderBy: { createdAt: "desc" }, take: CANARY_RUNS });
   const turns: TurnRow[] = rows;
   return {
     days,
@@ -58,5 +74,18 @@ export async function loadGuideHealth(days: number, now = new Date()): Promise<G
       tools: r.tools,
       finishReason: r.finishReason,
     })),
+    canary: runs.map((r) => {
+      const results = (Array.isArray(r.results) ? r.results : []) as CanaryRun["results"];
+      return {
+        id: r.id,
+        at: r.createdAt.toISOString(),
+        model: r.model,
+        total: r.total,
+        passed: r.passed,
+        failed: r.failed,
+        unavailable: results.filter((x) => x.pass === null).length,
+        results,
+      };
+    }),
   };
 }

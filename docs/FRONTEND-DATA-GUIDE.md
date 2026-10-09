@@ -415,11 +415,12 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 ### /admin/guide
 
-**AI guide health** — Guide health: questions, failures, timings, models, per-day chart, latest turns
+**AI guide health** — Guide health: daily self-check, questions, failures, timings, models, per-day chart, latest turns
 
 - Call `GET /admin/guide/health`
 - The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
-- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database.
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.
+- The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.
 
 ### /admin/inquiries
 

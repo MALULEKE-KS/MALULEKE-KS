@@ -100,7 +100,7 @@ maluleke-ks/
     ├── unit/                          # pure logic (session, CV engine, migration guard, display names, vercel config)
     ├── integration/                   # route handlers + the real local test database (.env.test.local)
     ├── e2e/                           # Playwright, in CI: mobile.spec (360/390 px), a11y.spec (axe), share-images.spec
-    ├── ai-evals/                      # the AI guide's evals (Constitution §6)
+    ├── ai-evals/                      # the AI guide's evals as data (cases.ts) + the runner (Constitution §6, docs/AI-GUIDE-PHASE2-PLAN.md §4)
     └── helpers/
 ```
 

@@ -28,7 +28,8 @@ const OUTCOME_TONE: Record<string, "good" | "critical" | "neutral" | "attention"
 
 export default async function AdminGuideHealthPage({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   const days = parseWindow((await searchParams).days);
-  const { summary: s, perDay, recent } = await loadGuideHealth(days);
+  const { summary: s, perDay, recent, canary } = await loadGuideHealth(days);
+  const latest = canary[0];
   const peak = Math.max(1, ...perDay.map((d) => d.turns));
 
   return (
@@ -48,6 +49,45 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
           </Link>
         ))}
       />
+
+      <Panel
+        title="Daily self-check"
+        description="Fixed questions put through the live guide each night and checked by plain rules — not a model. A failure means a prompt, model or limit changed what the guide is."
+        className="mb-6"
+      >
+        {!latest ? (
+          <p className="text-sm text-slate">No run yet. It runs nightly at 01:30 UTC; Jobs → guide.canary runs it now.</p>
+        ) : (
+          <>
+            <p className="flex flex-wrap items-center gap-2 text-sm text-ink">
+              <Pill tone={latest.failed > 0 ? "critical" : latest.total === 0 ? "attention" : "good"}>
+                {latest.total === 0 ? "could not run" : latest.failed > 0 ? `${latest.failed} failed` : "all passed"}
+              </Pill>
+              <span>
+                {latest.passed} of {latest.total} answered correctly
+                {latest.unavailable > 0 && ` · ${latest.unavailable} the guide couldn't answer (busy or resting)`}
+              </span>
+              <span className="text-xs text-slate">{formatWhen(latest.at)}{latest.model ? ` · ${latest.model}` : ""}</span>
+            </p>
+            <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
+              {latest.results.map((r) => (
+                <li key={r.id} className="flex items-start gap-2">
+                  <Pill tone={r.pass === true ? "good" : r.pass === false ? "critical" : "neutral"}>{r.pass === true ? "pass" : r.pass === false ? "fail" : "n/a"}</Pill>
+                  <span className="min-w-0">
+                    <span className="font-mono text-xs text-ink">{r.id}</span>
+                    {r.problems.length > 0 && <span className="block break-words text-xs text-slate">{r.problems.join("; ")}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {canary.length > 1 && (
+              <p className="mt-3 text-xs text-slate">
+                Earlier runs: {canary.slice(1).map((r) => `${r.at.slice(5, 10)} ${r.failed > 0 ? `✗${r.failed}` : r.total === 0 ? "–" : "✓"}`).join(" · ")}
+              </p>
+            )}
+          </>
+        )}
+      </Panel>
 
       {s.turns === 0 ? (
         <EmptyState icon={Gauge}>No questions in this window yet. Numbers appear as visitors talk to the guide.</EmptyState>
