@@ -6,7 +6,8 @@
 import { NextResponse } from "next/server";
 import { getGuideCheck } from "@/lib/queries/guide-check";
 
-export const revalidate = 300;
+// Read at request time (cached for five minutes by the header below), never prerendered at build.
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const check = await getGuideCheck();

@@ -3,6 +3,10 @@
 // (docs/AI-GUIDE-PHASE2-PLAN.md §7). Read through the public role from the
 // PublicGuideCheck view: when it ran, how many fixed questions it asked, and how
 // each came out — never an answer or anything a visitor wrote.
+//
+// It is a nicety beside the chat box, so it can never be allowed to break a page: if
+// the view can't be read (a database that hasn't had the migration yet, a blip), there
+// is simply no self-check to show.
 
 import { cache } from "react";
 import { dbPublic } from "@/lib/db";
@@ -18,14 +22,18 @@ export interface GuideCheck {
 }
 
 export const getGuideCheck = cache(async (): Promise<GuideCheck | null> => {
-  const row = await dbPublic.publicGuideCheck.findFirst();
-  if (!row) return null;
-  return {
-    ranAt: row.ranAt.toISOString(),
-    total: row.total,
-    passed: row.passed,
-    failed: row.failed,
-    unavailable: row.unavailable,
-    checks: Array.isArray(row.checks) ? (row.checks as GuideCheck["checks"]) : [],
-  };
+  try {
+    const row = await dbPublic.publicGuideCheck.findFirst();
+    if (!row) return null;
+    return {
+      ranAt: row.ranAt.toISOString(),
+      total: row.total,
+      passed: row.passed,
+      failed: row.failed,
+      unavailable: row.unavailable,
+      checks: Array.isArray(row.checks) ? (row.checks as GuideCheck["checks"]) : [],
+    };
+  } catch {
+    return null;
+  }
 });
