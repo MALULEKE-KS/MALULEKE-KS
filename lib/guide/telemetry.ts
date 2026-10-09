@@ -35,6 +35,16 @@ export interface GuideTurnRecord {
   route?: unknown;
 }
 
+/**
+ * The gateway reports a model by its plain name ("vendor/model") even when it was asked for under a
+ * tier suffix ("vendor/model-free", "vendor/model:free"), so two ids name the same model when they
+ * match once the suffix is gone — otherwise every answer from a free primary would count as a fallback.
+ */
+export function sameModel(a: string | null | undefined, b: string | null | undefined): boolean {
+  const plain = (id: string) => id.trim().toLowerCase().replace(/(?:[-:]free)$/, "");
+  return Boolean(a && b && plain(a) === plain(b));
+}
+
 const whole = (n: number | null | undefined) => (typeof n === "number" && Number.isFinite(n) && n >= 0 ? Math.round(n) : null);
 
 /** A bounded, JSON-safe copy of what the gateway said about routing — or null. */
@@ -58,7 +68,7 @@ export async function recordGuideTurn(rec: GuideTurnRecord): Promise<void> {
         source: rec.source ?? "visitor",
         configuredModel: rec.configuredModel ?? null,
         servedModel: served,
-        fallbackUsed: Boolean(served && rec.configuredModel && served !== rec.configuredModel),
+        fallbackUsed: Boolean(served && rec.configuredModel && !sameModel(served, rec.configuredModel)),
         firstTokenMs: whole(rec.firstTokenMs),
         totalMs: whole(rec.totalMs),
         inputTokens: whole(rec.inputTokens),

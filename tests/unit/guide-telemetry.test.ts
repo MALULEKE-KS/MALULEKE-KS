@@ -3,7 +3,7 @@
 // are pure functions of the metrics rows — tested here without a database.
 
 import { describe, expect, it } from "vitest";
-import { percentile, startTurnTimer, summariseTurns, turnsPerDay, type TurnRow } from "@/lib/guide/telemetry";
+import { percentile, sameModel, startTurnTimer, summariseTurns, turnsPerDay, type TurnRow } from "@/lib/guide/telemetry";
 
 const row = (over: Partial<TurnRow> = {}): TurnRow => ({
   createdAt: new Date("2026-10-09T10:00:00Z"),
@@ -129,5 +129,20 @@ describe("startTurnTimer", () => {
     timer.firstToken(); // a second call must not move it
     expect(timer.firstTokenMs).toBe(450);
     expect(timer.elapsed()).toBe(1000);
+  });
+});
+
+describe("sameModel — a free primary is not its own fallback", () => {
+  it("matches a model by its plain name, whichever tier suffix it was asked for under", () => {
+    expect(sameModel("inclusionai/ling-3.1-flash", "inclusionai/ling-3.1-flash-free")).toBe(true);
+    expect(sameModel("vendor/model", "vendor/model:free")).toBe(true);
+    expect(sameModel("Vendor/Model", "vendor/model")).toBe(true);
+    expect(sameModel("anthropic/claude-haiku-4.5", "anthropic/claude-haiku-4.5")).toBe(true);
+  });
+  it("tells different models apart, and never matches nothing", () => {
+    expect(sameModel("poolside/laguna-s-2.1", "inclusionai/ling-3.1-flash-free")).toBe(false);
+    expect(sameModel("vendor/model-a", "vendor/model-b-free")).toBe(false);
+    expect(sameModel(null, "vendor/model")).toBe(false);
+    expect(sameModel("vendor/model", undefined)).toBe(false);
   });
 });
