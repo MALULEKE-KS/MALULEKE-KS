@@ -36,8 +36,8 @@ export interface Verification {
 
 // A sentence is about him or the site when it says so — or names one of his systems (see aboutHim below).
 const ABOUT_HIM = /\b(he|his|him|kurhula|himself|platform|the site|this site|portfolio|the guide|the system|this system|that system|his work)\b/i;
-// A denial or a hedge: the sentence isn't asserting the thing it names.
-const DENIES = /n't\b|\b(not|no|never|none|without|nothing|neither|nor|lacks?|lacking|cannot|unlisted|unverified|unclear|unknown)\b/i;
+// A denial, a hedge, or a statement of what a role *asks for*: the sentence isn't asserting that he has the thing it names.
+const DENIES = /n't\b|\b(not|no|never|none|without|nothing|neither|nor|lacks?|lacking|cannot|unlisted|unverified|unclear|unknown|beyond|gaps?|missing|yet|asked for|asks for|requires?|required|requirements?|needs?|needed|wants?|looking for)\b/i;
 const QUANTITY = /\b(\d{1,3}(?:[ ,]\d{3})+|\d+)\s+(systems?|projects?|repos?|repositories|commits?|rules?|stars?|users?|customers?|clients?|downloads?|years?|months?|weeks?|days?|hours?)\b/gi;
 const YEAR = /\b(?:19|20)\d{2}\b/g;
 const URL = /https?:\/\/[^\s)\]>"'`]+/g;
