@@ -26,6 +26,8 @@ export interface GuideTurnRecord {
   steps?: number;
   tools?: string[];
   finishReason?: string | null;
+  /** The humor level the governor allowed for this reply. */
+  humor?: "off" | "dry" | "playful" | null;
   route?: unknown;
 }
 
@@ -62,6 +64,7 @@ export async function recordGuideTurn(rec: GuideTurnRecord): Promise<void> {
         steps: Math.max(0, rec.steps ?? 0),
         tools: (rec.tools ?? []).slice(0, 12),
         finishReason: rec.finishReason ?? null,
+        humor: rec.humor ?? null,
         route: boundedRoute(rec.route),
       },
     });

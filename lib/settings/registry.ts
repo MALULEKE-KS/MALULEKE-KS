@@ -215,6 +215,13 @@ export const SETTINGS = {
     description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
     rule: "Constitution §6",
   }),
+  "concierge.humor": define({
+    schema: z.enum(["off", "dry", "playful"]),
+    // dry: a touch of wit, one turn in three at most, never when the moment is serious (lib/guide/tone.ts).
+    default: "dry" as "off" | "dry" | "playful",
+    description: "The most wit the AI guide may use: off (always steady), dry (an occasional dry line — the default) or playful (plays along when the visitor does). Whatever you choose, it is never funny when someone is stressed, hurting or asking about money, law or health.",
+    rule: "Constitution §6",
+  }),
   "concierge.firstTokenDeadlineMs": define({
     schema: z.number().int().min(0).max(30000),
     default: 0,

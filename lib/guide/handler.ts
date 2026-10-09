@@ -35,6 +35,7 @@ import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { liveGatewayModels, pickModels } from "@/lib/guide/gateway-models";
 import { recordGuideTurn, startTurnTimer, type GuideTurnRecord } from "@/lib/guide/telemetry";
 import { buildInstant, instantChunks, matchInstant } from "@/lib/guide/instant";
+import { decideTone, toneInstruction } from "@/lib/guide/tone";
 import { getContentBlock } from "@/lib/content/blocks";
 import { waitUntil } from "@vercel/functions";
 
@@ -63,7 +64,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   const flags = await getFlags();
   if (flags[FLAGS.concierge] !== true) return errorResponse("GUIDE_OFF", "The AI guide is switched off.", 404);
 
-  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens, firstTokenDeadlineMs] = await Promise.all([
+  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens, firstTokenDeadlineMs, humorCeiling] = await Promise.all([
     getSetting("concierge.model"),
     getSetting("concierge.maxMessagesPerConversation"),
     getSetting("concierge.maxQuestionCharacters"),
@@ -76,6 +77,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     getSetting("concierge.fallbackModels"),
     getSetting("concierge.maxReasoningTokens"),
     getSetting("concierge.firstTokenDeadlineMs"),
+    getSetting("concierge.humor"),
   ]);
   // Never a model the gateway has retired (a free tier ending broke every fallback answer, 2026-10-08).
   const { model, fallbacks } = pickModels(
@@ -238,13 +240,18 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     };
   }
 
+  // How much wit this reply may carry — decided here from the conversation, never left to the model's mood
+  // (docs/AI-GUIDE-PHASE2-PLAN.md §6). A tool's follow-up request has the same last question, so the same answer.
+  const userTexts = parsed.messages.filter((m) => m.role === "user").map((m) => m.parts.find((p): p is { type: "text"; text: string } => p.type === "text")?.text ?? "");
+  const tone = decideTone({ question: userTexts[userTexts.length - 1] ?? "", earlier: userTexts.slice(0, -1), turn: userTexts.length, ceiling: humorCeiling });
+
   // One metrics row per answer, written exactly once however the stream ends (done, abort, error).
   const toolsRun: string[] = [];
   let written = false;
   const write = (rec: Omit<GuideTurnRecord, "configuredModel" | "totalMs" | "firstTokenMs" | "tools">) => {
     if (written) return;
     written = true;
-    track({ ...rec, configuredModel: model, totalMs: timer.elapsed(), firstTokenMs: timer.firstTokenMs, tools: toolsRun });
+    track({ ...rec, configuredModel: model, totalMs: timer.elapsed(), firstTokenMs: timer.firstTokenMs, tools: toolsRun, humor: tone.humor });
   };
 
   const result = streamText({
@@ -259,6 +266,8 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
       // Per-visitor context goes after the cached part, so the cache still hits. Built here from a
       // validated site path — never visitor text (system messages stay out of `messages`).
       ...(page ? [{ role: "system" as const, content: `The visitor is reading ${page} right now — "this", "this page" or "this system" means that one.` }] : []),
+      // The tone for this reply, from fixed text keyed on the governor's decision — never visitor text.
+      { role: "system" as const, content: toneInstruction(tone) },
     ],
     messages: await convertToModelMessages(parsed.messages),
     tools,
@@ -296,7 +305,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
       stream: result.stream,
       tools,
       // The chat says when an answer was cut short, instead of ending mid-sentence in silence.
-      messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason } : undefined),
+      messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason, tone: tone.mood } : undefined),
       // Never leak provider errors to the browser — but say honestly when it's just busy.
       onError: (error) => {
         const busy = isBusy(error);
