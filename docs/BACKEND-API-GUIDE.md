@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**33 capabilities · 136 endpoints.**
+**34 capabilities · 137 endpoints.**
 
 ## Public
 
@@ -922,6 +922,28 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
 - github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
+### AI guide health
+
+`admin.guide-health` · admin
+
+How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns. Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1).
+
+**Endpoints** (`/api/v1`, see `openapi-contract.yaml`)
+
+- `GET /admin/guide/health`
+
+**Database**
+
+- `GuideTurn`
+- `prune_guide_logs`
+
+**Rules:** BR-4.3, BR-5.2
+
+**Notes**
+
+- The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database.
+
 ## Database objects → capabilities
 
 | Object | Used by |
@@ -938,6 +960,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `Education` | admin.cv, admin.freshness |
 | `Experience` | admin.cv, admin.freshness |
 | `Flag` | admin.settings |
+| `GuideTurn` | admin.guide-health |
 | `Impact` | admin.systems |
 | `Inquiry` | inquiries.submit, admin.overview, admin.inquiries |
 | `InquiryDocument` | inquiries.submit, admin.inquiries |
@@ -963,6 +986,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 | `ProfileTitle` | admin.profile |
 | `propose_metric_snapshot` | admin.metrics |
 | `prune_expired` | admin.jobs |
+| `prune_guide_logs` | admin.guide-health |
 | `PublicAchievement` | achievements, cv |
 | `PublicAffiliation` | profile |
 | `PublicCvOption` | cv |

@@ -29,6 +29,8 @@ import { searchPublic } from "@/lib/queries/search";
 import { getInquiryTypes } from "@/lib/queries/site";
 import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { liveGatewayModels, pickModels } from "@/lib/guide/gateway-models";
+import { recordGuideTurn, startTurnTimer, type GuideTurnRecord } from "@/lib/guide/telemetry";
+import { waitUntil } from "@vercel/functions";
 
 export const maxDuration = 60;
 
@@ -49,10 +51,17 @@ function errorResponse(code: string, message: string, status: number, details?: 
   return NextResponse.json({ error: { code, message, details: details ?? null } }, { status });
 }
 
+/** Metrics are written after the answer, kept alive past the response by the platform (never delays or breaks it). */
+const track = (rec: GuideTurnRecord) => waitUntil(recordGuideTurn(rec));
+
 export async function POST(request: Request) {
+  const timer = startTurnTimer();
   const flags = await getFlags();
   if (flags[FLAGS.concierge] !== true) return errorResponse("GUIDE_OFF", "The AI guide is switched off.", 404);
-  if (!guideProviderConfigured()) return errorResponse("GUIDE_UNAVAILABLE", "The AI guide is resting right now.", 503);
+  if (!guideProviderConfigured()) {
+    track({ outcome: "resting", totalMs: timer.elapsed() });
+    return errorResponse("GUIDE_UNAVAILABLE", "The AI guide is resting right now.", 503);
+  }
 
   const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens] = await Promise.all([
     getSetting("concierge.model"),
@@ -88,6 +97,7 @@ export async function POST(request: Request) {
   if (parsed.isNewQuestion) {
     const visitor = await hitRateLimit("guide", request, perVisitor, windowHours * 60 * 60 * 1000);
     if (!visitor.allowed) {
+      track({ outcome: "limited", configuredModel: model, totalMs: timer.elapsed() });
       return errorResponse(
         "RATE_LIMITED",
         `This device has used all ${perVisitor} of its answers for now — that's the limit. Answers come back ${backIn(visitor.retryAfterMs ?? windowHours * 60 * 60 * 1000)}; meanwhile the contact form reaches him directly.`,
@@ -99,6 +109,7 @@ export async function POST(request: Request) {
   }
   const everyone = await hitRateLimitKey("guide:all", dailyCap, 24 * 60 * 60 * 1000);
   if (!everyone.allowed) {
+    track({ outcome: "resting", configuredModel: model, totalMs: timer.elapsed() });
     return errorResponse(
       "GUIDE_RESTING",
       `The guide has given every answer it has for today and is resting. Answers are available again ${backIn(everyone.retryAfterMs ?? 24 * 60 * 60 * 1000)} — meanwhile the contact form reaches him directly.`,
@@ -195,6 +206,15 @@ export async function POST(request: Request) {
     };
   }
 
+  // One metrics row per answer, written exactly once however the stream ends (done, abort, error).
+  const toolsRun: string[] = [];
+  let written = false;
+  const write = (rec: Omit<GuideTurnRecord, "configuredModel" | "totalMs" | "firstTokenMs" | "tools">) => {
+    if (written) return;
+    written = true;
+    track({ ...rec, configuredModel: model, totalMs: timer.elapsed(), firstTokenMs: timer.firstTokenMs, tools: toolsRun });
+  };
+
   const result = streamText({
     model: guideModel(model),
     instructions: [
@@ -214,6 +234,25 @@ export async function POST(request: Request) {
     // A reasoning model's thinking counts as output: give it its own allowance, or the answer is what gets cut.
     maxOutputTokens: maxAnswerTokens + maxReasoningTokens,
     abortSignal: request.signal,
+    onChunk: ({ chunk }) => {
+      if (chunk.type === "text-delta") timer.firstToken();
+      else if (chunk.type === "tool-call") toolsRun.push(chunk.toolName);
+    },
+    onEnd: (event) => {
+      const last = event.steps[event.steps.length - 1];
+      write({
+        outcome: "answered",
+        servedModel: last?.response?.modelId ?? null,
+        inputTokens: event.totalUsage.inputTokens,
+        outputTokens: event.totalUsage.outputTokens,
+        reasoningTokens: event.totalUsage.outputTokenDetails?.reasoningTokens,
+        cachedTokens: event.totalUsage.inputTokenDetails?.cacheReadTokens,
+        steps: event.steps.length,
+        finishReason: event.finishReason,
+        route: event.providerMetadata?.gateway,
+      });
+    },
+    onAbort: () => write({ outcome: "aborted" }),
     providerOptions: {
       // Busy or down → the next model on the owner's list; caching where the provider supports it.
       gateway: { ...(fallbacks.length > 0 && { models: fallbacks }), caching: "auto", tags: ["guide"] },
@@ -227,7 +266,11 @@ export async function POST(request: Request) {
       // The chat says when an answer was cut short, instead of ending mid-sentence in silence.
       messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason } : undefined),
       // Never leak provider errors to the browser — but say honestly when it's just busy.
-      onError: (error) => (isBusy(error) ? BUSY_MESSAGE : "The guide lost its train of thought — try again in a moment."),
+      onError: (error) => {
+        const busy = isBusy(error);
+        write({ outcome: busy ? "busy" : "error" });
+        return busy ? BUSY_MESSAGE : "The guide lost its train of thought — try again in a moment.";
+      },
     }),
   });
 }

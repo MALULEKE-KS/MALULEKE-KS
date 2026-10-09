@@ -413,6 +413,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Only a real edit to what visitors see, or Mark reviewed, restarts the clock; GitHub sync updates don't (BR-1.16).
 - The threshold is the setting content.freshnessDays (default 90).
 
+### /admin/guide
+
+**AI guide health** — Guide health: questions, failures, timings, models, per-day chart, latest turns
+
+- Call `GET /admin/guide/health`
+- The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
+- outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database.
+
 ### /admin/inquiries
 
 **Inquiries — Let's Talk management** — Inbox: search, filters, overdue and duplicate flags, failed-email banner
@@ -754,3 +762,4 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/freshness/{kind}/{id}/reviewed` | Freshness nudges | admin |
 | `GET /admin/jobs` | Scheduled jobs and their runs | admin |
 | `POST /admin/jobs/{job}/run` | Scheduled jobs and their runs | admin |
+| `GET /admin/guide/health` | AI guide health | admin |

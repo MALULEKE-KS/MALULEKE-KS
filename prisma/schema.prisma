@@ -82,6 +82,34 @@ model RateLimitEntry {
   @@index([windowEnd])
 }
 
+// One row per question the AI guide handled (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1):
+// how long it took, which model answered, what it cost in tokens — so speed
+// and reliability are measured, not guessed. Metrics only: no IP, no cookie,
+// no visitor text. Pruned by the daily maintenance job after
+// concierge.metricsRetentionDays. `outcome` is a control state, fixed by a
+// CHECK in the database (EXT-1 exception, like ContentStatus).
+model GuideTurn {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  outcome         String // answered | instant | busy | error | aborted | limited | resting
+  configuredModel String? // the concierge.model setting at the time
+  servedModel     String? // the model that actually answered (a fallback, when the first was busy)
+  fallbackUsed    Boolean  @default(false)
+  firstTokenMs    Int? // from the request arriving to the first word of the answer
+  totalMs         Int? // from the request arriving to the end of the answer
+  inputTokens     Int?
+  outputTokens    Int?
+  reasoningTokens Int?
+  cachedTokens    Int?
+  steps           Int      @default(0) // model calls in this turn (tool use adds steps)
+  tools           String[] // names of the tools it ran, in order
+  finishReason    String?
+  route           Json? // the gateway's routing record for the answer, as reported
+
+  @@index([createdAt])
+  @@index([outcome, createdAt])
+}
+
 // Who performed an audited action. A fixed control dimension (EXT-1
 // exception): the kinds of actor don't grow with content.
 enum ActorType {

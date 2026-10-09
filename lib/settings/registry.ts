@@ -215,6 +215,12 @@ export const SETTINGS = {
     description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
     rule: "Constitution §6",
   }),
+  "concierge.metricsRetentionDays": define({
+    schema: z.number().int().min(7).max(730),
+    default: 180,
+    description: "How long the guide keeps its speed and reliability numbers (one row per question: timings, model, tokens — never what a visitor typed or who they are).",
+    rule: "Constitution §6",
+  }),
   // System screenshots (BR-1.18): captured from live sites, or uploaded by the owner.
   "inquiry.minFillSeconds": define({
     schema: z.number().int().min(0).max(60),

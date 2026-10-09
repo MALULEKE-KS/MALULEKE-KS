@@ -19,6 +19,7 @@ import {
   KeyRound,
   LayoutDashboard,
   Leaf,
+  Gauge,
   ListChecks,
   LogOut,
   Menu,
@@ -51,6 +52,7 @@ const GROUPS: { label: string; items: { href: string; label: string; Icon: Lucid
       { href: "/admin/numbers", label: "Numbers", Icon: BarChart3 },
       { href: "/admin/freshness", label: "Freshness", Icon: Leaf },
       { href: "/admin/jobs", label: "Jobs", Icon: ListChecks },
+      { href: "/admin/guide", label: "Guide health", Icon: Gauge },
     ],
   },
   {

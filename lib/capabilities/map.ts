@@ -630,6 +630,21 @@ export const CAPABILITIES: Capability[] = [
       "github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).",
     ],
   },
+  {
+    id: "admin.guide-health",
+    title: "AI guide health",
+    audience: "admin",
+    summary:
+      "How fast and reliable the AI guide is: one metrics row per question — outcome, time to first word and to the full answer, the model that answered, tokens — summarised as p50/p95, failure and fallback rates, per-day counts and the latest turns. Metrics only: no visitor text, no identifiers (docs/AI-GUIDE-PHASE2-PLAN.md §3 A1).",
+    db: ["GuideTurn", "prune_guide_logs"],
+    endpoints: ["GET /admin/guide/health"],
+    rules: ["BR-4.3", "BR-5.2"],
+    frontend: [{ page: "/admin/guide", section: "Guide health: questions, failures, timings, models, per-day chart, latest turns" }],
+    notes: [
+      "The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).",
+      "outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database.",
+    ],
+  },
 ];
 
 /** Database objects deliberately without an endpoint — each with the reason. */
