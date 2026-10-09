@@ -8,7 +8,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Activity, Brain, Check, ChevronDown, Compass, LayoutGrid, LoaderCircle, Milestone, PenLine, Search, Sparkles, X, type LucideIcon } from "lucide-react";
+import { Activity, ArrowLeftRight, Brain, Check, ChevronDown, Compass, Footprints, LayoutGrid, ListChecks, LoaderCircle, Milestone, PenLine, Search, Sparkles, X, type LucideIcon } from "lucide-react";
 import type { StepKind, TrailStep } from "@/lib/guide/trail";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,9 @@ const ICON: Record<StepKind, LucideIcon> = {
   journey: Milestone,
   skills: Sparkles,
   pulse: Activity,
+  compare: ArrowLeftRight,
+  fit: ListChecks,
+  tour: Footprints,
   navigate: Compass,
   compose: PenLine,
 };

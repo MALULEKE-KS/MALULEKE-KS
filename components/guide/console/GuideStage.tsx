@@ -17,7 +17,7 @@ import { ThinkingOrb, type OrbMode } from "@/components/ui/thinking-orb";
 import type { StepKind } from "@/lib/guide/trail";
 import { cn } from "@/lib/utils";
 
-const ORB: Partial<Record<StepKind, OrbMode>> = { search: "search", systems: "search", journey: "search", skills: "search", pulse: "search", navigate: "navigate", compose: "compose" };
+const ORB: Partial<Record<StepKind, OrbMode>> = { search: "search", systems: "search", journey: "search", skills: "search", pulse: "search", compare: "search", fit: "search", tour: "navigate", navigate: "navigate", compose: "compose" };
 
 /** What the guide is doing, in a few words — from the chat's real state. */
 export function useGuideStatus() {

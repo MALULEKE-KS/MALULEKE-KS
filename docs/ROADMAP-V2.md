@@ -30,6 +30,17 @@
 
 ## Part 2 — Update log (newest first)
 
+### AI guide, phase 2, release 3: a tour, a say, and proof of its own reliability (2026-10-09)
+- **Guided tours:** the guide starts one of the owner's tours (`agent.tour`, off); a card steps through the stops — page, lit section, the owner's line. All content is the owner's (`guide-tours`); the model only picks which tour. ⌘K can send a question to the guide.
+- **A say, and proof:** "helpful / this was wrong / challenge this" under each answer (the owner's wording, each hidden until written; feedback scrubbed, no identifier, retention-bound); the nightly self-check shown beside the chat box through a public view — and a failure is said plainly.
+- **Left:** voice (owner: later).
+
+### AI guide, phase 2, release 2: it checks what it says, knows when wit belongs, and maps a need to the evidence (2026-10-09)
+- **Checks itself:** after each answer, the paths, links, technologies, years, counts and figures it states about him are looked up in the knowledge, in code; the chat shows what could not be found; Guide health shows how often. The questions the site couldn't answer are kept for the owner (scrubbed, no identifier, `concierge.logRetentionDays` days, 0 = none) and the chat says so beside the box.
+- **Humor on purpose:** a governor decides per reply — off, dry or playful — from gravity (distress, hardship, legal/medical/financial, formal and money matters, and the turns after), the visitor's register and a rhythm the owner sets; the model only carries it out. Never when someone is hurting.
+- **Thinks per question:** playbooks for fit, comparison, time, depth, general and small talk; `compare_systems` and the **Fit Check** (`fit_check`) — a job description's needs mapped against the evidence as evidenced / partly / not yet, no score, years and seniority honest. Both tools ship off; switch them on in Admin → Flags.
+- **Nothing hardcoded:** every number is a `concierge.*` setting; every visitor-facing sentence the model doesn't write is owner-edited content (`guide-instant`, `guide-fit`, `ai-guide.privacyNote`).
+
 ### AI guide, phase 2, release 1: it measures itself, tests itself, and answers the plain questions at once (2026-10-09)
 - **Plan:** `docs/AI-GUIDE-PHASE2-PLAN.md` (D-024). Owner: free models for now, nothing to rebuild when Claude is paid for; question log yes; public eval scoreboard yes; voice later.
 - **Measured:** `GuideTurn` — one metrics row per question (outcome, time to first word and to the full answer, serving model, tokens; no IP, no visitor text) pruned by the daily job; Admin → Guide health (p50/p95, failure and fallback rates, models, per-day chart, latest turns); `scripts/guide-benchmark.mjs` for a controlled before/after.

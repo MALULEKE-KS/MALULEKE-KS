@@ -58,6 +58,15 @@ export function receiptsOf(message: UIMessage, index: GuideSiteIndex): Receipt[]
     if (p.type === "tool-show_systems" && Array.isArray(p.output)) paths.push(...(p.output as { href: string }[]).map((c) => c.href));
     if (p.type === "tool-search_systems" && Array.isArray(p.output)) paths.push(...(p.output as { path: string }[]).map((r) => r.path));
     if (p.type === "tool-show_skills" && Array.isArray(p.output)) paths.push(...(p.output as { systems: { slug: string }[] }[]).flatMap((c) => c.systems.map((s) => `/systems/${s.slug}`)));
+    if (p.type === "tool-compare_systems") {
+      const o = p.output as { left?: { href: string }; right?: { href: string } };
+      paths.push(...[o.left?.href, o.right?.href].filter((h): h is string => typeof h === "string"));
+    }
+    if (p.type === "tool-start_tour") paths.push(...((p.output as { stops?: { href: string }[] }).stops ?? []).map((s) => s.href));
+    if (p.type === "tool-fit_check") {
+      // Only the evidence a visitor can open: the systems (and pages) the card linked.
+      paths.push(...((p.output as { rows?: { evidence?: { href: string }[] }[] }).rows ?? []).flatMap((r) => (r.evidence ?? []).map((e) => e.href)));
+    }
     if (p.type === "tool-show_journey") paths.push(...((p.output as { moments?: { href: string | null }[] }).moments ?? []).flatMap((m) => (m.href ? [m.href] : [])));
   }
   for (const raw of message.parts) {

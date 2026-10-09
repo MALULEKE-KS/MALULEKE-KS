@@ -19,6 +19,11 @@ export const FLAGS = {
   showJourney: "agent.show_journey",
   showSkills: "agent.show_skills",
   showPulse: "agent.show_pulse",
+  // Tools that compute (docs/AI-GUIDE-PHASE2-PLAN.md §5, §7): read-only, server-executed, the card built from the public views.
+  compareSystems: "agent.compare_systems",
+  fitCheck: "agent.fit_check",
+  // A guided walk through the site, from the owner's own tours (docs/AI-GUIDE-PHASE2-PLAN.md §7).
+  tour: "agent.tour",
   tailorCv: "agent.tailor_cv",
   writeups: "writeups.enabled",
   // LT-9: confirmations to applicants — off until a sending domain is verified (Resend only delivers to the owner without one).

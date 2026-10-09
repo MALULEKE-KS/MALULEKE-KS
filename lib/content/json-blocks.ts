@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 import { EvidenceBlock } from "@/lib/evidence/schema";
+import { ToursBlock } from "@/lib/guide/tour";
 
 const Text = (max: number) => z.string().trim().min(1).max(max);
 const Year = z.number().int().min(1990).max(2100);
@@ -55,5 +56,5 @@ export const PageCopyBlock = z.record(
     .strict(),
 );
 
-export const JSON_BLOCKS = { evidence: EvidenceBlock, journey: JourneyBlock, "page-copy": PageCopyBlock } as const;
+export const JSON_BLOCKS = { evidence: EvidenceBlock, journey: JourneyBlock, "page-copy": PageCopyBlock, "guide-tours": ToursBlock } as const;
 export type JsonBlockKey = keyof typeof JSON_BLOCKS;

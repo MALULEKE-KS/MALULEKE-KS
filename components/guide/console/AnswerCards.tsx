@@ -8,9 +8,10 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { Activity, ArrowUpRight, GitCommitHorizontal, Lock, Milestone, ShieldCheck } from "lucide-react";
+import { Activity, ArrowLeftRight, ArrowUpRight, Check, CircleDashed, CircleDot, GitCommitHorizontal, ListChecks, Lock, Milestone, ShieldCheck } from "lucide-react";
 import { techMark } from "@/components/shared/TechChip";
-import type { JourneyCardData, PulseCardData, SkillCardData, SystemCardData } from "@/lib/guide/show-tools";
+import type { CompareCardData, JourneyCardData, PulseCardData, SkillCardData, SystemCardData } from "@/lib/guide/show-tools";
+import type { FitCardData, FitStatus } from "@/lib/guide/fit";
 import { cn } from "@/lib/utils";
 
 const ago = (iso: string) => {
@@ -177,6 +178,117 @@ export function PulseCard({ pulse }: { pulse: PulseCardData }) {
           ))}
         </span>
         {pulse.lastGithubSyncAt && <span className="text-line text-[10.5px]">GitHub synced {ago(pulse.lastGithubSyncAt)} · {pulse.auditEventsTotal.toLocaleString("en")} audited changes in all</span>}
+      </div>
+    </Appear>
+  );
+}
+
+/** Two systems side by side: what each is, and exactly what they share. Everything from the public view. */
+export function CompareCard({ compare }: { compare: CompareCardData }) {
+  const sides = [compare.left, compare.right];
+  return (
+    <Appear i={0}>
+      <div className={cn(card, "hover:border-white/10")}>
+        <span className="text-mist inline-flex items-center gap-1.5 text-[11px]">
+          <ArrowLeftRight aria-hidden="true" className="text-ember size-3.5" /> Compared
+        </span>
+        <span className="grid grid-cols-2 gap-3">
+          {sides.map((s) => (
+            <Link key={s.slug} href={s.href} className="group/side min-w-0">
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: `var(--color-${s.statusColorToken}-on-dark, var(--color-${s.statusColorToken}))` }} />
+                <span className="text-mist text-[11px]">{s.status}</span>
+                {s.repoPrivate && <Lock aria-label="Private repository" className="text-line ml-auto size-3" />}
+              </span>
+              <span className="text-paper group-hover/side:text-ember mt-1 block text-[14px] leading-snug font-semibold transition-colors">{s.name}</span>
+              <span className="text-line mt-0.5 block text-[11px]">{s.lastActivity ? `Pushed ${ago(s.lastActivity)}` : s.organization}</span>
+            </Link>
+          ))}
+        </span>
+        <dl className="space-y-1.5 border-t border-white/[0.07] pt-2.5 text-[12px]">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <dt className="text-line shrink-0">Both use</dt>
+            <dd className="flex flex-wrap gap-1">
+              {compare.shared.length === 0 ? <span className="text-mist">nothing in common in their stacks</span> : compare.shared.map((t) => <TechPill key={t} tech={t} />)}
+            </dd>
+          </div>
+          {[
+            { who: compare.left.name, tech: compare.onlyLeft },
+            { who: compare.right.name, tech: compare.onlyRight },
+          ].map(({ who, tech }) =>
+            tech.length > 0 ? (
+              <div key={who} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <dt className="text-line shrink-0">Only {who}</dt>
+                <dd className="flex flex-wrap gap-1">
+                  {tech.slice(0, 8).map((t) => (
+                    <TechPill key={t} tech={t} />
+                  ))}
+                </dd>
+              </div>
+            ) : null,
+          )}
+        </dl>
+      </div>
+    </Appear>
+  );
+}
+
+function TechPill({ tech }: { tech: string }) {
+  return (
+    <span className="text-mist inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5 text-[10.5px]">
+      {techMark(tech)}
+      {tech}
+    </span>
+  );
+}
+
+const FIT: Record<FitStatus, { icon: typeof Check; label: string; tone: string }> = {
+  evidenced: { icon: Check, label: "Evidenced", tone: "text-[var(--color-signal-finished-on-dark)]" },
+  partial: { icon: CircleDot, label: "Partly", tone: "text-ember" },
+  none: { icon: CircleDashed, label: "Not evidenced yet", tone: "text-line" },
+};
+
+/** A visitor's needs against the evidence on the site — never a score, always the reason and the proof. */
+export function FitCard({ fit }: { fit: FitCardData }) {
+  if (fit.rows.length === 0) return null;
+  return (
+    <Appear i={0}>
+      <div className={cn(card, "hover:border-white/10")}>
+        <span className="text-mist flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+          <span className="inline-flex items-center gap-1.5">
+            <ListChecks aria-hidden="true" className="text-ember size-3.5" /> Fit check
+          </span>
+          <span>
+            {fit.evidenced} evidenced{fit.partial > 0 && ` · ${fit.partial} partly`}
+            {fit.none > 0 && ` · ${fit.none} not yet`}
+          </span>
+        </span>
+        <ul className="space-y-2.5">
+          {fit.rows.map((r) => {
+            const { icon: Icon, label, tone } = FIT[r.status];
+            return (
+              <li key={r.requirement} className="flex gap-2.5">
+                <Icon aria-hidden="true" className={cn("mt-0.5 size-4 shrink-0", tone)} />
+                <span className="min-w-0 flex-1">
+                  <span className="text-paper block text-[13px] leading-snug">
+                    {r.requirement} <span className={cn("ml-1 text-[10.5px]", tone)}>{label}</span>
+                  </span>
+                  {r.evidence.length > 0 && (
+                    <span className="mt-1 flex flex-wrap gap-1">
+                      {r.evidence.map((e) => (
+                        <Link key={`${e.href}-${e.label}`} href={e.href} className="text-mist hover:text-paper hover:border-ember/40 rounded-full border border-white/10 px-2 py-0.5 text-[11px] transition-colors">
+                          {e.label}
+                        </Link>
+                      ))}
+                    </span>
+                  )}
+                  {r.note && <span className="text-line mt-1 block text-[11px] leading-snug">{r.note}</span>}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <span className="text-line text-[10.5px] leading-snug">Matched in code against what this site publishes — no score, and nothing counted that a visitor can&apos;t open.</span>
       </div>
     </Appear>
   );

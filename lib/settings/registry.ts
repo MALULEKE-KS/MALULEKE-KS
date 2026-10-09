@@ -215,10 +215,83 @@ export const SETTINGS = {
     description: "Models to try, in order, when the guide's model is busy or down — AI Gateway ids (provider/model) separated by commas. Empty = no fallback.",
     rule: "Constitution §6",
   }),
+  "concierge.humor": define({
+    schema: z.enum(["off", "dry", "playful"]),
+    // dry: a touch of wit, one turn in three at most, never when the moment is serious (lib/guide/tone.ts).
+    default: "dry" as "off" | "dry" | "playful",
+    description: "The most wit the AI guide may use: off (always steady), dry (an occasional dry line — the default) or playful (plays along when the visitor does). Whatever you choose, it is never funny when someone is stressed, hurting or asking about money, law or health.",
+    rule: "Constitution §6",
+  }),
   "concierge.firstTokenDeadlineMs": define({
     schema: z.number().int().min(0).max(30000),
     default: 0,
     description: "How long a model has to start answering before the guide gives up on it and asks the next model on the fallback list, in milliseconds (0 = wait; the default). Set it from Guide health's p95 first-word time — too low drops a model that was about to answer.",
+    rule: "Constitution §6",
+  }),
+  "concierge.logRetentionDays": define({
+    schema: z.number().int().min(0).max(365),
+    default: 30,
+    description: "How many days the AI guide keeps a question it couldn't answer from the site's data — with emails, phone numbers and links removed, and nothing that says who asked — so you can see what visitors want that the site doesn't say. 0 = keep no question text at all.",
+    rule: "Constitution §6",
+  }),
+  "concierge.humor.everyNthTurn": define({
+    schema: z.number().int().min(0).max(10),
+    default: 3,
+    description: "How often the AI guide's dry wit may appear when nobody invited it: on the second answer and then every Nth (3 = one answer in three; 0 = only when the visitor is playful or under pressure). The first answer is always substance.",
+    rule: "Constitution §6",
+  }),
+  "concierge.humor.coolDownTurns": define({
+    schema: z.number().int().min(0).max(6),
+    default: 2,
+    description: "How many of a visitor's next questions stay serious after they mention something hard (distress, loss, a failure) — the guide won't pivot to a joke straight away.",
+    rule: "Constitution §6",
+  }),
+  "concierge.instant.maxQuestionCharacters": define({
+    schema: z.number().int().min(20).max(300),
+    default: 90,
+    description: "The longest question the AI guide will answer instantly from the site's data (contact, CV, counts, the platform's numbers). Longer ones have more to them and go to the model.",
+    rule: "Constitution §6",
+  }),
+  "concierge.canary.timeBudgetSeconds": define({
+    schema: z.number().int().min(30).max(280),
+    default: 230,
+    description: "How long the guide's nightly self-check may keep starting new questions before it stops and reports the rest as not run (the scheduled job has 300 seconds in all).",
+    rule: "Constitution §6",
+  }),
+  "concierge.verifier.maxFlagged": define({
+    schema: z.number().int().min(1).max(12),
+    default: 6,
+    description: "The most claims the answer check will list under one answer as 'couldn't find in the site's data'.",
+    rule: "Constitution §6",
+  }),
+  "concierge.fit.maxRequirements": define({
+    schema: z.number().int().min(1).max(12),
+    default: 8,
+    description: "The most needs one Fit Check will map against the site's evidence (a pasted job description is read down to this many).",
+    rule: "Constitution §6",
+  }),
+  "concierge.fit.maxEvidence": define({
+    schema: z.number().int().min(1).max(6),
+    default: 3,
+    description: "The most pieces of evidence (systems, roles, studies) shown under each need in a Fit Check.",
+    rule: "Constitution §6",
+  }),
+  "concierge.logMaxCharacters": define({
+    schema: z.number().int().min(50).max(320),
+    default: 300,
+    description: "The longest part of a question the AI guide keeps when it logs one it couldn't answer (after contact details are removed).",
+    rule: "Constitution §6",
+  }),
+  "concierge.feedback.maxPerWindow": define({
+    schema: z.number().int().min(1).max(200),
+    default: 20,
+    description: "How many times one visitor can mark an AI guide answer 'helpful' or 'wrong' per window (the same window as their questions).",
+    rule: "BR-2.4",
+  }),
+  "concierge.feedback.maxAnswerCharacters": define({
+    schema: z.number().int().min(100).max(2000),
+    default: 800,
+    description: "How much of an answer the AI guide keeps when a visitor marks it 'wrong' or 'helpful' — its opening, with contact details removed.",
     rule: "Constitution §6",
   }),
   "concierge.metricsRetentionDays": define({

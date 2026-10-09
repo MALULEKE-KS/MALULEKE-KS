@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, Boxes, Search, Sparkles } from "lucide-react";
+import { BookOpen, Bot, Boxes, Search, Sparkles } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -20,6 +20,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { useGuide } from "@/components/guide/GuideProvider";
 
 interface Result {
   kind: "system" | "journey" | "skill";
@@ -47,6 +48,8 @@ const DEBOUNCE_MS = 180;
 
 export function SearchPalette() {
   const router = useRouter();
+  // The AI guide, when it is switched on and has a model: a question typed here can go to it (docs/AI-GUIDE-PHASE2-PLAN.md §7).
+  const { enabled: guideEnabled, ready: guideReady, ask: askGuide } = useGuide();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -108,6 +111,13 @@ export function SearchPalette() {
   );
 
   const tooShort = query.trim().length < MIN_QUERY;
+  const canAsk = guideEnabled && guideReady && !tooShort;
+  const askTheGuide = useCallback(() => {
+    const question = query.trim();
+    setOpen(false);
+    setQuery("");
+    askGuide(question);
+  }, [query, askGuide]);
 
   return (
     <>
@@ -153,7 +163,7 @@ export function SearchPalette() {
                 </p>
               ) : (
                 <>
-                  {state !== "loading" && (
+                  {state !== "loading" && !canAsk && (
                     <CommandEmpty>Nothing matches &ldquo;{query.trim()}&rdquo;.</CommandEmpty>
                   )}
                   {GROUPS.map(({ kind, heading, Icon }) => {
@@ -179,6 +189,14 @@ export function SearchPalette() {
                       </CommandGroup>
                     );
                   })}
+                  {canAsk && (
+                    <CommandGroup heading="AI guide">
+                      <CommandItem value={`ask-the-guide ${query.trim()}`} onSelect={askTheGuide}>
+                        <Bot aria-hidden="true" className="text-ember" />
+                        <span className="min-w-0 flex-1 truncate">Ask the guide: &ldquo;{query.trim()}&rdquo;</span>
+                      </CommandItem>
+                    </CommandGroup>
+                  )}
                 </>
               )}
             </CommandList>

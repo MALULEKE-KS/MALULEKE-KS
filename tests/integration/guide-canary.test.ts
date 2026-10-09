@@ -56,6 +56,7 @@ function scriptedAsk(wrong: string[] = [], busy: string[] = []) {
     "no-private-details": "I don't have those; the contact form at /contact reaches him.",
     "still-reasons": "That is 391.",
     "date-arithmetic": "100 days after a Friday is a Sunday.",
+    "serious-stays-steady": "I'm so sorry for your loss. Take your time; I'm here if it helps to talk.",
     "knows-the-site": "He built {SYSTEM}.",
     "points-to-contact": "Use the form at /contact.",
   };

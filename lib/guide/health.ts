@@ -11,6 +11,8 @@ export const HEALTH_WINDOWS = [1, 7, 30] as const;
 const MAX_ROWS = 20_000;
 const RECENT = 30;
 const CANARY_RUNS = 14;
+const GAPS = 60;
+const FEEDBACK = 40;
 
 export interface RecentTurn {
   id: string;
@@ -36,6 +38,23 @@ export interface CanaryRun {
   results: { id: string; category: string; pass: boolean | null; problems: string[] }[];
 }
 
+export interface GapRow {
+  id: string;
+  at: string;
+  reason: string;
+  question: string;
+  page: string | null;
+}
+
+export interface FeedbackRow {
+  id: string;
+  at: string;
+  rating: string;
+  question: string;
+  answer: string;
+  page: string | null;
+}
+
 export interface GuideHealth {
   days: number;
   summary: HealthSummary;
@@ -43,6 +62,10 @@ export interface GuideHealth {
   recent: RecentTurn[];
   /** The daily canary's latest runs, newest first. */
   canary: CanaryRun[];
+  /** Questions the site couldn't answer, newest first (scrubbed; empty while the owner keeps none). */
+  gaps: GapRow[];
+  /** What visitors said about answers: the counts, and the latest (scrubbed) with the question and the answer's opening. */
+  feedback: { helpful: number; wrong: number; recent: FeedbackRow[] };
 }
 
 export function parseWindow(raw: string | null | undefined): number {
@@ -58,6 +81,12 @@ export async function loadGuideHealth(days: number, now = new Date()): Promise<G
     take: MAX_ROWS,
   });
   const runs = await db.guideEvalRun.findMany({ where: { kind: "canary" }, orderBy: { createdAt: "desc" }, take: CANARY_RUNS });
+  const gaps = await db.guideGap.findMany({ where: { createdAt: { gte: since } }, orderBy: { createdAt: "desc" }, take: GAPS });
+  const [helpful, wrong, feedbackRows] = await Promise.all([
+    db.guideFeedback.count({ where: { createdAt: { gte: since }, rating: "helpful" } }),
+    db.guideFeedback.count({ where: { createdAt: { gte: since }, rating: "wrong" } }),
+    db.guideFeedback.findMany({ where: { createdAt: { gte: since } }, orderBy: [{ rating: "desc" }, { createdAt: "desc" }], take: FEEDBACK }),
+  ]);
   const turns: TurnRow[] = rows;
   return {
     days,
@@ -74,6 +103,12 @@ export async function loadGuideHealth(days: number, now = new Date()): Promise<G
       tools: r.tools,
       finishReason: r.finishReason,
     })),
+    feedback: {
+      helpful,
+      wrong,
+      recent: feedbackRows.map((f) => ({ id: f.id, at: f.createdAt.toISOString(), rating: f.rating, question: f.question, answer: f.answer, page: f.page })),
+    },
+    gaps: gaps.map((g) => ({ id: g.id, at: g.createdAt.toISOString(), reason: g.reason, question: g.question, page: g.page })),
     canary: runs.map((r) => {
       const results = (Array.isArray(r.results) ? r.results : []) as CanaryRun["results"];
       return {

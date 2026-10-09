@@ -38,8 +38,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `POST /guide`
 - Call `POST /guide/warm`
+- Call `POST /guide/feedback`
+- Call `GET /guide/check`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- Under each answer, in the owner's words (the ai-guide content block; each appears only when written): helpful / this was wrong (POST /guide/feedback — the question and the answer's opening, contact details removed, no identifier, kept concierge.logRetentionDays days) and a challenge button that asks the guide the owner's question. Beside the box, the guide's own nightly self-check (GET /guide/check, from the PublicGuideCheck view: when it ran and how many fixed questions passed — never an answer or a visitor's words). ⌘K can send a question to the guide.
+- A guided tour (flag agent.tour, shipped off): the guide starts one of the owner's tours — the "guide-tours" content block: each stop a site page, an optional section and the owner's line — as a card the visitor steps through, each stop opening the page and lighting the section for the owner's number of seconds. The model only picks the tour's key; a stop on a page the site doesn't have is skipped.
+- Two computing tools, each behind its own flag and shipped off (agent.compare_systems, agent.fit_check): compare_systems puts two published systems side by side; fit_check maps a visitor's needs (a job description) against the site's evidence — evidenced, partly, or not yet, never a score — matched in code from the public views, with the owner's wording for its honest notes in the guide-fit content block and its limits in concierge.fit.* settings.
+- Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Platform pulse** — Footer status line
@@ -85,8 +91,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `POST /guide`
 - Call `POST /guide/warm`
+- Call `POST /guide/feedback`
+- Call `GET /guide/check`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- Under each answer, in the owner's words (the ai-guide content block; each appears only when written): helpful / this was wrong (POST /guide/feedback — the question and the answer's opening, contact details removed, no identifier, kept concierge.logRetentionDays days) and a challenge button that asks the guide the owner's question. Beside the box, the guide's own nightly self-check (GET /guide/check, from the PublicGuideCheck view: when it ran and how many fixed questions passed — never an answer or a visitor's words). ⌘K can send a question to the guide.
+- A guided tour (flag agent.tour, shipped off): the guide starts one of the owner's tours — the "guide-tours" content block: each stop a site page, an optional section and the owner's line — as a card the visitor steps through, each stop opening the page and lighting the section for the owner's number of seconds. The model only picks the tour's key; a stop on a page the site doesn't have is skipped.
+- Two computing tools, each behind its own flag and shipped off (agent.compare_systems, agent.fit_check): compare_systems puts two published systems side by side; fit_check maps a visitor's needs (a job description) against the site's evidence — evidenced, partly, or not yet, never a score — matched in code from the public views, with the owner's wording for its honest notes in the guide-fit content block and its limits in concierge.fit.* settings.
+- Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Platform pulse** — Control room
@@ -203,8 +215,14 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `POST /guide`
 - Call `POST /guide/warm`
+- Call `POST /guide/feedback`
+- Call `GET /guide/check`
 - Off unless concierge.enabled is on; every limit (model, questions per conversation and per visitor, daily cap, answer length, context budget) is a concierge.* setting.
 - Grounded only in the public views, read through the public role; the lens framing prompt is read server-side and never sent to the browser.
+- Under each answer, in the owner's words (the ai-guide content block; each appears only when written): helpful / this was wrong (POST /guide/feedback — the question and the answer's opening, contact details removed, no identifier, kept concierge.logRetentionDays days) and a challenge button that asks the guide the owner's question. Beside the box, the guide's own nightly self-check (GET /guide/check, from the PublicGuideCheck view: when it ran and how many fixed questions passed — never an answer or a visitor's words). ⌘K can send a question to the guide.
+- A guided tour (flag agent.tour, shipped off): the guide starts one of the owner's tours — the "guide-tours" content block: each stop a site page, an optional section and the owner's line — as a card the visitor steps through, each stop opening the page and lighting the section for the owner's number of seconds. The model only picks the tour's key; a stop on a page the site doesn't have is skipped.
+- Two computing tools, each behind its own flag and shipped off (agent.compare_systems, agent.fit_check): compare_systems puts two published systems side by side; fit_check maps a visitor's needs (a job description) against the site's evidence — evidenced, partly, or not yet, never a score — matched in code from the public views, with the owner's wording for its honest notes in the guide-fit content block and its limits in concierge.fit.* settings.
+- Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
 **Let's Talk — send a message** — What brings you here? — the category tiles (GET /inquiries/types); The form shaped to the category, and the confirmation with its reference
@@ -425,6 +443,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 
 - Call `GET /admin/guide/health`
 - The window is 1, 7 or 30 days (?days=). Rows are pruned by the daily maintenance job after the setting concierge.metricsRetentionDays (default 180).
+- Beside the speed numbers: how many claims the answer verifier looked up in the site's data and how many it could not find (lib/guide/verify.ts), and the question log — what visitors asked that the site couldn't answer, with emails, phone numbers and links removed and nothing that says who asked, kept concierge.logRetentionDays days (0 = no question text kept).
 - outcome is one of answered, instant, busy, error, aborted, limited, resting — fixed by a CHECK in the database. The canary's own questions are stored with source = canary and kept out of the visitors' numbers.
 - The canary is the job guide.canary (run it now with POST /admin/jobs/{job}/run, see admin.jobs), on its own cron entry (01:30 UTC) so it keeps its own 300-second budget; each run is a GuideEvalRun row (fixed question ids and pass/fail/unavailable — never answers or visitor text). A failed check fails the job, which shows red on Admin → Jobs.
 
@@ -642,6 +661,8 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /activity` | Weekly build activity | public |
 | `POST /guide` | The AI guide | public |
 | `POST /guide/warm` | The AI guide | public |
+| `POST /guide/feedback` | The AI guide | public |
+| `GET /guide/check` | The AI guide | public |
 | `GET /platform/pulse` | Platform pulse | public |
 | `GET /home` | Homepage | public |
 | `GET /content/{key}` | Page content blocks | public |

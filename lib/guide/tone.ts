@@ -10,7 +10,8 @@
 //   register  a visitor who is playing (a riddle, a roast, "lol", an emoji) → play
 //             along; a formal register → at most a dry touch;
 //   cadence   never the very first answer unless the visitor opens playfully; then
-//             one turn in three at most, so wit stays a seasoning;
+//             on the second and every Nth (concierge.humor.everyNthTurn), so wit stays
+//             a seasoning;
 //   ceiling   the owner's setting (concierge.humor: off / dry / playful) caps it all.
 //
 // The result is a short instruction added to that turn only. Pure and tested: the
@@ -28,6 +29,10 @@ export interface ToneInput {
   turn: number;
   /** The owner's ceiling (concierge.humor). */
   ceiling: Humor;
+  /** concierge.humor.everyNthTurn: wit may appear on the 2nd answer and every Nth after; 0 = never uninvited. */
+  everyNthTurn: number;
+  /** concierge.humor.coolDownTurns: how many later questions stay serious after something hard. */
+  coolDownTurns: number;
 }
 
 export interface ToneDecision {
@@ -49,16 +54,14 @@ const PRESSURE = /\b(ignore (?:all |your )?(?:previous|prior|the above) (?:instr
 const HOSTILE = /\b(stupid|useless|idiot|dumb|garbage|trash|worthless|shut up|you suck)\b/i;
 const FACT_LOOKUP = /^(?:how many|when (?:did|was|is)|what(?:'s| is) (?:his|the) (?:email|cv|status|stack)|where (?:is|can)|which year)\b/i;
 
-const RECENT_TURNS = 2;
-
 /** Does the text carry a given signal? */
 const has = (re: RegExp, text: string) => re.test(text);
 
-export function decideTone({ question, earlier, turn, ceiling }: ToneInput): ToneDecision {
+export function decideTone({ question, earlier, turn, ceiling, everyNthTurn, coolDownTurns }: ToneInput): ToneDecision {
   const off = (reason: string): ToneDecision => ({ humor: "off", mood: "steady", reason });
   if (ceiling === "off") return off("the owner has switched humor off");
 
-  const recent = earlier.slice(-RECENT_TURNS);
+  const recent = coolDownTurns > 0 ? earlier.slice(-coolDownTurns) : [];
 
   // Gravity — now, or just before: a visitor who was hurting a moment ago isn't ready for a joke.
   if (has(DISTRESS, question) || recent.some((q) => has(DISTRESS, q))) return off("the visitor may be in distress");
@@ -78,9 +81,9 @@ export function decideTone({ question, earlier, turn, ceiling }: ToneInput): Ton
   // A plain lookup is answered plainly.
   if (FACT_LOOKUP.test(question.trim())) return off("a plain lookup");
 
-  // Cadence — never the first answer, then one turn in three at most.
+  // Cadence — never the first answer, then on the second and every Nth after (the owner's setting).
   if (turn <= 1) return off("the first answer is substance first");
-  if (turn % 3 === 2) return done("dry", "a light moment in the rhythm");
+  if (everyNthTurn > 0 && turn >= 2 && (turn - 2) % everyNthTurn === 0) return done("dry", "a light moment in the rhythm");
   return off("keeping wit a seasoning");
 }
 

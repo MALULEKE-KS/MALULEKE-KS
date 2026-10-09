@@ -39,6 +39,8 @@ const EXEMPT = new Set([
   "ContentChunk", // AI index (V1.1)
   "InquiryStatusChange", // append-only history, written by the database itself (LT-6)
   "GuideTurn", // AI guide metrics, written by the guide itself — no admin edits (P2-0)
+  "GuideFeedback", // visitors' ratings of the AI guide's answers, written by visitors, scrubbed and pruned on a schedule — no admin edits (P2-7)
+  "GuideGap", // questions the AI guide could not answer, written by the guide itself, pruned on a schedule — no admin edits (P2-3)
   "GuideEvalRun", // the AI guide's nightly canary results, written by the job itself — no admin edits (P2-1)
   "Notification", // the email outbox — its own state is its history (LT-10)
 ]);

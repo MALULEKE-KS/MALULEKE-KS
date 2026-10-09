@@ -40,7 +40,7 @@ const TIER = process.env.AI_EVAL_TIER ?? "all";
 const ONLY = process.env.AI_EVAL_ONLY ? new RegExp(process.env.AI_EVAL_ONLY) : null;
 const pace = () => new Promise((r) => setTimeout(r, PACE_MS));
 
-const TOOL_FLAGS = ["agent.open_page", "agent.search_systems", "agent.draft_inquiry", "agent.show_systems", "agent.show_journey", "agent.show_skills", "agent.show_pulse"];
+const TOOL_FLAGS = ["agent.open_page", "agent.search_systems", "agent.draft_inquiry", "agent.show_systems", "agent.show_journey", "agent.show_skills", "agent.show_pulse", "agent.compare_systems", "agent.fit_check"];
 const FLAG_KEYS = ["concierge.enabled", ...TOOL_FLAGS];
 const CAP = "concierge.dailyMessageCap";
 const PER_VISITOR = "concierge.rateLimit.maxPerWindow";

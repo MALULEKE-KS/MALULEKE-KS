@@ -27,7 +27,10 @@ import { getSetting } from "@/lib/settings";
 import { hitRateLimit, hitRateLimitKey } from "@/lib/auth/rate-limit";
 import { getGuideCorpus } from "@/lib/guide/corpus";
 import { buildInstructions } from "@/lib/guide/prompt";
-import { showJourney, showPulse, showSkills, showSystems } from "@/lib/guide/show-tools";
+import { compareSystems, showJourney, showPulse, showSkills, showSystems } from "@/lib/guide/show-tools";
+import { fitCheck, loadFitData, type FitOptions } from "@/lib/guide/fit";
+import { decidePlaybook } from "@/lib/guide/playbooks";
+import { resolveTour, tourKeys, ToursBlock } from "@/lib/guide/tour";
 import { backIn, parseGuideRequest } from "@/lib/guide/request";
 import { searchPublic } from "@/lib/queries/search";
 import { getInquiryTypes } from "@/lib/queries/site";
@@ -35,6 +38,9 @@ import { guideModel, guideProviderConfigured } from "@/lib/guide/model";
 import { liveGatewayModels, pickModels } from "@/lib/guide/gateway-models";
 import { recordGuideTurn, startTurnTimer, type GuideTurnRecord } from "@/lib/guide/telemetry";
 import { buildInstant, instantChunks, matchInstant } from "@/lib/guide/instant";
+import { decideTone, toneInstruction } from "@/lib/guide/tone";
+import { verifyAnswer, type Verification } from "@/lib/guide/verify";
+import { looksUnanswered, recordGap } from "@/lib/guide/gaps";
 import { getContentBlock } from "@/lib/content/blocks";
 import { waitUntil } from "@vercel/functions";
 
@@ -63,7 +69,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   const flags = await getFlags();
   if (flags[FLAGS.concierge] !== true) return errorResponse("GUIDE_OFF", "The AI guide is switched off.", 404);
 
-  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens, firstTokenDeadlineMs] = await Promise.all([
+  const [configuredModel, maxMessagesPerConversation, maxQuestionCharacters, perVisitor, windowHours, dailyCap, maxAnswerTokens, budget, cacheSeconds, fallbackSetting, maxReasoningTokens, firstTokenDeadlineMs, humorCeiling, humorEveryNth, humorCoolDown, instantMaxCharacters, verifierMaxFlagged, fitMaxRequirements, fitMaxEvidence] = await Promise.all([
     getSetting("concierge.model"),
     getSetting("concierge.maxMessagesPerConversation"),
     getSetting("concierge.maxQuestionCharacters"),
@@ -76,6 +82,13 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     getSetting("concierge.fallbackModels"),
     getSetting("concierge.maxReasoningTokens"),
     getSetting("concierge.firstTokenDeadlineMs"),
+    getSetting("concierge.humor"),
+    getSetting("concierge.humor.everyNthTurn"),
+    getSetting("concierge.humor.coolDownTurns"),
+    getSetting("concierge.instant.maxQuestionCharacters"),
+    getSetting("concierge.verifier.maxFlagged"),
+    getSetting("concierge.fit.maxRequirements"),
+    getSetting("concierge.fit.maxEvidence"),
   ]);
   // Never a model the gateway has retired (a free tier ending broke every fallback answer, 2026-10-08).
   const { model, fallbacks } = pickModels(
@@ -99,7 +112,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
   if (parsed.isNewQuestion && flags[FLAGS.instantLane] === true) {
     const last = parsed.messages[parsed.messages.length - 1]!;
     const question = last.parts.find((p): p is { type: "text"; text: string } => p.type === "text")?.text ?? "";
-    const intent = matchInstant(question);
+    const intent = matchInstant(question, instantMaxCharacters);
     if (intent) {
       const [instantCorpus, templates] = await Promise.all([getGuideCorpus(budget, cacheSeconds), getContentBlock("guide-instant")]);
       const reply = templates ? buildInstant(intent, instantCorpus.facts, instantCorpus.ownerFirstName, templates) : null;
@@ -164,6 +177,9 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     showJourney: flags[FLAGS.showJourney] === true,
     showSkills: flags[FLAGS.showSkills] === true,
     showPulse: flags[FLAGS.showPulse] === true,
+    compareSystems: flags[FLAGS.compareSystems] === true,
+    fitCheck: flags[FLAGS.fitCheck] === true,
+    tour: flags[FLAGS.tour] === true,
   };
   const tools: ToolSet = {};
   // The card tools (docs/AI-GUIDE-PHASE1-PLAN.md §7): the model picks which records; the cards are read
@@ -175,6 +191,44 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
       inputSchema: z.object({ slugs: z.array(z.enum(systemSlugs as [string, ...string[]])).min(1).max(4) }),
       execute: async ({ slugs }: { slugs: string[] }) => showSystems(slugs),
     };
+  }
+  if (on.compareSystems && systemSlugs.length >= 2) {
+    const slug = z.enum(systemSlugs as [string, ...string[]]);
+    tools.compare_systems = {
+      description: "Put two of his published systems side by side — status, what each is, which technologies they share and which are only in one — when the visitor asks to compare or contrast them.",
+      inputSchema: z.object({ left: slug, right: slug }),
+      execute: async ({ left, right }: { left: string; right: string }) => compareSystems(left, right),
+    };
+  }
+  if (on.fitCheck) {
+    // The limits are settings and the notes' wording is the owner's content ("guide-fit"); the matching is code.
+    const notes = await getContentBlock("guide-fit");
+    const fitOptions: FitOptions = {
+      maxRequirements: fitMaxRequirements,
+      maxEvidence: fitMaxEvidence,
+      yearsNote: notes?.yearsNote || null,
+      seniorityNote: notes?.seniorityNote || null,
+      noneNote: notes?.noneNote || null,
+    };
+    tools.fit_check = {
+      description:
+        "Map a visitor's needs — a job description's requirements, or the skills they're looking for — against the evidence on this site. Give each need as a short phrase (\"TypeScript\", \"5 years of Kubernetes\", \"experience leading a team\"), at most 8. The card shows each as evidenced, partly, or not evidenced yet, with the systems that prove it; matching is done in code from the site's data, so list the needs faithfully and never soften or sharpen them.",
+      inputSchema: z.object({ requirements: z.array(z.string().min(2).max(160)).min(1).max(fitMaxRequirements) }),
+      execute: async ({ requirements }: { requirements: string[] }) => fitCheck(requirements, await loadFitData(), fitOptions),
+    };
+  }
+  if (on.tour) {
+    // The tours are the owner's content; the model chooses a key, nothing else.
+    const parsedTours = ToursBlock.safeParse((await db.siteContent.findUnique({ where: { key: "guide-tours" }, select: { body: true } }))?.body);
+    const block = parsedTours.success ? parsedTours.data : null;
+    const keys = tourKeys(block);
+    if (block && keys.length > 0) {
+      tools.start_tour = {
+        description: `Start one of the owner's guided tours of this site. Tours: ${block.tours.map((t) => `${t.key} (${t.summary})`).join("; ")}.`,
+        inputSchema: z.object({ tour: z.enum(keys as [string, ...string[]]) }),
+        execute: async ({ tour }: { tour: string }) => resolveTour(block, tour, corpus.paths),
+      };
+    }
   }
   if (on.showJourney) {
     const year = z.number().int().min(1990).max(2100);
@@ -238,13 +292,49 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     };
   }
 
+  // How much wit this reply may carry — decided here from the conversation, never left to the model's mood
+  // (docs/AI-GUIDE-PHASE2-PLAN.md §6). A tool's follow-up request has the same last question, so the same answer.
+  const userTexts = parsed.messages.filter((m) => m.role === "user").map((m) => m.parts.find((p): p is { type: "text"; text: string } => p.type === "text")?.text ?? "");
+  const tone = decideTone({ question: userTexts[userTexts.length - 1] ?? "", earlier: userTexts.slice(0, -1), turn: userTexts.length, ceiling: humorCeiling, everyNthTurn: humorEveryNth, coolDownTurns: humorCoolDown });
+
+  // What the guide said, checked against the site's data once it has finished (lib/guide/verify.ts) —
+  // a count and a list of what it could not find, shown with the answer and kept as numbers only.
+  const lastQuestion = userTexts[userTexts.length - 1] ?? "";
+  let answerText = "";
+  let verification: Verification | null = null;
+  const verifyOnce = (): Verification => {
+    if (verification) return verification;
+    verification = verifyAnswer({ answer: answerText, question: lastQuestion, corpus, maxFlagged: verifierMaxFlagged });
+    // A question the site couldn't answer (or the guide answered beyond the site's data) is kept for the owner — scrubbed, if allowed.
+    if (looksUnanswered(answerText)) waitUntil(recordGap({ question: lastQuestion, reason: "unanswered", page }));
+    else if (verification.flagged.length > 0) waitUntil(recordGap({ question: lastQuestion, reason: "unverified", page }));
+    return verification;
+  };
+
+  // The playbook for this kind of question: fixed guidance, chosen from the question and the site's own names.
+  const playbook = decidePlaybook({
+    question: lastQuestion,
+    page,
+    systemNames: [...corpus.text.matchAll(/^### (.+?) \(source: \/systems\//gm)].map((m) => m[1]!),
+    tools: { fitCheck: on.fitCheck, compareSystems: on.compareSystems },
+  });
+
   // One metrics row per answer, written exactly once however the stream ends (done, abort, error).
   const toolsRun: string[] = [];
   let written = false;
   const write = (rec: Omit<GuideTurnRecord, "configuredModel" | "totalMs" | "firstTokenMs" | "tools">) => {
     if (written) return;
     written = true;
-    track({ ...rec, configuredModel: model, totalMs: timer.elapsed(), firstTokenMs: timer.firstTokenMs, tools: toolsRun });
+    const v = rec.outcome === "answered" ? verifyOnce() : null;
+    track({
+      ...rec,
+      configuredModel: model,
+      totalMs: timer.elapsed(),
+      firstTokenMs: timer.firstTokenMs,
+      tools: toolsRun,
+      humor: tone.humor,
+      ...(v && { verifierChecked: v.checked, verifierFlagged: v.flagged.length, flaggedKinds: [...new Set(v.flagged.map((f) => f.kind))] }),
+    });
   };
 
   const result = streamText({
@@ -259,6 +349,9 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
       // Per-visitor context goes after the cached part, so the cache still hits. Built here from a
       // validated site path — never visitor text (system messages stay out of `messages`).
       ...(page ? [{ role: "system" as const, content: `The visitor is reading ${page} right now — "this", "this page" or "this system" means that one.` }] : []),
+      // The tone for this reply, from fixed text keyed on the governor's decision — never visitor text.
+      { role: "system" as const, content: toneInstruction(tone) },
+      ...(playbook ? [{ role: "system" as const, content: playbook.instruction }] : []),
     ],
     messages: await convertToModelMessages(parsed.messages),
     tools,
@@ -267,8 +360,10 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
     maxOutputTokens: maxAnswerTokens + maxReasoningTokens,
     abortSignal: request.signal,
     onChunk: ({ chunk }) => {
-      if (chunk.type === "text-delta") timer.firstToken();
-      else if (chunk.type === "tool-call") toolsRun.push(chunk.toolName);
+      if (chunk.type === "text-delta") {
+        timer.firstToken();
+        answerText += chunk.text;
+      } else if (chunk.type === "tool-call") toolsRun.push(chunk.toolName);
     },
     onEnd: (event) => {
       const last = event.steps[event.steps.length - 1];
@@ -296,7 +391,7 @@ export async function handleGuideRequest(request: Request, source: GuideSource =
       stream: result.stream,
       tools,
       // The chat says when an answer was cut short, instead of ending mid-sentence in silence.
-      messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason } : undefined),
+      messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason, tone: tone.mood, verification: verifyOnce() } : undefined),
       // Never leak provider errors to the browser — but say honestly when it's just busy.
       onError: (error) => {
         const busy = isBusy(error);

@@ -1,6 +1,6 @@
 # AI guide — Phase 2 plan: fast, grounded, reasoned, funny on purpose, and unlike any other portfolio guide
 
-**Status:** owner answers recorded 2026-10-09 (§11) — model stays **free for now**, built so that paying for Claude later is a settings change, not a rebuild. **Release 1 built 2026-10-09 (P2-0, P2-1, P2-2 — see §12); releases 2 and 3 are next.**
+**Status:** owner answers recorded 2026-10-09 (§11) — model stays **free for now**, built so that paying for Claude later is a settings change, not a rebuild. **Release 1 built and live 2026-10-09 (§12). Release 2 and 3 built 2026-10-09 (§13, §14). Voice (P2-8) is the one optional step left.**
 **Owner's brief (2026-10-09):** phase 2 is the guide's *logical thinking and system interaction* and its *speed* "throughout the system". It has to be fast, accurate, reliable and must not hallucinate. It needs a sense of humor, and it must **know when humor is right** — "calculated". Recommend what to strengthen and what features would make it outstanding and unique: "the best guide ever for a portfolio".
 **Out of the locked V2 spec** — an owner request, logged as D-024 (proposed). The guide's laws do not move: read-only (BR-4.1), drafts never sent (BR-4.2), nothing about the owner that isn't in the site's data, always labelled AI, third person (BR-4.3), every tool behind a flag (BR-4.4), nothing a visitor sends changes what it is (BR-4.6).
 
@@ -192,3 +192,29 @@ Each step: phone first (`tests/e2e/mobile.spec.ts` at 360/390), a11y/axe, no new
 | — | A2 deferred (see §3); the handler moved out of the route so the canary runs the very same pipeline | `lib/guide/handler.ts` |
 
 **Not done by me, and why:** nothing was run against a live model — this machine has no gateway credential (the local OIDC token expired 2026-09-19) and the production endpoint was not used for benchmarking (it spends the live guide's quota). The evals and the benchmark are written, structurally tested and wired to CI; their first real run needs `AI_GATEWAY_API_KEY` (a repository secret for CI; a local env value for a local run).
+
+---
+
+## 13. Release 2 — what was built (2026-10-09)
+
+| Step | Built | Where |
+|---|---|---|
+| P2-3 | The **answer verifier**: after an answer finishes, every path, link, technology, year, count and money figure it states about him or the site is looked up in the knowledge in code; the visitor sees what couldn't be found ("Couldn't find in the site's data: …"), the owner sees counts and kinds; denials ("no Kubernetes in his stack") and general knowledge are not claims. The **question log**: what the site couldn't answer (or the guide answered beyond the data) is kept scrubbed, with no identifier, for `concierge.logRetentionDays` days (0 = none), shown on Guide health, disclosed beside the chat box in the owner's words. | `lib/guide/verify.ts`, `tech-lexicon.ts`, `gaps.ts`, `AnswerCheck.tsx`, `GuideGap`, `GuideTurn` verifier columns |
+| P2-4 | The **humor governor** is wired in: per reply, off / dry / playful, decided in code from gravity (distress, hardship, legal/medical/financial, formal and money matters — and the turns after them), register (a playful visitor, pressure) and rhythm, capped by the owner's ceiling; passed to the model as fixed text; the level is recorded, the mood rides the stream. 8 new tone evals, a tone check in the nightly canary. | `lib/guide/tone.ts`, `handler.ts` |
+| P2-5 | **Question playbooks** (fit, compare, timeline, depth, general, small talk) chosen from the question and the site's own names; **`compare_systems`** and **`fit_check`** — the Fit Check: a visitor's needs matched in code against the site's evidence as evidenced / partly / not yet, no score; years and seniority are never met by building alone. Cards in the chat; both tools ship **off** (BR-4.4). | `lib/guide/playbooks.ts`, `fit.ts`, `show-tools.ts`, `AnswerCards.tsx` |
+
+**Nothing hardcoded (owner, 2026-10-09).** Every tunable these add is an admin setting — `concierge.humor`, `.humor.everyNthTurn`, `.humor.coolDownTurns`, `.instant.maxQuestionCharacters`, `.canary.timeBudgetSeconds`, `.canary.paceSeconds`, `.firstTokenDeadlineMs`, `.verifier.maxFlagged`, `.fit.maxRequirements`, `.fit.maxEvidence`, `.logRetentionDays`, `.logMaxCharacters`, `.metricsRetentionDays` — and every sentence a visitor can read that isn't the model's is owner-edited content: the instant answers (`guide-instant`), Fit Check's honest notes (`guide-fit`), the question-log disclosure (`ai-guide.privacyNote`). What stays in code is logic and classifier vocabulary (the technology lexicon, the gravity/register patterns, the standing prompts and tone instructions) — tested, and the guide's laws, which the owner's words must not be able to loosen.
+
+**Not done by me, and why:** the new cards and the Guide health panels have not been seen in a browser (no dev server on this machine's memory; the owner's Chrome stays maximized) — CI and the unit/integration tests are the check. Nothing ran against a live model.
+
+---
+
+## 14. Release 3 — what was built (2026-10-09)
+
+| Step | Built | Where |
+|---|---|---|
+| P2-6 | **Guided tours**: the guide starts one of the owner's tours (`start_tour`, flag `agent.tour`, off); a card steps the visitor through its stops, opening each page, lighting the section for the owner's number of seconds and saying the owner's line. Everything in a tour is the owner's content (`guide-tours`, edited in Page content); the model only picks a key, and a stop on a page the site lacks is skipped. **⌘K → "Ask the guide"** sends a typed question to the guide. | `lib/guide/tour.ts`, `spotlight.ts`, `TourCard.tsx`, `SearchPalette.tsx` |
+| P2-7 | **Feedback and challenge** under every answer (helpful / this was wrong / challenge this — the owner's words, each hidden until written); feedback is kept scrubbed with no identifier, for `concierge.logRetentionDays`, and shown on Guide health. **Public proof of reliability**: the nightly self-check through a public view (`PublicGuideCheck`) and `GET /guide/check`, said beside the chat box in the owner's words — a failure said plainly. | `lib/guide/feedback.ts`, `AnswerFeedback.tsx`, `lib/queries/guide-check.ts`, `check-note.ts` |
+| P2-8 | Voice — **not built** (owner: later, optional). | — |
+
+**Not seen by eye:** the tour card, the spotlight, the feedback buttons and the new admin panels have unit and integration tests but have not been looked at in a browser (this machine's memory and CPU, and the owner's Chrome stays maximized). All of it is off or hidden until the owner writes the wording or switches the flag, so nothing unseen reaches visitors by accident.

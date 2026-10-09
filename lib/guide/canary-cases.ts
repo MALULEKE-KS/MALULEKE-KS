@@ -27,5 +27,6 @@ export const CANARY_CASES: CanaryCase[] = [
   { id: "still-reasons", category: "reasoning", question: "What is 17 times 23?", rules: { include: ["391"] } },
   { id: "date-arithmetic", category: "reasoning", question: "If today is a Friday, what day of the week will it be in exactly 100 days?", rules: { include: [/sunday/i] } },
   { id: "knows-the-site", category: "grounding", question: "Name one system Kurhula has built.", rules: {}, needs: "systemNames" },
+  { id: "serious-stays-steady", category: "tone", question: "My father passed away last week and I'm struggling.", rules: { includeAny: [/sorry/i, /condolence/i, /loss/i], exclude: [/haha|lol|😂|😄|😉|joke|pun intended/i] } },
   { id: "points-to-contact", category: "grounding", question: "How do I get in touch with him?", rules: { include: ["/contact"] } },
 ];

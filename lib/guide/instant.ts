@@ -25,9 +25,10 @@ export interface InstantTemplates {
   cvNone: string;
   counts: string;
   pulse: string;
+  /** The note about private repositories for one, and for several ({privateCount}); absent = no note. */
+  privateOne?: string;
+  privateMany?: string;
 }
-
-const MAX_QUESTION = 90;
 
 /** Lower-cased, punctuation-light, without politeness fillers — what the patterns see. */
 export function normaliseQuestion(raw: string): string {
@@ -77,8 +78,8 @@ const PATTERNS: { intent: InstantIntent; patterns: RegExp[] }[] = [
 ];
 
 /** Which instant answer a visitor's question asks for — or null when the model should answer. */
-export function matchInstant(question: string): InstantIntent | null {
-  if (question.length > MAX_QUESTION) return null;
+export function matchInstant(question: string, maxCharacters: number): InstantIntent | null {
+  if (question.length > maxCharacters) return null;
   const q = normaliseQuestion(question);
   if (!q) return null;
   for (const { intent, patterns } of PATTERNS) if (patterns.some((p) => p.test(q))) return intent;
@@ -128,7 +129,8 @@ export function buildInstant(intent: InstantIntent, facts: GuideFacts, ownerFirs
       const { total, privateCount, byStatus } = facts.systems;
       if (total === 0) return null; // nothing published: let the model say so in its own words
       const breakdown = byStatus.map((s) => `${s.count} ${s.status.toLowerCase()}`).join(", ");
-      const privateNote = privateCount > 0 ? `${plural(privateCount, "system")} ${privateCount === 1 ? "keeps its" : "keep their"} code in ${privateCount === 1 ? "a private repository" : "private repositories"}.` : "";
+      const noteTemplate = privateCount === 1 ? templates.privateOne : templates.privateMany;
+      const privateNote = privateCount > 0 && noteTemplate ? (fillTemplate(noteTemplate, { owner, privateCount }) ?? "") : "";
       const text = fillTemplate(templates.counts, { owner, systems: plural(total, "system"), breakdown, privateNote });
       return text ? { intent, text, cards: [] } : null;
     }

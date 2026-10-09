@@ -14,7 +14,7 @@ import { warmGuide } from "@/lib/guide/warm-client";
 
 export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function Composer({ id }, ref) {
   const { ownerFirstName, lookAt, setMood, mood } = useGuide();
-  const { busy, send, stop, maxQuestionCharacters } = useGuideChat();
+  const { busy, send, stop, maxQuestionCharacters, privacyNote, checkNote } = useGuideChat();
   const [input, setInput] = useState("");
   const tooLong = input.length > maxQuestionCharacters;
 
@@ -88,6 +88,8 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function
           {input.length}/{maxQuestionCharacters}
         </span>
       </p>
+      {checkNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{checkNote}</p>}
+      {privacyNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{privacyNote}</p>}
     </form>
   );
 });

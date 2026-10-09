@@ -105,10 +105,44 @@ model GuideTurn {
   steps           Int      @default(0) // model calls in this turn (tool use adds steps)
   tools           String[] // names of the tools it ran, in order
   finishReason    String?
+  humor           String? // off | dry | playful — how much wit the humor governor allowed this reply (lib/guide/tone.ts)
+  verifierChecked Int? // claims in the answer the verifier looked up in the site's data (lib/guide/verify.ts)
+  verifierFlagged Int? // …and how many it could not find
+  flaggedKinds    String[] // which kinds of claim those were (path, link, technology, year, number, figure)
   route           Json? // the gateway's routing record for the answer, as reported
 
   @@index([createdAt])
   @@index([outcome, createdAt])
+}
+
+// A question the AI guide could not answer from the site's data, or answered with
+// something the data does not contain (docs/AI-GUIDE-PHASE2-PLAN.md §4 B3) — what
+// visitors want that the site does not say. Contact details are stripped before it
+// is stored (lib/guide/gaps.ts); there is no IP, cookie or identifier. Kept only
+// while concierge.logRetentionDays is above 0, and pruned by the daily job.
+model GuideGap {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  reason    String // unanswered | unverified
+  question  String
+  page      String? // the site path the visitor was on, when it was one of the site's own
+
+  @@index([createdAt])
+}
+
+// "Helpful" / "this was wrong" from a visitor about an answer, with the question and the
+// answer's opening (docs/AI-GUIDE-PHASE2-PLAN.md §7). Contact details are stripped before
+// it is stored; there is no IP, cookie or identifier; kept only while
+// concierge.logRetentionDays is above 0 and pruned by the daily job.
+model GuideFeedback {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  rating    String // helpful | wrong
+  question  String
+  answer    String
+  page      String?
+
+  @@index([createdAt])
 }
 
 // One run of the guide's daily canary (docs/AI-GUIDE-PHASE2-PLAN.md §4 B4): a
@@ -1429,6 +1463,17 @@ view PublicPlatformPulse {
   auditEventsTotal        Int
   lastSuccessfulJobAt     DateTime?
   lastGithubSyncAt        DateTime?
+}
+
+// The AI guide's latest nightly self-check, for public pages (docs/AI-GUIDE-PHASE2-PLAN.md §7):
+// when it ran and how many fixed questions passed — never an answer or a visitor's words.
+view PublicGuideCheck {
+  ranAt       DateTime @unique @db.Timestamptz(3)
+  total       Int
+  passed      Int
+  failed      Int
+  unavailable Int
+  checks      Json // [{ id, category, pass }]
 }
 
 // F5c — which switches are on (keys and on/off only), for public pages (BR-4.4).
