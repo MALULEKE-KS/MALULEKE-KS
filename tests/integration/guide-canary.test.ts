@@ -132,6 +132,33 @@ describe("runGuideCanary — the recorded run and the job", () => {
     expect(health.canary[0]?.total).toBe(CANARY_CASES.length);
   });
 
+  it("keeps the canary's own questions out of the visitors' question log", async () => {
+    await db.platformSetting.upsert({ where: { key: "concierge.logRetentionDays" }, update: { value: 30 }, create: { key: "concierge.logRetentionDays", value: 30 } });
+    vi.mocked(guideModel).mockImplementation(
+      () =>
+        new MockLanguageModelV4({
+          doStream: async () => ({
+            stream: simulateReadableStream({
+              chunks: [
+                { type: "text-start", id: "t" },
+                { type: "text-delta", id: "t", delta: "That isn't on the site, so I won't guess — the contact form at /contact will reach him." },
+                { type: "text-end", id: "t" },
+                { type: "finish", finishReason: { unified: "stop", raw: undefined }, usage: { inputTokens: { total: 1, noCache: 1, cacheRead: undefined, cacheWrite: undefined }, outputTokens: { total: 1, text: 1, reasoning: undefined } } },
+              ],
+            }),
+          }),
+        }),
+    );
+    const before = await db.guideGap.count();
+    await runCanaryCases({ paceMs: 0, sleep: noSleep, cases: CANARY_CASES.slice(0, 2) });
+    await new Promise((r) => setTimeout(r, 400));
+    try {
+      expect(await db.guideGap.count()).toBe(before);
+    } finally {
+      await db.platformSetting.deleteMany({ where: { key: "concierge.logRetentionDays" } });
+    }
+  });
+
   it("the registered job fails — naming the checks — when the guide fails one", async () => {
     // Through the real pipeline with a model that answers wrongly everywhere.
     vi.mocked(guideModel).mockImplementation(
