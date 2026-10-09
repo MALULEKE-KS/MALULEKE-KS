@@ -145,3 +145,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Not verified by me:** phone layouts by eye (the owner's Chrome stays maximized — mobile e2e in CI only); the owner reports the guide works well on the phone.
 - **Owner, to do:** (1) fine-grained read-only GitHub tokens per home so private repos sync (DEPLOYMENT.md); (2) a real-phone pass of the home page; (3) choose the guide's phase 2 (paid model for reliability first — free models had a retired id and 503 outages today).
 - **Next step:** the AI guide's phase 2 (owner said "we will finish the AI phases next time"), then V2 **WP-001**.
+
+### 2026-10-09 · AI guide phase 2 planned (owner request, not a WP — D-024)
+- **Done:** read the Phase 1 plan, prompt, route, corpus, request whitelist, settings and evals; wrote `docs/AI-GUIDE-PHASE2-PLAN.md` (findings, targets, five pillars, ranked features, humor governor, cost, privacy, three-release build order). No code changed.
+- **Owner decisions (plan §11):** free models for now but nothing may need a rebuild when Claude is paid for; question log yes (scrubbed, 30 days); public eval scoreboard yes; voice later.
+- **Next step:** release 1 in progress (branch `feat/guide-phase2-r1`): P2-0 (telemetry + benchmark baseline) then P2-1 (evals as a CI gate) then P2-2 (speed core). V2 **WP-001** stays next in the spec order after the guide.
