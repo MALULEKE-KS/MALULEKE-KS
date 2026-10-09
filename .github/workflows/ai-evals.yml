@@ -44,6 +44,13 @@ on:
 permissions:
   contents: read
 
+# One run at a time: the free models allow about five requests a minute for the whole site
+# (the live guide shares that), so two eval runs at once only fight each other and the visitors.
+# A run waiting its turn is replaced by a newer one; the one running is left to finish.
+concurrency:
+  group: ai-evals
+  cancel-in-progress: false
+
 jobs:
   evals:
     runs-on: ubuntu-latest
