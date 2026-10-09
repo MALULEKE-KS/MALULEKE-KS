@@ -16,7 +16,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 | WP | Title | Phase | Status | Branch / PR | Updated | Note |
 |---|---|---|---|---|---|---|
-| WP-001 | Baseline measurement | 0 | Not started | — | 2026-10-02 | Include the guide eval baseline (39/39) and the measured image weights (spec 1.2.2) |
+| WP-001 | Baseline measurement | 0 | In progress | feat/wp-001-baseline | 2026-10-09 | Include the guide eval baseline (39/39) and the measured image weights (spec 1.2.2) |
 | WP-002 | Tracker and decision log | 0 | Done | V2 spec lock PR | 2026-10-02 | This file and `DECISIONS.md` |
 | WP-101 | Homepage metadata and link previews | 1 | Done | V1 finalization (release/v1-final) | 2026-10-03 | One metadata helper for every page (`lib/seo/metadata.ts`): share image 1200×630, `summary_large_image`, site name, `en_ZA`; descriptions clipped at a sentence (`lib/seo/clip.ts`); per-system share-image alt via `generateImageMetadata`. Re-check with a link-preview debugger after deploy |
 | WP-102 | Image performance and CI budgets | 1 | Partial | V1 finalization (release/v1-final) | 2026-10-03 | Character weight fixed: the rig's texture is the `<img>`'s own `currentSrc` (no raw 116 KB master), poses mount on first use or after 6 s. Lighthouse CI budgets remain |
