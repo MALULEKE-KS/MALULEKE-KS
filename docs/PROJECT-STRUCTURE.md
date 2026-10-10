@@ -73,7 +73,7 @@ maluleke-ks/
 │   ├── home/                          # home-page sections (hero, AI guide, work showcase, system map, control room)
 │   ├── systems/                       # catalog: CatalogCard, CatalogFilters + FilterDropdown, SystemsSpotlight
 │   ├── journey/, about/               # ChapterTimeline + ChapterNav; SkillOrbit, skill-icons, GuideInvite
-│   ├── guide/                         # the AI guide: GuideProvider (character state), GuideChatProvider (the one conversation),
+│   ├── guide/                         # the AI guide: GuideProvider (character state), GuideChatProvider (the one conversation, as every view sees it) + GuideChatEngine (the AI SDK side, loaded after the first view — WP-102) + chat-types,
 │   │   └── console/                   # the console: stage/bust, conversation, answer, trail, receipts, cards, composer; GuidePanel wraps it off home
 │   └── admin/                         # AdminNav, ui.tsx (the admin kit), ConfirmDelete, ActivityLogTable
 │
