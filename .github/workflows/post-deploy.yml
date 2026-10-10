@@ -39,4 +39,4 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
       - name: Every core page is within its weight budget
-        run: node scripts/check-budgets.mjs "${{ vars.PRODUCTION_URL || github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}" --lighthouse mobile
+        run: node scripts/check-budgets.mjs "${{ vars.PRODUCTION_URL || github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}" --lighthouse both
