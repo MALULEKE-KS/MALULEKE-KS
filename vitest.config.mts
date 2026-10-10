@@ -62,6 +62,9 @@ export default defineConfig({
           env: { SCREENSHOT_SERVICE_URL: "off" },
           include: ["tests/**/*.test.{ts,tsx}"],
           exclude: ["node_modules/**", "tests/e2e/**", ".next/**", ...GUIDE_INTEGRATION],
+          // A shared CI runner makes bcrypt, image and PDF work several times slower than a laptop; a real hang still fails at 30 s.
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
           sequence: { groupOrder: 1 },
         },
       },
@@ -74,6 +77,8 @@ export default defineConfig({
           include: GUIDE_INTEGRATION,
           exclude: ["node_modules/**", ".next/**"],
           fileParallelism: false,
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
           sequence: { groupOrder: 2 },
         },
       },

@@ -73,7 +73,7 @@ const setFlag = (key: string, enabled: boolean) => db.flag.update({ where: { key
 
 beforeAll(async () => {
   savedFlags = await db.flag.findMany({ where: { key: { in: FLAGS } }, select: { key: true, enabled: true } });
-  const [org, status] = await Promise.all([db.organization.findFirstOrThrow(), db.status.findFirstOrThrow({ where: { key: "in_progress" } })]);
+  const [org, status] = await Promise.all([db.organization.findFirstOrThrow({ where: { isClient: false } }), db.status.findFirstOrThrow({ where: { key: "in_progress" } })]);
   const base = { organizationId: org.id, statusId: status.id, description: "A system for the compute-tool tests.", clientVisibility: "PUBLIC" as const, updatedAt: new Date() };
   await db.system.createMany({
     data: [
