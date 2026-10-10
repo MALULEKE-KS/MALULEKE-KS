@@ -206,3 +206,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Deferred, in order** (also in `docs/ROADMAP-V2.md`, update log): (1) confirm #212's `/systems` CLS in the next post-deploy budgets run and tighten `perf-budgets.json`; (2) phone LCP ≤ 2.5 s — motion `LazyMotion`, fonts, analytics chunk; (3) guide retrieve-then-answer behind a default-off setting, judged by the eval gate; (4) content-tier evals in full and a look at `formal-hr` on the next nightly run; (5) voice, optional.
 - **Next up:** WP-102 (the open part), then WP-111, then the WP-103/104/109 remainders.
 
+### 2026-10-10 · Session closed — final numbers (main after #214; branch `docs/close-session`)
+- **Confirmed on production (build 8907403, runner, phone / desktop):** CLS **0 on every route and device** — the footer and `/systems` shifts are fixed. Weights 650–900 KB (home 997 → 846, `/journey` 800 → 651). Performance 78–87 phone (`/xkimi` 85), 99–100 desktop. Phone LCP 3.2–4.8 s — the one open WP-102 target (≤ 2.5 s).
+- **Budgets tightened** to these numbers (+10–15%): `perf-budgets.json` is now a ratchet; the test only forbids them being looser than the baseline + 20%.
+- **Deferred to V2** (unchanged order, minus the confirmed CLS item): phone LCP; guide retrieve-then-answer behind a default-off setting judged by the eval gate; content-tier evals in full and `formal-hr` on the nightly; voice (optional).
+- **Next up:** WP-102 (LCP only), then WP-111.
+
