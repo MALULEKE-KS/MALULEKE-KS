@@ -1,0 +1,54 @@
+{
+  "about": "Performance budgets (spec WP-102), checked by scripts/check-budgets.mjs after every production deploy. `weights` are exact, measured on what the page downloads: each is the WP-001 baseline (docs/improvements/baseline-2026-10-10.json) plus headroom, and a breach FAILS the check. `lab` are Lighthouse targets from the spec; they are noisy, so a breach only WARNS until the variance on a quiet runner is known (decision log D-027). Tighten a number by editing it here — never in code.",
+  "weights": {
+    "/": {
+      "totalKb": 1147,
+      "imageKb": 334,
+      "requests": 63,
+      "largestImageKb": 93
+    },
+    "/systems": {
+      "totalKb": 1202,
+      "imageKb": 415,
+      "requests": 55,
+      "largestImageKb": 134
+    },
+    "/systems/xkimi-xa-mali": {
+      "totalKb": 1030,
+      "imageKb": 244,
+      "requests": 58,
+      "largestImageKb": 134
+    },
+    "/about": {
+      "totalKb": 1050,
+      "imageKb": 238,
+      "requests": 62,
+      "largestImageKb": 134
+    },
+    "/journey": {
+      "totalKb": 924,
+      "imageKb": 144,
+      "requests": 56,
+      "largestImageKb": 134
+    },
+    "/contact": {
+      "totalKb": 1009,
+      "imageKb": 228,
+      "requests": 55,
+      "largestImageKb": 134
+    }
+  },
+  "lab": {
+    "mode": "warn",
+    "mobile": {
+      "lcpMs": 2500,
+      "cls": 0.1,
+      "performance": 70
+    },
+    "desktop": {
+      "lcpMs": 2500,
+      "cls": 0.1,
+      "performance": 80
+    }
+  }
+}

@@ -4,9 +4,9 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 ## Next up
 
-**Next up: WP-102**
+**Next up: WP-102 (the part still open: LCP and CLS)**
 
-> WP-001 is done (baseline `docs/improvements/baseline-2026-10-10.json` / `.md`, build 17df587). WP-102 is what remains of image performance: Lighthouse CI budgets against that baseline (phone LCP 3.0–6.2 s on five of six routes, `guide-master.webp` 116 KB on five of six, home desktop CLS 0.319). Then WP-111 (guide capacity — the guide health page and telemetry already count busy and resting refusals; check what is left), then WP-103/104/109 remainders.
+> The budgets are done and enforced after every production deploy (D-027). What the spec's acceptance still asks for and the baseline says is unmet: phone LCP ≤ 2.5 s (3.0–6.2 s now on five of six routes), CLS ≤ 0.1 (home desktop 0.319, `/systems` desktop 0.156). First find each route's LCP element and the layout shifts (re-measure on a quiet machine — the baseline's lab numbers are noisy), then fix and ratchet `perf-budgets.json`. Then WP-111, then WP-103/104/109 remainders.
 
 ## Status values
 
@@ -19,7 +19,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 | WP-001 | Baseline measurement | 0 | Done | PR #202 | 2026-10-10 | Include the guide eval baseline (39/39) and the measured image weights (spec 1.2.2) |
 | WP-002 | Tracker and decision log | 0 | Done | V2 spec lock PR | 2026-10-02 | This file and `DECISIONS.md` |
 | WP-101 | Homepage metadata and link previews | 1 | Done | V1 finalization (release/v1-final) | 2026-10-03 | One metadata helper for every page (`lib/seo/metadata.ts`): share image 1200×630, `summary_large_image`, site name, `en_ZA`; descriptions clipped at a sentence (`lib/seo/clip.ts`); per-system share-image alt via `generateImageMetadata`. Re-check with a link-preview debugger after deploy |
-| WP-102 | Image performance and CI budgets | 1 | Partial | V1 finalization (release/v1-final) | 2026-10-03 | Character weight fixed: the rig's texture is the `<img>`'s own `currentSrc` (no raw 116 KB master), poses mount on first use or after 6 s. Lighthouse CI budgets remain |
+| WP-102 | Image performance and CI budgets | 1 | Partial | PR (feat/wp-102-budgets) | 2026-10-10 | Character weight fixed earlier (V1 finalization). Budgets: `perf-budgets.json` + `scripts/check-budgets.mjs`, run after every production deploy (job `budgets`): weights fail, Lighthouse LCP/CLS/performance targets warn (D-027). Phone LCP target (2.5 s) is NOT met yet on five routes — that is a performance task, not a budget one
 | WP-103 | Skill evidence tiers (+ manifests) | 1 | Partial | V1 finalization (release/v1-final) | 2026-10-03 | Manifest evidence built: the sync reads package.json (+ workspaces), requirements.txt, pyproject.toml into `System.githubDependencies`; `Skill.aliases` (admin-editable) link skills as `SkillOnSystem.source = manifest`. Real preview: this platform 11 skills, Sunduza 15, Xkimi 12. Remaining: the `SkillEvidenceTier` lookup and links to the manifest line |
 | WP-104 | Work-map curation | 1 | Partial | V1 finalization (release/v1-final) | 2026-10-03 | Deleted repos now leave every public list (`System.githubGoneAt`; the owner's two portfolios retired). Remaining: the `ProjectGroup` lookup and grouping |
 | WP-105 | Contact exposure | 1 | Done | V1 finalization (release/v1-final) | 2026-10-03 | No raw email or WhatsApp in the footer, the home contact band or the phone menu; /contact keeps both as the deliberate alternative (D-006). Click-to-reveal obfuscation on /contact not built — D-011 |
@@ -181,3 +181,7 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Also fixed:** the formal-register slip — a formal matter (a letter, a reference check) now asks for a formal, third-person, no-contractions reply, not only "no jokes" (`lib/guide/tone.ts`, tested). Re-check on the next nightly run.
 - **Findings for later WPs:** every route but `/contact` has phone LCP over 2.5 s; `guide-master.webp` is the largest image on five of six routes; home desktop CLS 0.319 (> 0.1). Re-measure the outliers on a quiet machine before setting budgets. Axe is clean (0 violations everywhere); every route reports the platform's build.
 - **Next step:** WP-102 — Lighthouse CI budgets set from this baseline (a re-run on a quiet machine first). Owner to-do: look at `/` and `/systems` mobile LCP in the baseline and say if the targets in the spec are the ones to hold.
+
+### 2026-10-10 · WP-102 budgets built (issue #203, branch `feat/wp-102-budgets`; D-027)
+- **Done:** `perf-budgets.json` (weights = the WP-001 baseline plus headroom; lab targets LCP 2.5 s / CLS 0.1 / performance), `scripts/check-budgets.mjs` (measures weight on phone and desktop, Lighthouse on the phone, judges with `scripts/lib/budgets.mjs`), job `budgets` in `post-deploy.yml` after the smoke check, `tests/unit/perf-budgets.test.ts` (covers every route, the baseline can't exceed its budget, weights fail, lab warns). The measuring code is shared with the baseline (`scripts/lib/page-measure.mjs`). Checked live on `/contact` (875.5 KB — a third measurement within 2 KB of the others).
+- **Left (why the row is Partial):** the spec's LCP ≤ 2.5 s and CLS ≤ 0.1 targets are not met, so lab breaches only warn for now. Next: identify LCP elements and shifts per route, fix, then tighten the file.
