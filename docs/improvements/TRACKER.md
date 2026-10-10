@@ -4,9 +4,9 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 ## Next up
 
-**Next up: WP-102 (the part still open: LCP and CLS)**
+**Next up: WP-102**
 
-> The budgets are done and enforced after every production deploy (D-027). What the spec's acceptance still asks for and the baseline says is unmet: phone LCP ≤ 2.5 s (3.0–6.2 s now on five of six routes), CLS ≤ 0.1 (home desktop 0.319, `/systems` desktop 0.156). First find each route's LCP element and the layout shifts (re-measure on a quiet machine — the baseline's lab numbers are noisy), then fix and ratchet `perf-budgets.json`. Then WP-111, then WP-103/104/109 remainders.
+> (The part still open: LCP and CLS.) The budgets are done and enforced after every production deploy (D-027). What the spec's acceptance still asks for and the baseline says is unmet: phone LCP ≤ 2.5 s (3.0–6.2 s now on five of six routes), CLS ≤ 0.1 (home desktop 0.319, `/systems` desktop 0.156). First find each route's LCP element and the layout shifts (re-measure on a quiet machine — the baseline's lab numbers are noisy), then fix and ratchet `perf-budgets.json`. Then WP-111, then WP-103/104/109 remainders.
 
 ## Status values
 
