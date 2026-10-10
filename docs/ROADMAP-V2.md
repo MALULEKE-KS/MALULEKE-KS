@@ -280,6 +280,15 @@ The skills are 48 entries taken from his CV and his systems' stacks (migration `
 - **Mobile:** smaller character on phones (hero 1,521 → 1,451 px); no horizontal overflow at 390 px.
 - **SEO:** the home description and link previews use the owner's own introduction (≤160 characters).
 
+### AI guide phase 2 and V2 WP-001/102 — what is deferred (2026-10-10, owner: "defer the not finished to v2")
+Built and live: the guide's phase 2 (plan `docs/AI-GUIDE-PHASE2-PLAN.md`), the V2 baseline (`docs/improvements/baseline-2026-10-10.*`), performance budgets after every deploy (`perf-budgets.json`), the chat engine and zod out of every page's first load, and the footer/CLS fixes. Deferred to V2, in this order:
+1. **Confirm the `/systems` layout-shift fix** (#212) in the next post-deploy budgets run, then tighten `perf-budgets.json` to the measured numbers (WP-102).
+2. **Phone LCP ≤ 2.5 s** (3.6–4.5 s now; WP-102): motion (≈ 80 KB gzip, `LazyMotion`), the 10 font files (165 KB), the analytics chunk. Real-throttle experiments are in the tracker.
+3. **Retrieve-then-answer** for the guide (plan §3 A2): the trigger (~25k tokens) is reached; build behind a default-off setting, prove it no less accurate with the eval gate, then decide.
+4. **Content-tier guide evals** in full; **check the formal-register fix** on the next nightly gate run (`formal-hr`).
+5. **Voice** (plan P2-8): optional, owner said later.
+6. Remaining WP-103, WP-104, WP-109, WP-111 and the Phase 2–5 packages stay in `docs/improvements/TRACKER.md` as before.
+
 ### F5c — system map, control room: the home page complete (2026-10-01, local)
 - **System map** (SystemMap): the three GitHub homes → published systems and public repos not yet written up → the technologies they use (curated stack and skills plus GitHub languages), joined by beams drawn in one SVG (Magic UI Animated Beam, adapted); hover traces a chain. New view `PublicSystemHome`; `/homes` lists each home's systems.
 - **Control room** (ControlRoom) replaces the numbers strip: a terminal (Magic UI Terminal, adapted: full text always in the page) playing live checks from `PublicPlatformPulse` — rules the database enforces, changes audited, the public read-only role, last GitHub sync and job, the running build — plus tiles and the owner's approved figures; "Ask the AI guide how". No separate Now band (Now building lives in Selected work; `/now` becomes a page).
