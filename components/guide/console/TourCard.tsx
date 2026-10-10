@@ -11,7 +11,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Footprints, RotateCcw } from "lucide-react";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import { spotlight } from "@/lib/guide/spotlight";
-import { stepTo, type ResolvedTour } from "@/lib/guide/tour";
+import { stepTo } from "@/lib/guide/tour-step";
+import type { ResolvedTour } from "@/lib/guide/tour";
 import { cn } from "@/lib/utils";
 
 const button =

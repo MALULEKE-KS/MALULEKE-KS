@@ -70,8 +70,5 @@ export function resolveTour(block: TourBlockData | null, key: string, sitePaths:
 /** Which tour keys the model may choose from. */
 export const tourKeys = (block: TourBlockData | null) => block?.tours.map((t) => t.key) ?? [];
 
-/** Move through a tour, staying within it. */
-export function stepTo(current: number, direction: "next" | "back" | "restart", length: number): number {
-  if (direction === "restart") return 0;
-  return Math.min(length - 1, Math.max(0, current + (direction === "next" ? 1 : -1)));
-}
+/** Moving through a tour lives in tour-step.ts, which the browser can load without zod. */
+export { stepTo } from "@/lib/guide/tour-step";
