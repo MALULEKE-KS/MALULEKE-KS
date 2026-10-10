@@ -30,39 +30,50 @@ interface SystemsPageProps {
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-async function HeroStats() {
-  const { stats } = await getCatalog({ pageSize: 1 });
+/** The hero's live counts and, unfiltered, every published system on a ring in featured order — fetched together so they arrive together. */
+async function HeroExtras({ spotlight }: { spotlight: boolean }) {
+  const [{ stats }, catalog] = await Promise.all([getCatalog({ pageSize: 1 }), spotlight ? getCatalog({ pageSize: 100 }) : null]);
   const items = [
     { value: stats.systems, label: stats.systems === 1 ? "system" : "systems" },
     { value: stats.homes, label: stats.homes === 1 ? "GitHub home" : "GitHub homes" },
     { value: stats.caseStudies, label: stats.caseStudies === 1 ? "case study" : "case studies" },
     { value: stats.activeThisMonth, label: "active this month" },
   ].filter((i) => i.value > 0); // a zero is an absence, not a figure — it isn't shown
-  if (items.length === 0) return null;
   return (
-    <dl className="flex flex-wrap gap-x-8 gap-y-3">
-      {items.map((i) => (
-        <div key={i.label} className="flex items-baseline gap-2">
-          <dd className="type-data text-paper text-2xl font-semibold">{i.value}</dd>
-          <dt className="text-mist text-sm">{i.label}</dt>
+    <>
+      {items.length > 0 && (
+        <dl className="flex flex-wrap gap-x-8 gap-y-3">
+          {items.map((i) => (
+            <div key={i.label} className="flex items-baseline gap-2">
+              <dd className="type-data text-paper text-2xl font-semibold">{i.value}</dd>
+              <dt className="text-mist text-sm">{i.label}</dt>
+            </div>
+          ))}
+        </dl>
+      )}
+      {catalog && (
+        <div className="mt-10 -mx-4 sm:mx-0">
+          <SystemsSpotlight systems={catalog.systems} />
         </div>
-      ))}
-    </dl>
+      )}
+    </>
   );
 }
 
-/** Every published system on a ring, in featured order — the unfiltered first view only. */
-async function Spotlight() {
-  const { systems } = await getCatalog({ pageSize: 100 });
-  return (
-    <div className="mt-10 -mx-4 sm:mx-0">
-      <SystemsSpotlight systems={systems} />
-    </div>
-  );
+/**
+ * Holds the height the counts and the ring take once they arrive, so the catalog below doesn't jump
+ * when they stream in (layout shift, WP-102). Measured on the page, 2026-10-10: on a phone the counts
+ * are 76 px and the ring 40 + 299; from 640 px wide, 32 px and 40 + 398.
+ */
+function HeroExtrasFallback({ spotlight }: { spotlight: boolean }) {
+  return <div aria-hidden="true" className={spotlight ? "h-[415px] sm:h-[470px]" : "h-[76px] sm:h-[32px]"} />;
 }
 
 export default async function SystemsPage({ searchParams }: SystemsPageProps) {
   const [params, intro] = await Promise.all([searchParams, getContentBlock("systems-page")]);
+
+  // The ring is the unfiltered first view only.
+  const showSpotlight = !(params.home || params.status || params.domain || params.tech || (params.page && params.page !== "1"));
 
   return (
     <>
@@ -73,14 +84,9 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
         title={<Accent text={intro?.heading ?? "The systems."} className="type-accent text-ember-gradient pr-[0.06em]" />}
         description={intro?.lede}
       >
-        <Suspense fallback={null}>
-          <HeroStats />
+        <Suspense fallback={<HeroExtrasFallback spotlight={showSpotlight} />}>
+          <HeroExtras spotlight={showSpotlight} />
         </Suspense>
-        {!(params.home || params.status || params.domain || params.tech || (params.page && params.page !== "1")) && (
-          <Suspense fallback={null}>
-            <Spotlight />
-          </Suspense>
-        )}
       </PageHero>
       <section className="bg-paper py-12 md:py-16">
         <Container>
