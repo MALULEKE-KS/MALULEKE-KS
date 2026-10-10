@@ -4,9 +4,9 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 ## Next up
 
-**Next up: WP-001**
+**Next up: WP-102**
 
-> V1 is closed and released (2026-10-03, build c0eb952 — see the last handoff entry). V2 starts here: WP-001 against that build, then the WP-110 investigation (step 1 only, no code), then WP-101 — but only after the owner approves the WP-001 baseline (spec Appendix A).
+> WP-001 is done (baseline `docs/improvements/baseline-2026-10-10.json` / `.md`, build 17df587). WP-102 is what remains of image performance: Lighthouse CI budgets against that baseline (phone LCP 3.0–6.2 s on five of six routes, `guide-master.webp` 116 KB on five of six, home desktop CLS 0.319). Then WP-111 (guide capacity — the guide health page and telemetry already count busy and resting refusals; check what is left), then WP-103/104/109 remainders.
 
 ## Status values
 
@@ -16,7 +16,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 | WP | Title | Phase | Status | Branch / PR | Updated | Note |
 |---|---|---|---|---|---|---|
-| WP-001 | Baseline measurement | 0 | In progress | feat/wp-001-baseline | 2026-10-09 | Include the guide eval baseline (39/39) and the measured image weights (spec 1.2.2) |
+| WP-001 | Baseline measurement | 0 | Done | PR #202 | 2026-10-10 | Include the guide eval baseline (39/39) and the measured image weights (spec 1.2.2) |
 | WP-002 | Tracker and decision log | 0 | Done | V2 spec lock PR | 2026-10-02 | This file and `DECISIONS.md` |
 | WP-101 | Homepage metadata and link previews | 1 | Done | V1 finalization (release/v1-final) | 2026-10-03 | One metadata helper for every page (`lib/seo/metadata.ts`): share image 1200×630, `summary_large_image`, site name, `en_ZA`; descriptions clipped at a sentence (`lib/seo/clip.ts`); per-system share-image alt via `generateImageMetadata`. Re-check with a link-preview debugger after deploy |
 | WP-102 | Image performance and CI budgets | 1 | Partial | V1 finalization (release/v1-final) | 2026-10-03 | Character weight fixed: the rig's texture is the `<img>`'s own `currentSrc` (no raw 116 KB master), poses mount on first use or after 6 s. Lighthouse CI budgets remain |
@@ -175,3 +175,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Done:** `scripts/baseline.mjs` (`npm run baseline <url>`) — per route and for phone and desktop: Lighthouse (lighthouse@13.5.0, dev dependency), axe WCAG 2.2 AA, requests/bytes by type with every image, share metadata, footer build vs the platform pulse; writes `docs/improvements/baseline-<date>.json` and `.md`. Tried on `/contact` against production (build `17df587`): phone perf 65 / desktop 80, a11y 100, 0 axe violations, 41 requests, 876 KB, images 190 KB, `guide-master.webp` 116 KB still the largest, footer build matches. D-026.
 - **Not done:** the full six-route run. It was stopped twice by the machine running out of memory (≈0.2 GB free while other jobs were running). Run it when memory is free: `MSYS_NO_PATHCONV=1 node scripts/baseline.mjs https://maluleke-ks.vercel.app --out docs/improvements/baseline-2026-10-09` (≈2 min per route; close other heavy programs first), then add the guide's eval baseline from the latest full `AI evals` run, commit both files and set WP-001 to Done. Re-run one route to record the variance (spec Verify).
 - **Next up:** stays WP-001 until the run is committed.
+
+### 2026-10-10 · WP-001 done — baseline recorded (PR #202, issue #201; D-026)
+- **Done:** the full six-route baseline against production build `17df587`: `docs/improvements/baseline-2026-10-10.json` and `.md` (Lighthouse phone and desktop, axe, weights, metadata, footer builds) plus the guide's eval baseline: gate tier **93/95** on the nightly run (38013807118, 2 h 6 min on the free models) — `formal-hr` was a real register slip, `interview-panic` a gateway outage. Variance recorded from two `/contact` runs (weights within 1.2 KB; scores ±15 on this loaded machine).
+- **Also fixed:** the formal-register slip — a formal matter (a letter, a reference check) now asks for a formal, third-person, no-contractions reply, not only "no jokes" (`lib/guide/tone.ts`, tested). Re-check on the next nightly run.
+- **Findings for later WPs:** every route but `/contact` has phone LCP over 2.5 s; `guide-master.webp` is the largest image on five of six routes; home desktop CLS 0.319 (> 0.1). Re-measure the outliers on a quiet machine before setting budgets. Axe is clean (0 violations everywhere); every route reports the platform's build.
+- **Next step:** WP-102 — Lighthouse CI budgets set from this baseline (a re-run on a quiet machine first). Owner to-do: look at `/` and `/systems` mobile LCP in the baseline and say if the targets in the spec are the ones to hold.

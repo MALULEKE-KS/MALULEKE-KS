@@ -41,6 +41,8 @@ export interface ToneDecision {
   mood: Mood;
   /** Why, in plain words — for tests and the telemetry, never shown to a visitor. */
   reason: string;
+  /** A formal matter (a letter, a reference check): the reply is written in a formal register, not just without jokes. */
+  formal?: boolean;
 }
 
 const DISTRESS = /\b(suicid\w*|kill (?:myself|me)|end (?:it all|my life)|don'?t want to (?:live|be alive|exist)|self[- ]?harm\w*|hopeless|can'?t go on|want to die|no point (?:in )?(?:living|anything)|giv\w+ up on (?:everything|life))\b/i;
@@ -67,7 +69,8 @@ export function decideTone({ question, earlier, turn, ceiling, everyNthTurn, coo
   if (has(DISTRESS, question) || recent.some((q) => has(DISTRESS, q))) return off("the visitor may be in distress");
   if (has(HARDSHIP, question) || recent.some((q) => has(HARDSHIP, q))) return off("the visitor is dealing with something hard");
   if (has(SERIOUS_ADVICE, question)) return off("a legal, medical or financial question");
-  if (has(FORMAL_MATTER, question) || (has(MONEY_MATTER, question) && !has(PLAYFUL, question))) return off("a formal or money matter");
+  if (has(FORMAL_MATTER, question)) return { ...off("a formal or money matter"), formal: true };
+  if (has(MONEY_MATTER, question) && !has(PLAYFUL, question)) return off("a formal or money matter");
 
   const cap = (h: Humor): Humor => (ceiling === "dry" && h === "playful" ? "dry" : h);
   const done = (h: Humor, reason: string): ToneDecision => ({ humor: cap(h), mood: cap(h) === "playful" ? "playful" : cap(h) === "dry" ? "warm" : "steady", reason });
@@ -93,7 +96,9 @@ const NEVER = "Never joke at the visitor's expense, about Kurhula's weaknesses, 
 export function toneInstruction(decision: ToneDecision): string {
   switch (decision.humor) {
     case "off":
-      return "Tone for this reply: steady. Warm and direct — no jokes, puns, wordplay or playful asides; the moment doesn't call for them.";
+      return decision.formal
+        ? "Tone for this reply: formal and professional. Third person throughout, complete sentences, no contractions, no chatty asides and no narrating what you are about to do (\"I'll pull up…\"). No jokes, puns or wordplay. Crisp and outcome-first, summarising only what the data supports."
+        : "Tone for this reply: steady. Warm and direct — no jokes, puns, wordplay or playful asides; the moment doesn't call for them.";
     case "dry":
       return `Tone for this reply: a touch of dry wit is welcome — at most one short line, after the substance and never instead of it, and only if it comes naturally. A joke never carries or bends a fact. ${NEVER}`;
     case "playful":

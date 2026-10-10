@@ -1,0 +1,1410 @@
+{
+  "takenAt": "2026-10-10T05:45:37.720Z",
+  "base": "https://maluleke-ks.vercel.app",
+  "platformBuild": "17df587",
+  "lighthouseVersion": "13.5.0",
+  "settleMs": 2500,
+  "routes": [
+    {
+      "route": "/",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "Kurhula Success Maluleke — MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app",
+        "lang": "en",
+        "meta": {
+          "description": "I'm Kurhula — a software and AI engineer in South Africa. Rather than a list of claims, this site is the evidence: the systems I've shipped, a database that…",
+          "robots": null,
+          "og:title": "Kurhula Success Maluleke — MALULEKE-KS",
+          "og:description": "I'm Kurhula — a software and AI engineer in South Africa. Rather than a list of claims, this site is the evidence: the systems I've shipped, a database that…",
+          "og:type": "website",
+          "og:url": "https://maluleke-ks.vercel.app",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "Kurhula Success Maluleke — Software & AI Engineer",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "Kurhula Success Maluleke — MALULEKE-KS",
+          "twitter:description": "I'm Kurhula — a software and AI engineer in South Africa. Rather than a list of claims, this site is the evidence: the systems I've shipped, a database that…",
+          "twitter:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "twitter:image:alt": "Kurhula Success Maluleke — Software & AI Engineer"
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 44,
+            "totalKb": 997.3,
+            "byType": {
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26624,
+                "kb": 26
+              },
+              "font": {
+                "requests": 10,
+                "bytes": 169475,
+                "kb": 165.5
+              },
+              "script": {
+                "requests": 21,
+                "bytes": 482806,
+                "kb": 471.5
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 53302,
+                "kb": 52.1
+              },
+              "image": {
+                "requests": 5,
+                "bytes": 284954,
+                "kb": 278.3
+              },
+              "fetch": {
+                "requests": 5,
+                "bytes": 4090,
+                "kb": 4
+              }
+            },
+            "imageRequests": 5,
+            "imageKb": 278.3,
+            "images": [
+              {
+                "source": "/api/v1/systems/maluleke-ks/screenshot",
+                "width": null,
+                "kb": 80.7
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.3
+              },
+              {
+                "source": "/api/v1/systems/sunduza-architectural/screenshot",
+                "width": null,
+                "kb": 59.2
+              },
+              {
+                "source": "/character/guide-master.webp",
+                "width": 750,
+                "kb": 56.7
+              },
+              {
+                "source": "/brands/inngest.svg",
+                "width": null,
+                "kb": 1.4
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 28,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 46,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1602,
+              "lcpMs": 5313,
+              "tbtMs": 3354,
+              "cls": 0,
+              "speedIndexMs": 5134,
+              "totalByteWeightKb": 985.3
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 51,
+            "totalKb": 995.8,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169345,
+                "kb": 165.4
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26640,
+                "kb": 26
+              },
+              "script": {
+                "requests": 21,
+                "bytes": 482492,
+                "kb": 471.2
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 53375,
+                "kb": 52.1
+              },
+              "image": {
+                "requests": 12,
+                "bytes": 284527,
+                "kb": 277.9
+              },
+              "fetch": {
+                "requests": 5,
+                "bytes": 3341,
+                "kb": 3.3
+              }
+            },
+            "imageRequests": 12,
+            "imageKb": 277.8,
+            "images": [
+              {
+                "source": "/api/v1/systems/maluleke-ks/screenshot",
+                "width": null,
+                "kb": 80.7
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.4
+              },
+              {
+                "source": "/api/v1/systems/sunduza-architectural/screenshot",
+                "width": null,
+                "kb": 59.4
+              },
+              {
+                "source": "/character/guide-master.webp",
+                "width": 640,
+                "kb": 44.9
+              },
+              {
+                "source": "/brands/tk.svg",
+                "width": null,
+                "kb": 2.9
+              },
+              {
+                "source": "/brands/playwright.svg",
+                "width": null,
+                "kb": 2.1
+              },
+              {
+                "source": "/brands/magicui.svg",
+                "width": null,
+                "kb": 1.8
+              },
+              {
+                "source": "/brands/networkx.svg",
+                "width": null,
+                "kb": 1.5
+              },
+              {
+                "source": "/brands/inngest.svg",
+                "width": null,
+                "kb": 1.4
+              },
+              {
+                "source": "/brands/21st.svg",
+                "width": null,
+                "kb": 1.1
+              },
+              {
+                "source": "/brands/matplotlib.svg",
+                "width": null,
+                "kb": 0.9
+              },
+              {
+                "source": "/brands/motion.svg",
+                "width": null,
+                "kb": 0.7
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 27,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 53,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 518,
+              "lcpMs": 784,
+              "tbtMs": 649,
+              "cls": 0.319,
+              "speedIndexMs": 2517,
+              "totalByteWeightKb": 997
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "route": "/systems",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "Systems | MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app/systems",
+        "lang": "en",
+        "meta": {
+          "description": "Written-up case studies alongside every repo in my three GitHub homes, refreshed daily. Filter by home, status or what it's built with.",
+          "robots": null,
+          "og:title": "Systems",
+          "og:description": "Written-up case studies alongside every repo in my three GitHub homes, refreshed daily. Filter by home, status or what it's built with.",
+          "og:type": "website",
+          "og:url": "https://maluleke-ks.vercel.app/systems",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "Systems — MALULEKE-KS",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "Systems",
+          "twitter:description": "Written-up case studies alongside every repo in my three GitHub homes, refreshed daily. Filter by home, status or what it's built with.",
+          "twitter:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "twitter:image:alt": "Systems — MALULEKE-KS"
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 43,
+            "totalKb": 1044.9,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169521,
+                "kb": 165.5
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26443,
+                "kb": 25.8
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 469403,
+                "kb": 458.4
+              },
+              "image": {
+                "requests": 8,
+                "bytes": 353655,
+                "kb": 345.4
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 50147,
+                "kb": 49
+              },
+              "fetch": {
+                "requests": 2,
+                "bytes": 781,
+                "kb": 0.8
+              }
+            },
+            "imageRequests": 8,
+            "imageKb": 345.3,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/api/v1/systems/maluleke-ks/screenshot",
+                "width": null,
+                "kb": 80.7
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.5
+              },
+              {
+                "source": "/api/v1/systems/sunduza-architectural/screenshot",
+                "width": null,
+                "kb": 59.2
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 96,
+                "kb": 3.2
+              },
+              {
+                "source": "/brands/tk.svg",
+                "width": null,
+                "kb": 2.9
+              },
+              {
+                "source": "/brands/networkx.svg",
+                "width": null,
+                "kb": 1.6
+              },
+              {
+                "source": "/brands/matplotlib.svg",
+                "width": null,
+                "kb": 0.9
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 28,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 49,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1495,
+              "lcpMs": 6238,
+              "tbtMs": 1734,
+              "cls": 0,
+              "speedIndexMs": 3302,
+              "totalByteWeightKb": 1045.3
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 43,
+            "totalKb": 1043.8,
+            "byType": {
+              "document": {
+                "requests": 1,
+                "bytes": 50129,
+                "kb": 49
+              },
+              "font": {
+                "requests": 10,
+                "bytes": 169522,
+                "kb": 165.5
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26623,
+                "kb": 26
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 469375,
+                "kb": 458.4
+              },
+              "image": {
+                "requests": 8,
+                "bytes": 351745,
+                "kb": 343.5
+              },
+              "fetch": {
+                "requests": 2,
+                "bytes": 1415,
+                "kb": 1.4
+              }
+            },
+            "imageRequests": 8,
+            "imageKb": 343.6,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/api/v1/systems/maluleke-ks/screenshot",
+                "width": null,
+                "kb": 80.7
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.3
+              },
+              {
+                "source": "/api/v1/systems/sunduza-architectural/screenshot",
+                "width": null,
+                "kb": 59.3
+              },
+              {
+                "source": "/brands/tk.svg",
+                "width": null,
+                "kb": 2.9
+              },
+              {
+                "source": "/brands/networkx.svg",
+                "width": null,
+                "kb": 1.5
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.4
+              },
+              {
+                "source": "/brands/matplotlib.svg",
+                "width": null,
+                "kb": 1.2
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 28,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 38,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1034,
+              "lcpMs": 2618,
+              "tbtMs": 4038,
+              "cls": 0.156,
+              "speedIndexMs": 5409,
+              "totalByteWeightKb": 1049.8
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "route": "/systems/xkimi-xa-mali",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "Xkimi Xa Mali | MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app/systems/xkimi-xa-mali",
+        "lang": "en",
+        "meta": {
+          "description": "A private savings collective platform, built for real money and real family stakes.",
+          "robots": null,
+          "og:title": "Xkimi Xa Mali",
+          "og:description": "A private savings collective platform, built for real money and real family stakes.",
+          "og:type": "article",
+          "og:url": "https://maluleke-ks.vercel.app/systems/xkimi-xa-mali",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/systems/xkimi-xa-mali/opengraph-image-1o109z/card?b1736e03c336c773",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "Xkimi Xa Mali — A private savings collective platform, built for real money and real family stakes.",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "Xkimi Xa Mali",
+          "twitter:description": "A private savings collective platform, built for real money and real family stakes.",
+          "twitter:image": "https://maluleke-ks.vercel.app/systems/xkimi-xa-mali/opengraph-image-1o109z/card?b1736e03c336c773",
+          "twitter:image:alt": "Xkimi Xa Mali — A private savings collective platform, built for real money and real family stakes."
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 41,
+            "totalKb": 893.8,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169333,
+                "kb": 165.4
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26629,
+                "kb": 26
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 467987,
+                "kb": 457
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 42738,
+                "kb": 41.7
+              },
+              "image": {
+                "requests": 5,
+                "bytes": 207593,
+                "kb": 202.7
+              },
+              "fetch": {
+                "requests": 3,
+                "bytes": 944,
+                "kb": 0.9
+              }
+            },
+            "imageRequests": 5,
+            "imageKb": 202.6,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.3
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 96,
+                "kb": 3.2
+              },
+              {
+                "source": "/brands/inngest.svg",
+                "width": null,
+                "kb": 1.6
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.2
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 28,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 45,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1745,
+              "lcpMs": 5315,
+              "tbtMs": 7279,
+              "cls": 0,
+              "speedIndexMs": 5457,
+              "totalByteWeightKb": 895.9
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 46,
+            "totalKb": 895.4,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169283,
+                "kb": 165.3
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26708,
+                "kb": 26.1
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 468222,
+                "kb": 457.2
+              },
+              "image": {
+                "requests": 5,
+                "bytes": 204995,
+                "kb": 200.2
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 42761,
+                "kb": 41.8
+              },
+              "fetch": {
+                "requests": 8,
+                "bytes": 4895,
+                "kb": 4.8
+              }
+            },
+            "imageRequests": 5,
+            "imageKb": 200.3,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/api/v1/systems/xkimi-xa-mali/screenshot",
+                "width": null,
+                "kb": 80.3
+              },
+              {
+                "source": "/brands/inngest.svg",
+                "width": null,
+                "kb": 1.5
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.4
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 32,
+                "kb": 0.8
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 28,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 97,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 499,
+              "lcpMs": 960,
+              "tbtMs": 101,
+              "cls": 0,
+              "speedIndexMs": 1203,
+              "totalByteWeightKb": 896.1
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "route": "/about",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "About | MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app/about",
+        "lang": "en",
+        "meta": {
+          "description": "I’m a final-year Computer Science and Mathematics student building production-grade systems — full-stack web, AI integration, and enterprise automation …",
+          "robots": null,
+          "og:title": "About",
+          "og:description": "I’m a final-year Computer Science and Mathematics student building production-grade systems — full-stack web, AI integration, and enterprise automation …",
+          "og:type": "profile",
+          "og:url": "https://maluleke-ks.vercel.app/about",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "About — MALULEKE-KS",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "About",
+          "twitter:description": "I’m a final-year Computer Science and Mathematics student building production-grade systems — full-stack web, AI integration, and enterprise automation …",
+          "twitter:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "twitter:image:alt": "About — MALULEKE-KS"
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 45,
+            "totalKb": 909.8,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169284,
+                "kb": 165.3
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26688,
+                "kb": 26.1
+              },
+              "image": {
+                "requests": 9,
+                "bytes": 202917,
+                "kb": 198.2
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 470320,
+                "kb": 459.3
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 60574,
+                "kb": 59.2
+              },
+              "fetch": {
+                "requests": 3,
+                "bytes": 1802,
+                "kb": 1.8
+              }
+            },
+            "imageRequests": 9,
+            "imageKb": 198.3,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/character/about-portrait.webp",
+                "width": null,
+                "kb": 70.5
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 96,
+                "kb": 3.2
+              },
+              {
+                "source": "/brands/playwright.svg",
+                "width": null,
+                "kb": 2.1
+              },
+              {
+                "source": "/brands/magicui.svg",
+                "width": null,
+                "kb": 1.9
+              },
+              {
+                "source": "/brands/networkx.svg",
+                "width": null,
+                "kb": 1.5
+              },
+              {
+                "source": "/brands/21st.svg",
+                "width": null,
+                "kb": 1.1
+              },
+              {
+                "source": "/brands/matplotlib.svg",
+                "width": null,
+                "kb": 0.9
+              },
+              {
+                "source": "/brands/motion.svg",
+                "width": null,
+                "kb": 0.8
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 25,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 49,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1594,
+              "lcpMs": 5368,
+              "tbtMs": 3094,
+              "cls": 0,
+              "speedIndexMs": 3819,
+              "totalByteWeightKb": 909.1
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 50,
+            "totalKb": 912.6,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169420,
+                "kb": 165.4
+              },
+              "image": {
+                "requests": 9,
+                "bytes": 201011,
+                "kb": 196.3
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26624,
+                "kb": 26
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 470135,
+                "kb": 459.1
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 60462,
+                "kb": 59
+              },
+              "fetch": {
+                "requests": 8,
+                "bytes": 6808,
+                "kb": 6.6
+              }
+            },
+            "imageRequests": 9,
+            "imageKb": 196.4,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/character/about-portrait.webp",
+                "width": null,
+                "kb": 70.4
+              },
+              {
+                "source": "/brands/playwright.svg",
+                "width": null,
+                "kb": 2.2
+              },
+              {
+                "source": "/brands/magicui.svg",
+                "width": null,
+                "kb": 1.8
+              },
+              {
+                "source": "/brands/networkx.svg",
+                "width": null,
+                "kb": 1.5
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.4
+              },
+              {
+                "source": "/brands/21st.svg",
+                "width": null,
+                "kb": 1.1
+              },
+              {
+                "source": "/brands/matplotlib.svg",
+                "width": null,
+                "kb": 1.1
+              },
+              {
+                "source": "/brands/motion.svg",
+                "width": null,
+                "kb": 0.6
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 25,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 74,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 604,
+              "lcpMs": 1141,
+              "tbtMs": 445,
+              "cls": 0,
+              "speedIndexMs": 2059,
+              "totalByteWeightKb": 795.4
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "route": "/journey",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "Journey | MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app/journey",
+        "lang": "en",
+        "meta": {
+          "description": "Mathematics, then code, then companies — all while finishing a degree. The chapters so far, and where it goes next.",
+          "robots": null,
+          "og:title": "Journey",
+          "og:description": "Mathematics, then code, then companies — all while finishing a degree. The chapters so far, and where it goes next.",
+          "og:type": "website",
+          "og:url": "https://maluleke-ks.vercel.app/journey",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "Journey — MALULEKE-KS",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "Journey",
+          "twitter:description": "Mathematics, then code, then companies — all while finishing a degree. The chapters so far, and where it goes next.",
+          "twitter:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "twitter:image:alt": "Journey — MALULEKE-KS"
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 39,
+            "totalKb": 800.5,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169400,
+                "kb": 165.4
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26567,
+                "kb": 25.9
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 472401,
+                "kb": 461.3
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 25961,
+                "kb": 25.4
+              },
+              "image": {
+                "requests": 2,
+                "bytes": 122456,
+                "kb": 119.6
+              },
+              "fetch": {
+                "requests": 4,
+                "bytes": 2908,
+                "kb": 2.8
+              }
+            },
+            "imageRequests": 2,
+            "imageKb": 119.6,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.4
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 96,
+                "kb": 3.2
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 26,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 54,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1496,
+              "lcpMs": 4985,
+              "tbtMs": 1774,
+              "cls": 0,
+              "speedIndexMs": 3037,
+              "totalByteWeightKb": 799.1
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 44,
+            "totalKb": 803,
+            "byType": {
+              "document": {
+                "requests": 1,
+                "bytes": 26116,
+                "kb": 25.5
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26454,
+                "kb": 25.8
+              },
+              "script": {
+                "requests": 20,
+                "bytes": 472551,
+                "kb": 461.5
+              },
+              "font": {
+                "requests": 10,
+                "bytes": 169534,
+                "kb": 165.6
+              },
+              "image": {
+                "requests": 2,
+                "bytes": 120525,
+                "kb": 117.7
+              },
+              "fetch": {
+                "requests": 9,
+                "bytes": 7061,
+                "kb": 6.9
+              }
+            },
+            "imageRequests": 2,
+            "imageKb": 117.7,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.3
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.4
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 25,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 61,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 439,
+              "lcpMs": 977,
+              "tbtMs": 25773,
+              "cls": 0,
+              "speedIndexMs": 3061,
+              "totalByteWeightKb": 800.3
+            },
+            "lcpElement": null,
+            "warnings": [
+              "The page loaded too slowly to finish within the time limit. Results may be incomplete."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "route": "/contact",
+      "footerBuild": "17df587",
+      "metadata": {
+        "title": "Let's talk | MALULEKE-KS",
+        "canonical": "https://maluleke-ks.vercel.app/contact",
+        "lang": "en",
+        "meta": {
+          "description": "Hiring, a project, a collaboration, or a question — tell me what brings you here, and the form asks only what that needs.",
+          "robots": null,
+          "og:title": "Let's talk",
+          "og:description": "Hiring, a project, a collaboration, or a question — tell me what brings you here, and the form asks only what that needs.",
+          "og:type": "website",
+          "og:url": "https://maluleke-ks.vercel.app/contact",
+          "og:site_name": "MALULEKE-KS",
+          "og:locale": "en_ZA",
+          "og:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:image:alt": "Let's talk — MALULEKE-KS",
+          "twitter:card": "summary_large_image",
+          "twitter:title": "Let's talk",
+          "twitter:description": "Hiring, a project, a collaboration, or a question — tell me what brings you here, and the form asks only what that needs.",
+          "twitter:image": "https://maluleke-ks.vercel.app/opengraph-image",
+          "twitter:image:alt": "Let's talk — MALULEKE-KS"
+        }
+      },
+      "devices": {
+        "mobile": {
+          "weight": {
+            "requests": 40,
+            "totalKb": 875.4,
+            "byType": {
+              "font": {
+                "requests": 10,
+                "bytes": 169551,
+                "kb": 165.6
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 24239,
+                "kb": 23.7
+              },
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26502,
+                "kb": 25.9
+              },
+              "script": {
+                "requests": 21,
+                "bytes": 479985,
+                "kb": 468.7
+              },
+              "image": {
+                "requests": 3,
+                "bytes": 194417,
+                "kb": 189.9
+              },
+              "fetch": {
+                "requests": 3,
+                "bytes": 1727,
+                "kb": 1.7
+              }
+            },
+            "imageRequests": 3,
+            "imageKb": 189.9,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.4
+              },
+              {
+                "source": "/character/about-portrait.webp",
+                "width": null,
+                "kb": 70.3
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 96,
+                "kb": 3.2
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 25,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 68,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 100
+            },
+            "metrics": {
+              "fcpMs": 1343,
+              "lcpMs": 2993,
+              "tbtMs": 1636,
+              "cls": 0,
+              "speedIndexMs": 2630,
+              "totalByteWeightKb": 875.3
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        },
+        "desktop": {
+          "weight": {
+            "requests": 43,
+            "totalKb": 877,
+            "byType": {
+              "stylesheet": {
+                "requests": 2,
+                "bytes": 26535,
+                "kb": 25.9
+              },
+              "script": {
+                "requests": 21,
+                "bytes": 479959,
+                "kb": 468.7
+              },
+              "document": {
+                "requests": 1,
+                "bytes": 24301,
+                "kb": 23.7
+              },
+              "font": {
+                "requests": 10,
+                "bytes": 169630,
+                "kb": 165.7
+              },
+              "image": {
+                "requests": 3,
+                "bytes": 192576,
+                "kb": 188.1
+              },
+              "fetch": {
+                "requests": 6,
+                "bytes": 5010,
+                "kb": 4.9
+              }
+            },
+            "imageRequests": 3,
+            "imageKb": 188,
+            "images": [
+              {
+                "source": "/character/guide-master.webp",
+                "width": null,
+                "kb": 116.2
+              },
+              {
+                "source": "/character/about-portrait.webp",
+                "width": null,
+                "kb": 70.3
+              },
+              {
+                "source": "/character/guide-face.webp",
+                "width": 48,
+                "kb": 1.5
+              }
+            ]
+          },
+          "axe": {
+            "violations": 0,
+            "byImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0
+            },
+            "rules": [],
+            "passes": 25,
+            "incomplete": 1
+          },
+          "lighthouse": {
+            "scores": {
+              "performance": 94,
+              "accessibility": 100,
+              "best-practices": 100,
+              "seo": 92
+            },
+            "metrics": {
+              "fcpMs": 585,
+              "lcpMs": 1177,
+              "tbtMs": 148,
+              "cls": 0,
+              "speedIndexMs": 1112,
+              "totalByteWeightKb": 876.8
+            },
+            "lcpElement": null,
+            "warnings": []
+          }
+        }
+      }
+    }
+  ]
+}

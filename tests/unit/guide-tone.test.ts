@@ -124,6 +124,17 @@ describe("toneInstruction", () => {
     expect(toneInstruction({ humor: "playful", mood: "playful", reason: "" })).toMatch(/play along/);
   });
 
+  it("asks for a formal register — not just no jokes — when the matter is formal", () => {
+    const formal = decide("Dear Sir/Madam, kindly provide a formal summary of the candidate.");
+    expect(formal.formal).toBe(true);
+    expect(toneInstruction(formal)).toMatch(/formal and professional/);
+    expect(toneInstruction(formal)).toMatch(/no contractions/);
+    // A money question is serious, not a letter: steady, not formal.
+    const money = decide("What salary does he expect?");
+    expect(money.formal).toBeUndefined();
+    expect(toneInstruction(money)).toMatch(/steady/);
+  });
+
   it("always keeps wit away from facts, from the visitor, and from his weaknesses", () => {
     for (const humor of ["dry", "playful"] as const) {
       const text = toneInstruction({ humor, mood: "warm", reason: "" });
