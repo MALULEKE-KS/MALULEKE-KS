@@ -118,7 +118,8 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
             Skip to content
           </a>
           <SiteHeader links={profile.links} reviewSlaHours={reviewSlaHours} cvUrl={cv?.url ?? null} />
-          <main id="main" className="flex-1">
+          {/* At least a screen tall: while a page streams in, the footer stays below the fold instead of sitting in view and being pushed down (layout shift). */}
+          <main id="main" className="min-h-svh flex-1">
             {children}
           </main>
           <SiteFooter
