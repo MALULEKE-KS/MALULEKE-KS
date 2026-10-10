@@ -201,3 +201,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Still open for WP-102:** phone LCP over 2.5 s (JS ≈ 340 KB gzip + fonts 165 KB on a 1.6 Mbps link — see the levers above), and tightening `perf-budgets.json` to these numbers once the CLS fix is confirmed.
 - **After #210 (build 2070036):** home CLS is 0 on phone and desktop. `/systems` still shifted (0.234 phone, 0.158 desktop, reproduced under throttling): the hero's counts and the spotlight ring streamed in separately with no reserved height and pushed the catalog down. Fix (branch `fix/wp-102-systems-shift`): one boundary for both, with a fallback that holds their measured height (phone 415 px, wider 470 px; filtered 76 / 32 px).
 
+### 2026-10-10 · Handoff — the unfinished items are deferred to V2 (owner: "defer the not finished to v2")
+- **State:** main is `8907403`; everything built this session is merged and live. WP-001 Done; WP-102 Partial (budgets, lazy chat engine, no zod on first load, footer and `/systems` shift fixes built; the LCP target is open).
+- **Deferred, in order** (also in `docs/ROADMAP-V2.md`, update log): (1) confirm #212's `/systems` CLS in the next post-deploy budgets run and tighten `perf-budgets.json`; (2) phone LCP ≤ 2.5 s — motion `LazyMotion`, fonts, analytics chunk; (3) guide retrieve-then-answer behind a default-off setting, judged by the eval gate; (4) content-tier evals in full and a look at `formal-hr` on the next nightly run; (5) voice, optional.
+- **Next up:** WP-102 (the open part), then WP-111, then the WP-103/104/109 remainders.
+
