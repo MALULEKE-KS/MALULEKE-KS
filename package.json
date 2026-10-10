@@ -25,6 +25,7 @@
     "db:seed": "dotenv -e .env.development.local -- tsx prisma/seed.ts",
     "sync:github": "dotenv -e .env.development.local -- tsx scripts/github-sync.ts",
     "create-admin": "dotenv -e .env.development.local -- tsx scripts/create-admin.ts",
+    "baseline": "node scripts/baseline.mjs",
     "docs:capabilities": "tsx --tsconfig tsconfig.json scripts/generate-capability-docs.ts"
   },
   "prisma": {
@@ -80,6 +81,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.5",
     "jsdom": "^25.0.1",
+    "lighthouse": "^13.5.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
