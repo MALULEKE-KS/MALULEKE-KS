@@ -11,7 +11,7 @@ let published = "";
 let draft = "";
 
 beforeAll(async () => {
-  const [org, status] = await Promise.all([db.organization.findFirstOrThrow(), db.status.findFirstOrThrow({ where: { key: "in_progress" } })]);
+  const [org, status] = await Promise.all([db.organization.findFirstOrThrow({ where: { isClient: false } }), db.status.findFirstOrThrow({ where: { key: "in_progress" } })]);
   const base = { organizationId: org.id, statusId: status.id, description: "A system for the card tests.", clientVisibility: "PUBLIC" as const, updatedAt: new Date() };
   published = `${RUN}-live`;
   draft = `${RUN}-draft`;
