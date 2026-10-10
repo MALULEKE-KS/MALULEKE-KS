@@ -24,15 +24,17 @@ describe("perf-budgets.json", () => {
     expect(Object.keys(budgets.weights).sort()).toEqual([...ROUTES].sort());
   });
 
-  it("holds the WP-001 baseline with headroom, not below it", () => {
+  it("only ratchets down: never looser than the WP-001 baseline plus 20%", () => {
     const baseline = JSON.parse(readFileSync("docs/improvements/baseline-2026-10-10.json", "utf8"));
+    type Weight = { totalKb: number; imageKb: number; requests: number };
     for (const r of baseline.routes) {
-      for (const d of Object.values(r.devices) as { weight: { totalKb: number; imageKb: number; requests: number } }[]) {
-        const b = budgets.weights[r.route];
-        expect(b.totalKb).toBeGreaterThanOrEqual(d.weight.totalKb);
-        expect(b.imageKb).toBeGreaterThanOrEqual(d.weight.imageKb);
-        expect(b.requests).toBeGreaterThanOrEqual(d.weight.requests);
-      }
+      // A budget covers both devices, so it is judged against the heavier of the two.
+      const weights = (Object.values(r.devices) as { weight: Weight }[]).map((d) => d.weight);
+      const most = (f: (w: Weight) => number) => Math.max(...weights.map(f));
+      const b = budgets.weights[r.route];
+      expect(b.totalKb).toBeLessThanOrEqual(most((w) => w.totalKb) * 1.2);
+      expect(b.imageKb).toBeLessThanOrEqual(most((w) => w.imageKb) * 1.2);
+      expect(b.requests).toBeLessThanOrEqual(most((w) => w.requests) + 12);
     }
   });
 });

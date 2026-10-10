@@ -282,7 +282,7 @@ The skills are 48 entries taken from his CV and his systems' stacks (migration `
 
 ### AI guide phase 2 and V2 WP-001/102 — what is deferred (2026-10-10, owner: "defer the not finished to v2")
 Built and live: the guide's phase 2 (plan `docs/AI-GUIDE-PHASE2-PLAN.md`), the V2 baseline (`docs/improvements/baseline-2026-10-10.*`), performance budgets after every deploy (`perf-budgets.json`), the chat engine and zod out of every page's first load, and the footer/CLS fixes. Deferred to V2, in this order:
-1. **Confirm the `/systems` layout-shift fix** (#212) in the next post-deploy budgets run, then tighten `perf-budgets.json` to the measured numbers (WP-102).
+1. ~~Confirm the `/systems` layout-shift fix and tighten the budgets~~ — done: CLS 0 everywhere on production, budgets tightened (2026-10-10).
 2. **Phone LCP ≤ 2.5 s** (3.6–4.5 s now; WP-102): motion (≈ 80 KB gzip, `LazyMotion`), the 10 font files (165 KB), the analytics chunk. Real-throttle experiments are in the tracker.
 3. **Retrieve-then-answer** for the guide (plan §3 A2): the trigger (~25k tokens) is reached; build behind a default-off setting, prove it no less accurate with the eval gate, then decide.
 4. **Content-tier guide evals** in full; **check the formal-register fix** on the next nightly gate run (`formal-hr`).
