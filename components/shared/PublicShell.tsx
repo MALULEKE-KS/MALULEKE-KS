@@ -16,6 +16,7 @@ import { ConsentProvider } from "@/components/shared/Consent";
 import { getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
 import { getPlatformPulse, getPublicHomes } from "@/lib/queries/profile";
 import { getContentBlock } from "@/lib/content/blocks";
+import { getHeaderSystems } from "@/lib/queries/header";
 import { getUploadedCvLink } from "@/lib/cv/options";
 import { getPublicLenses } from "@/lib/queries/lenses";
 import { FLAGS, isFlagOn } from "@/lib/flags";
@@ -57,6 +58,8 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     liveSites,
     indexSystems,
     journey,
+    siteHeader,
+    headerSystems,
   ] = await Promise.all([
     getSiteProfile(),
     getReviewSlaHours(),
@@ -75,6 +78,9 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     // What the guide's receipts are checked against: only records a visitor can open (docs/AI-GUIDE-PHASE1-PLAN.md §6).
     dbPublic.publicSystem.findMany({ select: { slug: true, name: true }, orderBy: { name: "asc" } }),
     getJourney(),
+    getContentBlock("site-header"),
+    // The header's Systems preview: how many is a setting; the systems are the owner's featured ones.
+    getSetting("header.systemsPreview.count").then(getHeaderSystems),
   ]);
   const siteIndex: GuideSiteIndex = {
     systems: indexSystems,
@@ -111,13 +117,22 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           siteIndex={siteIndex}
         >
         <div className="flex min-h-screen flex-col">
-          <a
-            href="#main"
-            className="focus:bg-ember focus:text-ink sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:text-sm"
-          >
-            Skip to content
-          </a>
-          <SiteHeader links={profile.links} reviewSlaHours={reviewSlaHours} cvUrl={cv?.url ?? null} />
+          {siteHeader?.skipLabel && (
+            <a
+              href="#main"
+              className="focus:bg-ember focus:text-ink sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:text-sm"
+            >
+              {siteHeader.skipLabel}
+            </a>
+          )}
+          <SiteHeader
+            links={profile.links}
+            reviewSlaHours={reviewSlaHours}
+            cvUrl={cv?.url ?? null}
+            ownerName={profile.name}
+            labels={siteHeader ?? null}
+            systems={headerSystems}
+          />
           {/* At least a screen tall: while a page streams in, the footer stays below the fold instead of sitting in view and being pushed down (layout shift). */}
           <main id="main" className="min-h-svh flex-1">
             {children}

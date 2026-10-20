@@ -121,6 +121,12 @@ export const SETTINGS = {
     description: "Home hero: strength of an extra warm light along the cover image's lower edge, 0–100 (0 = none; the image carries its own light).",
     rule: "D-030",
   }),
+  "header.systemsPreview.count": define({
+    schema: z.number().int().min(0).max(6),
+    default: 3,
+    description: "Header: how many of your featured systems the Systems preview shows under the nav (0 = no preview). The same curation as the home page.",
+    rule: "D-037",
+  }),
   "home.hero.stackCount": define({
     schema: z.number().int().min(0).max(12),
     default: 6,

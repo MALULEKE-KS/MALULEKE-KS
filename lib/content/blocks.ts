@@ -71,6 +71,25 @@ export const CONTENT_BLOCKS = {
       imagePositionMobile: z.string().trim().regex(/^\d{1,3}% \d{1,3}%$/, 'like "50% 60%"').optional(),
     }),
   },
+  "site-header": {
+    title: "Site header",
+    description: "The public header's own wording: the contact button, the CV button, the home link's name, the skip link, and the Systems preview's name and \"all systems\" link. A label left empty hides that part.",
+    schema: z.object({
+      contactLabel: z.string().trim().max(40).optional(),
+      cvLabel: z.string().trim().max(24).optional(),
+      homeLabel: z.string().trim().max(60).optional(),
+      skipLabel: z.string().trim().max(40).optional(),
+      // The phone menu's own wording.
+      menuLabel: z.string().trim().max(24).optional(),
+      menuCloseLabel: z.string().trim().max(40).optional(),
+      cvMenuLabel: z.string().trim().max(40).optional(),
+      reviewPromise: instantTemplate(100, ["hours"]).optional(),
+      /** One line under each page in the phone menu, keyed by its path ("/systems"). A page without one shows none. */
+      pageHints: z.record(z.string().regex(/^\//), Text(80)).optional(),
+      systemsPreviewLabel: z.string().trim().max(60).optional(),
+      systemsAllLabel: instantTemplate(60, ["count"]).optional(),
+    }),
+  },
   "systems-page": {
     title: "Systems — introduction",
     description: "The /systems page's heading and introduction.",

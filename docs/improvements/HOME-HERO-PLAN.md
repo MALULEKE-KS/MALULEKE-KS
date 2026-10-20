@@ -226,3 +226,19 @@ Other statements considered, for the owner to choose between or rewrite: *"Full-
 **Rules.** (1) No wording in code — a part the owner has written nothing for is not shown, and no label is made up for a figure. (2) A zero is never proof, so a claim vanishes with its figure. (3) The statement carries no figure (it would go stale). (4) "Live" is said only of the production deployment. (5) One h1; reading order is visual order; the record is a list; the image is decorative (empty alt). (6) Every tunable is a setting: overlay, glow, entrance timing, how many technologies and from which categories.
 
 **The record is not a second layout of the control room:** the control room keeps its terminal and its own evidence; it stops repeating the figures the hero now carries.
+
+## 17. The header and navigation (owner, 2026-10-20: "the best outstanding header and nav bar … top notch"; "everything real data, nothing hardcoded")
+
+**Starting point.** The header was already well built (F5c, D10): a full-width bar that gathers into a glass capsule on scroll, a reading-progress line, hide-on-scroll-down, a gliding nav indicator, ⌘K search, and a full-screen phone menu with a focus trap. What it lacked was *the platform's own proof in the nav* and *owner-edited wording*.
+
+**What was added.**
+
+| Part | What it does | Data |
+|---|---|---|
+| **Systems preview** | Point at, or tab to, *Systems* and the owner's featured systems appear under it, each with its live status (the colour is the status lookup's), its organisation and domain, and a link to all of them with the true count. Opens on hover and keyboard focus, closes with Escape (wherever focus is), never traps the keyboard; the link itself still navigates | The public views (`PublicSystem`), the same curation the home page uses (featured in his order; the flagships if none); how many show is the setting `header.systemsPreview.count` (default 3, 0 = none) |
+| **Glass nav pill** | At the top of the page the links sit in a quiet glass pill so they read over the cover image; once the capsule forms, the capsule is the glass | — |
+| **Wording as data** | The contact button, the CV buttons, the home link's name, the skip link, the phone menu's button, close label, review promise and each page's one-line description, and the preview's name and "all systems" link are the `site-header` block (Admin → Page content → Site header); a label left empty hides its part; the logo link falls back to the owner's name | `site-header` block (seeded by migration `20261020180000`) |
+
+**Considered and left out, deliberately.** An availability pill: the profile's `availability` is empty, so the header would have nothing true to say (nothing is invented); it will appear the day the owner writes one. Page names (Systems, Journey, About) remain the route list in `lib/content/sheets.ts` — routes are structure, shared by the nav, the footer, the guide's index and each page's title, and are the recommended thing to keep in code.
+
+**Verified.** Unit (`header-systems`), integration (`site-header`: every label seeded, the preview is the published systems, the count is true, 0 hides it), Playwright (`header.spec`: hover opens it with real systems, Escape closes it, keyboard focus opens it and Tab enters it without trapping, the skip link works, axe is clean with the preview open).
