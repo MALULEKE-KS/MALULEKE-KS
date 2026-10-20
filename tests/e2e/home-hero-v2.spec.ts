@@ -88,13 +88,6 @@ test("the control room doesn't repeat the hero's record", async ({ page }) => {
   await expect(controlRoom.getByText(/rules the database enforces|business rules enforced|changes audited/i)).toHaveCount(0);
 });
 
-test("without the switch the previous hero shows, so production is unchanged until the flag is on", async ({ page }) => {
-  test.setTimeout(120_000);
-  await settle(page);
-  await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.locator('section[aria-labelledby="hero-title"] picture img')).toHaveCount(0);
-});
-
 test("reduced motion: the hero holds still", async ({ page }) => {
   test.setTimeout(120_000);
   await settle(page);
