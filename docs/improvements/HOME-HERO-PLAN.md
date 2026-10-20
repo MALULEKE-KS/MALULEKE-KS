@@ -135,7 +135,7 @@ The hero and the home keep the Design System's palette (graphite, bone, one embe
 
 | Tool | Used for in the hero (C) |
 |---|---|
-| **Figma** | The source of truth: tokens as variables; C v2 frames at 1440 and 390; after the review, the chosen treatment is refined and the shared pieces are made Figma components (`PageHero`, `ProofLedger`, `HeroImage`) beside the code |
+| **Figma** | The source of truth: tokens as variables; C v2 frames at 1440 and 390; after the review, the chosen treatment is refined and the shared pieces are made Figma components (`PageHero`, `ProofLedger`, `HeroBackdrop`) beside the code |
 | **shadcn/ui** (Radix, CVA, Lucide) | `button` (the two actions), `badge`/chip (live line), `tooltip` (evidence on each ledger figure), `separator` (the hairline) |
 | **Motion** | The one entrance — staggered opacity and an 8 px rise on the type, then the image fading in — and nothing else |
 | **Magic UI** | `blur-fade` is already in the repo (`components/ui/blur-fade.tsx`) and is reused for the entrance. The registry's `safari` and `marquee` are not needed under C |
@@ -151,7 +151,7 @@ The hero and the home keep the Design System's palette (graphite, bone, one embe
 
 ## 10. The kit — what the other pages inherit
 
-`components/shared/PageHero.tsx` already opens every inner page; the home hero **evolves it, it does not fork it**. Extracted and documented as the kit (code and Figma components, `DESIGN-SYSTEM.md` §7, the Playbook's per-page sheets): **`PageHero`** (name or title, role line, statement, actions), **`ProofLedger`** (hairline computed figures with their source), **`HeroImage`** (the `<picture>` slot, its credit and its empty state), and **the entrance**. Each page keeps its own idea (Playbook: one family, each page unique); the avatar (**`PageIdentity`**) joins the kit when the owner decides it.
+`components/shared/PageHero.tsx` already opens every inner page; the home hero **evolves it, it does not fork it**. Extracted and documented as the kit (code and Figma components, `DESIGN-SYSTEM.md` §7, the Playbook's per-page sheets): **`PageHero`** (name or title, role line, statement, actions), **`ProofLedger`** (hairline computed figures with their source), **`HeroBackdrop`** (the cover `<picture>`, its overlay, its credit and its empty state), and **the entrance**. Each page keeps its own idea (Playbook: one family, each page unique); the avatar (**`PageIdentity`**) joins the kit when the owner decides it.
 
 ## 11. Slices — Sprint 1 (a week; the push gate on each)
 
@@ -166,7 +166,7 @@ All behind the flag `home.hero_v2` until the review.
 | **S1.5** | **Cut the old hero:** the character, rig, flickering grid, beam, stat cards and their first-view weight; the guide stays in its section and launcher, *Ask the guide* opens it | First-view script/image weight measured before/after; the zod guard still passes |
 | **S1.6** | **No duplicates:** nothing on the page repeats the ledger; the control room keeps its terminal and evidence | One look at the whole home page: nothing appears twice |
 | **S1.7** | **Verify and measure:** phone LCP ≤ 2.5 s, CLS 0, axe 0, mobile e2e, the budgets job, `npm run baseline` vs 2026-10-10; flag **on** at the review | Numbers recorded in the PR and the tracker; the owner accepts at the live review |
-| **S1.8** | **The kit:** `PageHero`, `ProofLedger`, `HeroImage`, the entrance — in code and as Figma components; the Design System §7, the Playbook and the Frontend Craft Record updated | The next page can be built from the kit; docs current |
+| **S1.8** | **The kit:** `PageHero`, `ProofLedger`, `HeroBackdrop`, the entrance — in code and as Figma components; the Design System §7, the Playbook and the Frontend Craft Record updated | The next page can be built from the kit; docs current |
 
 Every slice ends with the push gate (`WAY-OF-WORKING.md` §7): I tell the owner what is going and wait for **approve, or additions**. One release at the end of the sprint, reviewed live.
 
@@ -195,7 +195,7 @@ Phone and desktop by eye in the owner's Chrome (phones by `mobile.spec` at 360/3
 
 **The cover image.** One image behind the *whole* hero; the name, role, statement, actions and record sit on it. `components/shared/HeroBackdrop.tsx` (replaces the framed `HeroImage`): a `<picture>` with a portrait source below 768 px and a landscape one above, `object-cover` so any shape fills the hero; a graphite overlay (top and bottom, plus a soft pool behind the type) whose strength is the setting `home.hero.scrim` (default 70, tuned by eye); an optional warm light (`home.hero.glow`, default 0 — the image carries its own orange); the credit on the image. The section is at least a screen tall, content centred on it. No image uploaded → a graphite field, never a broken box.
 
-**The images** — generated in the owner's ChatGPT account (Free plan) from two prompts (recorded in `design/hero/README.md`): a photoreal, low-key data-centre aisle — dark graphite racks receding to a vanishing point, thin International Orange fibre-optic light lines converging like a living flow of data, a few steel-blue status LEDs — the system itself, in the brand's one accent colour, with a dark, smooth centre and upper area for the type. Desktop 1536 × 1024 (92.8 KiB), phone 1024 × 1536 (71.2 KiB), WebP, no metadata. Budgets: **100 KiB desktop, 80 KiB phone** (the image is now the page's largest paint). The credit is honest: *Image: AI-generated with ChatGPT*.
+**The images** — generated in the owner's ChatGPT account (Free plan) from two prompts (recorded in `design/hero/README.md`): a photoreal, low-key data-centre aisle — dark graphite racks receding to a vanishing point, thin International Orange fibre-optic light lines converging like a living flow of data, a few steel-blue status LEDs — the system itself, in the brand's one accent colour, with a dark, smooth centre and upper area for the type. Desktop 1536 × 1024 (92.8 KiB), phone 1024 × 1536 (71.2 KiB), WebP, no metadata. Budgets: **100 KiB desktop, 80 KiB phone** (the image is now the page's largest paint). No credit is shown on the site (the owner's decision, D-036); the provenance — including the exact prompts — is kept in `design/hero/README.md`.
 
 **Better content** (all data; the owner edits any of it in Admin → Page content → Home — hero):
 
@@ -207,3 +207,22 @@ Phone and desktop by eye in the owner's Chrome (phones by `mobile.spec` at 360/3
 | Record | systems published · rules · audited changes · organisations | **systems shipped to production** · systems published · rules the database enforces · changes audited this week | Leads with the strongest proof; organisations founded is the weakest evidence and the least relevant to a first impression (the data is unchanged and can return) |
 
 Other statements considered, for the owner to choose between or rewrite: *"Full-stack systems with real users and real money behind them — and the evidence to check every claim."* (Xkimi Xa Mali is described on this site as built for real money and real family stakes) · *"Software and AI engineer in South Africa. Every claim on this site opens its proof."*
+
+## 16. The hero's content architecture (owner, 2026-10-20: "structure the content … at the highest professional, unique level"; "everything should come as real data")
+
+**The idea that makes it this site's and no other's:** the platform's thesis is *evidence, not claims* — so the hero's sentence and its record are one structure. The statement makes three claims; the record under it is their live proof, each claim in the owner's words over the figure that backs it, and a claim is shown only while its figure is above zero. The hero cannot say something its data does not support.
+
+| Level | Part | What it says | Source (nothing typed in code) | Phone | Short screens |
+|---|---|---|---|---|---|
+| 1 · Status | Where this page runs; what is being built right now | "Live · build …" / "Preview build …" / local; "Building now · <repo> · <when>" | The pulse (commit and environment) and the GitHub sync; the wording is the `home-hero` block | Both chips, wrapping | Same |
+| 2 · Identity | Name (the one h1), role, credential | Who | `Profile.displayName`, `Profile.headline`, the owner's second title | Centred, two-line name | Same |
+| 3 · Promise | One sentence, no figure in it | What he does | The `home-hero` block's `statement` | Centred | Same |
+| 4 · Action | Two actions | See the work · Ask the guide (hidden if the guide is off) | The block's labels; the guide's own flag | Stacked, full width | Same |
+| 5 · Proof | The record, docked in a frosted bar: *Runs in production → N shipped*, *Enforces its own rules → N rules* (evidence), *Shows its proof → N audited changes* (evidence), N published | Why the promise is true | `PublicLedger`, `PublicPlatformPulse`, the evidence claims; the claim phrases are the block's | 2 × 2 under the image | Same |
+| 6 · Stack | The technologies behind the work, most used first | What it is built with | `SkillEvidence` (categories from a setting, ranked by systems) | Hidden | Hidden unless the screen is at least 1000 px tall |
+
+**Composition.** One cover image behind everything (a portrait crop on phones, a landscape one above). On larger screens the type is set at the left, in the image's quiet zone, and the overlay clears toward the right so the lit racks show at full strength; on phones the type is centred in the dark upper half and the aisle glows beneath it. The hero is a screen tall at least and never taller than it needs to be: levels 1–5 fit a 900 px screen with their record; level 6 appears only when there is room.
+
+**Rules.** (1) No wording in code — a part the owner has written nothing for is not shown, and no label is made up for a figure. (2) A zero is never proof, so a claim vanishes with its figure. (3) The statement carries no figure (it would go stale). (4) "Live" is said only of the production deployment. (5) One h1; reading order is visual order; the record is a list; the image is decorative (empty alt). (6) Every tunable is a setting: overlay, glow, entrance timing, how many technologies and from which categories.
+
+**The record is not a second layout of the control room:** the control room keeps its terminal and its own evidence; it stops repeating the figures the hero now carries.

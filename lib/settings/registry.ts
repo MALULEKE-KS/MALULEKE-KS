@@ -121,10 +121,22 @@ export const SETTINGS = {
     description: "Home hero: strength of an extra warm light along the cover image's lower edge, 0–100 (0 = none; the image carries its own light).",
     rule: "D-030",
   }),
+  "home.hero.stackCount": define({
+    schema: z.number().int().min(0).max(12),
+    default: 6,
+    description: "Home hero: how many of the technologies you build with are shown under the actions, most used first (0 = none).",
+    rule: "D-030",
+  }),
+  "home.hero.stackCategories": define({
+    schema: z.string().trim().max(200),
+    default: "languages,frontend,backend,database,ai-ml",
+    description: "Home hero: which skill categories the technologies under the actions are drawn from — keys separated by commas (languages, frontend, backend, database, ai-ml, infra, testing, design). Ranked by how many systems use each.",
+    rule: "D-030",
+  }),
   "home.hero.scrim": define({
     schema: z.number().int().min(0).max(100),
-    default: 70,
-    description: "Home hero: strength of the dark overlay that keeps the type readable on the cover image, 0–100 (higher = darker image, more contrast).",
+    default: 100,
+    description: "Home hero: strength of the overlay that keeps the type readable on the cover image, 0–100 (100 = as designed: dark where the type sits, clearing where the image shows; lower = a lighter overlay, more image).",
     rule: "D-030",
   }),
   "cv.download.rateLimit.maxPerWindow": define({

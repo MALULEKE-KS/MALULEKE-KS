@@ -10,7 +10,8 @@ import type { ProofLedgerItem } from "@/components/shared/ProofLedger";
 import { HomeHeroV2 } from "@/components/home/HomeHeroV2";
 import type { ContentBody } from "@/lib/content/blocks";
 import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
-import { heroCopy, heroCredential, heroLedger, heroLiveLine } from "@/lib/home/hero";
+import { getSkillEvidence } from "@/lib/queries/evidence";
+import { heroCopy, heroCredential, heroLedger, heroLiveLine, heroStack } from "@/lib/home/hero";
 import { getPublicPhotos } from "@/lib/queries/profile";
 import type { SiteProfile } from "@/lib/queries/site";
 import { getSetting } from "@/lib/settings";
@@ -21,7 +22,7 @@ interface HomeHeroV2SectionProps {
   pulse: {
     rulesEnforcedByDatabase: number;
     auditEventsLast7Days: number;
-    deployment: { commit: string } | null;
+    deployment: { commit: string; environment: string | null } | null;
   };
   systemsShipped: number;
   systemsPublished: number;
@@ -31,12 +32,15 @@ interface HomeHeroV2SectionProps {
 }
 
 export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
-  const [photos, durationMs, staggerMs, glow, scrim] = await Promise.all([
+  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories] = await Promise.all([
     getPublicPhotos(),
+    getSkillEvidence(),
     getSetting("home.hero.entrance.durationMs"),
     getSetting("home.hero.entrance.staggerMs"),
     getSetting("home.hero.glow"),
     getSetting("home.hero.scrim"),
+    getSetting("home.hero.stackCount"),
+    getSetting("home.hero.stackCategories"),
   ]);
 
   const copy = heroCopy(block);
@@ -49,6 +53,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       key: item.key,
       value: item.value,
       label: item.label,
+      claim: item.claim,
       evidence: claims.length > 0 ? <Evidence claims={claims} label={`${item.value} ${item.label}`} commit={evidence.source.commit} /> : undefined,
     };
   });
@@ -69,6 +74,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       credential={heroCredential(titles, role)}
       liveLine={heroLiveLine(pulse.deployment, copy)}
       nowBuilding={nowBuilding}
+      stack={heroStack(skills, stackCategories, stackCount)}
       copy={copy}
       ledger={ledger}
       entrance={{ durationMs, staggerMs }}

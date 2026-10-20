@@ -30,8 +30,18 @@ describe("home hero — flag and content", () => {
     expect(block?.ledgerLabels?.systems?.many).toBe("systems published");
     expect(block?.ledgerLabels?.shipped?.many).toBe("systems shipped to production");
     expect(block?.nowLabel).toBe("Building now");
-    // Honest sourcing: the cover image is AI-generated, and the credit says so.
-    expect(block?.imageCredit).toMatch(/AI-generated/i);
+    // The line above the name is true to where the page runs: live, preview and local each have the owner's own wording.
+    expect(block?.liveLabel).toMatch(/\{commit\}/);
+    expect(block?.previewLabel).toMatch(/\{commit\}/);
+    expect(block?.localLabel).toBeTruthy();
+    // The record is the proof of the statement: three claims over their figures; the catalogue size supports.
+    expect(block?.ledgerLabels?.shipped?.claim).toBe("Runs in production");
+    expect(block?.ledgerLabels?.rules?.claim).toBe("Enforces its own rules");
+    expect(block?.ledgerLabels?.audited?.claim).toBe("Shows its proof");
+    expect(block?.ledgerLabels?.systems?.claim).toBeUndefined();
+    expect(heroCopy(block).ledgerLabels.rules?.claim).toBe("Enforces its own rules");
+    // No credit is shown on the image unless the owner writes one (his decision, 2026-10-20).
+    expect(block?.imageCredit).toBeUndefined();
     // The seeded wording is what the page would show on its own.
     expect(heroCopy(block).primaryLabel).toBe(block?.primaryLabel);
   });

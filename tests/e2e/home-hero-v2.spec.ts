@@ -66,6 +66,10 @@ for (const vp of VIEWPORTS) {
       // no character, rig or canvas in the hero
       await expect(hero.locator("canvas")).toHaveCount(0);
 
+      // the record is the proof of the statement: each claim sits over its figure
+      const claims = hero.getByRole("list").last().getByRole("listitem").filter({ hasText: /Runs in production|Enforces its own rules|Shows its proof/ });
+      expect(await claims.count()).toBeGreaterThan(0);
+
       // nothing pushes the page sideways
       const sizes = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, width: document.documentElement.clientWidth }));
       expect(sizes.scroll).toBeLessThanOrEqual(sizes.width + 1);

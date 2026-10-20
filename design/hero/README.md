@@ -2,7 +2,7 @@
 
 Two images — one landscape for tablets and desktops, one portrait for phones — shown behind the whole home hero (`components/shared/HeroBackdrop.tsx`), served by the photo slots `hero-desktop` and `hero-mobile` (Admin → Photos). They reach the database through the data migration `prisma/migrations/20261020160000_home_hero_cover_images` and can be replaced in the admin at any time; the original files are never committed.
 
-**They are AI-generated, and the site says so** (the credit shown on the image: *Image: AI-generated with ChatGPT*, the `home-hero` block's `imageCredit`).
+**They are AI-generated** — that provenance is kept here, in the repository. **No credit is shown on the site:** the owner decided on 2026-10-20 that the hero carries no credit line (the `home-hero` block's `imageCredit` stays empty; if he ever writes one, it appears).
 
 | | |
 |---|---|
@@ -28,9 +28,9 @@ Encoded exactly as an admin upload is (`lib/profile/photos.ts`: oriented, resize
 
 ```
 node scripts/build-hero-photos.mjs --desktop <landscape.png> --mobile <portrait.png> \
-  --migration <new-migration-folder> --credit "Image: AI-generated with ChatGPT" --alt "…"
+  --migration <new-migration-folder> --alt "…"
 ```
 
-The credit and the focal points are the `home-hero` block's (Admin → Page content → Home — hero); the overlay's darkness is the setting `home.hero.scrim`. Weight budgets (100 KiB desktop, 80 KiB phone) are asserted in `tests/integration/home-hero.test.ts`.
+The focal points (and a credit, only if the owner ever writes one) are the `home-hero` block's (Admin → Page content → Home — hero); the overlay's darkness is the setting `home.hero.scrim`. Weight budgets (100 KiB desktop, 80 KiB phone) are asserted in `tests/integration/home-hero.test.ts`.
 
 *History:* the first cover image was a Johannesburg dusk photograph (Tania Melnyczuk, Unsplash). The owner rejected it on 2026-10-20 (not related to the system) and it was removed before it ever reached production.

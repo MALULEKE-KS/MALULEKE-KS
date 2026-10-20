@@ -1,17 +1,21 @@
 // lib/home/hero.ts
 // The home hero's copy and computed facts, as pure functions (docs/improvements/
-// HOME-HERO-PLAN.md §6–7). Every figure comes from the database (the public
-// ledger, the platform pulse); every label is the owner's, read from the
-// "home-hero" content block — the wording below is only the fallback a page
-// shows until a label is written (D-010). A zero is never shown as proof, and
-// the statement carries no figure (a number in a sentence goes stale; the
-// ledger's numbers are computed).
+// HOME-HERO-PLAN.md §6–7, D-036). **There is no wording in code.** Every figure
+// comes from the database (the public ledger, the platform pulse); every label,
+// claim and sentence is the owner's, read from the "home-hero" content block
+// (seeded by migrations, edited in Admin → Page content). Where the block has
+// no wording for a part, that part is not shown — nothing is invented in its
+// place. A zero is never shown as proof, the statement carries no figure (a
+// number in a sentence goes stale; the ledger's numbers are computed), and a
+// build is only called "live" when it is the production deployment.
 
 export type LedgerKey = "shipped" | "systems" | "rules" | "audited";
 
 export interface LabelPair {
   one: string;
   many: string;
+  /** The claim this figure proves, in the owner's words — shown above the figure (the statement's clauses, each with its live proof). */
+  claim?: string;
 }
 
 /** The shape of the "home-hero" block's interface wording (lib/content/blocks.ts validates it). */
@@ -19,53 +23,41 @@ export interface HeroCopyBlock {
   primaryLabel?: string;
   secondaryLabel?: string;
   liveLabel?: string;
+  previewLabel?: string;
   localLabel?: string;
   nowLabel?: string;
+  stackLabel?: string;
   ledgerAria?: string;
   ledgerLabels?: Partial<Record<LedgerKey, LabelPair>>;
 }
 
+/** The owner's wording, or null where he has written none — a null part is simply not shown. */
 export interface HeroCopy {
-  primaryLabel: string;
-  secondaryLabel: string;
-  liveLabel: string;
-  localLabel: string;
-  nowLabel: string;
-  ledgerAria: string;
-  ledgerLabels: Record<LedgerKey, LabelPair>;
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
+  liveLabel: string | null;
+  previewLabel: string | null;
+  localLabel: string | null;
+  nowLabel: string | null;
+  stackLabel: string | null;
+  ledgerAria: string | null;
+  ledgerLabels: Partial<Record<LedgerKey, LabelPair>>;
 }
 
-/** Shipped wording — a fallback only; the owner's block wins field by field. */
-export const DEFAULT_HERO_COPY: HeroCopy = {
-  primaryLabel: "See the work",
-  secondaryLabel: "Ask the guide",
-  liveLabel: "Live · build {commit}",
-  localLabel: "Local development build",
-  nowLabel: "Building now",
-  ledgerAria: "The record, live",
-  ledgerLabels: {
-    shipped: { one: "system shipped to production", many: "systems shipped to production" },
-    systems: { one: "system published", many: "systems published" },
-    rules: { one: "rule the database enforces", many: "rules the database enforces" },
-    audited: { one: "change audited this week", many: "changes audited this week" },
-  },
-};
+const text = (value: string | undefined) => (value && value.trim() ? value : null);
 
-const text = (value: string | undefined, fallback: string) => (value && value.trim() ? value : fallback);
-
-/** The owner's wording where written, the shipped wording where not (per label, too). */
+/** Read the owner's wording from the block; anything he has not written stays null. */
 export function heroCopy(block: HeroCopyBlock | null | undefined): HeroCopy {
-  const d = DEFAULT_HERO_COPY;
-  const labels = { ...d.ledgerLabels };
-  for (const key of Object.keys(labels) as LedgerKey[]) labels[key] = block?.ledgerLabels?.[key] ?? labels[key];
   return {
-    primaryLabel: text(block?.primaryLabel, d.primaryLabel),
-    secondaryLabel: text(block?.secondaryLabel, d.secondaryLabel),
-    liveLabel: text(block?.liveLabel, d.liveLabel),
-    localLabel: text(block?.localLabel, d.localLabel),
-    nowLabel: text(block?.nowLabel, d.nowLabel),
-    ledgerAria: text(block?.ledgerAria, d.ledgerAria),
-    ledgerLabels: labels,
+    primaryLabel: text(block?.primaryLabel),
+    secondaryLabel: text(block?.secondaryLabel),
+    liveLabel: text(block?.liveLabel),
+    previewLabel: text(block?.previewLabel),
+    localLabel: text(block?.localLabel),
+    nowLabel: text(block?.nowLabel),
+    stackLabel: text(block?.stackLabel),
+    ledgerAria: text(block?.ledgerAria),
+    ledgerLabels: block?.ledgerLabels ?? {},
   };
 }
 
@@ -80,6 +72,8 @@ export interface HeroLedgerItem {
   key: LedgerKey;
   value: number;
   label: string;
+  /** The claim this figure is the live proof of, or null for a supporting figure. */
+  claim: string | null;
   /** The evidence claim key that backs this figure (docs/EVIDENCE-SPEC.md), where one exists. */
   evidenceKey: string | null;
 }
@@ -94,22 +88,70 @@ export const HERO_EVIDENCE_KEYS: Record<LedgerKey, string | null> = {
 
 const pick = (n: number, pair: LabelPair) => (n === 1 ? pair.one : pair.many);
 
-/** The record on the hero: only figures above zero, each labelled to agree with its number. */
-export function heroLedger(input: HeroLedgerInput, labels: Record<LedgerKey, LabelPair> = DEFAULT_HERO_COPY.ledgerLabels): HeroLedgerItem[] {
+/**
+ * The record on the hero, built as the proof of the statement: the three claims
+ * (runs in production, enforces its own rules, shows its proof) each over the
+ * figure that proves it, then the catalogue size as a supporting figure. Only
+ * figures above zero, and only those the owner has labelled — a figure with no
+ * label is not shown, because a label is never made up for it.
+ */
+export function heroLedger(input: HeroLedgerInput, labels: Partial<Record<LedgerKey, LabelPair>>): HeroLedgerItem[] {
   const rows: [LedgerKey, number][] = [
     ["shipped", input.systemsShipped],
-    ["systems", input.systemsPublished],
     ["rules", input.rulesEnforced],
     ["audited", input.auditedThisWeek],
+    ["systems", input.systemsPublished],
   ];
-  return rows
-    .filter(([, value]) => value > 0)
-    .map(([key, value]) => ({ key, value, label: pick(value, labels[key]), evidenceKey: HERO_EVIDENCE_KEYS[key] }));
+  const items: HeroLedgerItem[] = [];
+  for (const [key, value] of rows) {
+    const pair = labels[key];
+    if (value <= 0 || !pair) continue;
+    items.push({ key, value, label: pick(value, pair), claim: pair.claim?.trim() || null, evidenceKey: HERO_EVIDENCE_KEYS[key] });
+  }
+  return items;
 }
 
-/** The small line above the name: the build that is running, or an honest local-development label. */
-export function heroLiveLine(deployment: { commit: string } | null, copy: Pick<HeroCopy, "liveLabel" | "localLabel"> = DEFAULT_HERO_COPY): string {
-  return deployment ? copy.liveLabel.replaceAll("{commit}", deployment.commit) : copy.localLabel;
+/**
+ * The small line above the name, true to where the page is running: "live" only
+ * for the production deployment, a preview label for a preview deployment, the
+ * local label for a local build. Null when the owner has written no wording for
+ * that case.
+ */
+export function heroLiveLine(
+  deployment: { commit: string; environment: string | null } | null,
+  copy: Pick<HeroCopy, "liveLabel" | "previewLabel" | "localLabel">,
+): string | null {
+  if (!deployment) return copy.localLabel;
+  const template = deployment.environment === "production" ? copy.liveLabel : copy.previewLabel;
+  return template ? template.replaceAll("{commit}", deployment.commit) : null;
+}
+
+/** A skill as the evidence view gives it — only what the hero needs. */
+export interface HeroSkill {
+  name: string;
+  categoryKey: string;
+  systemCount: number;
+}
+
+/**
+ * The technologies under the actions: skills from the chosen categories that at
+ * least one system uses, the most used first (ties by name), at most `count`.
+ * Categories come from a setting as comma-separated keys; none chosen, or a
+ * count of 0, shows nothing.
+ */
+export function heroStack(skills: HeroSkill[], categoriesCsv: string, count: number): string[] {
+  const categories = new Set(
+    categoriesCsv
+      .split(",")
+      .map((c) => c.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  if (categories.size === 0 || count <= 0) return [];
+  return skills
+    .filter((s) => s.systemCount > 0 && categories.has(s.categoryKey.toLowerCase()))
+    .sort((a, b) => b.systemCount - a.systemCount || a.name.localeCompare(b.name))
+    .slice(0, count)
+    .map((s) => s.name);
 }
 
 /**
