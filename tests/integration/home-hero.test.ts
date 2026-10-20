@@ -9,6 +9,8 @@ import { db, dbPublic } from "@/lib/db";
 import { getContentBlock } from "@/lib/content/blocks";
 import { heroCopy } from "@/lib/home/hero";
 import { getPublicPhotos } from "@/lib/queries/profile";
+import { countSystemsInProduction } from "@/lib/queries/homepage";
+import { getSelectedWork } from "@/lib/queries/work";
 
 const KIB = 1024;
 // The plan's budgets (HOME-HERO-PLAN §7, D-034): weight is law, not a hope — the cover image is the page's largest paint.
@@ -30,9 +32,11 @@ describe("home hero — content", () => {
     expect(block?.statement, "the statement carries no figure").not.toMatch(/\d/);
     expect(block?.ledgerLabels?.systems?.many).toBe("systems published");
     expect(block?.ledgerLabels?.shipped?.many).toBe("systems shipped to production");
-    expect(block?.nowLabel).toBe("Building now");
+    // It names what it knows: the repo with the latest real commit — not a claim that something is being built (D-039).
+    expect(block?.nowLabel).toBe("Latest commit");
     // The line above the name is true to where the page runs: live, preview and local each have the owner's own wording.
-    expect(block?.liveLabel).toMatch(/\{commit\}/);
+    expect(block?.liveLabel).toMatch(/\{date\}/);
+    expect(block?.previewLabel).toMatch(/\{date\}/);
     expect(block?.previewLabel).toMatch(/\{commit\}/);
     expect(block?.localLabel).toBeTruthy();
     // The record is the proof of the statement: three claims over their figures; the catalogue size supports.
@@ -77,5 +81,20 @@ describe("home hero — photographs", () => {
       expect(photos[purpose]?.url).toMatch(new RegExp(`^/api/v1/profile/photo/${purpose}\\?v=[0-9a-f]{12}$`));
       expect(photos[purpose]?.width).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("home hero — the figures and lines it states are the real ones (D-039)", () => {
+  it("counts the systems in production as the published systems that have a live address", async () => {
+    const withAddress = await dbPublic.publicSystem.findMany({ where: { liveUrl: { not: null } }, select: { slug: true } });
+    expect(await countSystemsInProduction()).toBe(withAddress.length);
+  });
+
+  it("names the repo with the latest real commit as what is current — never the latest push", async () => {
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const latest = await dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+    const { nowBuilding } = await getSelectedWork(0);
+    if (!latest) expect(nowBuilding).toBeNull();
+    else expect(nowBuilding?.fullName).toBe(latest.fullName);
   });
 });

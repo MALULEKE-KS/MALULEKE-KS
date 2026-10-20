@@ -5,7 +5,7 @@
 // running, and the preview switch is one production refuses.
 
 import { describe, expect, it } from "vitest";
-import { heroCopy, heroCredential, heroEntranceVars, heroLedger, heroLiveLine, heroStack, type LabelPair, type LedgerKey } from "@/lib/home/hero";
+import { heroCopy, heroCredential, heroAsOf, heroEntranceVars, heroLedger, heroLiveLine, heroStack, type LabelPair, type LedgerKey } from "@/lib/home/hero";
 
 // What the seeded "home-hero" block carries (the migrations are the source of this wording).
 const LABELS: Partial<Record<LedgerKey, LabelPair>> = {
@@ -83,24 +83,43 @@ describe("heroCopy", () => {
 });
 
 describe("heroLiveLine", () => {
-  const words = { liveLabel: "Live · build {commit}", previewLabel: "Preview build {commit}", localLabel: "Local development build" };
+  const words = { liveLabel: "Live, as of {date}", previewLabel: "Preview, as of {date} · build {commit}", localLabel: "Local development build" };
+  const asOf = "20 Oct 2026";
 
-  it("says live only for the production deployment", () => {
-    expect(heroLiveLine({ commit: "0091d34", environment: "production" }, words)).toBe("Live · build 0091d34");
+  it("says live, with the real date, only for the production deployment", () => {
+    expect(heroLiveLine({ commit: "0091d34", environment: "production" }, words, asOf)).toBe("Live, as of 20 Oct 2026");
   });
 
   it("says preview, not live, on a preview deployment — a preview is not the live site", () => {
-    expect(heroLiveLine({ commit: "b602718", environment: "preview" }, words)).toBe("Preview build b602718");
-    expect(heroLiveLine({ commit: "b602718", environment: null }, words)).toBe("Preview build b602718");
+    expect(heroLiveLine({ commit: "b602718", environment: "preview" }, words, asOf)).toBe("Preview, as of 20 Oct 2026 · build b602718");
+    expect(heroLiveLine({ commit: "b602718", environment: null }, words, asOf)).toBe("Preview, as of 20 Oct 2026 · build b602718");
+  });
+
+  it("fills the commit as well when the owner's wording asks for it", () => {
+    expect(heroLiveLine({ commit: "0091d34", environment: "production" }, { ...words, liveLabel: "Live · build {commit} · {date}" }, asOf)).toBe("Live · build 0091d34 · 20 Oct 2026");
   });
 
   it("says it is a local build when there is no deployment", () => {
-    expect(heroLiveLine(null, words)).toBe("Local development build");
+    expect(heroLiveLine(null, words, asOf)).toBe("Local development build");
   });
 
   it("shows nothing where the owner has written no wording for that case", () => {
-    expect(heroLiveLine({ commit: "0091d34", environment: "production" }, { liveLabel: null, previewLabel: null, localLabel: null })).toBeNull();
-    expect(heroLiveLine(null, { liveLabel: null, previewLabel: null, localLabel: null })).toBeNull();
+    expect(heroLiveLine({ commit: "0091d34", environment: "production" }, { liveLabel: null, previewLabel: null, localLabel: null }, asOf)).toBeNull();
+    expect(heroLiveLine(null, { liveLabel: null, previewLabel: null, localLabel: null }, asOf)).toBeNull();
+  });
+});
+
+describe("heroAsOf", () => {
+  // 22:30 UTC on 20 Oct is already 21 Oct in South Africa (UTC+2) — the date the owner sees.
+  const late = new Date("2026-10-20T22:30:00Z");
+
+  it("gives the date in the site's time zone", () => {
+    expect(heroAsOf(late, "Africa/Johannesburg")).toBe("21 Oct 2026");
+    expect(heroAsOf(late, "UTC")).toBe("20 Oct 2026");
+  });
+
+  it("falls back to UTC for a time zone it does not know, never a crash", () => {
+    expect(heroAsOf(late, "Not/AZone")).toBe("20 Oct 2026");
   });
 });
 

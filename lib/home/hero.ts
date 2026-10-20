@@ -120,10 +120,21 @@ export function heroLedger(input: HeroLedgerInput, labels: Partial<Record<Ledger
 export function heroLiveLine(
   deployment: { commit: string; environment: string | null } | null,
   copy: Pick<HeroCopy, "liveLabel" | "previewLabel" | "localLabel">,
+  asOf: string,
 ): string | null {
   if (!deployment) return copy.localLabel;
   const template = deployment.environment === "production" ? copy.liveLabel : copy.previewLabel;
-  return template ? template.replaceAll("{commit}", deployment.commit) : null;
+  return template ? template.replaceAll("{commit}", deployment.commit).replaceAll("{date}", asOf) : null;
+}
+
+/** Today's date for the live line, like "20 Oct 2026", in the site's time zone (setting `site.timeZone`); an unknown zone falls back to UTC. */
+export function heroAsOf(now: Date, timeZone: string): string {
+  const format = (tz: string) => now.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: tz });
+  try {
+    return format(timeZone);
+  } catch {
+    return format("UTC");
+  }
 }
 
 /** A skill as the evidence view gives it — only what the hero needs. */

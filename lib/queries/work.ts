@@ -42,6 +42,14 @@ function series(rows: { weekStart: Date; commits: number }[], now: Date): number
   });
 }
 
+/** The public repo whose latest commit is the newest since `since`, with that commit's time; null when nothing was committed. */
+async function latestCommitRepo(since: Date) {
+  const latest = await dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+  if (!latest) return null;
+  const repo = await dbPublic.publicGithubRepo.findUnique({ where: { fullName: latest.fullName } });
+  return repo ? { ...repo, latestCommitAt: latest.committedAt } : null;
+}
+
 /** Selected work on the home page: the owner's featured systems, then `more` others (getHomeSelection). */
 export async function getSelectedWork(more = 3) {
   const now = new Date();
@@ -54,11 +62,9 @@ export async function getSelectedWork(more = 3) {
     dbPublic.publicImpact.findMany({ where: { systemId: { in: ids } }, orderBy: { sortOrder: "asc" } }),
     dbPublic.publicGithubRepo.findMany({ where: { slug: { in: slugs } } }),
     dbPublic.publicSystemActivity.findMany({ where: { slug: { in: slugs } } }),
-    // Now building: the most recently pushed public repo that moved in the last 30 days.
-    dbPublic.publicGithubRepo.findFirst({
-      where: { pushedAt: { gte: new Date(now.getTime() - 30 * DAY) } },
-      orderBy: { pushedAt: "desc" },
-    }),
+    // The repo with the most recent real commit in the last 30 days. A push is not work: GitHub's
+    // "pushed at" moves for branches, tags and automation, so a repo can show a fresh push with no commit in weeks.
+    latestCommitRepo(new Date(now.getTime() - 30 * DAY)),
   ]);
 
   const work = systems.map((s) => {
@@ -92,7 +98,7 @@ export async function getSelectedWork(more = 3) {
       home: active.home,
       url: active.published && active.slug ? `/systems/${active.slug}` : `https://github.com/${active.fullName}`,
       onSite: Boolean(active.published && active.slug),
-      lastPush: ago(active.pushedAt, now),
+      lastPush: ago(active.latestCommitAt, now),
       commitsLast4Weeks: active.commitsLast4Weeks,
       commits: commits.map((c) => ({ message: c.message, when: ago(c.committedAt, now), key: `${c.committedAt.toISOString()}:${c.message.slice(0, 24)}` })),
       screenshotUrl: shot?.screenshotUrl ?? null,

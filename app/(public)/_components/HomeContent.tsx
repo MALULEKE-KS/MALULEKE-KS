@@ -29,6 +29,7 @@ import { getSetting } from "@/lib/settings";
 import { AiGuideSection } from "@/components/home/AiGuideSection";
 import {
   countPublishedSystems,
+  countSystemsInProduction,
   getHomepageStats,
 } from "@/lib/queries/homepage";
 
@@ -37,6 +38,7 @@ export async function HomeContent() {
     stats,
     selectedWork,
     totalPublished,
+    inProduction,
     numbers,
     profile,
     affiliations,
@@ -52,6 +54,7 @@ export async function HomeContent() {
     getHomepageStats(),
     getSelectedWork(3),
     countPublishedSystems(),
+    countSystemsInProduction(),
     getPublicMetrics(), // approved values only (BR-5.3)
     getSiteProfile(),
     getAffiliations(),
@@ -87,7 +90,7 @@ export async function HomeContent() {
         profile={profile}
         block={heroBlock}
         pulse={pulse}
-        systemsShipped={stats.systemsShipped}
+        systemsShipped={inProduction}
         systemsPublished={totalPublished}
         titles={titles}
         nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, lastPush: selectedWork.nowBuilding.lastPush } : null}
