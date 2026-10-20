@@ -228,6 +228,7 @@ Still to do: the learning loop (unanswered questions → admin) and running the 
 | Systems filters (2026-10-03) | Our own `FilterDropdown` on `<details>` (works without JS), glass panel per DESIGN-SYSTEM | Dropdowns replace the chip rows; links underneath; brand marks and search for technologies. |
 | Brand marks (2026-10-03) | Simple Icons (react-icons) + official SVGs in `public/brands` — svgl.app (Playwright, MATLAB, Motion, Magic UI), project repos/sites (Matplotlib, NetworkX, Chroma, Inngest, 21st.dev, Tk) | One map in TechChip; vendored marks drawn single-colour as masks, never hot-linked. |
 | AI guide thinking state (2026-10-03) | 21st.dev **AI thinking orb and input** (MorphOrb) — the orb only | The dotted canvas sphere and its light programs, recoloured from tokens read off computed style; the program follows the chat's real state. The pill-to-card morph and timed labels were left out: the guide streams long answers in its own panel, and labels must be true. |
+| Home hero rebuilt (2026-10-20, D-030) | Our own `HomeHeroV2`, `HeroBackdrop`, `ProofLedger`; shadcn **Button**; Lucide | Direction C: the type is the hero. Magic UI (`safari`, `marquee`, `blur-fade`), 21st.dev hero patterns and Motion were considered and not needed here — the entrance is CSS so it needs no JavaScript and never delays the largest paint (docs/FRONTEND-CRAFT-RECORD.md). No 21st.dev retrieval spent |
 
 ## 8. Delivery
 

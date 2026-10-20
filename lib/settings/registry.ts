@@ -78,6 +78,73 @@ export const SETTINGS = {
     description: "Longest side a stored photo is resized to, in pixels.",
     rule: "BR-1.17",
   }),
+  // The home hero (docs/improvements/HOME-HERO-PLAN.md, D-030): its image's weight and its motion are tunable without a deploy.
+  "home.hero.desktop.maxEdgePixels": define({
+    schema: z.number().int().min(800).max(4000),
+    default: 2560,
+    description: "Home hero cover image, desktop: the longest side the stored image is resized to, in pixels.",
+    rule: "D-030",
+  }),
+  "home.hero.desktop.quality": define({
+    schema: z.number().int().min(40).max(95),
+    default: 74,
+    description: "Home hero cover image, desktop: WebP quality (lower is lighter).",
+    rule: "D-030",
+  }),
+  "home.hero.mobile.maxEdgePixels": define({
+    schema: z.number().int().min(600).max(3000),
+    default: 1536,
+    description: "Home hero cover image, phones: the longest side the stored image is resized to, in pixels.",
+    rule: "D-030",
+  }),
+  "home.hero.mobile.quality": define({
+    schema: z.number().int().min(40).max(95),
+    default: 72,
+    description: "Home hero cover image, phones: WebP quality (lower is lighter).",
+    rule: "D-030",
+  }),
+  "home.hero.entrance.durationMs": define({
+    schema: z.number().int().min(0).max(2000),
+    default: 450,
+    description: "Home hero: how long each part takes to settle in when the page opens, in milliseconds (0 = no entrance). Reduced-motion visitors never see it.",
+    rule: "D-030",
+  }),
+  "home.hero.entrance.staggerMs": define({
+    schema: z.number().int().min(0).max(400),
+    default: 70,
+    description: "Home hero: the pause between one part settling in and the next, in milliseconds.",
+    rule: "D-030",
+  }),
+  "home.hero.glow": define({
+    schema: z.number().int().min(0).max(100),
+    default: 0,
+    description: "Home hero: strength of an extra warm light along the cover image's lower edge, 0–100 (0 = none; the image carries its own light).",
+    rule: "D-030",
+  }),
+  "header.systemsPreview.count": define({
+    schema: z.number().int().min(0).max(6),
+    default: 3,
+    description: "Header: how many of your featured systems the Systems preview shows under the nav (0 = no preview). The same curation as the home page.",
+    rule: "D-037",
+  }),
+  "home.hero.stackCount": define({
+    schema: z.number().int().min(0).max(12),
+    default: 6,
+    description: "Home hero: how many of the technologies you build with are shown under the actions, most used first (0 = none).",
+    rule: "D-030",
+  }),
+  "home.hero.stackCategories": define({
+    schema: z.string().trim().max(200),
+    default: "languages,frontend,backend,database,ai-ml",
+    description: "Home hero: which skill categories the technologies under the actions are drawn from — keys separated by commas (languages, frontend, backend, database, ai-ml, infra, testing, design). Ranked by how many systems use each.",
+    rule: "D-030",
+  }),
+  "home.hero.scrim": define({
+    schema: z.number().int().min(0).max(100),
+    default: 100,
+    description: "Home hero: strength of the overlay that keeps the type readable on the cover image, 0–100 (100 = as designed: dark where the type sits, clearing where the image shows; lower = a lighter overlay, more image).",
+    rule: "D-030",
+  }),
   "cv.download.rateLimit.maxPerWindow": define({
     schema: z.number().int().min(1).max(500),
     default: 30,

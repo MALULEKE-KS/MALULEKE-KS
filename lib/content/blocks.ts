@@ -41,6 +41,55 @@ export const CONTENT_BLOCKS = {
       lede: Text(600),
     }),
   },
+  "home-hero": {
+    title: "Home — hero",
+    description: "The rebuilt home hero (shown when the flag home.hero_v2 is on): the one statement under your name and role.",
+    schema: z.object({
+      statement: Text(200),
+      // Interface wording — each optional; the page keeps its shipped wording when one is empty.
+      primaryLabel: z.string().trim().max(40).optional(),
+      secondaryLabel: z.string().trim().max(40).optional(),
+      liveLabel: instantTemplate(60, ["commit"]).optional(),
+      previewLabel: instantTemplate(60, ["commit"]).optional(),
+      localLabel: z.string().trim().max(60).optional(),
+      nowLabel: z.string().trim().max(40).optional(),
+      stackLabel: z.string().trim().max(60).optional(),
+      ledgerAria: z.string().trim().max(60).optional(),
+      // The record's labels: one when the figure is 1, many otherwise. Any label left out keeps the shipped wording.
+      ledgerLabels: z
+        .object({
+          shipped: z.object({ one: Text(60), many: Text(60), claim: Text(40).optional() }).optional(),
+          systems: z.object({ one: Text(60), many: Text(60), claim: Text(40).optional() }).optional(),
+          rules: z.object({ one: Text(60), many: Text(60), claim: Text(40).optional() }).optional(),
+          audited: z.object({ one: Text(60), many: Text(60), claim: Text(40).optional() }).optional(),
+        })
+        .optional(),
+      // The hero photograph's credit (shown on the image) and where its subject sits in each crop.
+      imageCredit: z.string().trim().max(120).optional(),
+      imageCreditUrl: z.string().trim().max(300).refine((u) => u.startsWith("https://"), "must start with https://").optional(),
+      imagePositionDesktop: z.string().trim().regex(/^\d{1,3}% \d{1,3}%$/, 'like "50% 60%"').optional(),
+      imagePositionMobile: z.string().trim().regex(/^\d{1,3}% \d{1,3}%$/, 'like "50% 60%"').optional(),
+    }),
+  },
+  "site-header": {
+    title: "Site header",
+    description: "The public header's own wording: the contact button, the CV button, the home link's name, the skip link, and the Systems preview's name and \"all systems\" link. A label left empty hides that part.",
+    schema: z.object({
+      contactLabel: z.string().trim().max(40).optional(),
+      cvLabel: z.string().trim().max(24).optional(),
+      homeLabel: z.string().trim().max(60).optional(),
+      skipLabel: z.string().trim().max(40).optional(),
+      // The phone menu's own wording.
+      menuLabel: z.string().trim().max(24).optional(),
+      menuCloseLabel: z.string().trim().max(40).optional(),
+      cvMenuLabel: z.string().trim().max(40).optional(),
+      reviewPromise: instantTemplate(100, ["hours"]).optional(),
+      /** One line under each page in the phone menu, keyed by its path ("/systems"). A page without one shows none. */
+      pageHints: z.record(z.string().regex(/^\//), Text(80)).optional(),
+      systemsPreviewLabel: z.string().trim().max(60).optional(),
+      systemsAllLabel: instantTemplate(60, ["count"]).optional(),
+    }),
+  },
   "systems-page": {
     title: "Systems — introduction",
     description: "The /systems page's heading and introduction.",

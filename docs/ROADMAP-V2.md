@@ -30,6 +30,12 @@
 
 ## Part 2 — Update log (newest first)
 
+### V2 goes agile — the way of working written (2026-10-20, docs only)
+- **Owner:** V2 is launched and worked "bit by bit and part by part delivering a working software"; agile is the core working technique (D-028).
+- **Written:** `docs/improvements/WAY-OF-WORKING.md` — vertical slices, sprints with one goal, the relay as the daily stand-up, review and retro, Definitions of Ready/Done/Released, the owner lane, and the proposed Sprints 1–8 (the spec's order, grouped; Sprint 1 sliced). Spec revision 4 (process only); the tracker has a **Current sprint**; D-029 (decided): one release per sprint, to stay inside the Vercel deploy caps; every push is announced to the owner first.
+- **No scope change.** Sprint 1 is the home hero rebuilt at the owner's request (D-030: `docs/improvements/HOME-HERO-PLAN.md`, three directions designed in Figma); WP-102 (the rest), WP-111 and WP-109 move to Sprint 2.
+- **Frontend craft record** (D-031): `docs/FRONTEND-CRAFT-RECORD.md` — the toolchain (Figma, Motion, shadcn/ui, Magic UI, 21st.dev), the method, the evidence, a dated log; it backs the frontend skills the site lists.
+
 ### AI guide, phase 2, release 3: a tour, a say, and proof of its own reliability (2026-10-09)
 - **Guided tours:** the guide starts one of the owner's tours (`agent.tour`, off); a card steps through the stops — page, lit section, the owner's line. All content is the owner's (`guide-tours`); the model only picks which tour. ⌘K can send a question to the guide.
 - **A say, and proof:** "helpful / this was wrong / challenge this" under each answer (the owner's wording, each hidden until written; feedback scrubbed, no identifier, retention-bound); the nightly self-check shown beside the chat box through a public view — and a failure is said plainly.

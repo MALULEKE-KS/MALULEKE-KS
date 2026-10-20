@@ -44,10 +44,10 @@ function HomeSkeleton() {
   return <section aria-busy="true" className="hero-field min-h-[640px]" />;
 }
 
-export default function HomePage() {
+export default function HomePage({ searchParams }: { searchParams: Promise<{ hero?: string | string[] }> }) {
   return (
     <Suspense fallback={<HomeSkeleton />}>
-      <HomeContent />
+      <HomeContent searchParams={searchParams} />
     </Suspense>
   );
 }

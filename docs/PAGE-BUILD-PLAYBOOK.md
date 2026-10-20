@@ -140,6 +140,8 @@ Show it, listen, iterate. The owner's feedback on home became rules in §1 and p
 | Beam graph | `components/home/SystemMapGraph.tsx` | Connected columns drawn in one SVG, hover to trace |
 | Ask the guide | `components/guide/AskGuideButton.tsx` | Open the AI guide with a question about this page |
 | Page hero | `components/shared/PageHero.tsx` | The dark opening band of an inner page (clears the header) |
+| Hero backdrop | `components/shared/HeroBackdrop.tsx` | A cover image behind a whole hero (a crop per screen, from owner-uploaded photo slots), a setting-driven overlay for legibility, a credit; renders nothing when none is uploaded |
+| Proof ledger | `components/shared/ProofLedger.tsx` | Computed figures under a hairline, each with its label and, where it has claims, the evidence chip — no tickers, no boxes |
 | Queries | `lib/queries/work.ts` (`ago()`, weekly series), `map.ts`, `github.ts`, `lenses.ts`, `profile.ts` | Page-shaped data from public views |
 | Content blocks | `lib/content/blocks.ts` + `/admin/content` | Owner-edited copy for any page |
 
@@ -298,7 +300,7 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 | Section | Components | Data |
 |---|---|---|
 | Header | `SiteHeader`, `HeaderFrame`, `NavLinks` (desktop), `MobileMenu` (full-screen phone menu), `SearchPalette` | sheets, search, profile links |
-| Hero | `HomeHero`, `HeroGuide` (rig + Flickering Grid), Number Ticker | `home-intro` block, titles, PublicLedger |
+| Hero | `HomeHero`, `HeroGuide` (rig + Flickering Grid), Number Ticker — **superseded, behind the flag `home.hero_v2`, by `HomeHeroV2` + `HeroImage` + `ProofLedger` (Direction C)** | `home-intro` block, titles, PublicLedger — and for the new hero the `home-hero` block (statement, every label, the photo's credit and focal point), the photo slots `hero-desktop` / `hero-mobile`, `PublicPlatformPulse`, 7 `home.hero.*` settings |
 | AI guide | `AiGuideSection` (Magic Card, Border Beam, Typing, Shiny Text, Blur Fade), `GuidePanel` | `ai-guide` block, lenses, flags, GitHub repo count |
 | Selected work | `WorkShowcase` (Magic Card, Lens, Animated List, Sparkline, Tech chips, Project Showcase) | `lib/queries/work.ts` |
 | System map | `SystemMap`, `SystemMapGraph` | `lib/queries/map.ts` |

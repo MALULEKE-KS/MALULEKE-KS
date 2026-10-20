@@ -2,7 +2,7 @@
 
 Audience: Claude Code (implementer). Owner: Kurhula Success Maluleke.
 **V2 PLAN — LOCKED (owner, 2026-10-02).** V1 is finished and released; this is everything V2 builds. Every Claude Code session reads this file first (CLAUDE.md points here), works the relay in Section 0.1, and updates `docs/improvements/TRACKER.md` before it stops. Formerly titled "v1.1"; REVISION 3 (Section 1.2) records the re-scope and the statuses checked against the repo.
-Status history: LOCKED 2026-10-02. REVISION 2 (2026-10-02): re-verified against the live site (builds 6b32ac6 and afed2f6) and re-scoped. Section 1.1 lists what changed. Changes follow Section 2.4.
+Status history: LOCKED 2026-10-02. REVISION 2 (2026-10-02): re-verified against the live site (builds 6b32ac6 and afed2f6) and re-scoped. Section 1.1 lists what changed. REVISION 4 (2026-10-20): process only — V2 is delivered agile (Section 1.3, `docs/improvements/WAY-OF-WORKING.md`); no scope change. Changes follow Section 2.4.
 Target: raise the platform from a reviewed 8/10 to a defensible 10/10 on one axis: **verifiability** — a skeptical reviewer can confirm any claim on the site in under two minutes.
 
 ---
@@ -27,8 +27,8 @@ V2 is built by a relay of Claude Code sessions, one after another. No session ho
 | `docs/improvements/DECISIONS.md` | **Why** — every decision, conflict resolution and owner answer, append-only. |
 
 **At the start of every session (before any code):**
-1. Read `CLAUDE.md`, then this spec in full, then `TRACKER.md` (Next up + the last three handoff entries), then `DECISIONS.md`.
-2. Take the WP named in **Next up** — not another one. If it's blocked on owner input, take the next unblocked WP in Section 13 order and say why in the handoff log.
+1. Read `CLAUDE.md`, then this spec in full, then `docs/improvements/WAY-OF-WORKING.md`, then `TRACKER.md` (Current sprint + Next up + the last three handoff entries), then `DECISIONS.md`.
+2. Take the WP named in **Next up** — not another one — and within it the first unfinished slice of the current sprint. If it's blocked on owner input, take the next unblocked WP in Section 13 order and say why in the handoff log.
 3. Claim it: set its row to `In progress` with today's date and your branch name, in the same first commit on the branch.
 
 **While working:** one WP per branch and per PR; the spec's Section 2.3 non-negotiables apply; anything you discover that the spec gets wrong goes into `DECISIONS.md` (and to the owner if it changes scope) — never silently "fixed" in this file.
@@ -181,6 +181,10 @@ Guiding doctrine (from the existing constitution; do not restate rule IDs from m
 - **Smart Not Hard**: buy the commodity, build the differentiated.
 - **Controlled Imperfection Engineering**: failures predictable, traceable, and documented; incidents produce documents.
 - **Permission Boundaries**: no AI acts autonomously on anything that matters. L4 hard-blocked, L3 requires owner approval.
+
+### 1.3 Revision 4: V2 is delivered agile (owner, 2026-10-20) — process only
+
+The owner: "we are going to start and launch V2 in an agile approach and work a bit by bit and part by part delivering a working software, so agile must be our core working technique." **No work package is added, removed or re-scoped, and Section 13's order is unchanged.** What changes is how the order is delivered, written in `docs/improvements/WAY-OF-WORKING.md`: each WP is cut just in time into small vertical slices, each one working, tested, verified software; slices are grouped into short sprints with one goal, a release and an owner review; the relay (Section 0.1) is the daily stand-up; the Definition of Done there adds to — never replaces — Sections 0 item 5 and 2.3. Where "one WP per branch and per pull request" reads in this spec, read "one slice per pull request, a WP being delivered across its slices". The release rhythm (a sprint release branch, one production deploy per sprint) is D-029, decided by the owner on 2026-10-20 (one release per sprint). The home hero is rebuilt first as Sprint 1 at the owner's request (D-030); the spec's order is otherwise unchanged.
 
 ## 2. Scope lock
 
@@ -549,6 +553,7 @@ V2 release checklist (all required):
 
 Phase 0 (WP-001, 002) then Phase 1 (WP-110 investigation first, then WP-101 to 109, then WP-111) then Phase 2 (WP-201 to 206) then Phase 3 (WP-301 to 304) then Phase 4 (WP-401 to 409) then Phase 5 (WP-501; WP-502 is owner-led).
 WP-106 is done (PR #144); WP-002 is done with this revision (the tracker and decision log exist).
+Revision 4: this order is delivered as sprints (`WAY-OF-WORKING.md`, Section 10); grouping it into sprints does not change it.
 Within a phase, follow numeric order unless a dependency says otherwise. WP-103 may initially link to systems and migrate to Evidence records once WP-201 lands.
 
 ## Appendix A — Kickoff prompt for Claude Code

@@ -25,6 +25,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ArrowUpRight, Clock, Menu, X, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
+import type { HeaderLabels } from "@/components/shared/SiteHeader";
 import { SHEETS } from "@/lib/content/sheets";
 import type { SiteLink } from "@/lib/queries/site";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,23 @@ import { cn } from "@/lib/utils";
 const PAGES = SHEETS.filter((s) => s.href !== "/contact");
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
-export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: SiteLink[]; reviewSlaHours: number; cvUrl?: string | null }) {
+export function MobileMenu({
+  links,
+  reviewSlaHours,
+  cvUrl = null,
+  labels,
+  ownerName,
+}: {
+  links: SiteLink[];
+  reviewSlaHours: number;
+  cvUrl?: string | null;
+  /** The owner's wording ("site-header" block). A label left empty hides its part — nothing is typed in here. */
+  labels: HeaderLabels | null;
+  ownerName: string;
+}) {
+  const word = (s: string | undefined) => s?.trim() || null;
+  const menuLabel = word(labels?.menuLabel);
+  const homeLabel = word(labels?.homeLabel) ?? ownerName;
   const pathname = usePathname();
   const reduced = useReducedMotion();
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -84,6 +101,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
           animate: { opacity: 1, y: 0, transition: { duration: 0.42, ease: EASE, delay: 0.06 + i * 0.045 } },
         };
 
+  if (!menuLabel) return null;
   return (
     <div className="lg:hidden">
       <button
@@ -95,7 +113,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
         className="text-paper focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3 pe-3.5 text-sm font-medium transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
       >
         <Menu aria-hidden="true" className="size-4" />
-        Menu
+        {menuLabel}
       </button>
 
       {mounted &&
@@ -108,7 +126,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
                 id="mobile-menu"
                 role="dialog"
                 aria-modal="true"
-                aria-label="Menu"
+                aria-label={menuLabel}
                 initial={reduced ? false : { opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.22 } }}
                 exit={reduced ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.18 } }}
@@ -118,7 +136,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
                 <div aria-hidden="true" className="pointer-events-none absolute -top-32 -right-24 size-[26rem] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.22),transparent)]" />
 
                 <div className="relative flex h-[4.25rem] shrink-0 items-center justify-between px-6">
-                  <Link href="/" onClick={() => setOpenFor(null)} aria-label="MALULEKE-KS — home" className="group focus-visible:outline-ember flex h-10 items-center gap-2.5 rounded-full focus-visible:outline-2">
+                  <Link href="/" onClick={() => setOpenFor(null)} aria-label={homeLabel} className="group focus-visible:outline-ember flex h-10 items-center gap-2.5 rounded-full focus-visible:outline-2">
                     <CubeMark className="size-9" />
                   </Link>
                   <button
@@ -127,7 +145,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
                     className="focus-visible:outline-ember inline-flex size-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.04] transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
                   >
                     <X aria-hidden="true" className="size-5" />
-                    <span className="sr-only">Close the menu</span>
+                    <span className="sr-only">{word(labels?.menuCloseLabel) ?? menuLabel}</span>
                   </button>
                 </div>
 
@@ -147,7 +165,7 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
                             <span className={cn("type-data w-6 shrink-0 text-xs", active ? "text-ember" : "text-line")}>{s.number}</span>
                             <span className="min-w-0 flex-1">
                               <span className={cn("block text-[1.75rem] leading-tight font-semibold tracking-tight", active ? "text-paper" : "text-paper/80")}>{s.label}</span>
-                              <span className="text-mist mt-0.5 block text-sm">{s.hint}</span>
+                              {labels?.pageHints?.[s.href] && <span className="text-mist mt-0.5 block text-sm">{labels.pageHints[s.href]}</span>}
                             </span>
                             {active ? (
                               <span aria-hidden="true" className="bg-ember size-2.5 shrink-0 rounded-full shadow-[0_0_14px_rgb(255_91_31/0.8)]" />
@@ -162,25 +180,29 @@ export function MobileMenu({ links, reviewSlaHours, cvUrl = null }: { links: Sit
                 </nav>
 
                 <motion.div {...item(PAGES.length)} className="relative shrink-0 border-t border-white/[0.07] px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-                  <Link
-                    href="/contact"
-                    onClick={() => setOpenFor(null)}
-                    className="bg-ember text-ink shadow-glow-ember focus-visible:outline-ember flex h-13 items-center justify-center gap-2 rounded-full text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.99]"
-                  >
-                    Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
+                  {word(labels?.contactLabel) && (
+                    <Link
+                      href="/contact"
+                      onClick={() => setOpenFor(null)}
+                      className="bg-ember text-ink shadow-glow-ember focus-visible:outline-ember flex h-13 items-center justify-center gap-2 rounded-full text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.99]"
+                    >
+                      {labels?.contactLabel} <ArrowRight aria-hidden="true" className="size-4" />
+                    </Link>
+                  )}
                   {/* The uploaded CV, while it's switched on — the phone's way to it (no CV page). */}
-                  {cvUrl && (
+                  {cvUrl && word(labels?.cvMenuLabel) && (
                     <a
                       href={cvUrl}
                       className="text-paper focus-visible:outline-ember mt-3 flex h-12 items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
-                      <FileDown aria-hidden="true" className="size-4" /> Download my CV
+                      <FileDown aria-hidden="true" className="size-4" /> {labels?.cvMenuLabel}
                     </a>
                   )}
-                  <p className="text-mist mt-4 flex items-center justify-center gap-1.5 text-xs">
-                    <Clock aria-hidden="true" className="size-3.5" /> Every inquiry is reviewed within {reviewSlaHours} hours
-                  </p>
+                  {word(labels?.reviewPromise) && (
+                    <p className="text-mist mt-4 flex items-center justify-center gap-1.5 text-xs">
+                      <Clock aria-hidden="true" className="size-3.5" /> {labels?.reviewPromise?.replaceAll("{hours}", String(reviewSlaHours))}
+                    </p>
+                  )}
                   {/* Public profiles only — the email and WhatsApp number live on /contact (spec WP-105). */}
                   <SocialLinks links={links.filter((l) => !l.url.includes("wa.me"))} className="mt-5 justify-center" />
                 </motion.div>
