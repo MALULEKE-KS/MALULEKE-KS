@@ -23,7 +23,8 @@ maluleke-ks/
 │   └── BACKEND-API-GUIDE.md, FRONTEND-DATA-GUIDE.md   # generated — npm run docs:capabilities
 │
 ├── design/
-│   └── character/                     # the AI guide's master art and the owner-approved portraits
+│   ├── character/                     # the AI guide's master art and the owner-approved portraits
+│   └── hero/                          # the home hero's two photographs, with their credit and licence (README); built by scripts/build-hero-photos.mjs
 │
 ├── prisma/
 │   ├── schema.prisma                  # models + Public* views (the only thing public pages read)
@@ -31,6 +32,7 @@ maluleke-ks/
 │   └── migrations/                    # additive only — CI migration guard; business rules as CHECKs/triggers
 │
 ├── scripts/                           # operator scripts (run in the owner's terminal where secrets are involved)
+│   ├── build-hero-photos.mjs          # crops, grades and encodes the home hero's photographs and writes their additive data migration
 │   ├── github-sync.ts, backup-drill.ts, create-admin.ts, reset-admin-password.ts, create-db-roles.ts
 │   ├── generate-capability-docs.ts, migration-guard.mjs, cv-continuity.mjs
 │   └── vercel-build.mjs, vercel-ignore.mjs, run-e2e-if-present.mjs
@@ -53,6 +55,7 @@ maluleke-ks/
 │   ├── jobs/                          # registry, schedule, run-job, github-sync, maintenance (retention)
 │   ├── metrics/                       # curated numbers (BR-5.3)
 │   ├── profile/photos.ts              # photo processing and versions (BR-1.17)
+│   ├── home/hero.ts                   # the home hero's fallback wording, computed ledger, live line and preview rule (pure, tested)
 │   ├── queries/                       # read models: site, profile (titles, homes, pulse, photos), systems, search, …
 │   ├── rules/                         # business rules as code, one file per cluster (publishing, inquiries, lookups,
 │   │                                  # slugs, revisions, scheduling, titles, organizations, cv, timeline, profile)

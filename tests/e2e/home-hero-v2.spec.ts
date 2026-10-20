@@ -59,11 +59,16 @@ for (const vp of VIEWPORTS) {
   });
 }
 
-test("the page doesn't repeat the hero's record: the rules figure appears once", async ({ page }) => {
+test("the control room doesn't repeat the hero's record", async ({ page }) => {
   test.setTimeout(120_000);
   await settle(page);
   await page.goto(URL, { waitUntil: "networkidle" });
-  await expect(page.getByText(/rules the database enforces/i)).toHaveCount(1);
+  // The hero's ledger shows (and evidences) the pulse's figures; the control room keeps only what is new.
+  const hero = page.locator('section[aria-labelledby="hero-title"]');
+  await expect(hero.getByText(/rules the database enforces/i).first()).toBeVisible();
+  const controlRoom = page.locator('section[aria-labelledby="control-title"]');
+  await expect(controlRoom).toBeAttached();
+  await expect(controlRoom.getByText(/rules the database enforces|business rules enforced|changes audited/i)).toHaveCount(0);
 });
 
 test("without the switch the previous hero shows, so production is unchanged until the flag is on", async ({ page }) => {
@@ -100,6 +105,16 @@ for (const [name, viewport] of [
     await page.setViewportSize(viewport);
     await settle(page);
     await page.goto(URL, { waitUntil: "networkidle" });
+    // Axe measures what is on screen: let the entrance finish so it never samples a part mid-fade.
+    // (The live dot's ping loops forever by design, so only finite animations are awaited.)
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+          .map((a) => a.finished.catch(() => undefined)),
+      ),
+    );
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
     const serious = results.violations
       .filter((v) => v.impact === "serious" || v.impact === "critical")
