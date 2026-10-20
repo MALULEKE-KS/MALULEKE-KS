@@ -14,6 +14,7 @@ import type { Metadata } from "next";
 import { Boxes } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { PageHero } from "@/components/shared/PageHero";
+import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { Accent, plainAccent } from "@/components/shared/Accent";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getCatalog } from "@/lib/queries/catalog";
@@ -81,6 +82,7 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
         icon={Boxes}
         eyebrow="Systems"
         wide
+        backdrop={<PageHeroBackdrop purpose="hero-systems" />}
         title={<Accent text={intro?.heading ?? "The systems."} className="type-accent text-ember-gradient pr-[0.06em]" />}
         description={intro?.lede}
       >

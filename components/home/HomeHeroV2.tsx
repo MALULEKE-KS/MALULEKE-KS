@@ -51,7 +51,7 @@ interface HomeHeroV2Props {
 const rise = (i: number): CSSProperties => ({ "--i": i }) as CSSProperties;
 
 export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, ledger, backdrop, entrance }: HomeHeroV2Props) {
-  const chip = "text-mist bg-night-deep/50 inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-xs backdrop-blur";
+  const chip = "text-mist bg-night-deep/50 inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-xs whitespace-nowrap backdrop-blur";
   return (
     <section
       aria-labelledby="hero-title"
@@ -70,16 +70,16 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
                   <span className="live-ping absolute inset-0 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
                   <span className="relative size-2 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
                 </span>
-                {liveLine}
+                <span className="min-w-0 truncate">{liveLine}</span>
               </p>
             )}
             {nowBuilding && (
               <p className={chip}>
-                {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
-                <Link href={nowBuilding.url} className="text-paper hover:text-ember underline-offset-2 hover:underline">
+                {nowBuilding.label && <span className="text-line shrink-0">{nowBuilding.label}</span>}
+                <Link href={nowBuilding.url} className="text-paper hover:text-ember min-w-0 truncate underline-offset-2 hover:underline">
                   {nowBuilding.name}
                 </Link>
-                {nowBuilding.when && <span className="text-line">· {nowBuilding.when}</span>}
+                {nowBuilding.when && <span className="text-line shrink-0">· {nowBuilding.when}</span>}
               </p>
             )}
           </div>

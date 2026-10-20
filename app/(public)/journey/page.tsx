@@ -17,6 +17,7 @@
 // computed. No GitHub entries — the systems live on /systems.
 
 import Link from "next/link";
+import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { Activity, ArrowRight, BookOpen, CalendarRange, FileText, Flag } from "lucide-react";
 import { StatCards, type Stat } from "@/components/shared/StatCards";
 import { Container } from "@/components/shared/Container";
@@ -82,7 +83,8 @@ export default async function JourneyPage() {
   return (
     <>
       {/* ─── 1. Hero ─── */}
-      <section aria-labelledby="journey-title" className="hero-field text-paper relative overflow-hidden">
+      <section aria-labelledby="journey-title" className="hero-field text-paper relative isolate overflow-hidden">
+        <PageHeroBackdrop purpose="hero-journey" />
         <LightRays count={6} length="85vh" />
         <Container className="relative pt-28 pb-20 md:pt-32 md:pb-24">
           <div className="rise-in">

@@ -24,7 +24,10 @@ describe("perf-budgets.json", () => {
     expect(Object.keys(budgets.weights).sort()).toEqual([...ROUTES].sort());
   });
 
-  it("only ratchets down: never looser than the WP-001 baseline plus 20%", () => {
+  it("only ratchets down: never looser than the WP-001 baseline plus 20% (plus the pages' own hero images, each named and owner-approved)", () => {
+    // D-041 (owner, 2026-10-20): Systems, Journey, About and Let's talk each open on their own hero image. Their weight is the only
+    // thing allowed above the ratchet, listed here by page in KB (the encoded images are 103, 35, 37 and 22 KiB).
+    const heroImageKb: Record<string, number> = { "/systems": 110, "/journey": 40, "/about": 42, "/contact": 30 };
     const baseline = JSON.parse(readFileSync("docs/improvements/baseline-2026-10-10.json", "utf8"));
     type Weight = { totalKb: number; imageKb: number; requests: number };
     for (const r of baseline.routes) {
@@ -32,8 +35,9 @@ describe("perf-budgets.json", () => {
       const weights = (Object.values(r.devices) as { weight: Weight }[]).map((d) => d.weight);
       const most = (f: (w: Weight) => number) => Math.max(...weights.map(f));
       const b = budgets.weights[r.route];
-      expect(b.totalKb).toBeLessThanOrEqual(most((w) => w.totalKb) * 1.2);
-      expect(b.imageKb).toBeLessThanOrEqual(most((w) => w.imageKb) * 1.2);
+      const own = heroImageKb[r.route] ?? 0;
+      expect(b.totalKb).toBeLessThanOrEqual(most((w) => w.totalKb) * 1.2 + own);
+      expect(b.imageKb).toBeLessThanOrEqual(most((w) => w.imageKb) * 1.2 + own);
       expect(b.requests).toBeLessThanOrEqual(most((w) => w.requests) + 12);
     }
   });

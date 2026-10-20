@@ -139,6 +139,24 @@ export const SETTINGS = {
     description: "Home hero: which skill categories the technologies under the actions are drawn from — keys separated by commas (languages, frontend, backend, database, ai-ml, infra, testing, design). Ranked by how many systems use each.",
     rule: "D-030",
   }),
+  "site.pageHero.maxEdgePixels": define({
+    schema: z.number().int().min(800).max(3000),
+    default: 1280,
+    description: "The images behind the top of Systems, Journey, About and Let's talk: the longest side a stored image is resized to, in pixels. 1280 keeps one image about 100 KiB; the bands are short and under a dark veil.",
+    rule: "D-041",
+  }),
+  "site.pageHero.quality": define({
+    schema: z.number().int().min(40).max(95),
+    default: 72,
+    description: "The images behind the top of Systems, Journey, About and Let's talk: WebP quality (lower is lighter).",
+    rule: "D-041",
+  }),
+  "site.pageHero.scrim": define({
+    schema: z.number().int().min(0).max(100),
+    default: 100,
+    description: "The images behind the top of Systems, Journey, About and Let's talk: strength of the overlay that keeps the type readable, 0–100 (lower = a lighter overlay, more image).",
+    rule: "D-041",
+  }),
   "site.timeZone": define({
     schema: z.string().trim().max(60).refine((tz) => {
       try {

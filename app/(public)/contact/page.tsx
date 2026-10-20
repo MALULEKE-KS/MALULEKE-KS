@@ -11,6 +11,7 @@
 // opens a category directly (the home page's links use it).
 
 import Image from "next/image";
+import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { Mail, MessageSquareText, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { SocialLinks } from "@/components/shared/SocialLinks";
@@ -74,7 +75,8 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <section aria-labelledby="talk-title" className="hero-field text-paper relative overflow-hidden">
+      <section aria-labelledby="talk-title" className="hero-field text-paper relative isolate overflow-hidden">
+        <PageHeroBackdrop purpose="hero-contact" />
         <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-1/2 size-[46rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.14),transparent)]" />
         <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
           <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">

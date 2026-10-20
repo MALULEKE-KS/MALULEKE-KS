@@ -32,6 +32,27 @@ export const PHOTO_PURPOSES = {
     description: "The portrait image behind the whole home hero on phones (about 9:16). Size and quality: Settings → home.hero.mobile.*",
     processing: { maxEdgeSetting: "home.hero.mobile.maxEdgePixels", qualitySetting: "home.hero.mobile.quality" },
   },
+  // One landscape image per page serves phones and desktops (the hero bands are short, so one image crops well for both).
+  "hero-systems": {
+    label: "Systems page — hero image",
+    description: "The image behind the top of /systems (landscape, about 3:2, the subject near the centre so it also crops to a square). Size and quality: Settings → site.pageHero.*",
+    processing: { maxEdgeSetting: "site.pageHero.maxEdgePixels", qualitySetting: "site.pageHero.quality" },
+  },
+  "hero-journey": {
+    label: "Journey page — hero image",
+    description: "The image behind the top of /journey (landscape, about 3:2, the subject near the centre). Size and quality: Settings → site.pageHero.*",
+    processing: { maxEdgeSetting: "site.pageHero.maxEdgePixels", qualitySetting: "site.pageHero.quality" },
+  },
+  "hero-about": {
+    label: "About page — hero image",
+    description: "The image behind the top of /about (landscape, about 3:2, the subject near the centre). Size and quality: Settings → site.pageHero.*",
+    processing: { maxEdgeSetting: "site.pageHero.maxEdgePixels", qualitySetting: "site.pageHero.quality" },
+  },
+  "hero-contact": {
+    label: "Let's talk page — hero image",
+    description: "The image behind the top of /contact (landscape, about 3:2, the subject near the centre). Size and quality: Settings → site.pageHero.*",
+    processing: { maxEdgeSetting: "site.pageHero.maxEdgePixels", qualitySetting: "site.pageHero.quality" },
+  },
 } as const satisfies Record<string, PhotoSlot>;
 
 export type PhotoPurpose = keyof typeof PHOTO_PURPOSES;

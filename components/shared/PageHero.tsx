@@ -16,6 +16,8 @@ interface PageHeroProps {
   children?: React.ReactNode;
   /** Wider title block, e.g. for a long system name. */
   wide?: boolean;
+  /** The image behind the band (PageHeroBackdrop) — omitted, the band keeps its graphite field. */
+  backdrop?: React.ReactNode;
 }
 
 export function PageHero({
@@ -25,9 +27,11 @@ export function PageHero({
   description,
   children,
   wide = false,
+  backdrop,
 }: PageHeroProps) {
   return (
-    <section aria-labelledby="page-title" className="hero-field text-paper overflow-hidden">
+    <section aria-labelledby="page-title" className="hero-field text-paper relative isolate overflow-hidden">
+      {backdrop}
       <Container className="pt-28 pb-16 md:pt-32 md:pb-20">
         <div className={wide ? "max-w-4xl" : "max-w-3xl"}>
           <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
