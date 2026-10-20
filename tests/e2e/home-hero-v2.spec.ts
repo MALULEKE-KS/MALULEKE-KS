@@ -1,7 +1,6 @@
 // tests/e2e/home-hero-v2.spec.ts
-// The rebuilt home hero (docs/improvements/HOME-HERO-PLAN.md, Sprint 1), seen
-// through the preview switch /?hero=v2 (outside production the flag is not needed):
-// it fits a phone, reads in order, shows the right crop of the owner's photograph
+// The home hero (docs/improvements/HOME-HERO-PLAN.md, Sprint 1; the only hero
+// since D-038): it fits a phone, reads in order, shows the right crop of the owner's photograph
 // for the screen, carries no character or canvas, doesn't repeat the control
 // room's figures, holds still for visitors who ask for reduced motion, and has no
 // serious accessibility violations. Runs in CI with the phone and axe checks.
@@ -9,7 +8,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-const URL = "/?hero=v2";
+const URL = "/";
 const VIEWPORTS = [
   { name: "small phone", width: 360, height: 760, crop: /hero-mobile/ },
   { name: "phone", width: 390, height: 844, crop: /hero-mobile/ },
@@ -87,13 +86,6 @@ test("the control room doesn't repeat the hero's record", async ({ page }) => {
   const controlRoom = page.locator('section[aria-labelledby="control-title"]');
   await expect(controlRoom).toBeAttached();
   await expect(controlRoom.getByText(/rules the database enforces|business rules enforced|changes audited/i)).toHaveCount(0);
-});
-
-test("without the switch the previous hero shows, so production is unchanged until the flag is on", async ({ page }) => {
-  test.setTimeout(120_000);
-  await settle(page);
-  await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.locator('section[aria-labelledby="hero-title"] picture img')).toHaveCount(0);
 });
 
 test("reduced motion: the hero holds still", async ({ page }) => {

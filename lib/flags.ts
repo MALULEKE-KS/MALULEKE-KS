@@ -28,8 +28,6 @@ export const FLAGS = {
   writeups: "writeups.enabled",
   // LT-9: confirmations to applicants — off until a sending domain is verified (Resend only delivers to the owner without one).
   applicantEmails: "notifications.applicant_emails",
-  // Home: the rebuilt hero (docs/improvements/HOME-HERO-PLAN.md, D-030) — off = the previous hero.
-  homeHeroV2: "home.hero_v2",
 } as const;
 
 export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];

@@ -2,7 +2,7 @@
 // The rebuilt home hero with its data (docs/improvements/HOME-HERO-PLAN.md §7):
 // gathers what only this hero needs — the photo slots, the entrance's and the
 // glow's settings, the evidence behind the ledger — and hands HomeHeroV2 ready
-// values. Rendered only while the flag "home.hero_v2" is on.
+// values. It is the home hero (the flag and the previous hero are gone — D-038).
 
 import { Evidence } from "@/components/shared/Evidence";
 import { HeroBackdrop, type HeroImageSource } from "@/components/shared/HeroBackdrop";

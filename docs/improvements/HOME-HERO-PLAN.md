@@ -1,6 +1,6 @@
 # Home hero — plan and design (Sprint 1)
 
-**Status: plan v2, 2026-10-20 (later) — the cover image changed: one AI-generated image behind the whole hero, on the owner's direction (§15, D-034). §6's framed panel and §7's Johannesburg photograph are superseded. The hero's content was also improved (§15). Built behind the flag `home.hero_v2`; pushed on `release/sprint-1` (PR #218), not merged.**
+**Status: plan v2, 2026-10-20 (later) — the cover image changed: one AI-generated image behind the whole hero, on the owner's direction (§15, D-034). §6's framed panel and §7's Johannesburg photograph are superseded. The hero's content was also improved (§15). First released in PR #218 behind the flag `home.hero_v2`; **the flag and the previous hero were then removed on the owner's instruction — the rebuilt hero is the only hero (D-038).**
 
 ## 1. Brief
 
@@ -172,7 +172,7 @@ Every slice ends with the push gate (`WAY-OF-WORKING.md` §7): I tell the owner 
 
 ## 12. Verification and rollback
 
-Phone and desktop by eye in the owner's Chrome (phones by `mobile.spec` at 360/390 and the preview); `a11y.spec`, the zod-out-of-first-load guard, the budgets job after release, `npm run baseline` against baseline-2026-10-10. Rollback: the flag `home.hero_v2` off restores the previous hero (kept until the next reviewed release — spec 2.3, expand/contract); the image slots are additive entries and settings.
+Phone and desktop by eye in the owner's Chrome (phones by `mobile.spec` at 360/390 and the preview); `a11y.spec`, the zod-out-of-first-load guard, the budgets job after release, `npm run baseline` against baseline-2026-10-10. Rollback: a revert of the release PR (the flag and the previous hero were removed at the Sprint 1 release, D-038 — superseding the expand/contract retention first planned); the image slots are additive entries and settings.
 
 ## 13. What the owner still picks ◆
 

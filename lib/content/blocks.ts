@@ -43,7 +43,7 @@ export const CONTENT_BLOCKS = {
   },
   "home-hero": {
     title: "Home — hero",
-    description: "The rebuilt home hero (shown when the flag home.hero_v2 is on): the one statement under your name and role.",
+    description: "The home hero: the one statement under your name and role.",
     schema: z.object({
       statement: Text(200),
       // Interface wording — each optional; the page keeps its shipped wording when one is empty.

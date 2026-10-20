@@ -164,17 +164,6 @@ export function heroCredential(titles: { label: string; detail: string | null }[
   return other ? (other.detail ? `${other.label} · ${other.detail}` : other.label) : null;
 }
 
-/**
- * Whether the rebuilt hero shows: the flag, or — outside production only — the
- * preview switch `/?hero=v2`, so the owner (and the tests) can see it before the
- * flag is switched on. A visitor to the production site can never reach it early.
- */
-export function heroV2Active(input: { flagOn: boolean; preview: string | string[] | undefined; environment: string | undefined }): boolean {
-  if (input.flagOn) return true;
-  const preview = Array.isArray(input.preview) ? input.preview[0] : input.preview;
-  return preview === "v2" && input.environment !== "production";
-}
-
 /** The entrance's timing as CSS custom properties — durations are settings, never constants in a component. */
 export function heroEntranceVars(durationMs: number, staggerMs: number): Record<"--hero-d" | "--hero-s", string> {
   return { "--hero-d": `${Math.max(0, durationMs)}ms`, "--hero-s": `${Math.max(0, staggerMs)}ms` };
