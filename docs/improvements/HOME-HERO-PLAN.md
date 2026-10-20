@@ -1,6 +1,6 @@
 # Home hero — plan and design (Sprint 1)
 
-**Status: plan v1.1, 2026-10-20 — Direction C, the guide's place, the wording, Sunduza, and the colour treatment (2 · Ember horizon) are decided; the hero photo is chosen (Section 7) and waits only for the owner's yes to download it. S1.1 (the skeleton) is built, behind the flag `home.hero_v2`, and not yet pushed.**
+**Status: plan v2, 2026-10-20 (later) — the cover image changed: one AI-generated image behind the whole hero, on the owner's direction (§15, D-034). §6's framed panel and §7's Johannesburg photograph are superseded. The hero's content was also improved (§15). Built behind the flag `home.hero_v2`; pushed on `release/sprint-1` (PR #218), not merged.**
 
 ## 1. Brief
 
@@ -54,6 +54,7 @@ Mobile first (360/390 px, `mobile.spec.ts`) · evidence not claims · no duplica
 | 7 | The photo | **Not the owner's own.** Claude searched professional libraries for the best fit and chose one (Section 7); nothing is downloaded until the owner says yes to that named file |
 
 ## 6. Structure of C
+> **Superseded in part (2026-10-20, later):** the image is no longer a framed panel under the actions — it is a **cover behind the whole hero**, with the content on it (§15).
 
 **Desktop (≥ lg), one centred column, then the image, then the ledger:**
 
@@ -80,6 +81,7 @@ Mobile first (360/390 px, `mobile.spec.ts`) · evidence not claims · no duplica
 Notes: the header already carries CV and *Let's talk*, so the hero has no CV button (no duplicate). The image is **below the type, not behind it**: legibility never depends on the photograph, and the page still works when no image has been chosen. Designed in Figma: https://www.figma.com/design/KkGly8QVHOrfyRSFjcqLxb — frames *C v2 · 1 Graphite*, *2 Ember horizon*, *3 Bone* (desktop 1440) and *1 Graphite* on a phone (390).
 
 ## 7. The hero image
+> **Superseded (2026-10-20, later):** the owner rejected the Johannesburg skyline — "not related to the system or software engineering" — and asked for a cover image behind the whole hero, generated in ChatGPT, one for mobile and one for desktop. The criteria and the licence-as-data idea below still hold; the chosen photograph and the framed panel do not (§15).
 
 **Role.** One calm, real, professional photograph — mood and place, not evidence (the evidence is the ledger beside it). It is decorative (`aria-hidden`, empty alt), framed in a rounded panel, and credited.
 
@@ -186,3 +188,22 @@ Phone and desktop by eye in the owner's Chrome (phones by `mobile.spec` at 360/3
 - **Ask the guide** shows a small sparkle, not the guide's face, in the hero (`AskGuideButton showFace={false}`); the docked launcher keeps the face.
 - **Ledger:** only figures above zero are shown (tested): systems published, rules the database enforces, changes audited this week, organisations founded.
 - **Not yet seen rendered.** The machine had about 0.6 GB free, too little for the dev server; the owner's live review runs it once memory allows. The Figma frames remain the visual reference.
+
+## 15. Update — the cover image and better content (owner, 2026-10-20, later)
+
+**The owner's direction:** "the hero that is behind the whole hero homepage … the whole cover … let the content on the hero be on it … and that picture is not related to the system or software engineering … call out ChatGPT in Chrome and do a powerful prompt … generate both mobile and desktop" and "think of a better hero content".
+
+**The cover image.** One image behind the *whole* hero; the name, role, statement, actions and record sit on it. `components/shared/HeroBackdrop.tsx` (replaces the framed `HeroImage`): a `<picture>` with a portrait source below 768 px and a landscape one above, `object-cover` so any shape fills the hero; a graphite overlay (top and bottom, plus a soft pool behind the type) whose strength is the setting `home.hero.scrim` (default 70, tuned by eye); an optional warm light (`home.hero.glow`, default 0 — the image carries its own orange); the credit on the image. The section is at least a screen tall, content centred on it. No image uploaded → a graphite field, never a broken box.
+
+**The images** — generated in the owner's ChatGPT account (Free plan) from two prompts (recorded in `design/hero/README.md`): a photoreal, low-key data-centre aisle — dark graphite racks receding to a vanishing point, thin International Orange fibre-optic light lines converging like a living flow of data, a few steel-blue status LEDs — the system itself, in the brand's one accent colour, with a dark, smooth centre and upper area for the type. Desktop 1536 × 1024 (92.8 KiB), phone 1024 × 1536 (71.2 KiB), WebP, no metadata. Budgets: **100 KiB desktop, 80 KiB phone** (the image is now the page's largest paint). The credit is honest: *Image: AI-generated with ChatGPT*.
+
+**Better content** (all data; the owner edits any of it in Admin → Page content → Home — hero):
+
+| Part | Before | Now | Why |
+|---|---|---|---|
+| Statement | "Full-stack systems that enforce their own rules, in production, with the proof one click away." | "I design and ship full-stack systems that run in production, enforce their own rules and show their proof." | First person, a verb, three things that are each true and checkable on this site — and **no figure in it** (a number in a sentence goes stale; the record under it is computed) |
+| Credential | — | The owner's own second title, from the profile: *Final-year BSc Computer Science & Mathematics student · North-West University* | Context a recruiter or an admissions reader wants in the first view, from data, nothing invented |
+| Building now | — | "Building now · <repository> · pushed <when>" from the GitHub sync (shown only when something was pushed in the last 30 days) | Proof the work is alive, computed, and a link to it |
+| Record | systems published · rules · audited changes · organisations | **systems shipped to production** · systems published · rules the database enforces · changes audited this week | Leads with the strongest proof; organisations founded is the weakest evidence and the least relevant to a first impression (the data is unchanged and can return) |
+
+Other statements considered, for the owner to choose between or rewrite: *"Full-stack systems with real users and real money behind them — and the evidence to check every claim."* (Xkimi Xa Mali is described on this site as built for real money and real family stakes) · *"Software and AI engineer in South Africa. Every claim on this site opens its proof."*

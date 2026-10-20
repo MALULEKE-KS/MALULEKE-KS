@@ -5,12 +5,12 @@
 // values. Rendered only while the flag "home.hero_v2" is on.
 
 import { Evidence } from "@/components/shared/Evidence";
-import { HeroImage, type HeroImageSource } from "@/components/shared/HeroImage";
+import { HeroBackdrop, type HeroImageSource } from "@/components/shared/HeroBackdrop";
 import type { ProofLedgerItem } from "@/components/shared/ProofLedger";
 import { HomeHeroV2 } from "@/components/home/HomeHeroV2";
 import type { ContentBody } from "@/lib/content/blocks";
 import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
-import { heroCopy, heroLedger, heroLiveLine } from "@/lib/home/hero";
+import { heroCopy, heroCredential, heroLedger, heroLiveLine } from "@/lib/home/hero";
 import { getPublicPhotos } from "@/lib/queries/profile";
 import type { SiteProfile } from "@/lib/queries/site";
 import { getSetting } from "@/lib/settings";
@@ -23,22 +23,25 @@ interface HomeHeroV2SectionProps {
     auditEventsLast7Days: number;
     deployment: { commit: string } | null;
   };
-  organisations: number;
+  systemsShipped: number;
   systemsPublished: number;
+  titles: { label: string; detail: string | null }[];
+  nowBuilding: { name: string; url: string; lastPush: string | null } | null;
   evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
 }
 
-export async function HomeHeroV2Section({ profile, block, pulse, organisations, systemsPublished, evidence }: HomeHeroV2SectionProps) {
-  const [photos, durationMs, staggerMs, glow] = await Promise.all([
+export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
+  const [photos, durationMs, staggerMs, glow, scrim] = await Promise.all([
     getPublicPhotos(),
     getSetting("home.hero.entrance.durationMs"),
     getSetting("home.hero.entrance.staggerMs"),
     getSetting("home.hero.glow"),
+    getSetting("home.hero.scrim"),
   ]);
 
   const copy = heroCopy(block);
   const ledger: ProofLedgerItem[] = heroLedger(
-    { systemsPublished, rulesEnforced: pulse.rulesEnforcedByDatabase, auditedThisWeek: pulse.auditEventsLast7Days, organisations },
+    { systemsShipped, systemsPublished, rulesEnforced: pulse.rulesEnforcedByDatabase, auditedThisWeek: pulse.auditEventsLast7Days },
     copy.ledgerLabels,
   ).map((item) => {
     const claims = item.evidenceKey ? claimsFor(evidence.claims, item.evidenceKey) : [];
@@ -57,23 +60,27 @@ export async function HomeHeroV2Section({ profile, block, pulse, organisations, 
   const desktop = source("hero-desktop");
   const mobile = source("hero-mobile");
 
+  const role = profile.headline ?? profile.role;
   return (
     <HomeHeroV2
       name={profile.name}
-      role={profile.headline ?? profile.role}
+      role={role}
       statement={block?.statement ?? null}
+      credential={heroCredential(titles, role)}
       liveLine={heroLiveLine(pulse.deployment, copy)}
+      nowBuilding={nowBuilding}
       copy={copy}
       ledger={ledger}
       entrance={{ durationMs, staggerMs }}
-      image={
+      backdrop={
         desktop || mobile ? (
-          <HeroImage
+          <HeroBackdrop
             desktop={desktop}
             mobile={mobile}
             credit={block?.imageCredit ? { text: block.imageCredit, url: block.imageCreditUrl ?? null } : null}
             positionDesktop={block?.imagePositionDesktop ?? null}
             positionMobile={block?.imagePositionMobile ?? null}
+            scrim={scrim}
             glow={glow}
           />
         ) : null

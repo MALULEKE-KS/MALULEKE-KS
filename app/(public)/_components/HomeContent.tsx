@@ -98,8 +98,10 @@ export async function HomeContent({ searchParams }: { searchParams: Promise<{ he
           profile={profile}
           block={heroBlock}
           pulse={pulse}
-          organisations={stats.organizationsFounded}
+          systemsShipped={stats.systemsShipped}
           systemsPublished={totalPublished}
+          titles={titles}
+          nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, lastPush: selectedWork.nowBuilding.lastPush } : null}
           evidence={evidence}
         />
       ) : (

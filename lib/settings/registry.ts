@@ -82,25 +82,25 @@ export const SETTINGS = {
   "home.hero.desktop.maxEdgePixels": define({
     schema: z.number().int().min(800).max(4000),
     default: 2560,
-    description: "Home hero image, desktop: the longest side the stored image is resized to, in pixels.",
+    description: "Home hero cover image, desktop: the longest side the stored image is resized to, in pixels.",
     rule: "D-030",
   }),
   "home.hero.desktop.quality": define({
     schema: z.number().int().min(40).max(95),
-    default: 72,
-    description: "Home hero image, desktop: WebP quality (lower is lighter; the page budget is about 90 KB).",
+    default: 74,
+    description: "Home hero cover image, desktop: WebP quality (lower is lighter).",
     rule: "D-030",
   }),
   "home.hero.mobile.maxEdgePixels": define({
     schema: z.number().int().min(600).max(3000),
-    default: 1462,
-    description: "Home hero image, phones: the longest side the stored image is resized to, in pixels.",
+    default: 1536,
+    description: "Home hero cover image, phones: the longest side the stored image is resized to, in pixels.",
     rule: "D-030",
   }),
   "home.hero.mobile.quality": define({
     schema: z.number().int().min(40).max(95),
-    default: 70,
-    description: "Home hero image, phones: WebP quality (the page budget is about 55 KB).",
+    default: 72,
+    description: "Home hero cover image, phones: WebP quality (lower is lighter).",
     rule: "D-030",
   }),
   "home.hero.entrance.durationMs": define({
@@ -117,8 +117,14 @@ export const SETTINGS = {
   }),
   "home.hero.glow": define({
     schema: z.number().int().min(0).max(100),
-    default: 22,
-    description: "Home hero: strength of the warm light along the image's lower edge, 0–100 (0 = none).",
+    default: 0,
+    description: "Home hero: strength of an extra warm light along the cover image's lower edge, 0–100 (0 = none; the image carries its own light).",
+    rule: "D-030",
+  }),
+  "home.hero.scrim": define({
+    schema: z.number().int().min(0).max(100),
+    default: 70,
+    description: "Home hero: strength of the dark overlay that keeps the type readable on the cover image, 0–100 (higher = darker image, more contrast).",
     rule: "D-030",
   }),
   "cv.download.rateLimit.maxPerWindow": define({

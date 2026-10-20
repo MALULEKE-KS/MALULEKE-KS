@@ -3,9 +3,11 @@
 // HOME-HERO-PLAN.md §6–7). Every figure comes from the database (the public
 // ledger, the platform pulse); every label is the owner's, read from the
 // "home-hero" content block — the wording below is only the fallback a page
-// shows until a label is written (D-010). A zero is never shown as proof.
+// shows until a label is written (D-010). A zero is never shown as proof, and
+// the statement carries no figure (a number in a sentence goes stale; the
+// ledger's numbers are computed).
 
-export type LedgerKey = "systems" | "rules" | "audited" | "organisations";
+export type LedgerKey = "shipped" | "systems" | "rules" | "audited";
 
 export interface LabelPair {
   one: string;
@@ -18,8 +20,9 @@ export interface HeroCopyBlock {
   secondaryLabel?: string;
   liveLabel?: string;
   localLabel?: string;
+  nowLabel?: string;
   ledgerAria?: string;
-  ledgerLabels?: Record<LedgerKey, LabelPair>;
+  ledgerLabels?: Partial<Record<LedgerKey, LabelPair>>;
 }
 
 export interface HeroCopy {
@@ -27,6 +30,7 @@ export interface HeroCopy {
   secondaryLabel: string;
   liveLabel: string;
   localLabel: string;
+  nowLabel: string;
   ledgerAria: string;
   ledgerLabels: Record<LedgerKey, LabelPair>;
 }
@@ -37,35 +41,39 @@ export const DEFAULT_HERO_COPY: HeroCopy = {
   secondaryLabel: "Ask the guide",
   liveLabel: "Live · build {commit}",
   localLabel: "Local development build",
+  nowLabel: "Building now",
   ledgerAria: "The record, live",
   ledgerLabels: {
+    shipped: { one: "system shipped to production", many: "systems shipped to production" },
     systems: { one: "system published", many: "systems published" },
     rules: { one: "rule the database enforces", many: "rules the database enforces" },
     audited: { one: "change audited this week", many: "changes audited this week" },
-    organisations: { one: "organisation founded", many: "organisations founded" },
   },
 };
 
 const text = (value: string | undefined, fallback: string) => (value && value.trim() ? value : fallback);
 
-/** The owner's wording where written, the shipped wording where not. */
+/** The owner's wording where written, the shipped wording where not (per label, too). */
 export function heroCopy(block: HeroCopyBlock | null | undefined): HeroCopy {
   const d = DEFAULT_HERO_COPY;
+  const labels = { ...d.ledgerLabels };
+  for (const key of Object.keys(labels) as LedgerKey[]) labels[key] = block?.ledgerLabels?.[key] ?? labels[key];
   return {
     primaryLabel: text(block?.primaryLabel, d.primaryLabel),
     secondaryLabel: text(block?.secondaryLabel, d.secondaryLabel),
     liveLabel: text(block?.liveLabel, d.liveLabel),
     localLabel: text(block?.localLabel, d.localLabel),
+    nowLabel: text(block?.nowLabel, d.nowLabel),
     ledgerAria: text(block?.ledgerAria, d.ledgerAria),
-    ledgerLabels: block?.ledgerLabels ?? d.ledgerLabels,
+    ledgerLabels: labels,
   };
 }
 
 export interface HeroLedgerInput {
+  systemsShipped: number;
   systemsPublished: number;
   rulesEnforced: number;
   auditedThisWeek: number;
-  organisations: number;
 }
 
 export interface HeroLedgerItem {
@@ -76,23 +84,23 @@ export interface HeroLedgerItem {
   evidenceKey: string | null;
 }
 
-/** Which evidence claim stands behind a figure — the same claims the control room carries. */
+/** Which evidence claim stands behind a figure — the same claims the control room had. */
 export const HERO_EVIDENCE_KEYS: Record<LedgerKey, string | null> = {
+  shipped: null,
   systems: null,
   rules: "pulse:rulesEnforcedByDatabase",
   audited: "pulse:auditEventsLast7Days",
-  organisations: null,
 };
 
 const pick = (n: number, pair: LabelPair) => (n === 1 ? pair.one : pair.many);
 
-/** The record under the hero: only figures above zero, each labelled to agree with its number. */
+/** The record on the hero: only figures above zero, each labelled to agree with its number. */
 export function heroLedger(input: HeroLedgerInput, labels: Record<LedgerKey, LabelPair> = DEFAULT_HERO_COPY.ledgerLabels): HeroLedgerItem[] {
   const rows: [LedgerKey, number][] = [
+    ["shipped", input.systemsShipped],
     ["systems", input.systemsPublished],
     ["rules", input.rulesEnforced],
     ["audited", input.auditedThisWeek],
-    ["organisations", input.organisations],
   ];
   return rows
     .filter(([, value]) => value > 0)
@@ -102,6 +110,16 @@ export function heroLedger(input: HeroLedgerInput, labels: Record<LedgerKey, Lab
 /** The small line above the name: the build that is running, or an honest local-development label. */
 export function heroLiveLine(deployment: { commit: string } | null, copy: Pick<HeroCopy, "liveLabel" | "localLabel"> = DEFAULT_HERO_COPY): string {
   return deployment ? copy.liveLabel.replaceAll("{commit}", deployment.commit) : copy.localLabel;
+}
+
+/**
+ * The credential under the role — the first title that isn't the role itself
+ * (a qualification, say), from the owner's own titles; null when there is none.
+ */
+export function heroCredential(titles: { label: string; detail: string | null }[], role: string): string | null {
+  const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const other = titles.find((t) => !same(t.label, role));
+  return other ? (other.detail ? `${other.label} · ${other.detail}` : other.label) : null;
 }
 
 /**

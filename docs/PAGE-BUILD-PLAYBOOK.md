@@ -140,7 +140,7 @@ Show it, listen, iterate. The owner's feedback on home became rules in §1 and p
 | Beam graph | `components/home/SystemMapGraph.tsx` | Connected columns drawn in one SVG, hover to trace |
 | Ask the guide | `components/guide/AskGuideButton.tsx` | Open the AI guide with a question about this page |
 | Page hero | `components/shared/PageHero.tsx` | The dark opening band of an inner page (clears the header) |
-| Hero image | `components/shared/HeroImage.tsx` | A credited, decorative photograph with its own crop per screen, from owner-uploaded photo slots; renders nothing when none is uploaded |
+| Hero backdrop | `components/shared/HeroBackdrop.tsx` | A cover image behind a whole hero (a crop per screen, from owner-uploaded photo slots), a setting-driven overlay for legibility, a credit; renders nothing when none is uploaded |
 | Proof ledger | `components/shared/ProofLedger.tsx` | Computed figures under a hairline, each with its label and, where it has claims, the evidence chip — no tickers, no boxes |
 | Queries | `lib/queries/work.ts` (`ago()`, weekly series), `map.ts`, `github.ts`, `lenses.ts`, `profile.ts` | Page-shaped data from public views |
 | Content blocks | `lib/content/blocks.ts` + `/admin/content` | Owner-edited copy for any page |

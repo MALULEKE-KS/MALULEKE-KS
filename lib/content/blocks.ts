@@ -51,14 +51,15 @@ export const CONTENT_BLOCKS = {
       secondaryLabel: z.string().trim().max(40).optional(),
       liveLabel: instantTemplate(60, ["commit"]).optional(),
       localLabel: z.string().trim().max(60).optional(),
+      nowLabel: z.string().trim().max(40).optional(),
       ledgerAria: z.string().trim().max(60).optional(),
-      // The record's labels: one when the figure is 1, many otherwise.
+      // The record's labels: one when the figure is 1, many otherwise. Any label left out keeps the shipped wording.
       ledgerLabels: z
         .object({
-          systems: z.object({ one: Text(60), many: Text(60) }),
-          rules: z.object({ one: Text(60), many: Text(60) }),
-          audited: z.object({ one: Text(60), many: Text(60) }),
-          organisations: z.object({ one: Text(60), many: Text(60) }),
+          shipped: z.object({ one: Text(60), many: Text(60) }).optional(),
+          systems: z.object({ one: Text(60), many: Text(60) }).optional(),
+          rules: z.object({ one: Text(60), many: Text(60) }).optional(),
+          audited: z.object({ one: Text(60), many: Text(60) }).optional(),
         })
         .optional(),
       // The hero photograph's credit (shown on the image) and where its subject sits in each crop.

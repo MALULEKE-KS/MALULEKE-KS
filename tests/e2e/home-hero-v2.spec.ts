@@ -44,10 +44,24 @@ for (const vp of VIEWPORTS) {
       expect(await items.count()).toBeGreaterThan(0);
       expect(await items.first().innerText()).toMatch(/^\d+\s+\S+/);
 
-      // the photograph: the phone crop on phones, the wide crop on larger screens
-      const img = hero.locator("figure img");
+      // the cover image: the phone crop on phones, the wide crop on larger screens
+      const img = hero.locator("picture img");
       await expect(img).toBeVisible();
       expect(await img.evaluate((e) => (e as HTMLImageElement).currentSrc)).toMatch(vp.crop);
+
+      // it covers the whole hero, and the content sits on top of it (not beside or under it)
+      const covers = await page.evaluate(() => {
+        const section = document.querySelector('section[aria-labelledby="hero-title"]')!.getBoundingClientRect();
+        const image = document.querySelector('section[aria-labelledby="hero-title"] picture img')!.getBoundingClientRect();
+        return { top: image.top - section.top, left: image.left - section.left, bottom: section.bottom - image.bottom, right: section.right - image.right };
+      });
+      for (const side of Object.values(covers)) expect(side).toBeLessThanOrEqual(1);
+      const onTop = await page.evaluate(() => {
+        const h1 = document.querySelector("#hero-title")!.getBoundingClientRect();
+        const hit = document.elementFromPoint(h1.left + h1.width / 2, h1.top + h1.height / 2);
+        return hit?.closest("#hero-title") !== null;
+      });
+      expect(onTop, "the heading is the topmost thing at its own centre").toBe(true);
 
       // no character, rig or canvas in the hero
       await expect(hero.locator("canvas")).toHaveCount(0);
@@ -75,7 +89,7 @@ test("without the switch the previous hero shows, so production is unchanged unt
   test.setTimeout(120_000);
   await settle(page);
   await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.locator('section[aria-labelledby="hero-title"] figure img')).toHaveCount(0);
+  await expect(page.locator('section[aria-labelledby="hero-title"] picture img')).toHaveCount(0);
 });
 
 test("reduced motion: the hero holds still", async ({ page }) => {

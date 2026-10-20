@@ -23,13 +23,13 @@ export interface PhotoSlot {
 export const PHOTO_PURPOSES = {
   about: { label: "About page portrait", description: "Shown beside your story on /about." },
   "hero-desktop": {
-    label: "Home hero — desktop image",
-    description: "The wide (about 21:9) photograph under the home hero on tablets and desktops. Its credit and focal point: Page content → Home — hero. Size and quality: Settings → home.hero.desktop.*",
+    label: "Home hero — desktop cover image",
+    description: "The wide image behind the whole home hero on tablets and desktops (landscape, about 16:9). Credit and focal point: Page content → Home — hero. Size and quality: Settings → home.hero.desktop.*; darkness: home.hero.scrim.",
     processing: { maxEdgeSetting: "home.hero.desktop.maxEdgePixels", qualitySetting: "home.hero.desktop.quality" },
   },
   "hero-mobile": {
-    label: "Home hero — phone image",
-    description: "The portrait (about 4:5) crop of the hero photograph on phones. Size and quality: Settings → home.hero.mobile.*",
+    label: "Home hero — phone cover image",
+    description: "The portrait image behind the whole home hero on phones (about 9:16). Size and quality: Settings → home.hero.mobile.*",
     processing: { maxEdgeSetting: "home.hero.mobile.maxEdgePixels", qualitySetting: "home.hero.mobile.quality" },
   },
 } as const satisfies Record<string, PhotoSlot>;
