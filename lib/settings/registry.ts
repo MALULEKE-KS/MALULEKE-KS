@@ -78,6 +78,49 @@ export const SETTINGS = {
     description: "Longest side a stored photo is resized to, in pixels.",
     rule: "BR-1.17",
   }),
+  // The home hero (docs/improvements/HOME-HERO-PLAN.md, D-030): its image's weight and its motion are tunable without a deploy.
+  "home.hero.desktop.maxEdgePixels": define({
+    schema: z.number().int().min(800).max(4000),
+    default: 2560,
+    description: "Home hero image, desktop: the longest side the stored image is resized to, in pixels.",
+    rule: "D-030",
+  }),
+  "home.hero.desktop.quality": define({
+    schema: z.number().int().min(40).max(95),
+    default: 72,
+    description: "Home hero image, desktop: WebP quality (lower is lighter; the page budget is about 90 KB).",
+    rule: "D-030",
+  }),
+  "home.hero.mobile.maxEdgePixels": define({
+    schema: z.number().int().min(600).max(3000),
+    default: 1462,
+    description: "Home hero image, phones: the longest side the stored image is resized to, in pixels.",
+    rule: "D-030",
+  }),
+  "home.hero.mobile.quality": define({
+    schema: z.number().int().min(40).max(95),
+    default: 70,
+    description: "Home hero image, phones: WebP quality (the page budget is about 55 KB).",
+    rule: "D-030",
+  }),
+  "home.hero.entrance.durationMs": define({
+    schema: z.number().int().min(0).max(2000),
+    default: 450,
+    description: "Home hero: how long each part takes to settle in when the page opens, in milliseconds (0 = no entrance). Reduced-motion visitors never see it.",
+    rule: "D-030",
+  }),
+  "home.hero.entrance.staggerMs": define({
+    schema: z.number().int().min(0).max(400),
+    default: 70,
+    description: "Home hero: the pause between one part settling in and the next, in milliseconds.",
+    rule: "D-030",
+  }),
+  "home.hero.glow": define({
+    schema: z.number().int().min(0).max(100),
+    default: 22,
+    description: "Home hero: strength of the warm light along the image's lower edge, 0–100 (0 = none).",
+    rule: "D-030",
+  }),
   "cv.download.rateLimit.maxPerWindow": define({
     schema: z.number().int().min(1).max(500),
     default: 30,

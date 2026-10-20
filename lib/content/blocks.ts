@@ -41,6 +41,33 @@ export const CONTENT_BLOCKS = {
       lede: Text(600),
     }),
   },
+  "home-hero": {
+    title: "Home — hero",
+    description: "The rebuilt home hero (shown when the flag home.hero_v2 is on): the one statement under your name and role.",
+    schema: z.object({
+      statement: Text(200),
+      // Interface wording — each optional; the page keeps its shipped wording when one is empty.
+      primaryLabel: z.string().trim().max(40).optional(),
+      secondaryLabel: z.string().trim().max(40).optional(),
+      liveLabel: instantTemplate(60, ["commit"]).optional(),
+      localLabel: z.string().trim().max(60).optional(),
+      ledgerAria: z.string().trim().max(60).optional(),
+      // The record's labels: one when the figure is 1, many otherwise.
+      ledgerLabels: z
+        .object({
+          systems: z.object({ one: Text(60), many: Text(60) }),
+          rules: z.object({ one: Text(60), many: Text(60) }),
+          audited: z.object({ one: Text(60), many: Text(60) }),
+          organisations: z.object({ one: Text(60), many: Text(60) }),
+        })
+        .optional(),
+      // The hero photograph's credit (shown on the image) and where its subject sits in each crop.
+      imageCredit: z.string().trim().max(120).optional(),
+      imageCreditUrl: z.string().trim().max(300).refine((u) => u.startsWith("https://"), "must start with https://").optional(),
+      imagePositionDesktop: z.string().trim().regex(/^\d{1,3}% \d{1,3}%$/, 'like "50% 60%"').optional(),
+      imagePositionMobile: z.string().trim().regex(/^\d{1,3}% \d{1,3}%$/, 'like "50% 60%"').optional(),
+    }),
+  },
   "systems-page": {
     title: "Systems — introduction",
     description: "The /systems page's heading and introduction.",

@@ -42,7 +42,10 @@ export function ControlRoom({
   pulse,
   numbers,
   evidence,
+  showFigures = true,
 }: {
+  /** Off when the home hero's record already shows (and evidences) the pulse's figures — nothing appears twice. */
+  showFigures?: boolean;
   pulse: Pulse;
   numbers: CuratedNumber[];
   evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
@@ -53,8 +56,12 @@ export function ControlRoom({
 
   const lines: TerminalLine[] = [
     { kind: "command", text: "platform status --live" },
-    { kind: "ok", text: `${pulse.rulesEnforcedByDatabase} business rules enforced by the database itself` },
-    { kind: "ok", text: `${pulse.auditEventsLast7Days} changes audited this week · ${pulse.auditEventsTotal} in total` },
+    ...(showFigures
+      ? [
+          { kind: "ok" as const, text: `${pulse.rulesEnforcedByDatabase} business rules enforced by the database itself` },
+          { kind: "ok" as const, text: `${pulse.auditEventsLast7Days} changes audited this week · ${pulse.auditEventsTotal} in total` },
+        ]
+      : []),
     { kind: "ok", text: "every public page reads through a read-only database role" },
     ...(synced ? [{ kind: "ok" as const, text: `GitHub synced ${synced}` }] : []),
     ...(job ? [{ kind: "ok" as const, text: `scheduled jobs healthy · last run ${job}` }] : []),
@@ -84,7 +91,7 @@ export function ControlRoom({
             </Reveal>
             <Reveal delay={80}>
               <dl className="grid grid-cols-2 gap-3">
-                {tiles.map(({ key, icon: Icon, value, label }) => (
+                {showFigures && tiles.map(({ key, icon: Icon, value, label }) => (
                   <div key={key} className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
                     <Icon aria-hidden="true" className="text-accent size-4" />
                     <dd className="type-data text-ink mt-3 text-4xl font-semibold">

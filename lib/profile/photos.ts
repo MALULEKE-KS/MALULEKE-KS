@@ -10,13 +10,37 @@
 import { createHash } from "node:crypto";
 import sharp from "sharp";
 import type { Tx } from "@/lib/audit";
+import type { SettingKey } from "@/lib/settings/registry";
+
+/** A photo slot. `processing` names the settings that set how an upload to it is resized and encoded (default: the global photo settings). */
+export interface PhotoSlot {
+  label: string;
+  description: string;
+  processing?: { maxEdgeSetting: SettingKey; qualitySetting: SettingKey };
+}
 
 /** Which photo slots exist. A new slot is one entry here — no migration. */
 export const PHOTO_PURPOSES = {
   about: { label: "About page portrait", description: "Shown beside your story on /about." },
-} as const;
+  "hero-desktop": {
+    label: "Home hero — desktop image",
+    description: "The wide (about 21:9) photograph under the home hero on tablets and desktops. Its credit and focal point: Page content → Home — hero. Size and quality: Settings → home.hero.desktop.*",
+    processing: { maxEdgeSetting: "home.hero.desktop.maxEdgePixels", qualitySetting: "home.hero.desktop.quality" },
+  },
+  "hero-mobile": {
+    label: "Home hero — phone image",
+    description: "The portrait (about 4:5) crop of the hero photograph on phones. Size and quality: Settings → home.hero.mobile.*",
+    processing: { maxEdgeSetting: "home.hero.mobile.maxEdgePixels", qualitySetting: "home.hero.mobile.quality" },
+  },
+} as const satisfies Record<string, PhotoSlot>;
 
 export type PhotoPurpose = keyof typeof PHOTO_PURPOSES;
+
+/** The settings that govern uploads to this slot, or null for the global photo settings. */
+export function photoProcessing(purpose: PhotoPurpose) {
+  const slot: PhotoSlot = PHOTO_PURPOSES[purpose];
+  return slot.processing ?? null;
+}
 
 export function isPhotoPurpose(value: string): value is PhotoPurpose {
   return Object.prototype.hasOwnProperty.call(PHOTO_PURPOSES, value);
@@ -28,7 +52,7 @@ const ACCEPTED_INPUT = new Set(["jpeg", "png", "webp", "avif", "heif"]);
 const WEBP_QUALITY = 86;
 
 /** Decode, resize and re-encode an upload. Throws PhotoRejected for anything that isn't a supported image. */
-export async function processPhoto(bytes: Uint8Array, maxEdgePixels: number) {
+export async function processPhoto(bytes: Uint8Array, maxEdgePixels: number, quality: number = WEBP_QUALITY) {
   let format: string | undefined;
   try {
     format = (await sharp(bytes).metadata()).format;
@@ -42,7 +66,7 @@ export async function processPhoto(bytes: Uint8Array, maxEdgePixels: number) {
   const { data, info } = await sharp(bytes)
     .rotate()
     .resize({ width: maxEdgePixels, height: maxEdgePixels, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: WEBP_QUALITY })
+    .webp({ quality })
     .toBuffer({ resolveWithObject: true });
   return { data: new Uint8Array(data), width: info.width, height: info.height, mimeType: "image/webp" as const };
 }

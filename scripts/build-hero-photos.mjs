@@ -1,0 +1,98 @@
+// scripts/build-hero-photos.mjs
+// Builds the home hero's two photographs from one original (docs/improvements/
+// HOME-HERO-PLAN.md §7): a wide crop for desktops and a portrait crop for
+// phones, graded lightly, encoded the way an admin upload is (lib/profile/
+// photos.ts: oriented, resized to fit the edge, WebP, no metadata), and written
+// as design/hero/*.webp plus an additive data migration that adds them as the
+// current "hero-desktop" and "hero-mobile" photos and fills the credit in the
+// "home-hero" content block. The original is never committed. Replace a photo
+// later in Admin → Photos — the migration only runs once.
+//
+//   node scripts/build-hero-photos.mjs <original.jpg> --migration 20261020140000_home_hero_photos \
+//     --credit "Photo: Name · Site" --credit-url https://… --alt "…"
+//
+// The defaults are the values chosen for the current photograph; the size and
+// quality defaults match the settings home.hero.desktop.* / home.hero.mobile.*.
+
+import { createHash } from "node:crypto";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import sharp from "sharp";
+
+const args = process.argv.slice(2);
+const original = args[0];
+const flag = (name, fallback) => {
+  const i = args.indexOf(`--${name}`);
+  return i >= 0 && args[i + 1] !== undefined ? args[i + 1] : fallback;
+};
+if (!original || original.startsWith("--")) {
+  console.error("usage: node scripts/build-hero-photos.mjs <original.jpg> --migration <folder-name> --credit … --credit-url … --alt …");
+  process.exit(1);
+}
+
+const migration = flag("migration", null);
+const credit = flag("credit", null);
+const creditUrl = flag("credit-url", null);
+const alt = flag("alt", "A city skyline at dusk");
+const grade = { saturation: Number(flag("saturation", "0.9")), brightness: Number(flag("brightness", "0.94")) };
+const desktop = { top: Number(flag("desktop-top", "330")), edge: Number(flag("desktop-edge", "2560")), quality: Number(flag("desktop-quality", "62")), ratio: [21, 9] };
+const mobile = { left: Number(flag("mobile-left", "640")), edge: Number(flag("mobile-edge", "1462")), quality: Number(flag("mobile-quality", "58")), ratio: [4, 5] };
+
+const input = resolve(original);
+const meta = await sharp(input).metadata(); // throws if it is not an image we can read
+if (!meta.width || !meta.height) throw new Error("Could not read the image's size.");
+
+// Crop windows at full resolution: the desktop band takes the full width, the phone portrait the full height.
+const deskH = Math.round((meta.width * desktop.ratio[1]) / desktop.ratio[0]);
+const mobW = Math.round((meta.height * mobile.ratio[0]) / mobile.ratio[1]);
+if (desktop.top + deskH > meta.height) throw new Error(`The desktop crop (${deskH} px tall from y=${desktop.top}) runs past the image (${meta.height} px).`);
+if (mobile.left + mobW > meta.width) throw new Error(`The phone crop (${mobW} px wide from x=${mobile.left}) runs past the image (${meta.width} px).`);
+
+const graded = (extract) => sharp(input).extract(extract).modulate(grade).jpeg({ quality: 95 }).toBuffer();
+const encode = async (buffer, { edge, quality }) => {
+  // Same steps as processPhoto() in lib/profile/photos.ts.
+  const { data, info } = await sharp(buffer)
+    .rotate()
+    .resize({ width: edge, height: edge, fit: "inside", withoutEnlargement: true })
+    .webp({ quality })
+    .toBuffer({ resolveWithObject: true });
+  return { data, width: info.width, height: info.height, sha256: createHash("sha256").update(data).digest("hex") };
+};
+
+const built = {
+  "hero-desktop": await encode(await graded({ left: 0, top: desktop.top, width: meta.width, height: deskH }), desktop),
+  "hero-mobile": await encode(await graded({ left: mobile.left, top: 0, width: mobW, height: meta.height }), mobile),
+};
+
+const outDir = resolve("design/hero");
+mkdirSync(outDir, { recursive: true });
+for (const [purpose, p] of Object.entries(built)) {
+  writeFileSync(resolve(outDir, `${purpose}.webp`), p.data);
+  console.log(`${purpose}: ${p.width}x${p.height}, ${(p.data.length / 1024).toFixed(1)} KB, sha256 ${p.sha256.slice(0, 12)}`);
+}
+
+if (migration) {
+  const q = (s) => `'${String(s).replaceAll("'", "''")}'`;
+  const insert = ([purpose, p]) => `INSERT INTO "ProfilePhoto" ("id", "purpose", "altText", "mimeType", "width", "height", "byteSize", "sha256", "fileData")
+SELECT gen_random_uuid()::text, ${q(purpose)}, ${q(alt)}, 'image/webp', ${p.width}, ${p.height}, ${p.data.length}, ${q(p.sha256)}, decode('${p.data.toString("base64")}', 'base64')
+WHERE NOT EXISTS (SELECT 1 FROM "ProfilePhoto" WHERE "purpose" = ${q(purpose)});`;
+  const creditSql =
+    credit && creditUrl
+      ? `\nUPDATE "SiteContent"
+SET "body" = "body" || jsonb_build_object('imageCredit', ${q(credit)}, 'imageCreditUrl', ${q(creditUrl)})
+WHERE "key" = 'home-hero' AND NOT ("body" ? 'imageCredit');\n`
+      : "";
+  const sql = `-- Sprint 1 (docs/improvements/HOME-HERO-PLAN.md §7, D-030, D-032): the home hero's photograph, as data.
+-- Generated by scripts/build-hero-photos.mjs from one original (not committed); the two crops are
+-- design/hero/hero-desktop.webp and hero-mobile.webp. Each is added as the current photo of its slot
+-- only if the slot is empty — the owner replaces either in Admin → Photos at any time (the old one is
+-- kept, BR-1.17). The credit is the "home-hero" block's, shown on the image. The hero itself stays off
+-- until the flag home.hero_v2 is switched on. Additive only.
+
+${Object.entries(built).map(insert).join("\n\n")}
+${creditSql}`;
+  const file = resolve("prisma/migrations", migration, "migration.sql");
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, sql);
+  console.log(`migration written: ${file} (${(sql.length / 1024).toFixed(0)} KB)`);
+}

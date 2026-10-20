@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
-import { isPhotoPurpose, listPhotoVersions, PhotoRejected, processPhoto, storePhoto, toPhotoVersion } from "@/lib/profile/photos";
+import { isPhotoPurpose, listPhotoVersions, PhotoRejected, photoProcessing, processPhoto, storePhoto, toPhotoVersion } from "@/lib/profile/photos";
 
 const MULTIPART_OVERHEAD_BYTES = 64 * 1024;
 
@@ -44,7 +44,10 @@ export const POST = withAdmin(async (request, { write }) => {
   if (file.size > maxBytes) return tooLarge();
 
   try {
-    const processed = await processPhoto(new Uint8Array(await file.arrayBuffer()), maxEdge);
+    // A slot may name its own size and quality settings (the home hero's images); otherwise the global ones apply.
+    const slot = photoProcessing(purpose);
+    const [edge, quality] = slot ? await Promise.all([getSetting(slot.maxEdgeSetting), getSetting(slot.qualitySetting)]) : [maxEdge, undefined];
+    const processed = await processPhoto(new Uint8Array(await file.arrayBuffer()), edge as number, quality as number | undefined);
     const { version, created } = await write((tx) => storePhoto(tx, purpose, altText, processed));
     return NextResponse.json(toPhotoVersion(version), { status: created ? 201 : 200 });
   } catch (err) {
