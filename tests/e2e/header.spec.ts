@@ -63,7 +63,8 @@ test("the skip link is the first thing a keyboard user reaches, and it works", a
   await settle(page);
   await page.goto("/about", { waitUntil: "networkidle" });
   await page.keyboard.press("Tab");
-  const skip = page.locator('a[href="#main"]');
+  // the first link to #main in the page is the skip link (the footer's "Back to top" points there too)
+  const skip = page.locator('a[href="#main"]').first();
   await expect(skip).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#main$/);

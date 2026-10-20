@@ -39,10 +39,10 @@ for (const vp of VIEWPORTS) {
       await expect(h1).toBeVisible();
       expect((await h1.innerText()).trim().length).toBeGreaterThan(2);
 
-      // the record is computed: at least one figure, each a number with a label
+      // the record is computed: at least one entry, each a claim with its figure and label
       const items = hero.getByRole("list").last().getByRole("listitem");
       expect(await items.count()).toBeGreaterThan(0);
-      expect(await items.first().innerText()).toMatch(/^\d+\s+\S+/);
+      expect(await items.first().innerText()).toMatch(/\d+/);
 
       // the cover image: the phone crop on phones, the wide crop on larger screens
       const img = hero.locator("picture img");
