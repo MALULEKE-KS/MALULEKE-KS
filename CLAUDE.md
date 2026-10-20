@@ -2,15 +2,16 @@
 
 This file is loaded automatically by Claude Code at the start of every session in this repository. Do not treat anything below as optional context — it is binding for all implementation work here.
 
-## Start here — V2 is a relay (owner, 2026-10-02)
+## Start here — V2 is a relay, delivered agile (owner, 2026-10-02; agile 2026-10-20)
 
-V1 is finished and released. **All V2 work follows `/docs/V2-IMPROVEMENT-SPEC.md` — LOCKED.** Before any code in any session:
+V1 is finished and released. **All V2 work follows `/docs/V2-IMPROVEMENT-SPEC.md` — LOCKED.** **Agile is the core working technique** (owner, 2026-10-20): work bit by bit, in small vertical slices, each one working, tested, verified software; slices are grouped into short sprints with a goal, a release and a review. Agile governs order, size and shipping — never scope. Before any code in any session:
 
 1. Read `/docs/V2-IMPROVEMENT-SPEC.md` in full (Section 0.1 is the relay protocol).
-2. Read `/docs/improvements/TRACKER.md` — take the WP named in **Next up**, claim it (status `In progress`, date, branch) in your first commit.
-3. Read `/docs/improvements/DECISIONS.md` — the open conflicts and owner answers.
+2. Read `/docs/improvements/WAY-OF-WORKING.md` — slices, sprints, the Definition of Done, how releases fit the deploy budget.
+3. Read `/docs/improvements/TRACKER.md` — **Current sprint** and **Next up**; take the first unfinished slice, claim it (status `In progress`, date, branch) in your first commit.
+4. Read `/docs/improvements/DECISIONS.md` — the open conflicts and owner answers.
 
-Before you stop — even mid-WP — update the WP's row, append a handoff entry, move **Next up**, and log decisions, so the next session picks up exactly where you left off. `tests/unit/v2-tracker.test.ts` keeps the tracker complete. Never add scope the spec doesn't name (spec Section 2.4); never fabricate owner-supplied content.
+Before you stop — even mid-slice — update the slice and WP rows, append a handoff entry, move **Next up**, and log decisions, so the next session picks up exactly where you left off. Nothing is Done that was only read, not run. `tests/unit/v2-tracker.test.ts` keeps the tracker complete. Never add scope the spec doesn't name (spec Section 2.4); never fabricate owner-supplied content.
 
 ## What this project is
 
@@ -32,6 +33,8 @@ MALULEKE-KS — Kurhula Success Maluleke's personal platform. Not a static portf
 | `/docs/LETS-TALK-SPEC.md` | Let's Talk — opportunity intake & management on `Inquiry` (LT-1…LT-14), V2 accountless tracking |
 | `/docs/AI-GUIDE-PHASE1-PLAN.md` | The AI guide's phase 1 (owner request, 2026-10-08, D-023): one console and conversation, live cards, working trail and sources, the character at work — built; phase 2 candidates listed at its end |
 | `/docs/V2-IMPROVEMENT-SPEC.md` | **The locked V2 plan** — every work package (WP), in order, with acceptance and verification; the relay protocol (§0.1) |
+| `/docs/FRONTEND-CRAFT-RECORD.md` | **The frontend design and implementation record** (owner, 2026-10-20) — the toolchain (Figma, Motion, shadcn/ui, Magic UI, 21st.dev, …), the method, the evidence for each, and a dated log of every design decision. Also the evidence behind the frontend skills the site lists. Update it in the same PR as any tool, component or design decision |
+| `/docs/improvements/WAY-OF-WORKING.md` | **How V2 is delivered (agile)** — slices, sprints, review and retro, Definition of Ready/Done, releases against the deploy budget, the owner lane, the proposed sprints |
 | `/docs/improvements/TRACKER.md`, `/docs/improvements/DECISIONS.md` | Where V2 stands (status per WP, Next up, handoff log) and why (decisions, conflicts, owner answers) — updated by every session |
 | `/docs/ROADMAP-V2.md` | V2 features that wait for a trigger (Part 1, reconciled with the spec in its §1.2.4), and the update log — add to both in the same PR as the change |
 | `/docs/DEPLOYMENT.md` | Where it actually runs — Vercel project, Neon database, migration pipeline, local dev/test databases |

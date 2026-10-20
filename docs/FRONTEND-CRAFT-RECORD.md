@@ -1,0 +1,77 @@
+# Frontend craft record — design and implementation
+
+**Started 2026-10-20 (owner: "that must also be our frontend skills design and implementation record and document it").** This is the living record of *how the frontend is designed and built here*: the toolchain, the method, what each tool is actually used for, where the evidence is in the repo, and a dated log of every design and implementation decision. It is also the evidence behind the frontend skills the About page lists (Figma, Magic UI, 21st.dev, shadcn/ui, Motion, Tailwind — see D-019): a skill is claimed only where this record can point to a file, a commit or a Figma file.
+
+**Rule for keeping it true:** every slice that brings in a tool, a component or a pattern, or makes a design decision, adds a log entry in the same PR (it is part of the Definition of Done, `improvements/WAY-OF-WORKING.md` §6). Only what was done is written as done; what is planned is marked *planned*. Nothing here is retro-fitted: where a tool was not used before a date, the log says so.
+
+## 1. The method
+
+1. **Brief and evidence first** — the Page Build Playbook's Stage 0: the page's one story, the real data (`docs/PAGE-BUILD-PLAYBOOK.md`).
+2. **Design in Figma, phone and desktop, before code** (CLAUDE.md: "Figma for layout decisions before code"). Tokens are Figma variables mirroring `docs/DESIGN-SYSTEM.md`; frames use auto-layout so they map to flex/grid; real data on the frames, labelled placeholders only where a real image goes.
+3. **Components from sources, in this order:** this codebase → shadcn/ui → Magic UI → 21st.dev (CLAUDE.md). Browse and shortlist by eye; retrieve code only for the pick (21st.dev's free tier: 2 retrievals a day).
+4. **Convert, then ship:** anything brought in is rewritten to the design tokens and IBM Plex — no bundled fonts, colours or CDN assets — made reduced-motion safe, visible without JavaScript where it carries content, and recorded in `docs/PUBLIC-REDESIGN-PLAN.md` §7a.
+5. **Motion with a budget:** the `motion` library for anything that must respond or coordinate; CSS for the rest; one entrance, then still; every loop (live dot, beam) off under `prefers-reduced-motion`.
+6. **Verify, with numbers:** `tests/e2e/mobile.spec.ts` (360 / 390 px), `tests/e2e/a11y.spec.ts` (axe, WCAG 2.2 AA), the zod-out-of-first-load guard, `npm run baseline` and the post-deploy budgets job (`perf-budgets.json`).
+7. **Record it here** (Section 4) and, for components, in PLAN §7a.
+
+## 2. The toolchain — what each tool is for, and the evidence
+
+Evidence was checked against the repository on 2026-10-20.
+
+| Tool | Role here | Evidence in the repo (or "not yet") |
+|---|---|---|
+| **Figma** | Layout and visual decisions before code; the design tokens as variables; phone and desktop frames per page; later, Code Connect | **First file made 2026-10-20** for the home hero (Section 4). Before that, Figma appears in the docs as the planned layout tool and as a listed skill; no earlier Figma file exists, so no earlier page is claimed as Figma-designed |
+| **Motion** (`motion` ^13.4) | Layout/shared-element animation, enter/exit, springs, scroll-driven effects | 19 files import it, e.g. `components/shared/NavLinks.tsx` (gliding active pill via `layoutId`), `components/shared/MobileMenu.tsx`, `components/journey/ChapterTimeline.tsx`, `components/about/GuideInvite.tsx`, `components/guide/console/*`, `components/ui/animated-list.tsx` |
+| **shadcn/ui** (new-york, CSS variables, RSC) | The primitive layer: button, badge, card, command, dialog, input, separator, tooltip — restyled to the tokens; installed through the CLI, never hand-edited | `components.json`; `components/ui/` (README explains the CLI rule); Radix via `@radix-ui/react-slot`, `class-variance-authority` |
+| **Magic UI** (registry; MCP server) | Effects that carry information: number ticker, border beam, magic card, animated list, flickering grid, dot pattern, blur fade, orbiting circles, light rays, shine border, shimmer button, terminal, typing and text animations, lens | `components/ui/` (each adapted: tokens, reduced motion, hydration-safe; the three written from the registry's source are named in the README); used on Home, Journey, About, Let's Talk (PLAN §7a). **Registry reachable 2026-10-20** through the MCP server: `safari` (browser mockup), `marquee`, `blur-fade`, `text-animate` are available for the hero |
+| **21st.dev** (free tier: 2 retrievals/day; search free) | Whole-section patterns, adapted | Dithered Footer, Message Thread (the AI chat), MorphOrb (`thinking-orb`), Coverflow Carousel, Project Showcase — PLAN §7a, each with what was changed |
+| **Tailwind CSS v4** + the v3 design tokens | Every colour, radius, shadow and type size is a token; no magic hex in components | `app/globals.css`, `docs/DESIGN-SYSTEM.md` §10 |
+| **IBM Plex** (Sans, Serif, Mono) | The one type family | `app/layout.tsx` (`next/font/google`: IBM Plex Sans, Serif, Mono), DESIGN-SYSTEM §2 |
+| **Lucide** and **Simple Icons / real brand marks** | UI icons; the real marks of every technology | `components/shared/TechChip.tsx`, `public/brands` |
+| **Playwright, axe, Lighthouse** | The proof that it is phone-safe, accessible and fast | `tests/e2e/*`, `scripts/baseline.mjs`, `scripts/check-budgets.mjs`, `perf-budgets.json` |
+
+**Reference platforms** (studied for structure and restraint, never copied): Linear, Vercel (Geist), Stripe, Resend, Raycast, and the best engineer portfolios — the principles drawn from them are in `improvements/HOME-HERO-PLAN.md` §3.
+
+## 3. Standards this record holds us to
+
+- The tokens in `docs/DESIGN-SYSTEM.md` are the only colour/radius/space source; Figma variables mirror them one to one (`color/ember` = `--color-ember`).
+- Phone first: every frame is made at 390 px before 1440 px.
+- One accent, one hero device, one entrance motion (HOME-HERO-PLAN §9).
+- Evidence, not claims; no duplicates; copy and tunables as data (Playbook §1).
+- Real product imagery over illustration.
+
+## 4. Design and implementation log (append-only, newest last)
+
+Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, Let's Talk, the header, footer and mark, the AI guide's console — is recorded where it was done: `docs/PUBLIC-REDESIGN-PLAN.md` §3 and §7a, the update log in `docs/ROADMAP-V2.md` Part 2, and `docs/DESIGN-SYSTEM.md` §6. It is not repeated here.
+
+### 2026-10-20 · Home hero — design stage (Sprint 1, S1.1 in progress; owner request, D-030)
+- **Tools used:** Figma (new), Magic UI registry (MCP, search and inspect), 21st.dev (search only, no retrieval), Chrome for the live critique.
+- **Design:** Figma file *MALULEKE-KS — Home hero (Sprint 1)* — https://www.figma.com/design/KkGly8QVHOrfyRSFjcqLxb. A **21-variable token collection** ("MALULEKE-KS tokens": the graphite/bone/ember colours and radii from the Design System) and four frames, all in IBM Plex, all built with auto-layout and token-bound fills: **A · Shipped product** (desktop 1440 and phone 390 — recommended), **B · Portrait and proof** (desktop), **C · Editorial** (desktop). Real data on the frames (20 rules enforced, 66 audited changes this week, 11 systems, build `0091d34` — read from the live public API); the two product windows and the portrait are labelled placeholders for the real captures, which Figma cannot fetch.
+- **Candidates shortlisted, nothing retrieved or installed:** Magic UI `safari` (the browser frame — or our own `SystemPreviewFrame`, already built), `marquee` (stack strip), `blur-fade` (the one entrance); 21st.dev *Hero with Mockup* (#1492), *Featured Project Hero* (#37282), *Hero with Product Mockup* (#4710), *Portfolio Hero* (#9037), *Hero Block* (#10628), *Minimal Logo Kicker Strip* (#26889) — to be looked at by eye at the live review; at most one retrieval (the 2/day limit) after the owner picks.
+- **Decided / pending:** direction, wording, the guide's place — pending the owner's live review (HOME-HERO-PLAN §13).
+- **Verified:** the Figma frames were screenshotted and corrected twice (padding and translucent fills were wrong in the first build; an overlapping caption and a clipped stack row in the second). Nothing in code changed.
+- **Found:** the live hero (build `0091d34`) shows five competing devices and an illustration as its subject; a duplicate CV action; its numbers sit below the fold (HOME-HERO-PLAN §2).
+
+### 2026-10-20 · Home hero — Direction C chosen; the image slot and colour treatments designed (Sprint 1, S1.1)
+- **Decided by the owner:** Direction C (editorial) with a professional hero photograph — a crop for desktop and one for mobile, from a professional site; the guide's character leaves the hero; the avatar later; Sunduza stays featured.
+- **Tools used:** Figma (frames *C v2 · 1 Graphite · 2 Ember horizon · 3 Bone* at 1440, *1 Graphite* at 390; the image slot with a credit pill; auto-layout, token-bound fills, IBM Plex — same file, variables reused); Chrome with Unsplash (view only) to scout photo themes; the repo's photo pipeline read (`lib/profile/photos.ts`, `PHOTO_PURPOSES`).
+- **Implementation decisions (planned, not yet built):** the hero image as two photo slots (`hero-desktop`, `hero-mobile`) — one `PHOTO_PURPOSES` entry each, no migration — with their own max-edge and quality settings and the credit as content-block data; the photo sits below the type in a framed panel so legibility never depends on it; no image → no panel; `components/shared/PageHero.tsx` is evolved, not forked, so inner pages inherit; the entrance reuses the existing `components/ui/blur-fade.tsx`.
+- **Not needed, so not used:** Magic UI `safari` and `marquee`; any 21st.dev code (no retrieval spent — two free ones remain).
+- **Standards held:** tokens only (the palette is unchanged); ember only where the page acts; image weight budgets (≤ 90 KB desktop, ≤ 60 KB mobile); decorative image with empty alt; real photography, credited, licence read on each photo's own page.
+
+### 2026-10-20 · Home hero — S1.1 built; colour and photo decided (Sprint 1)
+- **Decided by the owner:** the colour treatment *C v2 · 2 Ember horizon*; the photo is to be found online by Claude, not the owner's own.
+- **Tools used:** Chrome with Unsplash (view only; the size menu was read, nothing downloaded) to choose the photo; the repo's own stack for the build — Next.js server component, Tailwind v4 tokens, shadcn `Button` (Radix Slot, CVA), Lucide (`ArrowRight`, `Sparkles`).
+- **Implementation:** `components/home/HomeHeroV2.tsx` (server component; type is the hero — one fluid display size, `.type-hero-name`; no effects, no Magic UI and no Motion in this slice — the one entrance is S1.4); `lib/home/hero.ts` (pure, tested); the owner-edited `home-hero` content block with its admin field (D-010: statements are data, button labels are code); the flag `home.hero_v2`, off, so the previous hero stays until the review; `AskGuideButton` gained `showFace` so the hero carries a sparkle, not the cartoon face.
+- **Evidence:** `tests/unit/home-hero.test.ts`; the Figma frames *C v2*; plan §14.
+- **Standards held:** tokens only; one accent (ember on the primary action and the live dot); a zero is never shown as proof; no illustration in the first view; the Design System's contrast pairs (paper and mist on night-deep).
+- **Not yet:** the image (S1.2/S1.3), the entrance (S1.4), a rendered check by eye.
+
+### 2026-10-20 · Home hero — S1.2 to S1.7 built (Sprint 1)
+- **Nothing hardcoded (owner's rule, restated):** the statement, both button labels, the live line, the record's labels and aria name, the photo's credit and focal points are the `home-hero` content block (shipped wording is only a fallback); the photos are two photo slots; the image's size and quality, the entrance's duration and stagger, and the glow's strength are seven `home.hero.*` settings — all editable in the admin without a deploy.
+- **Components (kit):** `HeroImage` (`<picture>` with a crop per screen, credit, warm light, nothing when empty), `ProofLedger` (hairline figures with evidence chips) — shared; `HomeHeroV2` + `HomeHeroV2Section` (the data) — home.
+- **Motion — a decision recorded, not skipped:** Motion remains the library for anything that responds or coordinates (nav, guide, timeline). The hero's entrance is **CSS** (`.hero-rise`): it needs no hydration, starts at 40 % opacity so the largest text is a paint candidate from the first frame, and is gone under reduced motion — a Motion entrance would add client JavaScript and an initial hidden state to the LCP element. Verified by `tests/e2e/home-hero-v2.spec.ts` (`animation-name` is `hero-rise` with motion allowed, `none` when reduced).
+- **Magic UI, 21st.dev, shadcn:** shadcn `Button` for both actions; Magic UI and 21st.dev were consulted (registry search, shortlists) and nothing was needed — recorded in PLAN §7a. No 21st.dev retrieval was spent.
+- **Photograph:** *City skyline during night time*, Tania Melnyczuk, Unsplash — chosen from four themes, downloaded with approval (Original Size, 1.23 MB), cropped to a 21:9 band and a 4:5 portrait, graded lightly, encoded to 88.6 KB and 57.3 KB; provenance and licence in `design/hero/README.md`; reproducible with `scripts/build-hero-photos.mjs`.
+- **No duplicates:** the hero's record carries the rules and audited-changes figures *with their evidence*; the control room drops its tiles and two terminal lines when the new hero shows (`ControlRoom showFigures`).
+- **Verification built:** unit (`home-hero`, `photo-slots`), integration (`home-hero`: flag off, block valid, photos within budget, no metadata), Playwright (`home-hero-v2.spec.ts`: 360, 390 and 1280 px, the right crop per screen, no canvas, no overflow, reduced motion, axe) and the preview switch `/?hero=v2` (refused on production).
