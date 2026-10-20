@@ -13,8 +13,8 @@
 // block (the shipped wording is only a fallback, lib/home/hero.ts); the live
 // line, the "building now" line, the technologies and the ledger are computed per
 // request; the entrance's timing, the overlay, the glow and how many technologies
-// show are settings. Shown only while the flag "home.hero_v2" is on; the previous
-// hero (HomeHero) stays until the sprint review.
+// show are settings. It is the home hero — the previous one was removed when the
+// owner approved the release (D-038).
 
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";

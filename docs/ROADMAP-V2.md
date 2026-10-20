@@ -347,5 +347,8 @@ Built and live: the guide's phase 2 (plan `docs/AI-GUIDE-PHASE2-PLAN.md`), the V
 ### F5b — admin panel (2026-09-30, same local branch, not yet pushed)
 - A screen for everything the admin API can do: overview (attention first), systems editor (scheduling, slug rename, revisions, impacts, skills, ownership, GitHub facts), organisations, journey (approve drafts), CV (options, uploads, completeness check, full role/education forms — fixing data-loss on edit), profile + links + achievements, page content, inquiries (overdue filter), numbers, freshness, jobs, settings (platform tunables, every lookup, flags, lenses), activity log, account (password, recovery codes), sign-in and sign-out (ends every session).
 
+### Sprint 1 follow-up — the rebuilt hero is the only hero (2026-10-20, D-038)
+The flag `home.hero_v2`, the `/?hero=v2` preview switch and the previous hero (`HomeHero`, `HeroGuide`) are removed; the control room no longer repeats the figures the hero shows. Sprints replace what they rebuild on release.
+
 ### Earlier releases
 - F5a public site on v3 (#103) · F4 scheduler, GitHub sync, retention, continuity CV (#98) · F2.3 features 7–10, CV options, auth hardening (#93) · F3.1 password change and single-use TOTP (#85) · F2.2 complete API surface (#83) · F1 database foundation (#55–#79). Details in `project` history and each PR.

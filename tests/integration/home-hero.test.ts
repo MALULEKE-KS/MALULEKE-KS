@@ -1,5 +1,5 @@
-// The rebuilt home hero's data (docs/improvements/HOME-HERO-PLAN.md): the flag
-// ships off, the owner's block is seeded and valid, and the hero photographs are
+// The home hero's data (docs/improvements/HOME-HERO-PLAN.md): the rebuilt hero is
+// the hero (its switch is retired, D-038), the owner's block is seeded and valid, and the hero photographs are
 // the public site's data — current photos of their slots, within the weight
 // budgets, with no metadata, readable through the public role.
 
@@ -14,11 +14,12 @@ const KIB = 1024;
 // The plan's budgets (HOME-HERO-PLAN §7, D-034): weight is law, not a hope — the cover image is the page's largest paint.
 const BUDGET = { "hero-desktop": 100 * KIB, "hero-mobile": 80 * KIB } as const;
 
-describe("home hero — flag and content", () => {
-  it("ships the flag off, so the previous hero stays until the owner switches it on", async () => {
+describe("home hero — content", () => {
+  it("has retired its switch: the rebuilt hero replaced the previous one, so the old flag says so and nothing reads it", async () => {
     const flag = await db.flag.findUnique({ where: { key: "home.hero_v2" } });
-    expect(flag).not.toBeNull();
-    expect(flag?.enabled).toBe(false);
+    // The row stays (migrations only add); it is on and described as retired, so no toggle in the admin pretends to do anything.
+    expect(flag?.enabled).toBe(true);
+    expect(flag?.notes).toMatch(/^Retired/);
   });
 
   it("seeds the owner's statement, wording and credit as a valid content block", async () => {

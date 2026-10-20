@@ -3,12 +3,13 @@
 // folded in): the platform reporting on itself — the proof behind the hero's
 // "already running". A terminal (Magic UI, adapted) plays live checks read
 // from the database the moment the page was loaded (PublicPlatformPulse);
-// beside it, the same facts as tiles and the owner's approved figures
-// (PublicMetric, BR-5.3 — none approved, none shown). With the AI guide on,
-// a visitor can ask it how these rules are enforced. Each live tile carries
-// its evidence — how the number is counted (docs/EVIDENCE-SPEC.md).
+// beside it, when GitHub last synced and the owner's approved figures
+// (PublicMetric, BR-5.3 — none approved, none shown). The rules and audited
+// changes figures live, with their evidence, in the hero's record — nothing
+// appears twice (docs/improvements/HOME-HERO-PLAN.md §16). With the AI guide
+// on, a visitor can ask it how these rules are enforced.
 
-import { Activity, BarChart3, GitBranch, ScrollText, ShieldCheck } from "lucide-react";
+import { Activity, BarChart3, GitBranch } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
@@ -17,8 +18,6 @@ import { Terminal, type TerminalLine } from "@/components/ui/terminal";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { ago } from "@/lib/queries/work";
 import { Accent } from "@/components/shared/Accent";
-import { Evidence } from "@/components/shared/Evidence";
-import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
 
 /** An owner-approved figure (PublicMetric — BR-5.3). */
 export interface CuratedNumber {
@@ -41,14 +40,9 @@ interface Pulse {
 export function ControlRoom({
   pulse,
   numbers,
-  evidence,
-  showFigures = true,
 }: {
-  /** Off when the home hero's record already shows (and evidences) the pulse's figures — nothing appears twice. */
-  showFigures?: boolean;
   pulse: Pulse;
   numbers: CuratedNumber[];
-  evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
 }) {
   const synced = ago(pulse.lastGithubSyncAt ? new Date(pulse.lastGithubSyncAt) : null);
   const job = ago(pulse.lastSuccessfulJobAt ? new Date(pulse.lastSuccessfulJobAt) : null);
@@ -56,21 +50,10 @@ export function ControlRoom({
 
   const lines: TerminalLine[] = [
     { kind: "command", text: "platform status --live" },
-    ...(showFigures
-      ? [
-          { kind: "ok" as const, text: `${pulse.rulesEnforcedByDatabase} business rules enforced by the database itself` },
-          { kind: "ok" as const, text: `${pulse.auditEventsLast7Days} changes audited this week · ${pulse.auditEventsTotal} in total` },
-        ]
-      : []),
     { kind: "ok", text: "every public page reads through a read-only database role" },
     ...(synced ? [{ kind: "ok" as const, text: `GitHub synced ${synced}` }] : []),
     ...(job ? [{ kind: "ok" as const, text: `scheduled jobs healthy · last run ${job}` }] : []),
     { kind: "info", text: build },
-  ];
-
-  const tiles = [
-    { key: "rulesEnforcedByDatabase", icon: ShieldCheck, value: pulse.rulesEnforcedByDatabase, label: "rules the database enforces" },
-    { key: "auditEventsLast7Days", icon: ScrollText, value: pulse.auditEventsLast7Days, label: "changes audited this week" },
   ];
 
   return (
@@ -91,20 +74,6 @@ export function ControlRoom({
             </Reveal>
             <Reveal delay={80}>
               <dl className="grid grid-cols-2 gap-3">
-                {showFigures && tiles.map(({ key, icon: Icon, value, label }) => (
-                  <div key={key} className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
-                    <Icon aria-hidden="true" className="text-accent size-4" />
-                    <dd className="type-data text-ink mt-3 text-4xl font-semibold">
-                      <NumberTicker value={value} />
-                    </dd>
-                    <dt className="text-slate mt-1 text-sm">{label}</dt>
-                    {claimsFor(evidence.claims, `pulse:${key}`).length > 0 && (
-                      <dd className="mt-3">
-                        <Evidence claims={claimsFor(evidence.claims, `pulse:${key}`)} label={`${value} ${label}`} commit={evidence.source.commit} tone="light" />
-                      </dd>
-                    )}
-                  </div>
-                ))}
                 {synced && (
                   <div className="border-ink/10 bg-sheet shadow-soft col-span-2 flex items-center gap-3 rounded-2xl border px-5 py-4">
                     <GitBranch aria-hidden="true" className="text-accent size-4" />

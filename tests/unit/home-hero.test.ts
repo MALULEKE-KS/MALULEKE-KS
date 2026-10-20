@@ -5,7 +5,7 @@
 // running, and the preview switch is one production refuses.
 
 import { describe, expect, it } from "vitest";
-import { heroCopy, heroCredential, heroEntranceVars, heroLedger, heroLiveLine, heroStack, heroV2Active, type LabelPair, type LedgerKey } from "@/lib/home/hero";
+import { heroCopy, heroCredential, heroEntranceVars, heroLedger, heroLiveLine, heroStack, type LabelPair, type LedgerKey } from "@/lib/home/hero";
 
 // What the seeded "home-hero" block carries (the migrations are the source of this wording).
 const LABELS: Partial<Record<LedgerKey, LabelPair>> = {
@@ -159,28 +159,6 @@ describe("heroCredential", () => {
 
   it("leaves out a missing detail", () => {
     expect(heroCredential([{ label: "Founder", detail: null }], "Engineer")).toBe("Founder");
-  });
-});
-
-describe("heroV2Active", () => {
-  it("shows when the flag is on, in any environment", () => {
-    expect(heroV2Active({ flagOn: true, preview: undefined, environment: "production" })).toBe(true);
-  });
-
-  it("previews with ?hero=v2 outside production", () => {
-    expect(heroV2Active({ flagOn: false, preview: "v2", environment: undefined })).toBe(true); // local
-    expect(heroV2Active({ flagOn: false, preview: "v2", environment: "preview" })).toBe(true); // a Vercel preview
-    expect(heroV2Active({ flagOn: false, preview: ["v2"], environment: "preview" })).toBe(true);
-  });
-
-  it("never previews on production — a visitor cannot reach the hero early", () => {
-    expect(heroV2Active({ flagOn: false, preview: "v2", environment: "production" })).toBe(false);
-  });
-
-  it("stays on the previous hero by default and for any other value", () => {
-    expect(heroV2Active({ flagOn: false, preview: undefined, environment: "preview" })).toBe(false);
-    expect(heroV2Active({ flagOn: false, preview: "v1", environment: "preview" })).toBe(false);
-    expect(heroV2Active({ flagOn: false, preview: "", environment: undefined })).toBe(false);
   });
 });
 

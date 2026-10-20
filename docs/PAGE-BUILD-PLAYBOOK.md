@@ -300,7 +300,7 @@ Fill each sheet at Stage 0; it changes as the page is built. "Candidates" are id
 | Section | Components | Data |
 |---|---|---|
 | Header | `SiteHeader`, `HeaderFrame`, `NavLinks` (desktop), `MobileMenu` (full-screen phone menu), `SearchPalette` | sheets, search, profile links |
-| Hero | `HomeHero`, `HeroGuide` (rig + Flickering Grid), Number Ticker — **superseded, behind the flag `home.hero_v2`, by `HomeHeroV2` + `HeroImage` + `ProofLedger` (Direction C)** | `home-intro` block, titles, PublicLedger — and for the new hero the `home-hero` block (statement, every label, the photo's credit and focal point), the photo slots `hero-desktop` / `hero-mobile`, `PublicPlatformPulse`, 7 `home.hero.*` settings |
+| Hero | `HomeHeroV2` + `HeroBackdrop` + `ProofLedger` (Direction C); the earlier `HomeHero` and `HeroGuide` (rig + Flickering Grid) were **removed** at the Sprint 1 release (D-038) | `home-intro` block, titles, PublicLedger — and for the new hero the `home-hero` block (statement, every label, the photo's credit and focal point), the photo slots `hero-desktop` / `hero-mobile`, `PublicPlatformPulse`, 7 `home.hero.*` settings |
 | AI guide | `AiGuideSection` (Magic Card, Border Beam, Typing, Shiny Text, Blur Fade), `GuidePanel` | `ai-guide` block, lenses, flags, GitHub repo count |
 | Selected work | `WorkShowcase` (Magic Card, Lens, Animated List, Sparkline, Tech chips, Project Showcase) | `lib/queries/work.ts` |
 | System map | `SystemMap`, `SystemMapGraph` | `lib/queries/map.ts` |

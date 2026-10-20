@@ -114,7 +114,7 @@ The home-page character is the face of the **Tier 1 concierge** (PLATFORM-CONSTI
 | Request whitelist and bounds (BR-4.6) | `lib/guide/request.ts` |
 | Grounding — every public view, one document, sources per section | `lib/guide/corpus.ts` |
 | Standing instructions — persona, range, honesty, defences | `lib/guide/prompt.ts` |
-| Chat panel, docked launcher, hero greeting + lens chips, safe answer rendering | `components/guide/*`, `components/home/HeroGuide.tsx` |
+| Chat panel, docked launcher, hero greeting + lens chips, safe answer rendering | `components/guide/*` (the hero greeting lived in `components/home/HeroGuide.tsx`, removed at the Sprint 1 release — D-038) |
 | Lenses as data (key/label public, framing prompt private) | `VisitorLens.sortOrder`, `PublicVisitorLens`, `GET /lenses` |
 | Settings | `concierge.model`, `.fallbackModels`, `.maxMessagesPerConversation`, `.maxQuestionCharacters`, `.rateLimit.*`, `.dailyMessageCap`, `.maxAnswerTokens`, `.maxReasoningTokens`, `.contextBudgetTokens`, `.corpusCacheSeconds` |
 | Tests | `tests/unit/guide-request.test.ts`, `tests/unit/guide-text.test.tsx`, `tests/integration/guide-api.test.ts` (mock model, real everything else), `tests/ai-evals/guide.eval.test.ts` (30 judge-graded cases: grounding, range, "I don't know", commitments, attacks — needs `AI_GATEWAY_API_KEY`) |
