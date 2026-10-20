@@ -9,10 +9,10 @@
 // is shaped to the composition, not laid evenly over the picture: on larger
 // screens the type sits on the left in the image's quiet zone, so the overlay is
 // dark at the left and clears towards the right, where the image shows at full
-// strength; on phones the type sits in the dark upper half, so the overlay is
-// heavy at the top and clears below, where the image glows. A soft fade at the
-// bottom meets the record's bar. Its overall strength is the setting
-// home.hero.scrim.
+// strength; on phones the image shows behind the whole hero, top to bottom, under
+// an even, lighter veil (the image is dark by nature, so the type stays
+// readable), deepening only at the very bottom to meet the record's bar. Its
+// overall strength is the setting home.hero.scrim.
 //
 // It is mood and place, not evidence — decorative, so an empty alt. With no image
 // uploaded it renders nothing: the hero is a graphite field. The section that
@@ -71,9 +71,9 @@ export function HeroBackdrop({ desktop, mobile, credit, positionDesktop, positio
             className="size-full object-cover [object-position:var(--pos-m)] md:[object-position:var(--pos-d)]"
           />
         </picture>
-        {/* Phones: heavy at the top where the type sits, clearing below so the image glows. */}
+        {/* Phones: the image behind the whole hero under an even veil, deepening only at the bottom into the record's bar. */}
         <div
-          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(11_12_14/0.9),rgb(11_12_14/0.72)_30%,rgb(11_12_14/0.18)_58%,rgb(11_12_14/0.05)_74%,rgb(11_12_14/0.9))] md:hidden"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(11_12_14/0.5),rgb(11_12_14/0.34)_35%,rgb(11_12_14/0.26)_62%,rgb(11_12_14/0.45)_84%,rgb(11_12_14/0.88))] md:hidden"
           style={strength}
         />
         {/* Larger screens: dark at the left where the type sits, clearing to the right where the image shows at full strength. */}

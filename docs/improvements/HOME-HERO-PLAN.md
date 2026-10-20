@@ -221,7 +221,7 @@ Other statements considered, for the owner to choose between or rewrite: *"Full-
 | 5 · Proof | The record, docked in a frosted bar: *Runs in production → N shipped*, *Enforces its own rules → N rules* (evidence), *Shows its proof → N audited changes* (evidence), N published | Why the promise is true | `PublicLedger`, `PublicPlatformPulse`, the evidence claims; the claim phrases are the block's | 2 × 2 under the image | Same |
 | 6 · Stack | The technologies behind the work, most used first | What it is built with | `SkillEvidence` (categories from a setting, ranked by systems) | Hidden | Hidden unless the screen is at least 1000 px tall |
 
-**Composition.** One cover image behind everything (a portrait crop on phones, a landscape one above). On larger screens the type is set at the left, in the image's quiet zone, and the overlay clears toward the right so the lit racks show at full strength; on phones the type is centred in the dark upper half and the aisle glows beneath it. The hero is a screen tall at least and never taller than it needs to be: levels 1–5 fit a 900 px screen with their record; level 6 appears only when there is room.
+**Composition.** One cover image behind everything (a portrait crop on phones, a landscape one above). On larger screens the type is set at the left, in the image's quiet zone, and the overlay clears toward the right so the lit racks show at full strength; on phones the type is centred over the aisle, which shows behind the whole hero under an even, lighter veil that deepens only at the bottom into the record (the first phone version darkened the top half and the owner saw the image only below — corrected). The hero is a screen tall at least and never taller than it needs to be: levels 1–5 fit a 900 px screen with their record; level 6 appears only when there is room.
 
 **Rules.** (1) No wording in code — a part the owner has written nothing for is not shown, and no label is made up for a figure. (2) A zero is never proof, so a claim vanishes with its figure. (3) The statement carries no figure (it would go stale). (4) "Live" is said only of the production deployment. (5) One h1; reading order is visual order; the record is a list; the image is decorative (empty alt). (6) Every tunable is a setting: overlay, glow, entrance timing, how many technologies and from which categories.
 
@@ -242,3 +242,16 @@ Other statements considered, for the owner to choose between or rewrite: *"Full-
 **Considered and left out, deliberately.** An availability pill: the profile's `availability` is empty, so the header would have nothing true to say (nothing is invented); it will appear the day the owner writes one. Page names (Systems, Journey, About) remain the route list in `lib/content/sheets.ts` — routes are structure, shared by the nav, the footer, the guide's index and each page's title, and are the recommended thing to keep in code.
 
 **Verified.** Unit (`header-systems`), integration (`site-header`: every label seeded, the preview is the published systems, the count is true, 0 hides it), Playwright (`header.spec`: hover opens it with real systems, Escape closes it, keyboard focus opens it and Tab enters it without trapping, the skip link works, axe is clean with the preview open).
+
+## 18. What the hero states must be provable (owner, 2026-10-20, after the release; D-039)
+
+The owner read the live hero on his phone and found it saying things the data does not support. Each is fixed at its source, not by editing a label:
+
+| What it said | Why it was wrong | Now |
+|---|---|---|
+| 2 systems shipped | Counted the pipeline status the owner chose; this platform's own entry reads "On GitHub" though it runs in production | Published systems with a live production address (`countSystemsInProduction`) — three, each checkable by opening its link |
+| Building now · Xkimi Xa Mali | Used GitHub's last-**push** time, which moves for pushes that are not work; the system is finished | The repo with the latest **real commit** in 30 days, worded "Latest commit" (`latestCommitRepo` in `lib/queries/work.ts`); the Selected work card shares the selection |
+| Live · build 0091d34 | The real date the previous hero showed was gone | "Live, as of 20 Oct 2026" — the date in the site's time zone (setting `site.timeZone`); a preview says Preview, never Live |
+| The image only in the lower part of the phone hero | My phone overlay was dark over the top half | An even, lighter veil so the cover image shows behind the whole hero; it deepens only at the bottom into the record |
+
+Rule: a line on the hero is either a computed fact or the owner's own words — never a guess dressed as a fact.

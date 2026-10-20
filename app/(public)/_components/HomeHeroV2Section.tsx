@@ -11,7 +11,7 @@ import { HomeHeroV2 } from "@/components/home/HomeHeroV2";
 import type { ContentBody } from "@/lib/content/blocks";
 import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
 import { getSkillEvidence } from "@/lib/queries/evidence";
-import { heroCopy, heroCredential, heroLedger, heroLiveLine, heroStack } from "@/lib/home/hero";
+import { heroAsOf, heroCopy, heroCredential, heroLedger, heroLiveLine, heroStack } from "@/lib/home/hero";
 import { getPublicPhotos } from "@/lib/queries/profile";
 import type { SiteProfile } from "@/lib/queries/site";
 import { getSetting } from "@/lib/settings";
@@ -32,7 +32,7 @@ interface HomeHeroV2SectionProps {
 }
 
 export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
-  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories] = await Promise.all([
+  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories, timeZone] = await Promise.all([
     getPublicPhotos(),
     getSkillEvidence(),
     getSetting("home.hero.entrance.durationMs"),
@@ -41,6 +41,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
     getSetting("home.hero.scrim"),
     getSetting("home.hero.stackCount"),
     getSetting("home.hero.stackCategories"),
+    getSetting("site.timeZone"),
   ]);
 
   const copy = heroCopy(block);
@@ -72,7 +73,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       role={role}
       statement={block?.statement ?? null}
       credential={heroCredential(titles, role)}
-      liveLine={heroLiveLine(pulse.deployment, copy)}
+      liveLine={heroLiveLine(pulse.deployment, copy, heroAsOf(new Date(), timeZone))}
       nowBuilding={nowBuilding}
       stack={heroStack(skills, stackCategories, stackCount)}
       copy={copy}

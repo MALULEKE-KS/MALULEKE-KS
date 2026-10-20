@@ -49,8 +49,8 @@ export const CONTENT_BLOCKS = {
       // Interface wording — each optional; the page keeps its shipped wording when one is empty.
       primaryLabel: z.string().trim().max(40).optional(),
       secondaryLabel: z.string().trim().max(40).optional(),
-      liveLabel: instantTemplate(60, ["commit"]).optional(),
-      previewLabel: instantTemplate(60, ["commit"]).optional(),
+      liveLabel: instantTemplate(60, ["commit", "date"]).optional(),
+      previewLabel: instantTemplate(60, ["commit", "date"]).optional(),
       localLabel: z.string().trim().max(60).optional(),
       nowLabel: z.string().trim().max(40).optional(),
       stackLabel: z.string().trim().max(60).optional(),

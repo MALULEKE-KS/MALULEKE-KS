@@ -6,7 +6,7 @@
 // hero (HeroBackdrop; the owner's direction, same day), the two giving each
 // other room: on larger screens the type sits at the left, in the image's quiet
 // zone, and the right of the image shows at full strength; on phones the type is
-// centred in the dark upper half and the image glows below it.
+// centred over the image, which shows behind the whole hero under an even veil.
 //
 // Nothing is typed in here. The name and role are the profile's; the statement,
 // every label, the image's credit and focal points are the owner's "home-hero"
@@ -62,7 +62,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
 
       <Container className="flex flex-1 flex-col justify-start pt-28 pb-8 md:justify-center md:pt-[5.5rem] md:pb-10">
         {/* One column: centred on a phone, set at the left on larger screens so the image's right side has the room. */}
-        <div className="flex max-w-[46rem] flex-col items-center text-center md:items-start md:text-left">
+        <div className="flex max-w-[46rem] flex-col items-center text-center max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)] md:items-start md:text-left">
           <div className="hero-rise flex flex-wrap items-center justify-center gap-2 md:justify-start" style={rise(0)}>
             {liveLine && (
               <p className={chip}>

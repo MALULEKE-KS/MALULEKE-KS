@@ -96,3 +96,14 @@ export async function getHomeSelection(more = 3) {
 export async function countPublishedSystems() {
   return db.publicSystem.count();
 }
+
+/**
+ * Published systems that have a live production address — what "shipped to
+ * production" means to a visitor, and checkable by opening the link. (The
+ * ledger's "shipped" counts the pipeline *status* the owner picked, which a
+ * system that runs in production can still lack — e.g. this platform's own
+ * entry reads "On GitHub".) Published-only and masked, like every public read.
+ */
+export async function countSystemsInProduction() {
+  return db.publicSystem.count({ where: { liveUrl: { not: null } } });
+}

@@ -139,6 +139,19 @@ export const SETTINGS = {
     description: "Home hero: which skill categories the technologies under the actions are drawn from — keys separated by commas (languages, frontend, backend, database, ai-ml, infra, testing, design). Ranked by how many systems use each.",
     rule: "D-030",
   }),
+  "site.timeZone": define({
+    schema: z.string().trim().max(60).refine((tz) => {
+      try {
+        new Intl.DateTimeFormat("en-GB", { timeZone: tz });
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Use an IANA time zone such as Africa/Johannesburg"),
+    default: "Africa/Johannesburg",
+    description: "The time zone the site's dates are shown in — today it is the live line's \"as of\" date on the home hero (an IANA name, e.g. Africa/Johannesburg).",
+    rule: "D-039",
+  }),
   "home.hero.scrim": define({
     schema: z.number().int().min(0).max(100),
     default: 100,
