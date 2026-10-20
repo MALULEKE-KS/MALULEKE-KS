@@ -57,7 +57,7 @@ const creditUrl = flag("credit-url", null);
 const alt = flag("alt", "The home hero's cover image");
 const desktop = { edge: Number(flag("desktop-edge", "2560")), quality: Number(flag("desktop-quality", "74")) };
 const mobile = { edge: Number(flag("mobile-edge", "1536")), quality: Number(flag("mobile-quality", "72")) };
-const page = { edge: Number(flag("page-edge", "1920")), quality: Number(flag("page-quality", "78")) };
+const page = { edge: Number(flag("page-edge", "1280")), quality: Number(flag("page-quality", "72")) };
 
 // --denoise <n>: a median filter of that size before encoding. Generated photographs carry film grain, which
 // WebP spends most of its bytes on; a size-3 median keeps the edges and drops the grain, so a sharper image fits the budget.

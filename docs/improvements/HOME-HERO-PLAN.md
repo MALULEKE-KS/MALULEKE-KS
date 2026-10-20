@@ -272,3 +272,16 @@ Rule: a line on the hero is either a computed fact or the owner's own words — 
 **To measure after the release:** phone LCP and the home page's image weight on the runner (the budgets job prints both); then ratchet `perf-budgets.json` and decide whether the phone cover image needs re-encoding.
 
 **Phone image corrected (owner, 2026-10-20, "still on the lower part, doesn't cover the whole hero, blurry").** Overlays were never the problem: the generated phone image was black across its top half (my own prompt asked for it) and encoded too hard. A new full-frame image was generated, encoded sharper (117 KiB; budgets raised with the reason) and swapped in by migration `20261020230000`; the phone veil is lighter and even. Lesson: judge the image file itself at phone size before blaming the CSS.
+
+## 20. The other pages' heroes (owner, 2026-10-20/21; D-041)
+
+**Question:** should Systems, Journey, About and Let's talk open on images like the home page? **Answer: yes, with conditions** — each unique; one landscape image per page for both phone and desktop (short bands crop well; four generations not eight); the scene fills the whole frame (no empty dark area — D-040's lesson); judged at phone size; encoded sharp but light (1280 px, WebP q72, median denoise: ~100 KiB each); data, replaceable in Admin → Photos.
+
+| Page | Slot | Scene (generated in the owner's ChatGPT, image mode) | Why |
+|---|---|---|---|
+| Systems | `hero-systems` | Macro of a dark circuit board, orange copper traces in a city-like grid, a few blue LEDs | The things built |
+| Journey | `hero-journey` | An empty straight dark road to a dawn horizon with orange edge lines | The path travelled |
+| About | `hero-about` | An engineer's desk at night, keyboard and lamp glow, no person | Where the work happens |
+| Let's talk | `hero-contact` | A door ajar at the end of a dark corridor, warm orange light spilling out | An invitation |
+
+**Build:** `components/shared/PageHeroBackdrop.tsx` (renders nothing until the slot has an image, so a page never waits on one) over the home hero's `HeroBackdrop`; `PageHero` takes a `backdrop` prop and Journey, About and Let's talk place it as the first child of their hero section; `scripts/build-hero-photos.mjs --slot <purpose>=<file> --replace` writes the encoded image and an additive migration. The CV page keeps its field. Prompts and provenance: `design/hero/README.md`.

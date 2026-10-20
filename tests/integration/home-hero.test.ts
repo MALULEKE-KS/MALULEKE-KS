@@ -108,3 +108,26 @@ describe("home hero — the figures and lines it states are the real ones (D-039
     else expect(nowBuilding?.fullName).toBe(latest.fullName);
   });
 });
+
+describe("page hero images (D-041)", () => {
+  // One landscape image per page (Systems, Journey, About, Let's talk), shown behind the top of its page; a page with none keeps its graphite field.
+  const PAGE_HEROES = ["hero-systems", "hero-journey", "hero-about", "hero-contact"];
+  const PAGE_HERO_BUDGET = 110 * KIB;
+
+  it("keeps every page image that exists landscape, light, WebP and free of metadata", async () => {
+    const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: PAGE_HEROES } } });
+    for (const r of rows) {
+      expect(r.byteSize, `${r.purpose} is ${(r.byteSize / KIB).toFixed(1)} KiB`).toBeLessThanOrEqual(PAGE_HERO_BUDGET);
+      expect(r.width, `${r.purpose} is landscape`).toBeGreaterThan(r.height);
+      const meta = await sharp(r.fileData).metadata();
+      expect(meta.format).toBe("webp");
+      expect(meta.exif).toBeUndefined();
+    }
+  });
+
+  it("has an image for Systems, Journey and About (Let's talk follows)", async () => {
+    const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: PAGE_HEROES } }, select: { purpose: true } });
+    const have = new Set(rows.map((r) => r.purpose));
+    for (const purpose of ["hero-systems", "hero-journey", "hero-about"]) expect(have.has(purpose), `${purpose} is seeded`).toBe(true);
+  });
+});

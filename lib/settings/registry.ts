@@ -141,13 +141,13 @@ export const SETTINGS = {
   }),
   "site.pageHero.maxEdgePixels": define({
     schema: z.number().int().min(800).max(3000),
-    default: 1920,
-    description: "The images behind the top of Systems, Journey, About and Let's talk: the longest side a stored image is resized to, in pixels.",
+    default: 1280,
+    description: "The images behind the top of Systems, Journey, About and Let's talk: the longest side a stored image is resized to, in pixels. 1280 keeps one image about 100 KiB; the bands are short and under a dark veil.",
     rule: "D-041",
   }),
   "site.pageHero.quality": define({
     schema: z.number().int().min(40).max(95),
-    default: 78,
+    default: 72,
     description: "The images behind the top of Systems, Journey, About and Let's talk: WebP quality (lower is lighter).",
     rule: "D-041",
   }),
