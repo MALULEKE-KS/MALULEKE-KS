@@ -1,6 +1,6 @@
 // scripts/check-budgets.mjs — fail when a core page has got heavier than its budget (spec WP-102).
 //
-// usage: node scripts/check-budgets.mjs <base-url> [--budgets <file>] [--lighthouse none|mobile|both] [--only <route>]
+// usage: node scripts/check-budgets.mjs <base-url> [--budgets <file>] [--lighthouse none|mobile|both] [--only <route>] [--repeats <n>]
 //
 // Measures what each core route downloads on a phone and a desktop (always), and optionally runs
 // Lighthouse, then judges the numbers against perf-budgets.json. Weight breaches fail (exit 1);
@@ -19,6 +19,7 @@ function args(argv) {
     if (a === "--budgets") out.budgets = argv[++i];
     else if (a === "--lighthouse") out.lighthouse = argv[++i];
     else if (a === "--only") out.only = argv[++i];
+    else if (a === "--repeats") out.repeats = Number(argv[++i]);
     else if (!out.base) out.base = a;
   }
   return out;
@@ -47,10 +48,17 @@ async function main() {
   try {
     for (const route of routes) {
       for (const [device, profile] of Object.entries(DEVICES)) {
-        const context = await browser.newContext(profile);
-        const page = await context.newPage();
-        const weight = await measureWeight(page, `${base}${route}`, 2500);
-        await context.close();
+        // The page is measured a few times, each in a fresh browser context, and the lightest run counts: on identical code the
+        // same page has measured up to ~117 KB apart (an extra image caught by one run's timing), so a single reading made the
+        // check fail at random. A real regression is in every run; a one-off extra download is not (D-040).
+        let weight = null;
+        for (let run = 0; run < (opts.repeats ?? 3); run++) {
+          const context = await browser.newContext(profile);
+          const page = await context.newPage();
+          const w = await measureWeight(page, `${base}${route}`, 2500);
+          await context.close();
+          if (!weight || w.totalKb < weight.totalKb) weight = w;
+        }
         const wantsLighthouse = lighthouse && (opts.lighthouse === "both" || device === "mobile");
         const lh = wantsLighthouse ? await runLighthouse(`${base}${route}`, device, lighthouse, desktopConfig) : null;
         measurements.push({ route, device, weight, lighthouse: lh });
