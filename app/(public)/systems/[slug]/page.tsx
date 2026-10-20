@@ -220,7 +220,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
             {(system.screenshotUrl || system.liveUrl) && (
-              <SystemPreviewFrame screenshotUrl={system.screenshotUrl} liveUrl={system.liveUrl} name={system.name} />
+              <SystemPreviewFrame screenshotUrl={system.screenshotUrl} liveUrl={system.liveUrl} name={system.name} eager />
             )}
             {cs.writeUp?.source === "case-study" && (
               <div className={system.screenshotUrl || system.liveUrl ? "mt-12" : undefined}>

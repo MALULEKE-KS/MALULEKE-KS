@@ -2,14 +2,14 @@
 // Root layout — IBM Plex Sans/Serif/Mono font loading (Design System §2),
 // VisitorLensProvider wrapping the tree.
 //
-// This was a stub until now — tailwind.config.ts has always referenced
-// var(--font-ibm-plex-sans/serif/mono) as the actual font-family values,
-// but nothing ever defined those CSS custom properties, since that's
-// exactly what next/font generates when wired into the root layout. Every
-// page has been silently falling back to the system font stack since the
-// project's structure was first scaffolded.
+// The fonts are self-hosted from the @fontsource packages (the latin files, the
+// weights the design uses) through next/font/local: no request to Google at build
+// or run time, so a build never fails on a font download and the browser fetches
+// the files from this site's own origin (docs/improvements/HOME-HERO-PLAN.md §19).
+// next/font generates the CSS custom properties the stylesheet uses
+// (var(--font-ibm-plex-sans/serif/mono)).
 
-import { IBM_Plex_Sans, IBM_Plex_Serif, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import type { Metadata } from "next";
@@ -17,25 +17,39 @@ import { VisitorLensProvider } from "@/components/shared/VisitorLensProvider";
 import { getSiteProfile } from "@/lib/queries/site";
 import { siteUrl } from "@/lib/site-url";
 
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const ibmPlexSans = localFont({
+  src: [
+    { path: "../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-ibm-plex-sans",
   display: "swap",
 });
 
-const ibmPlexSerif = IBM_Plex_Serif({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const ibmPlexSerif = localFont({
   // Italic for the editorial accent words in headlines ("Plex, elevated", owner's choice 2026-09-30).
-  style: ["normal", "italic"],
+  src: [
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-400-italic.woff2", weight: "400", style: "italic" },
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-500-italic.woff2", weight: "500", style: "italic" },
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-600-italic.woff2", weight: "600", style: "italic" },
+  ],
   variable: "--font-ibm-plex-serif",
   display: "swap",
+  // Used for accent words further down the page, not in the first view: it loads when needed instead of competing with the hero.
+  preload: false,
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const ibmPlexMono = localFont({
+  src: [
+    { path: "../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2", weight: "600", style: "normal" },
+  ],
   variable: "--font-ibm-plex-mono",
   display: "swap",
 });

@@ -69,6 +69,15 @@ jobs:
       # 70/20/10 unit/integration/E2E per Constitution §2 — a single script
       # composing all three so CI has one gate, not three separately maintained ones.
       - run: npm run test
+      # The hero's first view at each width (tests/e2e/home-hero-v2.spec.ts), kept so it can be looked at on the pull request.
+      - name: Keep the hero screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-screenshots
+          path: hero-screenshots/
+          if-no-files-found: ignore
+          retention-days: 14
 
   migration-check:
     runs-on: ubuntu-latest

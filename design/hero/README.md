@@ -34,3 +34,17 @@ node scripts/build-hero-photos.mjs --desktop <landscape.png> --mobile <portrait.
 The focal points (and a credit, only if the owner ever writes one) are the `home-hero` block's (Admin → Page content → Home — hero); the overlay's darkness is the setting `home.hero.scrim`. Weight budgets (100 KiB desktop, 80 KiB phone) are asserted in `tests/integration/home-hero.test.ts`.
 
 *History:* the first cover image was a Johannesburg dusk photograph (Tania Melnyczuk, Unsplash). The owner rejected it on 2026-10-20 (not related to the system) and it was removed before it ever reached production.
+
+### Phone image, second version (2026-10-20, Sprint 1b, D-040)
+
+The first phone image was **black across its top half**: the prompt asked for "the whole upper 55% dark, smooth and uncluttered", so the scene existed only in the lower half, and the owner saw the picture "only in the lower part, not covering the whole hero, blurry". It was also encoded at quality 72 and shown at about twice its pixel size, hence the blur.
+
+| | |
+|---|---|
+| Generated | 2026-10-20, ChatGPT (the owner's account, Free plan), image mode, in Chrome. The account then reported it was out of image creations until tomorrow |
+| Source | `Futuristic Data Centre Server Corridor.png`, 1024 × 1536, 2.85 MB (downloaded from the owner's own generation; the original is not committed) |
+| Encoded | WebP quality 78, effort 6, with a size-3 median denoise (generated film grain is what made the first encode 170+ KiB) — 1024 × 1536, 117.1 KiB; migration `20261020230000_home_hero_phone_image_full_frame` supersedes the slot's first version (BR-1.17: kept, never altered) |
+
+**Prompt (verbatim, abridged only by the repeated palette sentence):** *"Create an image: a cinematic, photorealistic VERTICAL portrait photograph (2:3) to be used as a full-bleed phone background … the inside of a pristine modern data centre, looking down a long aisle of dark graphite server racks. IMPORTANT composition: the scene must fill the ENTIRE frame from the top edge to the bottom edge with no empty dark area anywhere. Tall server racks rise all the way to the top of the frame on both sides, with rack doors, perforated mesh, cable trays and ceiling light strips visible in the upper half as well as the lower half; the aisle recedes toward a vanishing point at the vertical centre of the frame. Thin, glowing International Orange (#FF5B1F) fibre-optic light lines run along the rack edges and cable trays the full height of the frame … Detail must be crisp and sharp everywhere, with texture visible even in the shadows … Strictly: no people, no text, no logos … a real photograph shot on a full-frame camera with a 24mm lens."*
+
+Weight budget for the phone image is now 130 KiB (law in `tests/integration/home-hero.test.ts`); the home page's largest image is 125 KB in `perf-budgets.json`.

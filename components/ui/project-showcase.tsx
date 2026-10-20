@@ -99,6 +99,8 @@ export function ProjectShowcase({ items, className }: { items: ShowcaseItem[]; c
                   key={item.key}
                   src={item.image}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 h-full w-full object-cover object-top transition-all duration-500 ease-out"
                   style={{ opacity: hovered === i ? 1 : 0, scale: hovered === i ? "1" : "1.08", filter: hovered === i ? "none" : "blur(8px)" }}
                 />

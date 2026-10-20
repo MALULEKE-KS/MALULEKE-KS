@@ -73,7 +73,7 @@ export function HeroBackdrop({ desktop, mobile, credit, positionDesktop, positio
         </picture>
         {/* Phones: the image behind the whole hero under an even veil, deepening only at the bottom into the record's bar. */}
         <div
-          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(11_12_14/0.5),rgb(11_12_14/0.34)_35%,rgb(11_12_14/0.26)_62%,rgb(11_12_14/0.45)_84%,rgb(11_12_14/0.88))] md:hidden"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(11_12_14/0.56),rgb(11_12_14/0.44)_30%,rgb(11_12_14/0.3)_62%,rgb(11_12_14/0.46)_84%,rgb(11_12_14/0.88))] md:hidden"
           style={strength}
         />
         {/* Larger screens: dark at the left where the type sits, clearing to the right where the image shows at full strength. */}

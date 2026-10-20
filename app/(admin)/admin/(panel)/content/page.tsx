@@ -26,7 +26,9 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "liveLabel", label: "The live line", max: 60, kind: "line", hint: "Fill-ins: {date} — today's date; {commit} — the build that is running. Empty = the shipped wording." },
     { name: "previewLabel", label: "The line on a preview deployment (not the live site)", max: 60, kind: "line", hint: "Fill-in: {commit}. Shown instead of the live line when the page is a preview build." },
     { name: "localLabel", label: "The live line on a local build", max: 60, kind: "line" },
-    { name: "nowLabel", label: "The \"building now\" line (before the project's name)", max: 40, kind: "line", hint: "Shown when a repository of yours was pushed to in the last 30 days." },
+    { name: "buildingSlug", label: "The system you are building now", max: 120, kind: "line", hint: "Only you can say what you are building. Write the address name of one of your published systems (the part after /systems/, e.g. fundslink-academy). Empty = the line shows the repository with your latest commit instead." },
+    { name: "buildingLabel", label: "The line before it, when you have named one", max: 40, kind: "line" },
+    { name: "nowLabel", label: "The line before the latest commit, when you have not named one", max: 40, kind: "line", hint: "Shown for the repository with your latest real commit in the last 30 days." },
     { name: "stackLabel", label: "The line above the technologies you build with", max: 60, kind: "line", hint: "How many are shown: Settings → home.hero.stackCount. They are ranked by how many of your systems use each." },
     { name: "ledgerAria", label: "Screen-reader name of the record", max: 60, kind: "line" },
     {

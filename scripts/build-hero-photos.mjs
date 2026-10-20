@@ -8,6 +8,10 @@
 // "home-hero" content block. The originals are never committed. Replace either
 // later in Admin → Photos — the migration only runs once.
 //
+// With --replace the migration supersedes the slot's current photo (BR-1.17: a version is
+// superseded, never altered or deleted) and adds the new image as the current one; give just
+// the source(s) you are replacing (--desktop and/or --mobile), and --note for the migration's header.
+//
 //   node scripts/build-hero-photos.mjs --desktop <landscape.png> --mobile <portrait.png> \
 //     --migration 20261020160000_home_hero_cover_images --credit "Image: …" --alt "…"
 //
@@ -26,8 +30,13 @@ const flag = (name, fallback) => {
 };
 const desktopSrc = flag("desktop", null);
 const mobileSrc = flag("mobile", null);
-if (!desktopSrc || !mobileSrc) {
-  console.error("usage: node scripts/build-hero-photos.mjs --desktop <landscape> --mobile <portrait> [--migration <folder>] [--credit …] [--credit-url …] [--alt …]");
+const replace = args.includes("--replace");
+if ((!desktopSrc || !mobileSrc) && !replace) {
+  console.error("usage: node scripts/build-hero-photos.mjs --desktop <landscape> --mobile <portrait> [--migration <folder>] [--credit …] [--credit-url …] [--alt …] [--replace [--note …]]");
+  process.exit(1);
+}
+if (!desktopSrc && !mobileSrc) {
+  console.error("give at least one of --desktop and --mobile");
   process.exit(1);
 }
 
@@ -38,22 +47,26 @@ const alt = flag("alt", "The home hero's cover image");
 const desktop = { edge: Number(flag("desktop-edge", "2560")), quality: Number(flag("desktop-quality", "74")) };
 const mobile = { edge: Number(flag("mobile-edge", "1536")), quality: Number(flag("mobile-quality", "72")) };
 
+// --denoise <n>: a median filter of that size before encoding. Generated photographs carry film grain, which
+// WebP spends most of its bytes on; a size-3 median keeps the edges and drops the grain, so a sharper image fits the budget.
+const denoise = Number(flag("denoise", "0"));
+
 const encode = async (file, { edge, quality }) => {
-  // Same steps as processPhoto() in lib/profile/photos.ts; throws if the file is not an image we can read.
-  const { data, info } = await sharp(resolve(file))
-    .rotate()
+  // The steps of processPhoto() in lib/profile/photos.ts (plus the optional denoise); throws if the file is not an image we can read.
+  let image = sharp(resolve(file)).rotate();
+  if (denoise > 0) image = image.median(denoise);
+  const { data, info } = await image
     .resize({ width: edge, height: edge, fit: "inside", withoutEnlargement: true })
-    .webp({ quality })
+    .webp({ quality, effort: 6 })
     .toBuffer({ resolveWithObject: true });
   return { data, width: info.width, height: info.height, sha256: createHash("sha256").update(data).digest("hex") };
 };
 
-const built = {
-  "hero-desktop": await encode(desktopSrc, desktop),
-  "hero-mobile": await encode(mobileSrc, mobile),
-};
-if (built["hero-desktop"].width <= built["hero-desktop"].height) throw new Error("The desktop image should be landscape.");
-if (built["hero-mobile"].width >= built["hero-mobile"].height) throw new Error("The phone image should be portrait.");
+const built = {};
+if (desktopSrc) built["hero-desktop"] = await encode(desktopSrc, desktop);
+if (mobileSrc) built["hero-mobile"] = await encode(mobileSrc, mobile);
+if (built["hero-desktop"] && built["hero-desktop"].width <= built["hero-desktop"].height) throw new Error("The desktop image should be landscape.");
+if (built["hero-mobile"] && built["hero-mobile"].width >= built["hero-mobile"].height) throw new Error("The phone image should be portrait.");
 
 const outDir = resolve("design/hero");
 mkdirSync(outDir, { recursive: true });
@@ -64,21 +77,27 @@ for (const [purpose, p] of Object.entries(built)) {
 
 if (migration) {
   const q = (s) => `'${String(s).replaceAll("'", "''")}'`;
-  const insert = ([purpose, p]) => `INSERT INTO "ProfilePhoto" ("id", "purpose", "altText", "mimeType", "width", "height", "byteSize", "sha256", "fileData")
+  const note = flag("note", null);
+  // --replace: supersede the slot's current version first (allowed: only the alt text and whether it is current may change), then add the new one.
+  const supersede = ([purpose, p]) => `UPDATE "ProfilePhoto" SET "supersededAt" = now() WHERE "purpose" = ${q(purpose)} AND "supersededAt" IS NULL AND "sha256" <> ${q(p.sha256)};\n\n`;
+  const insert = ([purpose, p]) => (replace ? supersede([purpose, p]) : "") + `INSERT INTO "ProfilePhoto" ("id", "purpose", "altText", "mimeType", "width", "height", "byteSize", "sha256", "fileData")
 SELECT gen_random_uuid()::text, ${q(purpose)}, ${q(alt)}, 'image/webp', ${p.width}, ${p.height}, ${p.data.length}, ${q(p.sha256)}, decode('${p.data.toString("base64")}', 'base64')
-WHERE NOT EXISTS (SELECT 1 FROM "ProfilePhoto" WHERE "purpose" = ${q(purpose)});`;
+WHERE NOT EXISTS (SELECT 1 FROM "ProfilePhoto" WHERE "purpose" = ${q(purpose)} AND "supersededAt" IS NULL);`;
   const creditFields = [credit ? `'imageCredit', ${q(credit)}` : null, credit && creditUrl ? `'imageCreditUrl', ${q(creditUrl)}` : null].filter(Boolean);
   const creditSql = creditFields.length
     ? `\nUPDATE "SiteContent"
 SET "body" = "body" || jsonb_build_object(${creditFields.join(", ")})
 WHERE "key" = 'home-hero' AND NOT ("body" ? 'imageCredit');\n`
     : "";
-  const sql = `-- Sprint 1 (docs/improvements/HOME-HERO-PLAN.md §7, D-030, D-034): the home hero's cover images, as data.
+  const header = replace && note
+    ? `-- ${note}\n-- Generated by scripts/build-hero-photos.mjs --replace; the encoded image(s) are in design/hero/. The slot's current\n-- photo is superseded (BR-1.17: kept, never altered or deleted) and the new one becomes current — the owner can replace\n-- it in Admin → Photos at any time. Additive only.\n`
+    : `-- Sprint 1 (docs/improvements/HOME-HERO-PLAN.md §7, D-030, D-034): the home hero's cover images, as data.
 -- Generated by scripts/build-hero-photos.mjs from two source files (not committed); the encoded images are
 -- design/hero/hero-desktop.webp (landscape) and hero-mobile.webp (portrait). Each is added as the current photo
 -- of its slot only if the slot is empty — the owner replaces either in Admin → Photos at any time (the old one
 -- is kept, BR-1.17). The credit is the "home-hero" block's, shown on the image. The hero itself stays off until
--- the flag home.hero_v2 is switched on. Additive only.
+-- the flag home.hero_v2 is switched on. Additive only.`;
+  const sql = `${header}
 
 ${Object.entries(built).map(insert).join("\n\n")}
 ${creditSql}`;

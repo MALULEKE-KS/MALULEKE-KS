@@ -1,11 +1,11 @@
 {
-  "about": "Performance budgets (spec WP-102), checked by scripts/check-budgets.mjs after every production deploy. `weights` are exact, measured on what the page downloads: each is what the production runner measured on 2026-10-10 (after the lazy chat engine and the zod fix) plus 10-15% headroom — a ratchet: it only ever moves down, and a breach FAILS the check. `lab` are Lighthouse targets from the spec; they are noisy, so a breach only WARNS until the variance on a quiet runner is known (decision log D-027). Tighten a number by editing it here — never in code. One deliberate exception to only-down: the home page's largest image is 100 KB, not 90, from the Sprint 1 release (2026-10-20) — the hero's cover image (92.8 KiB desktop, 71.2 KiB phone) is the page's largest paint on purpose (HOME-HERO-PLAN §15, D-034), and its weight is also a law in tests/integration/home-hero.test.ts.",
+  "about": "Performance budgets (spec WP-102), checked by scripts/check-budgets.mjs after every production deploy. `weights` are exact, measured on what the page downloads: each is what the production runner measured on 2026-10-10 (after the lazy chat engine and the zod fix) plus 10-15% headroom — a ratchet: it only ever moves down, and a breach FAILS the check. `lab` are Lighthouse targets from the spec; they are noisy, so a breach only WARNS until the variance on a quiet runner is known (decision log D-027). Tighten a number by editing it here — never in code. One deliberate exception to only-down: the home page's largest image is 125 KB, not 90, from the Sprint 1b release (2026-10-20) — the hero's cover image (92.8 KiB desktop, 117 KiB phone: the phone image is sharper and fills the whole hero) is the page's largest paint on purpose (HOME-HERO-PLAN §15, D-034), and its weight is also a law in tests/integration/home-hero.test.ts.",
   "weights": {
     "/": {
       "totalKb": 931,
       "imageKb": 320,
       "requests": 58,
-      "largestImageKb": 100
+      "largestImageKb": 125
     },
     "/systems": {
       "totalKb": 986,

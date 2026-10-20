@@ -10,9 +10,11 @@ interface SystemPreviewFrameProps {
   screenshotUrl: string | null;
   liveUrl: string | null;
   name: string;
+  /** True only where the preview is in the first view of its page; everywhere else it loads when it nears the screen, so it never competes with what the visitor sees first. */
+  eager?: boolean;
 }
 
-export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPreviewFrameProps) {
+export function SystemPreviewFrame({ screenshotUrl, liveUrl, name, eager = false }: SystemPreviewFrameProps) {
   const host = liveUrl ? liveUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
 
   return (
@@ -37,6 +39,8 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name }: SystemPrevi
           <img
             src={screenshotUrl}
             alt={`${name} homepage`}
+            loading={eager ? "eager" : "lazy"}
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover object-top"
           />
         ) : (

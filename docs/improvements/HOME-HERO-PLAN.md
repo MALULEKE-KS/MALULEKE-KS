@@ -255,3 +255,20 @@ The owner read the live hero on his phone and found it saying things the data do
 | The image only in the lower part of the phone hero | My phone overlay was dark over the top half | An even, lighter veil so the cover image shows behind the whole hero; it deepens only at the bottom into the record |
 
 Rule: a line on the hero is either a computed fact or the owner's own words — never a guess dressed as a fact.
+
+## 19. Speed, reliability and honest lines (Sprint 1b, owner-approved in order, 2026-10-20; D-040)
+
+**Measured on the runner before this work:** phone LCP 4.6–4.8 s on `/` (every core page 3.6–4.1 s), desktop 0.8–0.9 s; the home page carried 270 KB of images on a phone, of which the hero's is 71 KB.
+
+| # | Change | Why |
+|---|---|---|
+| 1 | Below-the-fold screenshots `loading="lazy"` (`SystemPreviewFrame`, `ProjectShowcase`; the system page's own first-view preview stays eager); the serif font `preload: false` | React hoists a preload for every eager `<img>`; two Selected-work screenshots were fetched at high priority alongside the hero image on a ~1.6 Mbps link |
+| 2 | `home-hero.buildingSlug` + `buildingLabel`: the owner names what he is building; else the latest real commit | Only the owner can say what he is building; a push or a commit is only evidence of activity |
+| 3 | Fonts self-hosted: `@fontsource/ibm-plex-sans, -serif and -mono` through `next/font/local` (latin, the weights the design uses) | No Google request at build or run time; CI's build failed twice on the download |
+| 4 | The hero spec saves its first view at 360, 390 and 1280 px to `hero-screenshots/`; CI uploads it as an artifact | The owner can look at the phone layout on the pull request without anyone running a server |
+| 5 | The Selected work card's heading is the same data as the hero's line; "last commit" replaces "last push" | One meaning for the same words |
+| 6 | AI evals trigger narrowed to `lib/guide`, `app/api/v1/guide`, `tests/ai-evals` and the workflow; the retired flag row deleted; the README diagrams' custom font removed | Evals ran on unrelated content and migration changes; a dead switch in Admin; two clipped diagram labels |
+
+**To measure after the release:** phone LCP and the home page's image weight on the runner (the budgets job prints both); then ratchet `perf-budgets.json` and decide whether the phone cover image needs re-encoding.
+
+**Phone image corrected (owner, 2026-10-20, "still on the lower part, doesn't cover the whole hero, blurry").** Overlays were never the problem: the generated phone image was black across its top half (my own prompt asked for it) and encoded too hard. A new full-frame image was generated, encoded sharper (117 KiB; budgets raised with the reason) and swapped in by migration `20261020230000`; the phone veil is lighter and even. Lesson: judge the image file itself at phone size before blaming the CSS.

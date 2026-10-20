@@ -5,6 +5,7 @@
 
 import { ContactBand } from "@/components/home/ContactBand";
 import { HomeHeroV2Section } from "./HomeHeroV2Section";
+import { heroCopy } from "@/lib/home/hero";
 import { PrinciplesBand } from "@/components/home/PrinciplesBand";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
 import { getSelectedWork } from "@/lib/queries/work";
@@ -34,6 +35,10 @@ import {
 } from "@/lib/queries/homepage";
 
 export async function HomeContent() {
+  // First: the owner's hero block names the system he is building (if he has), which decides what "now" is.
+  const heroBlock = await getContentBlock("home-hero");
+  const building = heroBlock?.buildingSlug?.trim() || null;
+  const heroWords = heroCopy(heroBlock);
   const [
     stats,
     selectedWork,
@@ -46,13 +51,12 @@ export async function HomeContent() {
     reviewSlaHours,
     titles,
     flags,
-    heroBlock,
     aiGuide,
     systemMap,
     pulse,
   ] = await Promise.all([
     getHomepageStats(),
-    getSelectedWork(3),
+    getSelectedWork(3, building),
     countPublishedSystems(),
     countSystemsInProduction(),
     getPublicMetrics(), // approved values only (BR-5.3)
@@ -62,7 +66,6 @@ export async function HomeContent() {
     getReviewSlaHours(),
     getPublicTitles(),
     getFlags(),
-    getContentBlock("home-hero"),
     getContentBlock("ai-guide"),
     getSystemMap(),
     getPlatformPulse(),
@@ -70,6 +73,9 @@ export async function HomeContent() {
   const guideEnabled = flags[FLAGS.concierge] === true;
   const [howIBuild, evidence] = await Promise.all([getContentBlock("how-i-build"), getEvidence()]);
 
+
+  // The line before the name: "Building now" when the owner named the system, "Latest commit" when it is only the latest real commit.
+  const nowLabel = selectedWork.nowBuilding?.chosen ? heroWords.buildingLabel : heroWords.nowLabel;
 
   const base = siteUrl();
   // Structured data (#101): who this is and what the site is — the same data the page shows.
@@ -93,13 +99,13 @@ export async function HomeContent() {
         systemsShipped={inProduction}
         systemsPublished={totalPublished}
         titles={titles}
-        nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, lastPush: selectedWork.nowBuilding.lastPush } : null}
+        nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, when: selectedWork.nowBuilding.lastPush, label: nowLabel } : null}
         evidence={evidence}
       />
       {guideEnabled && aiGuide && (
         <AiGuideSection content={aiGuide} />
       )}
-      <WorkShowcase {...selectedWork} totalPublished={totalPublished} />
+      <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
       <SystemMap data={systemMap} />
       <ControlRoom pulse={pulse} numbers={numbers} />
       <PrinciplesBand content={howIBuild} evidence={evidence} />

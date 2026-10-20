@@ -27,7 +27,7 @@ interface HomeHeroV2SectionProps {
   systemsShipped: number;
   systemsPublished: number;
   titles: { label: string; detail: string | null }[];
-  nowBuilding: { name: string; url: string; lastPush: string | null } | null;
+  nowBuilding: { name: string; url: string; when: string | null; label: string | null } | null;
   evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
 }
 

@@ -53,6 +53,9 @@ export const CONTENT_BLOCKS = {
       previewLabel: instantTemplate(60, ["commit", "date"]).optional(),
       localLabel: z.string().trim().max(60).optional(),
       nowLabel: z.string().trim().max(40).optional(),
+      // What the owner says he is building: the slug of one of his published systems. Empty = the line shows the latest real commit instead.
+      buildingLabel: z.string().trim().max(40).optional(),
+      buildingSlug: z.string().trim().max(120).optional(),
       stackLabel: z.string().trim().max(60).optional(),
       ledgerAria: z.string().trim().max(60).optional(),
       // The record's labels: one when the figure is 1, many otherwise. Any label left out keeps the shipped wording.
