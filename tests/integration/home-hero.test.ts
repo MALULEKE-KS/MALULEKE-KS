@@ -125,9 +125,9 @@ describe("page hero images (D-041)", () => {
     }
   });
 
-  it("has an image for Systems, Journey and About (Let's talk follows)", async () => {
+  it("has an image for each of the four pages", async () => {
     const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: PAGE_HEROES } }, select: { purpose: true } });
     const have = new Set(rows.map((r) => r.purpose));
-    for (const purpose of ["hero-systems", "hero-journey", "hero-about"]) expect(have.has(purpose), `${purpose} is seeded`).toBe(true);
+    for (const purpose of PAGE_HEROES) expect(have.has(purpose), `${purpose} is seeded`).toBe(true);
   });
 });
