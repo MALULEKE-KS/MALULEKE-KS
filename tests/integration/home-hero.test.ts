@@ -1,5 +1,5 @@
 // The home hero's data (docs/improvements/HOME-HERO-PLAN.md): the rebuilt hero is
-// the hero (its switch is retired, D-038), the owner's block is seeded and valid, and the hero photographs are
+// the hero (its switch is gone, D-038 and D-040), the owner's block is seeded and valid, and the hero photographs are
 // the public site's data — current photos of their slots, within the weight
 // budgets, with no metadata, readable through the public role.
 
@@ -14,14 +14,12 @@ import { getSelectedWork } from "@/lib/queries/work";
 
 const KIB = 1024;
 // The plan's budgets (HOME-HERO-PLAN §7, D-034): weight is law, not a hope — the cover image is the page's largest paint.
-const BUDGET = { "hero-desktop": 100 * KIB, "hero-mobile": 80 * KIB } as const;
+const BUDGET = { "hero-desktop": 100 * KIB, "hero-mobile": 130 * KIB } as const;
 
 describe("home hero — content", () => {
-  it("has retired its switch: the rebuilt hero replaced the previous one, so the old flag says so and nothing reads it", async () => {
+  it("has no switch left: the rebuilt hero replaced the previous one, and the retired flag's row was removed", async () => {
     const flag = await db.flag.findUnique({ where: { key: "home.hero_v2" } });
-    // The row stays (migrations only add); it is on and described as retired, so no toggle in the admin pretends to do anything.
-    expect(flag?.enabled).toBe(true);
-    expect(flag?.notes).toMatch(/^Retired/);
+    expect(flag).toBeNull();
   });
 
   it("seeds the owner's statement, wording and credit as a valid content block", async () => {
@@ -34,6 +32,8 @@ describe("home hero — content", () => {
     expect(block?.ledgerLabels?.shipped?.many).toBe("systems shipped to production");
     // It names what it knows: the repo with the latest real commit — not a claim that something is being built (D-039).
     expect(block?.nowLabel).toBe("Latest commit");
+    // When the owner names the system he is building, the line says so in his own words.
+    expect(block?.buildingLabel).toBe("Building now");
     // The line above the name is true to where the page runs: live, preview and local each have the owner's own wording.
     expect(block?.liveLabel).toMatch(/\{date\}/);
     expect(block?.previewLabel).toMatch(/\{date\}/);
@@ -84,7 +84,17 @@ describe("home hero — photographs", () => {
   });
 });
 
-describe("home hero — the figures and lines it states are the real ones (D-039)", () => {
+describe("home hero — the figures and lines it states are the real ones (D-039, D-040)", () => {
+  it("shows the system the owner names as what he is building — and ignores a name that is not a published system", async () => {
+    const repo = await dbPublic.publicGithubRepo.findFirst({ where: { published: true, slug: { not: null } } });
+    const { nowBuilding: none } = await getSelectedWork(0, "no-such-system-anywhere");
+    expect(none?.chosen ?? false, "an unknown name is never guessed at").toBe(false);
+    if (!repo?.slug) return; // the test database has no published repository to name
+    const { nowBuilding } = await getSelectedWork(0, repo.slug);
+    expect(nowBuilding?.chosen).toBe(true);
+    expect(nowBuilding?.fullName).toBe(repo.fullName);
+  });
+
   it("counts the systems in production as the published systems that have a live address", async () => {
     const withAddress = await dbPublic.publicSystem.findMany({ where: { liveUrl: { not: null } }, select: { slug: true } });
     expect(await countSystemsInProduction()).toBe(withAddress.length);

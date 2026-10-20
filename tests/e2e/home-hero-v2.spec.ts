@@ -55,6 +55,10 @@ for (const vp of VIEWPORTS) {
         return { top: image.top - section.top, left: image.left - section.left, bottom: section.bottom - image.bottom, right: section.right - image.right };
       });
       for (const side of Object.values(covers)) expect(side).toBeLessThanOrEqual(1);
+
+      // keep the first view as a picture: CI uploads hero-screenshots/ with every run, so the owner can look at
+      // the hero at each width on the pull request without running anything (docs/improvements/HOME-HERO-PLAN.md §19)
+      await page.screenshot({ path: `hero-screenshots/hero-${vp.width}x${vp.height}-${vp.name.replace(/\s+/g, "-")}.png` });
       const onTop = await page.evaluate(() => {
         const h1 = document.querySelector("#hero-title")!.getBoundingClientRect();
         const hit = document.elementFromPoint(h1.left + h1.width / 2, h1.top + h1.height / 2);

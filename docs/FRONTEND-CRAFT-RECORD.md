@@ -99,6 +99,11 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **Caught by the tests before CI:** the first Escape handler lived on the nav item, so a preview opened by hovering could not be closed with Escape — moved to the document. A skip-link label added to the block but not seeded would have removed the skip link — seeded and asserted.
 - **Standards held:** no wording in code; real data only; keyboard parity with hover; reduced-motion respected (no transition under `motion-reduce`); the preview is an addition, never a gate.
 
+### 2026-10-20 · Sprint 1b — speed and reliability (D-040)
+- **Decided by the owner:** approved in order — phone speed, the owner-set building line, self-hosted fonts, CI screenshots, one meaning of the words, the tidy-ups.
+- **Method:** read what the phone actually loads (the page's own resource list) before changing anything; the finding was two below-the-fold screenshots being preloaded beside the hero image. Self-hosting fonts removes a build-time network dependency, and `next/font/local` needs literal font lists — a `.map()` does not compile.
+- **Evidence still to come:** the runner's phone LCP after the release.
+
 ### 2026-10-20 · The new hero replaces the old one (D-038)
 - **Decided by the owner:** after the first release he could not see the hero on his phone because it was behind a flag: "everything old should be replaced per sprint … the new one must work, not the old one."
 - **Done:** the flag, the preview switch and the previous hero's code are removed; the rebuilt hero is the home hero. A flag is for work the owner has not approved; once approved, the sprint replaces what it rebuilt.

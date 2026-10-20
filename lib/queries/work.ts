@@ -42,6 +42,22 @@ function series(rows: { weekStart: Date; commits: number }[], now: Date): number
   });
 }
 
+/**
+ * What the owner is working on: the published system he named (only he can say), else the repo with the
+ * latest real commit. A name that matches no published system is ignored, never guessed at.
+ */
+async function currentRepo(chosenSlug: string | null, since: Date) {
+  if (chosenSlug) {
+    const repo = await dbPublic.publicGithubRepo.findFirst({ where: { slug: chosenSlug, published: true } });
+    if (repo) {
+      const last = await dbPublic.publicRepoCommit.findFirst({ where: { fullName: repo.fullName }, orderBy: { committedAt: "desc" } });
+      return { ...repo, latestCommitAt: last?.committedAt ?? null, chosen: true };
+    }
+  }
+  const latest = await latestCommitRepo(since);
+  return latest ? { ...latest, chosen: false } : null;
+}
+
 /** The public repo whose latest commit is the newest since `since`, with that commit's time; null when nothing was committed. */
 async function latestCommitRepo(since: Date) {
   const latest = await dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
@@ -51,7 +67,7 @@ async function latestCommitRepo(since: Date) {
 }
 
 /** Selected work on the home page: the owner's featured systems, then `more` others (getHomeSelection). */
-export async function getSelectedWork(more = 3) {
+export async function getSelectedWork(more = 3, chosenSlug: string | null = null) {
   const now = new Date();
   const selection = await getHomeSelection(more);
   const systems = [...selection.featured, ...selection.more];
@@ -64,7 +80,7 @@ export async function getSelectedWork(more = 3) {
     dbPublic.publicSystemActivity.findMany({ where: { slug: { in: slugs } } }),
     // The repo with the most recent real commit in the last 30 days. A push is not work: GitHub's
     // "pushed at" moves for branches, tags and automation, so a repo can show a fresh push with no commit in weeks.
-    latestCommitRepo(new Date(now.getTime() - 30 * DAY)),
+    currentRepo(chosenSlug, new Date(now.getTime() - 30 * DAY)),
   ]);
 
   const work = systems.map((s) => {
@@ -98,6 +114,8 @@ export async function getSelectedWork(more = 3) {
       home: active.home,
       url: active.published && active.slug ? `/systems/${active.slug}` : `https://github.com/${active.fullName}`,
       onSite: Boolean(active.published && active.slug),
+      /** True when the owner named this system himself; false when it is only the latest real commit. */
+      chosen: active.chosen,
       lastPush: ago(active.latestCommitAt, now),
       commitsLast4Weeks: active.commitsLast4Weeks,
       commits: commits.map((c) => ({ message: c.message, when: ago(c.committedAt, now), key: `${c.committedAt.toISOString()}:${c.message.slice(0, 24)}` })),

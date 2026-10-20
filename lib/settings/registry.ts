@@ -99,8 +99,8 @@ export const SETTINGS = {
   }),
   "home.hero.mobile.quality": define({
     schema: z.number().int().min(40).max(95),
-    default: 72,
-    description: "Home hero cover image, phones: WebP quality (lower is lighter).",
+    default: 78,
+    description: "Home hero cover image, phones: WebP quality (lower is lighter). 78 keeps a phone-sized image sharp; 72 looked blurry on a high-density phone screen (D-040).",
     rule: "D-030",
   }),
   "home.hero.entrance.durationMs": define({

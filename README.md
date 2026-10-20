@@ -113,7 +113,7 @@ I'm a final-year Computer Science and Mathematics student building production-gr
 ### How the platform works
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#131519','primaryTextColor':'#f4f2ee','primaryBorderColor':'#ff5b1f','lineColor':'#ff5b1f','secondaryColor':'#1c1f24','tertiaryColor':'#0b0c0e','clusterBkg':'#0b0c0e','clusterBorder':'#3a3f47','titleColor':'#ff5b1f','edgeLabelBackground':'#0b0c0e','fontFamily':'ui-monospace, SFMono-Regular, Menlo, monospace','fontSize':'14px'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#131519','primaryTextColor':'#f4f2ee','primaryBorderColor':'#ff5b1f','lineColor':'#ff5b1f','secondaryColor':'#1c1f24','tertiaryColor':'#0b0c0e','clusterBkg':'#0b0c0e','clusterBorder':'#3a3f47','titleColor':'#ff5b1f','edgeLabelBackground':'#0b0c0e'}}}%%
 flowchart TB
   subgraph GH["GitHub homes"]
     direction LR
@@ -150,7 +150,7 @@ flowchart TB
 ### From code to claim
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#131519','primaryTextColor':'#f4f2ee','primaryBorderColor':'#ff5b1f','lineColor':'#ff5b1f','secondaryColor':'#1c1f24','tertiaryColor':'#0b0c0e','clusterBkg':'#0b0c0e','clusterBorder':'#3a3f47','titleColor':'#ff5b1f','edgeLabelBackground':'#0b0c0e','fontFamily':'ui-monospace, SFMono-Regular, Menlo, monospace','fontSize':'14px'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#131519','primaryTextColor':'#f4f2ee','primaryBorderColor':'#ff5b1f','lineColor':'#ff5b1f','secondaryColor':'#1c1f24','tertiaryColor':'#0b0c0e','clusterBkg':'#0b0c0e','clusterBorder':'#3a3f47','titleColor':'#ff5b1f','edgeLabelBackground':'#0b0c0e'}}}%%
 flowchart LR
   C["Code pushed to GitHub"] --> S["Sync reads the manifests<br/>package.json · requirements.txt · pyproject.toml"]
   S --> E{"A dependency matches<br/>a skill's alias?"}

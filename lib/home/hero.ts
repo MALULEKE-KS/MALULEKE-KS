@@ -26,6 +26,7 @@ export interface HeroCopyBlock {
   previewLabel?: string;
   localLabel?: string;
   nowLabel?: string;
+  buildingLabel?: string;
   stackLabel?: string;
   ledgerAria?: string;
   ledgerLabels?: Partial<Record<LedgerKey, LabelPair>>;
@@ -39,6 +40,7 @@ export interface HeroCopy {
   previewLabel: string | null;
   localLabel: string | null;
   nowLabel: string | null;
+  buildingLabel: string | null;
   stackLabel: string | null;
   ledgerAria: string | null;
   ledgerLabels: Partial<Record<LedgerKey, LabelPair>>;
@@ -55,6 +57,7 @@ export function heroCopy(block: HeroCopyBlock | null | undefined): HeroCopy {
     previewLabel: text(block?.previewLabel),
     localLabel: text(block?.localLabel),
     nowLabel: text(block?.nowLabel),
+    buildingLabel: text(block?.buildingLabel),
     stackLabel: text(block?.stackLabel),
     ledgerAria: text(block?.ledgerAria),
     ledgerLabels: block?.ledgerLabels ?? {},

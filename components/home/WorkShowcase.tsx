@@ -126,7 +126,7 @@ function FeaturedCard({ w }: { w: Work }) {
   );
 }
 
-function NowBuildingCard({ now, strip = false }: { now: NonNullable<SelectedWork["nowBuilding"]>; strip?: boolean }) {
+function NowBuildingCard({ now, label, strip = false }: { now: NonNullable<SelectedWork["nowBuilding"]>; label: string | null; strip?: boolean }) {
   const external = !now.onSite;
   const text = (
     <>
@@ -136,11 +136,11 @@ function NowBuildingCard({ now, strip = false }: { now: NonNullable<SelectedWork
           <span className="relative size-2 rounded-full bg-ember" />
         </span>
         <Radio aria-hidden="true" className="size-3.5" />
-        Now building
+        {label}
       </p>
       <h3 className="relative mt-4 text-xl font-semibold tracking-tight">{now.name}</h3>
       <p className="text-mist relative mt-1 text-xs">
-        {now.home} · last push {now.lastPush}
+        {now.home}{now.lastPush && ` · last commit ${now.lastPush}`}
         {now.commitsLast4Weeks > 0 && ` · ${now.commitsLast4Weeks} commits in 4 weeks`}
       </p>
     </>
@@ -243,7 +243,7 @@ function CompactCard({ w }: { w: Work }) {
  * "Featured on home") lead as large cards — one beside "Now building", or two
  * and more side by side with "Now building" as a strip beneath. Then more work.
  */
-export function WorkShowcase({ featured, more, nowBuilding, totalPublished }: SelectedWork & { totalPublished: number }) {
+export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowLabel }: SelectedWork & { totalPublished: number; /** The owner's wording for the card ("Building now" / "Latest commit") — empty hides it. */ nowLabel: string | null }) {
   if (featured.length === 0) return null;
   const rest = [...more];
   const single = featured.length === 1;
@@ -271,7 +271,7 @@ export function WorkShowcase({ featured, more, nowBuilding, totalPublished }: Se
               <FeaturedCard w={featured[0]!} />
             </Reveal>
             <Reveal className="min-w-0 lg:col-span-4" delay={100}>
-              {nowBuilding ? <NowBuildingCard now={nowBuilding} /> : side ? <CompactCard w={side} /> : null}
+              {nowBuilding ? <NowBuildingCard now={nowBuilding} label={nowLabel} /> : side ? <CompactCard w={side} /> : null}
             </Reveal>
           </div>
         ) : (
@@ -285,7 +285,7 @@ export function WorkShowcase({ featured, more, nowBuilding, totalPublished }: Se
             </div>
             {nowBuilding && (
               <Reveal className="mt-5" delay={150}>
-                <NowBuildingCard now={nowBuilding} strip />
+                <NowBuildingCard now={nowBuilding} label={nowLabel} strip />
               </Reveal>
             )}
           </>

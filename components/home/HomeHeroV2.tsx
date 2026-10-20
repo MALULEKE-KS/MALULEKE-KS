@@ -38,8 +38,8 @@ interface HomeHeroV2Props {
   liveLine: string | null;
   /** The technologies the systems are built with, most used first (already limited by the setting). */
   stack: string[];
-  /** The repository being built right now — null when nothing was pushed lately. */
-  nowBuilding: { name: string; url: string; lastPush: string | null } | null;
+  /** What the owner is building (named by him) or, failing that, the repository with his latest real commit — null when there is neither. */
+  nowBuilding: { name: string; url: string; when: string | null; label: string | null } | null;
   copy: HeroCopy;
   ledger: ProofLedgerItem[];
   /** The cover image behind everything (HeroBackdrop) — null leaves a graphite field. */
@@ -75,11 +75,11 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             )}
             {nowBuilding && (
               <p className={chip}>
-                {copy.nowLabel && <span className="text-line">{copy.nowLabel}</span>}
+                {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
                 <Link href={nowBuilding.url} className="text-paper hover:text-ember underline-offset-2 hover:underline">
                   {nowBuilding.name}
                 </Link>
-                {nowBuilding.lastPush && <span className="text-line">· {nowBuilding.lastPush}</span>}
+                {nowBuilding.when && <span className="text-line">· {nowBuilding.when}</span>}
               </p>
             )}
           </div>

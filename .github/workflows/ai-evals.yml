@@ -1,7 +1,8 @@
 # The AI guide's evals (BR-4.3, BR-4.6; Constitution §6; docs/AI-GUIDE-PHASE2-PLAN.md §4 B4).
 #
-# - On a pull request that touches the guide (its prompt, grounding, tools, limits,
-#   or the evals themselves): the "gate" tier — the cases that need no site content
+# - On a pull request that touches the guide's own files (its prompt, grounding, tools,
+#   limits, or the evals themselves — not the site's general queries, content,
+#   settings or migrations; the nightly run below covers drift in those): the "gate" tier — the cases that need no site content
 #   (hallucination traps, commitments, privacy, attacks, safety, tone, honesty). A
 #   failing case fails the job.
 # - Every night: the same, so a model change on the provider's side is caught too.
@@ -23,10 +24,6 @@ on:
       - "lib/guide/**"
       - "app/api/v1/guide/**"
       - "tests/ai-evals/**"
-      - "lib/settings/registry.ts"
-      - "lib/queries/**"
-      - "lib/content/**"
-      - "prisma/migrations/**"
       - ".github/workflows/ai-evals.yml"
   schedule:
     - cron: "0 22 * * *"

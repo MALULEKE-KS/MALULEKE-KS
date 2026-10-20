@@ -17,6 +17,7 @@
 /coverage
 /playwright-report
 /test-results
+/hero-screenshots
 /.playwright-mcp
 
 # Misc
