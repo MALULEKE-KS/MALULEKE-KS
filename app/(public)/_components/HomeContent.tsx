@@ -102,14 +102,27 @@ export async function HomeContent() {
         nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, when: selectedWork.nowBuilding.lastPush, label: nowLabel } : null}
         evidence={evidence}
       />
+      {/* Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css). */}
       {guideEnabled && aiGuide && (
-        <AiGuideSection content={aiGuide} />
+        <div className="below-fold">
+          <AiGuideSection content={aiGuide} />
+        </div>
       )}
-      <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
-      <SystemMap data={systemMap} />
-      <ControlRoom pulse={pulse} numbers={numbers} />
-      <PrinciplesBand content={howIBuild} evidence={evidence} />
-      <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
+      <div className="below-fold">
+        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
+      </div>
+      <div className="below-fold">
+        <SystemMap data={systemMap} />
+      </div>
+      <div className="below-fold">
+        <ControlRoom pulse={pulse} numbers={numbers} />
+      </div>
+      <div className="below-fold">
+        <PrinciplesBand content={howIBuild} evidence={evidence} />
+      </div>
+      <div className="below-fold">
+        <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
+      </div>
     </>
   );
 }

@@ -287,3 +287,17 @@ Rule: a line on the hero is either a computed fact or the owner's own words — 
 **Build:** `components/shared/PageHeroBackdrop.tsx` (renders nothing until the slot has an image, so a page never waits on one) over the home hero's `HeroBackdrop`; `PageHero` takes a `backdrop` prop and Journey, About and Let's talk place it as the first child of their hero section; `scripts/build-hero-photos.mjs --slot <purpose>=<file> --replace` writes the encoded image and an additive migration. The CV page keeps its field. Prompts and provenance: `design/hero/README.md`.
 
 **About's phone image (owner, 2026-10-21: "the About needs a supporting mobile image").** The wide desk photograph crops badly to a tall phone screen (only the monitor's glow and the lamp survive). A page can therefore also have a portrait image for phones: the slot `hero-about-mobile` (settings: the home hero's phone ones, 1536 px and quality 78) and `PageHeroBackdrop`'s `mobilePurpose` — the same scene, composed for a tall screen. Pages without one use their single image for both, as before.
+
+## 21. Phone speed, first pass (owner: "do 1"; D-042; WP-102)
+
+**What the phone loads for `/` (measured with the repo's own helper on the budget script's phone profile):** scripts 321 KB across 19 files — the framework runtime ≈ 71 + 43 KB, `motion` ≈ 47 + 35 KB (25 KB of that chunk unused on this page), the rest ≤ 18 KB each; fonts 159 KB across 8 files; images 315 KB (the cover image 117 KB, two Selected-work screenshots 80 + 59 KB, the guide character 57 KB); a 433 KB HTML document (≈ 234 KB of it the framework's embedded data, ≈ 62 KB of that inline brand-mark SVG paths). Lighthouse: the main thread (script evaluation, hydration) is the wall, more than the network.
+
+**Done:** two fewer font files in the first load (Sans 700 and Mono 600 reuse the 600 and 500 files); `content-visibility: auto` on every home section below the first view (`.below-fold`, each section its own wrapper so each skips on its own).
+
+**Next, with their risks (needs the owner's go):**
+
+| Step | Gain | Risk |
+|---|---|---|
+| Replace `motion` where CSS does the job (header indicator, menu, reveal-on-scroll, number ticker) | up to ≈ 80 KB gz and the evaluation of it, on every page | 19 files; the animations are part of the design — each needs a visual check |
+| Hydrate below-the-fold sections only when they near the screen | cuts the hydration work that blocks the main thread | a structural pattern new to this codebase; interactive sections must still work on first touch |
+| Stop embedding the brand-mark SVG paths twice (HTML and framework data) — serve marks as cached `/brands/*.svg` images | ≈ 60–120 KB of HTML parse | the marks are part of the "real brand marks" the owner asked for |

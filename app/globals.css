@@ -348,6 +348,13 @@ html {
   }
 }
 /* A detail that earns its place only when the screen has the room: hidden on phones and on short screens. */
+/* Sections below the first view: the browser skips their style, layout and paint until they are near the screen
+   (content-visibility), with a remembered size so the page does not jump (docs/improvements/HOME-HERO-PLAN.md §21). */
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
 .hero-tall-only { display: none; }
 @media (min-width: 640px) and (min-height: 1000px) {
   .hero-tall-only { display: flex; }
