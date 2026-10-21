@@ -355,3 +355,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Done (low-risk):** two fewer font files in the first load; `content-visibility: auto` on each home section below the first view.
 - **Not done, deliberately:** replacing `motion` (19 files, part of the design) and lazy-hydrating below-the-fold sections — proposed in HOME-HERO-PLAN §21 with gain and risk; they are what it takes to approach 2.5 s, and need the owner's go.
 - **Next up:** stays WP-102 — re-measure on the runner after this release, then the owner chooses from §21.
+
+### 2026-10-21 · Phone speed, first pass — what the runner measured (D-042) and a budget that was really data
+- **Measured after release (largest paint on the phone profile, before → after):** home 4.55 → 4.36 s, Systems 4.06 → 3.84 s, About 4.36 → 4.15 s, Journey 3.92 → 3.78 s, Let's talk 4.21 → 2.88 s; every page ≈ 38 KB lighter; CLS 0 (0.003 on two pages). A modest gain, as expected: the target (2.5 s) needs the structural steps in HOME-HERO-PLAN §21.
+- **The post-deploy check then failed on the home page's desktop image weight (371 KB against 320):** not the rendering change — the platform's own commits had synced, so MALULEKE-KS became the "Latest commit" system and the "Now building" card shows its own screenshot (81 KB). That is data (it depends on which system is current), bounded by one screenshot, so the budget now says so (+80 KB on `/` image weight, named in the ratchet test) instead of being loosened silently.
+- **Next up:** stays WP-102 — the owner chooses from §21 (replace `motion`, lazy hydration, brand marks as images).
