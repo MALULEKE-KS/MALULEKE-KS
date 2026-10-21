@@ -79,7 +79,9 @@ if (desktopSrc) built["hero-desktop"] = await encode(desktopSrc, desktop);
 if (mobileSrc) built["hero-mobile"] = await encode(mobileSrc, mobile);
 for (const [purpose, file] of slots) {
   built[purpose] = await encode(file, page);
-  if (built[purpose].width <= built[purpose].height) throw new Error(`The ${purpose} image should be landscape.`);
+  // A slot named "-mobile" is a page's portrait image for phones; every other page slot is landscape.
+  const portrait = purpose.endsWith("-mobile");
+  if (portrait ? built[purpose].width >= built[purpose].height : built[purpose].width <= built[purpose].height) throw new Error(`The ${purpose} image should be ${portrait ? "portrait" : "landscape"}.`);
 }
 if (built["hero-desktop"] && built["hero-desktop"].width <= built["hero-desktop"].height) throw new Error("The desktop image should be landscape.");
 if (built["hero-mobile"] && built["hero-mobile"].width >= built["hero-mobile"].height) throw new Error("The phone image should be portrait.");

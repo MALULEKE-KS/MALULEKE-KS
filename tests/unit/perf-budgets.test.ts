@@ -26,8 +26,8 @@ describe("perf-budgets.json", () => {
 
   it("only ratchets down: never looser than the WP-001 baseline plus 20% (plus the pages' own hero images, each named and owner-approved)", () => {
     // D-041 (owner, 2026-10-20): Systems, Journey, About and Let's talk each open on their own hero image. Their weight is the only
-    // thing allowed above the ratchet, listed here by page in KB (the encoded images are 103, 35, 37 and 22 KiB).
-    const heroImageKb: Record<string, number> = { "/systems": 110, "/journey": 40, "/about": 42, "/contact": 30 };
+    // thing allowed above the ratchet, listed here by page in KB (the encoded images are 39, 35, 37 and 22 KiB).
+    const heroImageKb: Record<string, number> = { "/systems": 45, "/journey": 40, "/about": 42, "/contact": 30 };
     const baseline = JSON.parse(readFileSync("docs/improvements/baseline-2026-10-10.json", "utf8"));
     type Weight = { totalKb: number; imageKb: number; requests: number };
     for (const r of baseline.routes) {

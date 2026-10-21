@@ -151,7 +151,7 @@ export default async function AboutPage() {
 
       {/* ─── 1. Hero ─── */}
       <section aria-labelledby="about-title" className="hero-field text-paper relative isolate overflow-hidden">
-        <PageHeroBackdrop purpose="hero-about" />
+        <PageHeroBackdrop purpose="hero-about" mobilePurpose="hero-about-mobile" />
         <div aria-hidden="true" className="pointer-events-none absolute -top-40 right-[-15%] size-[48rem] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.16),transparent)]" />
         <Container className="relative grid grid-cols-1 items-center gap-12 pt-28 pb-16 md:pt-32 lg:grid-cols-12 lg:gap-14 lg:pb-24">
           <div className="min-w-0 lg:col-span-7">

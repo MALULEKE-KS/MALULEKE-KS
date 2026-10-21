@@ -5,8 +5,9 @@
 // alike — the bands are short, so one image crops well for both. Each page's image
 // is its own (docs/improvements/HOME-HERO-PLAN.md §20, D-041).
 //
-// With no image uploaded it renders nothing and the page keeps its graphite field,
-// so a page never waits on an image. The section that holds it must be
+// A page whose wide image does not crop well to a tall phone screen can also give a
+// portrait image for phones (`mobilePurpose`, its own slot). With no image uploaded it
+// renders nothing and the page keeps its graphite field, so a page never waits on an image. The section that holds it must be
 // `relative isolate`. Darkness is the setting site.pageHero.scrim.
 
 import { HeroBackdrop } from "@/components/shared/HeroBackdrop";
@@ -14,10 +15,12 @@ import { getPublicPhotos } from "@/lib/queries/profile";
 import type { PhotoPurpose } from "@/lib/profile/photos";
 import { getSetting } from "@/lib/settings";
 
-export async function PageHeroBackdrop({ purpose }: { purpose: PhotoPurpose }) {
+export async function PageHeroBackdrop({ purpose, mobilePurpose }: { purpose: PhotoPurpose; mobilePurpose?: PhotoPurpose }) {
   const [photos, scrim] = await Promise.all([getPublicPhotos(), getSetting("site.pageHero.scrim")]);
-  const photo = photos[purpose];
-  if (!photo) return null;
-  const source = { url: photo.url, width: photo.width, height: photo.height };
-  return <HeroBackdrop desktop={source} mobile={source} scrim={scrim} glow={0} />;
+  const wide = photos[purpose];
+  const tall = (mobilePurpose && photos[mobilePurpose]) || wide;
+  if (!wide && !tall) return null;
+  const source = (p: NonNullable<typeof wide>) => ({ url: p.url, width: p.width, height: p.height });
+  // One image serves both when only one exists (HeroBackdrop falls back the same way).
+  return <HeroBackdrop desktop={wide ? source(wide) : null} mobile={tall ? source(tall) : null} scrim={scrim} glow={0} />;
 }
