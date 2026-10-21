@@ -48,6 +48,12 @@ export const PHOTO_PURPOSES = {
     description: "The image behind the top of /about (landscape, about 3:2, the subject near the centre). Size and quality: Settings → site.pageHero.*",
     processing: { maxEdgeSetting: "site.pageHero.maxEdgePixels", qualitySetting: "site.pageHero.quality" },
   },
+  // A page whose landscape image does not crop well to a tall phone screen may also have its own portrait image for phones (PageHeroBackdrop's mobilePurpose).
+  "hero-about-mobile": {
+    label: "About page — phone hero image",
+    description: "The portrait image behind the top of /about on phones (about 2:3; the same scene as the wide one, composed for a tall screen). Size and quality: Settings → home.hero.mobile.* (the same as the home hero's phone image).",
+    processing: { maxEdgeSetting: "home.hero.mobile.maxEdgePixels", qualitySetting: "home.hero.mobile.quality" },
+  },
   "hero-contact": {
     label: "Let's talk page — hero image",
     description: "The image behind the top of /contact (landscape, about 3:2, the subject near the centre). Size and quality: Settings → site.pageHero.*",

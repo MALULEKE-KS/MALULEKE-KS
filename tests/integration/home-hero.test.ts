@@ -112,13 +112,17 @@ describe("home hero — the figures and lines it states are the real ones (D-039
 describe("page hero images (D-041)", () => {
   // One landscape image per page (Systems, Journey, About, Let's talk), shown behind the top of its page; a page with none keeps its graphite field.
   const PAGE_HEROES = ["hero-systems", "hero-journey", "hero-about", "hero-contact"];
+  // A page may also have a portrait image for phones (About does).
+  const PAGE_PHONE_HEROES = ["hero-about-mobile"];
   const PAGE_HERO_BUDGET = 110 * KIB;
 
   it("keeps every page image that exists landscape, light, WebP and free of metadata", async () => {
-    const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: PAGE_HEROES } } });
+    const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: [...PAGE_HEROES, ...PAGE_PHONE_HEROES] } } });
     for (const r of rows) {
-      expect(r.byteSize, `${r.purpose} is ${(r.byteSize / KIB).toFixed(1)} KiB`).toBeLessThanOrEqual(PAGE_HERO_BUDGET);
-      expect(r.width, `${r.purpose} is landscape`).toBeGreaterThan(r.height);
+      const phone = PAGE_PHONE_HEROES.includes(r.purpose);
+      expect(r.byteSize, `${r.purpose} is ${(r.byteSize / KIB).toFixed(1)} KiB`).toBeLessThanOrEqual(phone ? 130 * KIB : PAGE_HERO_BUDGET);
+      if (phone) expect(r.height, `${r.purpose} is portrait`).toBeGreaterThan(r.width);
+      else expect(r.width, `${r.purpose} is landscape`).toBeGreaterThan(r.height);
       const meta = await sharp(r.fileData).metadata();
       expect(meta.format).toBe("webp");
       expect(meta.exif).toBeUndefined();
@@ -129,5 +133,8 @@ describe("page hero images (D-041)", () => {
     const rows = await dbPublic.publicProfilePhoto.findMany({ where: { purpose: { in: PAGE_HEROES } }, select: { purpose: true } });
     const have = new Set(rows.map((r) => r.purpose));
     for (const purpose of PAGE_HEROES) expect(have.has(purpose), `${purpose} is seeded`).toBe(true);
+    // About also has its own portrait image for phones.
+    const phone = await dbPublic.publicProfilePhoto.findFirst({ where: { purpose: "hero-about-mobile" }, select: { purpose: true } });
+    expect(phone, "hero-about-mobile is seeded").not.toBeNull();
   });
 });
