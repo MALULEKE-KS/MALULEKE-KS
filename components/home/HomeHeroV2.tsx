@@ -63,7 +63,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
       <Container className="flex flex-1 flex-col justify-start pt-28 pb-8 md:justify-center md:pt-[5.5rem] md:pb-10">
         {/* One column: centred on a phone, set at the left on larger screens so the image's right side has the room. */}
         <div className="flex max-w-[46rem] flex-col items-center text-center max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)] md:items-start md:text-left">
-          <div className="hero-rise flex flex-wrap items-center justify-center gap-2 md:justify-start" style={rise(0)}>
+          <div className="hero-rise flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-start" style={rise(0)}>
             {liveLine && (
               <p className={chip}>
                 <span className="relative flex size-2" aria-hidden="true">

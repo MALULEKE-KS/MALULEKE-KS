@@ -348,3 +348,10 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 ### 2026-10-21 · About gets its own phone image; Systems gets a new image (D-041, owner's requests)
 - **Owner:** the Systems page image "needs to be changed — let's generate another one"; "the About needs a supporting mobile image".
 - **Done in code:** the slot `hero-about-mobile` and `PageHeroBackdrop mobilePurpose` (a page can give a portrait image for phones; without one the single image serves both); the integration test treats a page's phone image as portrait. The new Systems image (interlocking graphite modules with orange light seams — a replacement for the circuit board) and About's portrait image are generated in the owner's ChatGPT account and are added by migration once downloaded and checked at phone size.
+
+### 2026-10-21 · Sprint 1d — phone speed, first pass (D-042; WP-102 partial)
+- **Owner:** "do 1" — trim the phone's JavaScript first.
+- **Read first:** the phone's largest paint is 3.9–4.5 s on every core page on the runner (target 2.5 s). The home page loads 321 KB of JavaScript (framework ≈ 115 KB, `motion` ≈ 80 KB), 159 KB of fonts, a 117 KB cover image; Lighthouse shows main-thread work (script evaluation, hydration) as the wall. Local Lighthouse on this machine swung from 3.6 s to 9.9 s between runs (memory pressure), so the runner's numbers are the evidence, not mine.
+- **Done (low-risk):** two fewer font files in the first load; `content-visibility: auto` on each home section below the first view.
+- **Not done, deliberately:** replacing `motion` (19 files, part of the design) and lazy-hydrating below-the-fold sections — proposed in HOME-HERO-PLAN §21 with gain and risk; they are what it takes to approach 2.5 s, and need the owner's go.
+- **Next up:** stays WP-102 — re-measure on the runner after this release, then the owner chooses from §21.
