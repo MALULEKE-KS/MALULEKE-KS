@@ -28,6 +28,8 @@ describe("perf-budgets.json", () => {
     // D-041 (owner, 2026-10-20): Systems, Journey, About and Let's talk each open on their own hero image. Their weight is the only
     // thing allowed above the ratchet, listed here by page in KB (the encoded images are 39, 35, 37 and 22 KiB).
     const heroImageKb: Record<string, number> = { "/systems": 45, "/journey": 40, "/about": 42, "/contact": 30 };
+    // And the home page: the "Now building" card shows the current system's screenshot when it has one (one image, ≤ 80 KB, data-driven).
+    const nowBuildingScreenshotKb = 80;
     const baseline = JSON.parse(readFileSync("docs/improvements/baseline-2026-10-10.json", "utf8"));
     type Weight = { totalKb: number; imageKb: number; requests: number };
     for (const r of baseline.routes) {
@@ -35,7 +37,7 @@ describe("perf-budgets.json", () => {
       const weights = (Object.values(r.devices) as { weight: Weight }[]).map((d) => d.weight);
       const most = (f: (w: Weight) => number) => Math.max(...weights.map(f));
       const b = budgets.weights[r.route];
-      const own = heroImageKb[r.route] ?? 0;
+      const own = (heroImageKb[r.route] ?? 0) + (r.route === "/" ? nowBuildingScreenshotKb : 0);
       expect(b.totalKb).toBeLessThanOrEqual(most((w) => w.totalKb) * 1.2 + own);
       expect(b.imageKb).toBeLessThanOrEqual(most((w) => w.imageKb) * 1.2 + own);
       expect(b.requests).toBeLessThanOrEqual(most((w) => w.requests) + 12);
