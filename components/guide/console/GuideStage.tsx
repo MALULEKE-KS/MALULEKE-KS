@@ -1,13 +1,15 @@
 // components/guide/console/GuideStage.tsx
-// The character at work (docs/AI-GUIDE-PHASE1-PLAN.md §8). GuideBust is the
-// live rig — the same body as the hero — cropped to the head and shoulders, so
-// it thinks, speaks and follows the visitor wherever it's shown: the home band's
-// card and console header, the panel's header elsewhere. (The large desktop
-// portrait, GuideStage, was removed with the home band's rebuild — D-043.)
+// The guide's identity and its state (docs/AI-GUIDE-PHASE1-PLAN.md §8). GuideMark is
+// the site's own K-S cube mark, still, with the guide's state on it — a status dot,
+// and a turning ring while it works — wherever the guide is shown: the home band's
+// card, the console header, the docked panel elsewhere, the "still answering"
+// button. It replaced the illustrated character on the owner's choice
+// (2026-10-22, D-043: "go ahead with the brand mark"); the large desktop portrait
+// (GuideStage) went with the home band's rebuild.
 
 "use client";
 
-import { GuideCharacter } from "@/components/guide/GuideCharacter";
+import { CubeMark } from "@/components/shared/BrandMark";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import type { OrbMode } from "@/components/ui/thinking-orb";
@@ -25,15 +27,13 @@ export function useGuideStatus() {
   return { label, mode, busy, working };
 }
 
-export function GuideBust({ className, ring = true }: { className?: string; ring?: boolean }) {
+export function GuideMark({ className }: { className?: string }) {
   const { busy } = useGuideChat();
   const { ready } = useGuide();
   return (
     <span className={cn("relative inline-block shrink-0", className)}>
-      <span className={cn("bg-night-deep absolute inset-0 overflow-hidden rounded-full", ring && "ring-1 ring-white/15")}>
-        <GuideCharacter className="absolute top-[-6%] left-1/2 w-[235%] -translate-x-1/2" />
-      </span>
-      {busy && <span aria-hidden="true" className="border-ember/70 absolute -inset-1 rounded-full border-2 border-t-transparent motion-safe:animate-spin" />}
+      <CubeMark spin={false} className="size-full ring-1 ring-white/12" />
+      {busy && <span aria-hidden="true" className="border-ember/70 absolute -inset-1 rounded-[32%] border-2 border-t-transparent motion-safe:animate-spin" />}
       <span
         aria-hidden="true"
         className={cn("ring-night absolute -right-0.5 -bottom-0.5 size-3 rounded-full ring-2", busy ? "bg-ember motion-safe:animate-pulse" : ready ? "bg-[var(--color-signal-finished-on-dark)]" : "bg-line")}

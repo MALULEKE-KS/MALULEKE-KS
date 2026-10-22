@@ -2,6 +2,9 @@
 // Where the visitor writes. While they type, every character on screen looks
 // at it (the rig's gaze); Enter sends, Shift+Enter breaks a line; the answer
 // can be stopped. The guide is labelled AI here, always (BR-4.3).
+// `compact` (the home band's ready card, D-043): a taller, calmer box and one line
+// of small print — the AI label and what is kept — because the card shows the
+// self-check itself, up where it can be seen.
 
 "use client";
 
@@ -12,7 +15,7 @@ import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import { cn } from "@/lib/utils";
 import { warmGuide } from "@/lib/guide/warm-client";
 
-export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function Composer({ id }, ref) {
+export const Composer = forwardRef<HTMLTextAreaElement, { id: string; compact?: boolean }>(function Composer({ id, compact = false }, ref) {
   const { ownerFirstName, lookAt, setMood, mood } = useGuide();
   const { busy, send, stop, maxQuestionCharacters, privacyNote, checkNote } = useGuideChat();
   const [input, setInput] = useState("");
@@ -31,7 +34,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function
 
   return (
     <form
-      className="relative border-t border-white/[0.07] p-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className={cn("relative p-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]", !compact && "border-t border-white/[0.07]")}
       onSubmit={(e) => {
         e.preventDefault();
         submit();
@@ -62,7 +65,10 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function
               }
             }}
             placeholder={`Ask about ${ownerFirstName}'s work — or anything`}
-            className="placeholder:text-line max-h-32 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-[15px] outline-none [field-sizing:content] sm:text-sm"
+            className={cn(
+              "placeholder:text-line max-h-32 flex-1 resize-none bg-transparent px-2 outline-none [field-sizing:content]",
+              compact ? "min-h-11 py-2.5 text-base" : "min-h-10 py-2 text-[15px] sm:text-sm",
+            )}
           />
           {busy ? (
             <button type="button" onClick={stop} className="bg-paper text-ink grid size-10 shrink-0 place-items-center rounded-full" aria-label="Stop the answer">
@@ -80,16 +86,20 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string }>(function
           )}
         </div>
       </div>
-      <p className="text-line mt-2 flex items-center justify-between gap-2 px-1 text-[11px]">
-        <span className="inline-flex items-center gap-1">
-          <ShieldCheck aria-hidden="true" className="size-3" /> AI · answers from this site&apos;s data · can make mistakes
+      <p className="text-line mt-2 flex items-start justify-between gap-2 px-1 text-[11px] leading-snug">
+        <span className="inline-flex items-start gap-1">
+          <ShieldCheck aria-hidden="true" className="mt-px size-3 shrink-0" />
+          <span>
+            AI · answers from this site&apos;s data · can make mistakes
+            {compact && privacyNote && <>. {privacyNote}</>}
+          </span>
         </span>
         <span className={cn(input.length > maxQuestionCharacters * 0.8 ? "" : "invisible", tooLong && "text-[var(--color-ember)]")}>
           {input.length}/{maxQuestionCharacters}
         </span>
       </p>
-      {checkNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{checkNote}</p>}
-      {privacyNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{privacyNote}</p>}
+      {!compact && checkNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{checkNote}</p>}
+      {!compact && privacyNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{privacyNote}</p>}
     </form>
   );
 });

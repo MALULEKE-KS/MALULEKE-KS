@@ -39,13 +39,19 @@ for (const vp of [
       expect(clipped, "a question is cut off").toBe(false);
     }
 
+    // the guide is the site's mark, not an illustrated character
+    await expect(band.locator(".ks-cube").first()).toBeVisible();
+
     // phone first: the guide comes straight after the introduction, before the trust points
     if (vp.name === "phone") {
       const box = await band.locator("#guide-input-home").boundingBox();
-      const points = band.locator("ul").last();
+      const points = band.locator(":scope > div dl").last();
       const pointsBox = await points.boundingBox();
       if (box && pointsBox) expect(box.y).toBeLessThan(pointsBox.y);
     }
+
+    // kept as a picture: CI uploads hero-screenshots/ with every run, so the band can be looked at on the pull request
+    await band.screenshot({ path: `hero-screenshots/guide-band-${vp.width}x${vp.height}-${vp.name}.png` });
 
     // nothing pushes the page sideways
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
@@ -74,4 +80,5 @@ test("asking on a phone gives the conversation the whole screen", async ({ page 
   // and nothing of the page shows through it
   const bg = await chat.evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(bg).not.toMatch(/rgba\(.*,\s*0\.\d+\)$/);
+  await page.screenshot({ path: "hero-screenshots/guide-band-asked-390x844-phone.png" });
 });

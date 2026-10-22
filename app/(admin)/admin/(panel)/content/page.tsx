@@ -65,6 +65,8 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "lede", label: "Introduction", max: 500, kind: "text" },
     { name: "suggestions", label: "Example questions", max: 140, kind: "list", maxItems: 6 },
     { name: "tryLabel", label: "The line above the example questions", max: 40, kind: "line", hint: "Empty shows none." },
+    { name: "knowsLine", label: "What the guide reads right now (under its name)", max: 120, kind: "line", hint: "Fill-ins: {systems} — published systems; {synced} — when GitHub was last synced. Parts separated by \" · \"; a part whose figure is missing is left out. Empty shows none." },
+    { name: "shortcutLabel", label: "Beside the / key on a desktop", max: 40, kind: "line", hint: "Pressing / puts the cursor in the box. Empty hides the hint." },
     {
       name: "points",
       label: "What makes the answers worth trusting (beside the guide)",

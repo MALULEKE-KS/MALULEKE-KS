@@ -20,7 +20,7 @@ import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import { Composer } from "@/components/guide/console/Composer";
 import { Conversation } from "@/components/guide/console/Conversation";
-import { GuideBust, useGuideStatus } from "@/components/guide/console/GuideStage";
+import { GuideMark, useGuideStatus } from "@/components/guide/console/GuideStage";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ function Header({ variant, full, onFull, onClose }: { variant: "inline" | "panel
   const icon = "text-mist hover:text-paper grid size-10 place-items-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-ember";
   return (
     <header className="relative flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
-      <GuideBust className="size-12" />
+      <GuideMark className="size-12" />
       <div className="min-w-0 flex-1">
         <h3 id={`guide-title-${variant}`} className="text-paper flex items-center gap-2 text-sm font-semibold">
           {ownerFirstName}&apos;s AI guide

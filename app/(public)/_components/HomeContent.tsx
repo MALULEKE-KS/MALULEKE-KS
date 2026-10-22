@@ -8,7 +8,7 @@ import { HomeHeroV2Section } from "./HomeHeroV2Section";
 import { heroCopy } from "@/lib/home/hero";
 import { PrinciplesBand } from "@/components/home/PrinciplesBand";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
-import { getSelectedWork } from "@/lib/queries/work";
+import { ago, getSelectedWork } from "@/lib/queries/work";
 import { SystemMap } from "@/components/home/SystemMap";
 import { getSystemMap } from "@/lib/queries/map";
 import { ControlRoom } from "@/components/home/ControlRoom";
@@ -105,7 +105,12 @@ export async function HomeContent() {
       {/* Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css) —
           except the AI guide's band: it holds fixed-position UI (the phone's full-screen conversation, the
           "still answering" button), which a content-visibility wrapper would trap inside the section. */}
-      {guideEnabled && aiGuide && <AiGuideSection content={aiGuide} />}
+      {guideEnabled && aiGuide && (
+        <AiGuideSection
+          content={aiGuide}
+          facts={{ systems: totalPublished, synced: ago(pulse.lastGithubSyncAt ? new Date(pulse.lastGithubSyncAt) : null) }}
+        />
+      )}
       <div className="below-fold">
         <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
       </div>

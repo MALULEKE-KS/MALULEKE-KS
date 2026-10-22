@@ -113,6 +113,10 @@ export const CONTENT_BLOCKS = {
       points: z.array(z.object({ title: Text(60), text: Text(200) })).max(3).optional(),
       // The line above the example questions on the home page; empty shows none.
       tryLabel: z.string().trim().max(40).optional(),
+      // What the guide reads right now, in the home band's card: fill-ins {systems} (published systems) and {synced} (when GitHub was last synced). A " · " part whose figure is missing is left out.
+      knowsLine: z.string().trim().max(120).optional(),
+      // Beside the "/" key on a desktop (it puts the cursor in the box). Empty shows no hint.
+      shortcutLabel: z.string().trim().max(40).optional(),
       // What the guide keeps of a question it can't answer, said beside the box. {retentionDays} is filled in from the setting; not shown when nothing is kept.
       privacyNote: z.string().trim().max(200).optional(),
       // The guide's own nightly self-check, said beside the box. {date}, {total}, {passed}, {failed} are filled in; nothing is shown before the first run.
