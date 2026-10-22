@@ -107,3 +107,8 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 ### 2026-10-20 · The new hero replaces the old one (D-038)
 - **Decided by the owner:** after the first release he could not see the hero on his phone because it was behind a flag: "everything old should be replaced per sprint … the new one must work, not the old one."
 - **Done:** the flag, the preview switch and the previous hero's code are removed; the rebuilt hero is the home hero. A flag is for work the owner has not approved; once approved, the sprint replaces what it rebuilt.
+
+### 2026-10-22 · The AI guide band, rebuilt (D-043, owner's choice A)
+- **Owner:** the band was "fading inside content and very poor". **Method:** captured the live band at phone and desktop width, closed and opened, before touching code; listed what was wrong by what a visitor sees; offered three directions (A ready guide beside the introduction, B no band, C A plus a live example); the owner chose A.
+- **Built:** a graphite band of its own; the introduction and three trust points (owner data) beside a ready guide — the real composer and three questions in full; the conversation replaces the card in place on the first question; no portrait, glows or moving lines; no blur-in. Phone-first order through CSS grid placement (DOM order introduction → guide → points; on large screens the guide spans both rows).
+- **Caught by looking, not by tests:** a `content-visibility: auto` wrapper (added the day before for speed) contains `position: fixed` descendants — the phone's full-screen conversation rendered inside the band. Rule written in `globals.css`; e2e test added.

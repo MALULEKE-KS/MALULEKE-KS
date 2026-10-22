@@ -143,3 +143,7 @@ New **read-only, server-executed** tools — the model only chooses *which* reco
 1. **The new card tools ship off** (BR-4.4). Switch them on yourself in Admin → Flags after seeing them — or tell me to enable them in the same release.
 2. **The four "what it does" cards go** from the home section (the console shows each one instead). OK?
 3. **Later phases (not now):** a better model than the free one (cost per question is in the AI Gateway note), role-tailored openers (F), "Ask the guide" in ⌘K search (G), rule cards once rules are data.
+
+## Update — the home band, rebuilt (2026-10-22, D-043)
+
+The home section described above (the character large on a stage beside the conversation, behind a closed accordion) was rebuilt on the owner's choice "A": the guide **ready** beside the owner's introduction and three trust points, the conversation replacing the card in place on the first question. `GuideStage` (the large portrait) is removed; the bust (`GuideBust`) stays as the guide's identity in the card, the console header and the docked panel. The console, the receipts, the cards and the working trail are unchanged.

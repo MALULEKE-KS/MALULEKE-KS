@@ -1,67 +1,113 @@
 // components/home/AiGuideSection.tsx
-// Home — the AI guide's own section (docs/AI-GUIDE-PHASE1-PLAN.md §4).
-// Closed by default (owner, 2026-10-02, kept 2026-10-08: "a collapsable
-// dropdown … free scrolling for those who didn't visit for AI"): a glass bar
-// with the character's live bust, the heading and three questions. Opening it —
-// or asking one of the questions — unfolds the guide's console right here, the
-// same conversation the docked panel holds on every other page. The console's
-// code loads on first open, so a visitor who never opens it never downloads it.
-// An accordion by the book: the heading holds the button, aria-expanded /
-// aria-controls; reduced motion opens instantly.
+// Home — the AI guide's own band (docs/AI-GUIDE-PHASE1-PLAN.md §4; rebuilt on the
+// owner's choice "A", 2026-10-22, D-043). Its own section, clearly apart from the
+// hero: on the left the owner's introduction and what makes the answers worth
+// trusting (three points, his wording); on the right the guide itself, ready —
+// three questions and the box to ask your own, with nothing to open first.
 //
-// A question asked from elsewhere on the page (a lens chip in the hero) opens
-// it and scrolls here. While the guide is still answering and the console is
-// off screen, a small bust in the corner says so and brings the visitor back.
+// Asking — here, or from the hero's "Ask the guide" — turns the right side into the
+// conversation in place. The conversation's code loads on that first question, so a
+// visitor who never asks never downloads it. No portrait, no glows, no moving lines:
+// the small bust is the guide's identity, and everything else is the answer.
+//
+// While the guide is still answering and the band is off screen, a small bust in the
+// corner says so and brings the visitor back.
 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
-import { BorderBeam } from "@/components/ui/border-beam";
-import { MagicCard } from "@/components/ui/magic-card";
+import { ArrowUpRight, Database, FileSearch, ShieldCheck, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Accent } from "@/components/shared/Accent";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
+import { Composer } from "@/components/guide/console/Composer";
 import { GuideBust, useGuideStatus } from "@/components/guide/console/GuideStage";
-import { cn } from "@/lib/utils";
 
 export interface AiGuideContent {
   eyebrow: string;
   heading: string;
   lede: string;
   suggestions: string[];
+  /** What makes the answers worth trusting — up to three, the owner's wording. */
+  points?: { title: string; text: string }[];
+  /** The line above the example questions. */
+  tryLabel?: string;
 }
+
+// One icon per point, in order: where the answers come from, that they show their sources, that the guide never acts for you.
+const POINT_ICONS: LucideIcon[] = [Database, FileSearch, ShieldCheck];
 
 const GuideConsole = dynamic(() => import("@/components/guide/console/GuideConsole").then((m) => m.GuideConsole), {
   ssr: false,
-  loading: () => <div className="h-[min(36rem,calc(100dvh-7rem))] animate-pulse rounded-3xl bg-white/[0.03] lg:h-[38rem]" />,
+  loading: () => <div className="h-[min(34rem,calc(100dvh-7rem))] animate-pulse rounded-3xl border border-white/10 bg-white/[0.03]" />,
 });
 
+/** The guide before the first question: who it is, three questions, and the box. */
+function AskCard({ content }: { content: AiGuideContent }) {
+  const { ownerFirstName } = useGuide();
+  const { send, busy } = useGuideChat();
+  const { label } = useGuideStatus();
+  const questions = content.suggestions.slice(0, 3);
+  return (
+    <div className="bg-night-deep/70 overflow-hidden rounded-3xl border border-white/10 shadow-[0_30px_80px_-40px_rgb(0_0_0/0.9)]">
+      <div className="flex items-center gap-3 border-b border-white/[0.07] px-5 py-4">
+        <GuideBust className="size-11" />
+        <div className="min-w-0">
+          <p className="text-paper flex items-center gap-2 text-sm font-semibold">
+            {ownerFirstName}&apos;s AI guide
+            <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+          </p>
+          <p className="text-mist mt-0.5 truncate text-xs">{label}</p>
+        </div>
+      </div>
+      {questions.length > 0 && (
+        <div className="px-5 pt-5">
+          {content.tryLabel && <p className="text-line mb-3 font-mono text-[11px] tracking-[0.14em] uppercase">{content.tryLabel}</p>}
+          <ul className="grid gap-2">
+            {questions.map((q, i) => (
+              <li key={q}>
+                <button
+                  type="button"
+                  onClick={() => send(q)}
+                  disabled={busy}
+                  className="group/q hover:border-ember/40 focus-visible:outline-ember flex w-full items-start gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-left text-[15px] leading-snug transition-colors hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+                >
+                  <span className="type-data text-ember/80 mt-0.5 text-xs">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="text-paper flex-1">{q}</span>
+                  <ArrowUpRight aria-hidden="true" className="text-mist group-hover/q:text-ember mt-0.5 size-4 shrink-0" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="mt-4">
+        <Composer id="guide-input-home" />
+      </div>
+    </div>
+  );
+}
+
 export function AiGuideSection({ content }: { content: AiGuideContent }) {
-  const { enabled, ready, open: askedFromPage, setOpen: setAskedFromPage, ownerFirstName } = useGuide();
-  const { busy, send, askedAt } = useGuideChat();
+  const { enabled, open: askedFromPage, setOpen: setAskedFromPage } = useGuide();
+  const { busy, messages, askedAt } = useGuideChat();
   const { label } = useGuideStatus();
   const reduced = useReducedMotion();
   const section = useRef<HTMLElement>(null);
-  const [open, setOpen] = useState(false);
   const [inView, setInView] = useState(true);
+  // The conversation shows once there is one: a question asked now, or one restored from earlier in the visit.
+  const live = askedAt !== null || messages.length > 0;
 
-  // Asked from elsewhere on the home page (there's no panel here): open, and bring the console into view.
+  // Asked to open from elsewhere on the page (the hero's "Ask the guide"): bring the band into view and put the cursor in the box.
   useEffect(() => {
     if (!askedFromPage) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- a question was asked from the page: the guide opens
-    setOpen(true);
     section.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    if (!live) document.getElementById("guide-input-home")?.focus({ preventScroll: true });
     setAskedFromPage(false);
-  }, [askedFromPage, setAskedFromPage, reduced]);
-  // Any question asked opens the guide, wherever it was asked from.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- a question was asked: show the answer
-    if (askedAt !== null) setOpen(true);
-  }, [askedAt]);
+  }, [askedFromPage, setAskedFromPage, reduced, live]);
 
   useEffect(() => {
     const el = section.current;
@@ -72,88 +118,48 @@ export function AiGuideSection({ content }: { content: AiGuideContent }) {
   }, []);
 
   if (!enabled) return null;
+  const points = (content.points ?? []).slice(0, POINT_ICONS.length);
 
   return (
-    <section ref={section} id="ai-guide" aria-labelledby="ai-guide-title" className="text-paper bg-night-deep relative scroll-mt-20 overflow-hidden">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgb(255_91_31/0.5),transparent)]" />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(38rem_22rem_at_22%_40%,rgb(255_91_31/0.12),transparent_70%),radial-gradient(30rem_20rem_at_90%_90%,rgb(96_130_170/0.12),transparent_70%)]"
-      />
-
-      <Container className="relative py-14 md:py-16">
-        <MagicCard className="rounded-3xl shadow-[0_40px_100px_-50px_rgb(0_0_0/0.95)]" surface="rgb(16 18 22 / 0.94)">
-          <div className="flex flex-col p-4 sm:p-6">
-            <h2 id="ai-guide-title" className="min-w-0 flex-1">
-              <button
-                type="button"
-                onClick={() => setOpen((o) => !o)}
-                aria-expanded={open}
-                aria-controls="ai-guide-panel"
-                className="group/bar flex w-full items-center gap-4 rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember"
-              >
-                <GuideBust className="size-12 sm:size-14" />
-                <span className="min-w-0 flex-1">
-                  <span className="text-mist flex flex-wrap items-center gap-2 text-xs font-normal">
-                    <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
-                    {content.eyebrow}
-                    <span aria-hidden="true">·</span>
-                    {busy ? label : ready ? "Online" : "Resting"}
-                  </span>
-                  <span className="mt-1 block text-[1.35rem] leading-tight font-semibold tracking-[-0.02em] text-balance sm:text-[1.75rem]">
-                    <Accent text={content.heading} className="type-accent text-ember-gradient pr-[0.06em]" />
-                  </span>
-                </span>
-                <span className="text-mist group-hover/bar:text-paper hidden shrink-0 items-center gap-1.5 text-sm transition-colors sm:inline-flex">
-                  {open ? "Close" : "Open"}
-                  <span className="grid size-9 place-items-center rounded-full border border-white/12 bg-white/[0.04] transition-colors group-hover/bar:border-ember/50">
-                    <ChevronDown aria-hidden="true" className={cn("size-4 transition-transform duration-300 motion-reduce:transition-none", open && "rotate-180")} />
-                  </span>
-                </span>
-                <ChevronDown aria-hidden="true" className={cn("text-mist size-5 shrink-0 transition-transform duration-300 sm:hidden motion-reduce:transition-none", open && "rotate-180")} />
-                <span className="sr-only">{open ? `Close ${ownerFirstName}'s AI guide` : `Open ${ownerFirstName}'s AI guide`}</span>
-              </button>
+    <section ref={section} id="ai-guide" aria-labelledby="ai-guide-title" className="bg-night text-paper relative scroll-mt-20 border-t border-white/[0.08]">
+      <Container className="py-16 md:py-24">
+        {/* Phone: introduction, the guide, then the points. Larger screens: the guide beside both. */}
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-10">
+          <div className="lg:col-span-5 lg:row-start-1">
+            <p className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium">
+              <span className="text-ember font-semibold tracking-wide">AI</span>
+              <span aria-hidden="true" className="bg-line size-1 rounded-full" />
+              {content.eyebrow}
+            </p>
+            <h2 id="ai-guide-title" className="mt-5 font-sans text-3xl leading-[1.1] font-semibold tracking-tight text-balance md:text-5xl">
+              <Accent text={content.heading} className="type-accent text-ember-gradient pr-[0.06em]" />
             </h2>
-
-            {/* Closed: three questions, one tap from an answer. On phones they scroll sideways. */}
-            {!open && content.suggestions.length > 0 && (
-              <ul aria-label="Ask a question" className="-mx-4 mt-4 flex gap-2 overflow-x-auto border-t border-white/[0.07] px-4 pt-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 md:flex-wrap md:overflow-visible">
-                {content.suggestions.slice(0, 3).map((q) => (
-                  <li key={q} className="shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => send(q)}
-                      className="group/q hover:border-ember/40 text-mist hover:text-paper inline-flex min-h-10 max-w-[20rem] items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-left text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
-                    >
-                      <span className="truncate">{q}</span>
-                      <ArrowUpRight aria-hidden="true" className="group-hover/q:text-ember size-3.5 shrink-0" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {content.lede && <p className="text-mist mt-5 max-w-xl text-lg leading-relaxed">{content.lede}</p>}
           </div>
-          <BorderBeam size={160} duration={12} colorFrom="#FF5B1F" colorTo="#FFB547" />
-        </MagicCard>
 
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              id="ai-guide-panel"
-              key="panel"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={reduced ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-              className="overflow-hidden"
-            >
-              <div className="pt-6 md:pt-8">
-                {content.lede && <p className="text-mist mb-6 max-w-2xl text-[15px] leading-relaxed sm:text-base">{content.lede}</p>}
-                <GuideConsole variant="inline" />
-              </div>
-            </motion.div>
+          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">{live ? <GuideConsole variant="inline" /> : <AskCard content={content} />}</div>
+
+          {points.length > 0 && (
+            <div className="lg:col-span-5 lg:row-start-2">
+              <ul className="grid gap-5">
+                {points.map((p, i) => {
+                  const Icon = POINT_ICONS[i]!;
+                  return (
+                    <li key={p.title} className="flex gap-4">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04]">
+                        <Icon aria-hidden="true" className="text-ember size-4" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="text-paper block text-[15px] font-semibold">{p.title}</span>
+                        <span className="text-mist mt-1 block text-sm leading-relaxed">{p.text}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </Container>
 
       {/* Still answering, out of sight: the character waits in the corner and brings you back. */}

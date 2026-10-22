@@ -102,12 +102,10 @@ export async function HomeContent() {
         nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, when: selectedWork.nowBuilding.lastPush, label: nowLabel } : null}
         evidence={evidence}
       />
-      {/* Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css). */}
-      {guideEnabled && aiGuide && (
-        <div className="below-fold">
-          <AiGuideSection content={aiGuide} />
-        </div>
-      )}
+      {/* Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css) —
+          except the AI guide's band: it holds fixed-position UI (the phone's full-screen conversation, the
+          "still answering" button), which a content-visibility wrapper would trap inside the section. */}
+      {guideEnabled && aiGuide && <AiGuideSection content={aiGuide} />}
       <div className="below-fold">
         <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
       </div>

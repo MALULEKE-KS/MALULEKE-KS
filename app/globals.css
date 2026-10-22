@@ -349,7 +349,9 @@ html {
 }
 /* A detail that earns its place only when the screen has the room: hidden on phones and on short screens. */
 /* Sections below the first view: the browser skips their style, layout and paint until they are near the screen
-   (content-visibility), with a remembered size so the page does not jump (docs/improvements/HOME-HERO-PLAN.md §21). */
+   (content-visibility), with a remembered size so the page does not jump (docs/improvements/HOME-HERO-PLAN.md §21).
+   Never wrap a section that holds position: fixed UI — content-visibility contains it, so "fixed" stops meaning
+   the screen (the AI guide's full-screen conversation was caught this way; D-043). */
 .below-fold {
   content-visibility: auto;
   contain-intrinsic-size: auto 800px;

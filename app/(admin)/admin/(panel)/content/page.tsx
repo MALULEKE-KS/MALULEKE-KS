@@ -64,6 +64,13 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "heading", label: "Heading", max: 120, kind: "line" },
     { name: "lede", label: "Introduction", max: 500, kind: "text" },
     { name: "suggestions", label: "Example questions", max: 140, kind: "list", maxItems: 6 },
+    { name: "tryLabel", label: "The line above the example questions", max: 40, kind: "line", hint: "Empty shows none." },
+    {
+      name: "points",
+      label: "What makes the answers worth trusting (beside the guide)",
+      kind: "json",
+      hint: 'Up to three, shown with their icons in this order — where answers come from, that they show their sources, that the guide never acts for you: [{ "title": "…", "text": "…" }]. Say only what the guide really does.',
+    },
     { name: "checkNote", label: "What the chat says about its nightly self-check (all passed)", max: 200, kind: "line", hint: "Shown beside the box. Fill-ins: {date} {total} {passed}." },
     { name: "checkNoteFailed", label: "…and when some checks failed", max: 200, kind: "line", hint: "Fill-ins: {date} {total} {passed} {failed}." },
     { name: "feedbackHelpful", label: "Button: the answer was helpful", max: 40, kind: "line", hint: "Empty hides the feedback buttons." },
