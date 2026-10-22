@@ -238,7 +238,6 @@ export default async function CvPage() {
     <>
       <div className="no-print">
         <PageHero
-          icon={FileText}
           eyebrow="CV"
           title="The CV."
           description={cv ? "Read it here, or take it with you — generated from the same records as everything else on this site." : "Download the CV below."}

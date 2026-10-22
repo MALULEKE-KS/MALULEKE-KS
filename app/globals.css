@@ -457,18 +457,6 @@ html {
   to { opacity: 1; transform: none; }
 }
 
-/* StatCards: the ember line under a hero number draws in from the left. */
-@keyframes stat-line {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-/* Let's Talk's steps: a light travelling the line from the first to the last. */
-@keyframes flow-light {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(400%); }
-}
-
 /* Let's Talk, sent: the check draws itself, then a few embers rise from it. */
 @keyframes draw-check {
   from { stroke-dashoffset: 1; }

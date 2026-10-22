@@ -11,16 +11,17 @@
 import { Suspense } from "react";
 import { pageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
-import { Boxes } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { PageHero } from "@/components/shared/PageHero";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
+import { HeroFigures } from "@/components/shared/HeroKit";
 import { Accent, plainAccent } from "@/components/shared/Accent";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getCatalog } from "@/lib/queries/catalog";
 import { SystemsResults } from "./_components/SystemsResults";
 import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
 import { SystemsSpotlight } from "@/components/systems/SystemsSpotlight";
+import { SPOTLIGHT_CARD_ASPECT, SPOTLIGHT_CARD_WIDTH } from "@/components/systems/spotlight-size";
 
 export async function generateMetadata(): Promise<Metadata> {
   const intro = await getContentBlock("systems-page").catch(() => null);
@@ -38,22 +39,13 @@ async function HeroExtras({ spotlight }: { spotlight: boolean }) {
     { value: stats.systems, label: stats.systems === 1 ? "system" : "systems" },
     { value: stats.homes, label: stats.homes === 1 ? "GitHub home" : "GitHub homes" },
     { value: stats.caseStudies, label: stats.caseStudies === 1 ? "case study" : "case studies" },
-    { value: stats.activeThisMonth, label: "active this month" },
+    { value: stats.activeThisMonth, label: "active this month", live: true },
   ].filter((i) => i.value > 0); // a zero is an absence, not a figure — it isn't shown
   return (
     <>
-      {items.length > 0 && (
-        <dl className="flex flex-wrap gap-x-8 gap-y-3">
-          {items.map((i) => (
-            <div key={i.label} className="flex items-baseline gap-2">
-              <dd className="type-data text-paper text-2xl font-semibold">{i.value}</dd>
-              <dt className="text-mist text-sm">{i.label}</dt>
-            </div>
-          ))}
-        </dl>
-      )}
+      <HeroFigures figures={items} />
       {catalog && (
-        <div className="mt-10 -mx-4 sm:mx-0">
+        <div className="mt-8 -mx-4 sm:mx-0 md:mt-10">
           <SystemsSpotlight systems={catalog.systems} />
         </div>
       )}
@@ -62,12 +54,18 @@ async function HeroExtras({ spotlight }: { spotlight: boolean }) {
 }
 
 /**
- * Holds the height the counts and the ring take once they arrive, so the catalog below doesn't jump
- * when they stream in (layout shift, WP-102). Measured on the page, 2026-10-10: on a phone the counts
- * are 76 px and the ring 40 + 299; from 640 px wide, 32 px and 40 + 398.
+ * Holds the height the figures and the ring take once they arrive, so the catalog below doesn't jump
+ * when they stream in (layout shift, WP-102). Measured on the page, 2026-10-22 (D-046): the figures
+ * are 153 px on a phone (two rows) and 93 px from 768 px wide (one row); with the ring, the figures,
+ * its frame, dots and caption are 367 px on a phone and 316 px from 768 px, plus the card's own
+ * height — its width over its shape (spotlight-size.ts).
  */
 function HeroExtrasFallback({ spotlight }: { spotlight: boolean }) {
-  return <div aria-hidden="true" className={spotlight ? "h-[415px] sm:h-[470px]" : "h-[76px] sm:h-[32px]"} />;
+  return spotlight ? (
+    <div aria-hidden="true" className="h-[var(--ring-phone)] md:h-[var(--ring-wide)]" style={{ "--ring-phone": `calc(367px + ${SPOTLIGHT_CARD_WIDTH} / ${SPOTLIGHT_CARD_ASPECT})`, "--ring-wide": `calc(316px + ${SPOTLIGHT_CARD_WIDTH} / ${SPOTLIGHT_CARD_ASPECT})` } as React.CSSProperties} />
+  ) : (
+    <div aria-hidden="true" className="h-[153px] md:h-[93px]" />
+  );
 }
 
 export default async function SystemsPage({ searchParams }: SystemsPageProps) {
@@ -79,7 +77,6 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
   return (
     <>
       <PageHero
-        icon={Boxes}
         eyebrow="Systems"
         wide
         backdrop={<PageHeroBackdrop purpose="hero-systems" />}

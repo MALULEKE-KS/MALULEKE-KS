@@ -6,6 +6,11 @@
 // name, status, where it lives, what it's built with — never a stock image.
 // The centre card opens its case study; the caption under the ring says which
 // system it is and links there too, so nothing depends on dragging.
+// Sized so the system in front can be read (owner, 2026-10-21: "a little bit
+// bigger so it can also be seen", D-046): the front card takes most of a phone's
+// width, its neighbours tucked behind it and peeking at the sides, never cut in
+// half by the screen edge; the caption sits on two lines, centred, clear of the
+// guide's button in the corner.
 
 "use client";
 
@@ -18,6 +23,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { techMark } from "@/components/shared/TechChip";
 import type { CatalogSystem } from "@/lib/queries/catalog";
 import { cn } from "@/lib/utils";
+import { SPOTLIGHT_CARD_ASPECT, SPOTLIGHT_CARD_WIDTH } from "./spotlight-size";
 
 type Slide = Pick<CatalogSystem, "slug" | "name" | "description" | "status" | "statusColorToken" | "home" | "domain" | "tech" | "screenshotUrl">;
 
@@ -72,20 +78,24 @@ export function SystemsSpotlight({ systems }: { systems: Slide[] }) {
         slides={systems}
         label="Systems spotlight"
         slideLabel={(s) => s.name}
-        aspect={16 / 10}
-        cardWidth="clamp(230px, 62vw, 400px)"
-        rotate={40}
-        depth={0.5}
-        fade={0.16}
+        aspect={SPOTLIGHT_CARD_ASPECT}
+        cardWidth={SPOTLIGHT_CARD_WIDTH}
+        gap={-0.2}
+        rotate={38}
+        depth={0.55}
+        fade={0.22}
+        frameClassName="[mask-image:linear-gradient(to_right,transparent,#000_7%,#000_93%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,#000_14%,#000_86%,transparent)]"
         onSelect={setIndex}
         onActivate={(s) => router.push(`/systems/${s.slug}`)}
         renderSlide={(s, { active }) => <Face s={s} active={active} />}
       />
-      <p className="mt-3 text-center" aria-live="polite">
-        <Link href={`/systems/${current.slug}`} className="text-paper hover:text-ember focus-visible:outline-ember inline-flex items-center gap-1.5 rounded-full text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
-          {current.name}
-          {current.domain && <span className="text-mist font-normal">· {current.domain}</span>}
-          <ArrowRight aria-hidden="true" className="size-4" />
+      <p className="mx-auto mt-4 max-w-[16rem] text-center sm:max-w-md" aria-live="polite">
+        <Link href={`/systems/${current.slug}`} className="group/c text-paper focus-visible:outline-ember inline-flex flex-col items-center rounded-lg px-2 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
+          <span className="group-hover/c:text-ember inline-flex items-center gap-1.5 font-sans text-base font-semibold transition-colors">
+            {current.name}
+            <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover/c:translate-x-0.5 motion-reduce:transition-none" />
+          </span>
+          {current.domain && <span className="text-mist mt-0.5 text-sm">{current.domain}</span>}
         </Link>
       </p>
     </div>

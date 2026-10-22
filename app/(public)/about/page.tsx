@@ -2,11 +2,13 @@
 // /about — the person, and how he builds. Built to the showcase level (owner,
 // 2026-10-03: "never said remove the good cards, components, structure … at
 // the highest level"), with a clear structure so it never gets noisy:
-//   1. Hero — his portrait in a lit frame with a shine border; name, headline,
-//      titles, the opening of his own introduction; Let's talk and his CV; four
-//      live counters (years building, published systems, proven skills,
-//      companies) — every number computed.
-//   2. In my own words — a bento grid: his story, then a card per fact (based
+//   1. Hero — the shape every inner page shares (D-046): a plain label, his
+//      name and headline, his titles, the first sentence of his own
+//      introduction; Let's talk and his CV; his portrait beside it from a laptop
+//      up; then the record as one hairline row of live figures (years building,
+//      published systems, proven skills, companies) — every number computed.
+//   2. In my own words — on a phone his portrait first; the rest of his
+//      introduction, word for word, then a bento card per fact (based
 //      in, building since, studying, each company), spotlight on hover.
 //   3. Method (#method) — the mission as a pull quote, then the principles as
 //      spotlight cards on graphite, the first carrying a border beam, each
@@ -21,8 +23,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
-import { ArrowRight, BadgeCheck, Boxes, Building2, CalendarDays, FileText, GraduationCap, Hammer, MapPin, Rocket, type LucideIcon } from "lucide-react";
-import { StatCards, type Stat } from "@/components/shared/StatCards";
+import { ArrowRight, Building2, CalendarDays, FileText, GraduationCap, MapPin, Rocket, type LucideIcon } from "lucide-react";
+import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/HeroKit";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
 import { Accent } from "@/components/shared/Accent";
@@ -30,7 +32,6 @@ import { Evidence } from "@/components/shared/Evidence";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { MagicCard } from "@/components/ui/magic-card";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { ShineBorder } from "@/components/ui/shine-border";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { GuideInvite } from "@/components/about/GuideInvite";
 import { SkillOrbit } from "@/components/about/SkillOrbit";
@@ -42,6 +43,7 @@ import { countPublishedSystems } from "@/lib/queries/homepage";
 import { getContentBlock } from "@/lib/content/blocks";
 import { claimsFor, getEvidence } from "@/lib/evidence";
 import { getUploadedCvLink } from "@/lib/cv/options";
+import { splitBio } from "@/lib/profile/bio";
 import { dbPublic } from "@/lib/db";
 import { personLd } from "@/lib/seo/person";
 import { siteUrl } from "@/lib/site-url";
@@ -99,8 +101,8 @@ export default async function AboutPage() {
     }),
     sectionCopy("about.close", { title: "Let's build *something real.*" }),
   ]);
-  const paragraphs = (row?.bio ?? "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-  const [opening, ...story] = paragraphs;
+  // The hero keeps his first sentence; the rest of his words open the story below (D-046).
+  const { lead, story } = splitBio(row?.bio);
   // The owner's uploaded About photo wins (BR-1.17); until there is one, the portrait he approved.
   const photo = photos.about ?? { url: "/character/about-portrait.webp", alt: `Portrait of ${profile.name}`, width: 900, height: 1207 };
   const companies = homes.filter((h) => h.kind !== "personal" && h.role);
@@ -131,11 +133,11 @@ export default async function AboutPage() {
   // Live counters — computed, never typed.
   const thisYear = new Date().getUTCFullYear();
   const counters = [
-    row?.buildingSinceYear && { value: Math.max(1, thisYear - row.buildingSinceYear), label: "years building", icon: Hammer },
-    { value: published, label: "published systems", icon: Boxes },
-    { value: provenSkills.length, label: "skills proven in code", icon: BadgeCheck },
-    companies.length > 0 && { value: companies.length, label: companies.length === 1 ? "company" : "companies", icon: Building2 },
-  ].filter((c): c is Stat => Boolean(c));
+    row?.buildingSinceYear && { value: Math.max(1, thisYear - row.buildingSinceYear), label: "years building" },
+    { value: published, label: "published systems" },
+    { value: provenSkills.length, label: "skills proven in code" },
+    { value: companies.length, label: companies.length === 1 ? "company" : "companies" },
+  ].filter((c): c is HeroFigure => Boolean(c) && (c as HeroFigure).value > 0); // a zero is an absence, not a figure
 
   // Structured data: this page is his profile (#101) — the same facts it shows.
   const profileLd = {
@@ -149,66 +151,57 @@ export default async function AboutPage() {
     <>
       <JsonLd data={profileLd} />
 
-      {/* ─── 1. Hero ─── */}
+      {/* ─── 1. Hero — the shared shape (D-046): label, name, his headline, his first sentence, the record ─── */}
       <section aria-labelledby="about-title" className="hero-field text-paper relative isolate overflow-hidden">
         <PageHeroBackdrop purpose="hero-about" mobilePurpose="hero-about-mobile" />
-        <div aria-hidden="true" className="pointer-events-none absolute -top-40 right-[-15%] size-[48rem] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.16),transparent)]" />
-        <Container className="relative grid grid-cols-1 items-center gap-12 pt-28 pb-16 md:pt-32 lg:grid-cols-12 lg:gap-14 lg:pb-24">
-          <div className="min-w-0 lg:col-span-7">
-            <p className="text-mist rise-in inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
-              <span className="bg-ember size-1.5 rounded-full" /> About
-            </p>
-            <h1 id="about-title" className="type-display rise-in mt-6" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
-              {profile.name}
-            </h1>
-            {profile.headline && (
-              <p className="rise-in mt-3 font-serif text-2xl italic md:text-3xl" style={{ "--rise-delay": "140ms" } as React.CSSProperties}>
-                <Accent text={`*${profile.headline}*`} className={ACCENT} />
-              </p>
-            )}
-            {otherTitles.length > 0 && (
-              <ul aria-label="Current titles" className="rise-in mt-6 flex flex-wrap gap-2" style={{ "--rise-delay": "200ms" } as React.CSSProperties}>
-                {otherTitles.map((t) => (
-                  <li key={`${t.kind}:${t.label}`} className="text-mist rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-sm">
-                    <span className="text-paper">{t.label}</span>
-                    {t.detail && <span> · {t.detail}</span>}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {opening && (
-              <p className="type-lede text-paper/85 rise-in mt-7 max-w-xl" style={{ "--rise-delay": "260ms" } as React.CSSProperties}>
-                {opening}
-              </p>
-            )}
-            <div className="rise-in mt-9 flex flex-col gap-3 sm:flex-row" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
-              <Link href="/contact" className="bg-ember text-ink shadow-glow-ember focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
-                Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
-              {cv && (
-                <a href={cv.url} className="text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
-                  <FileText aria-hidden="true" className="size-4" /> Get my CV
-                </a>
+        <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-14">
+            <div className="min-w-0 lg:col-span-7">
+              <HeroLabel className="rise-in">About</HeroLabel>
+              <h1 id="about-title" className="type-display rise-in mt-6" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
+                {profile.name}
+              </h1>
+              {profile.headline && (
+                <p className="rise-in mt-3 font-serif text-2xl italic md:text-3xl" style={{ "--rise-delay": "140ms" } as React.CSSProperties}>
+                  <Accent text={`*${profile.headline}*`} className={ACCENT} />
+                </p>
               )}
-            </div>
-          </div>
-
-          <figure className="rise-in mx-auto w-full max-w-sm lg:col-span-5 lg:max-w-md" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
-            <div className="relative">
-              <div aria-hidden="true" className="absolute inset-x-[6%] -bottom-6 top-[10%] rounded-[3rem] bg-[radial-gradient(closest-side,rgb(255_91_31/0.4),transparent)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-2 shadow-[0_50px_100px_-40px_rgb(0_0_0/0.9)] backdrop-blur">
-                <ShineBorder borderWidth={1.5} duration={14} />
-                <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized priority className="h-auto w-full rounded-[1.6rem]" />
+              {otherTitles.length > 0 && (
+                <ul aria-label="Current titles" className="text-mist rise-in mt-5 flex flex-wrap gap-x-4 gap-y-1.5 text-sm" style={{ "--rise-delay": "200ms" } as React.CSSProperties}>
+                  {otherTitles.map((t) => (
+                    <li key={`${t.kind}:${t.label}`}>
+                      <span aria-hidden="true" className="bg-ember mr-2 inline-block size-1 -translate-y-0.5 rounded-full" />
+                      <span className="text-paper">{t.label}</span>
+                      {t.detail && <span> · {t.detail}</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {lead && (
+                <p className="type-lede text-paper/85 rise-in mt-6 max-w-xl" style={{ "--rise-delay": "260ms" } as React.CSSProperties}>
+                  {lead}
+                </p>
+              )}
+              <div className="rise-in mt-8 flex flex-col gap-3 sm:flex-row" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
+                <Link href="/contact" className="bg-ember text-ink focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+                  Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
+                </Link>
+                {cv && (
+                  <a href={cv.url} className="text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+                    <FileText aria-hidden="true" className="size-4" /> Get my CV
+                  </a>
+                )}
               </div>
             </div>
-          </figure>
-        </Container>
 
-        {counters.length > 0 && (
-          <Container className="relative pb-16 md:pb-20">
-            <StatCards stats={counters} delay={360} />
-          </Container>
-        )}
+            {/* The portrait sits beside the words from a laptop up; on a phone it opens the story instead, so the hero stays one screen. */}
+            <figure className="rise-in hidden w-full max-w-md justify-self-end lg:col-span-5 lg:block" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
+              <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized priority className="h-auto w-full rounded-[1.75rem] border border-white/10 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.9)]" />
+            </figure>
+          </div>
+
+          <HeroFigures figures={counters} className="rise-in mt-12 md:mt-16" style={{ "--rise-delay": "360ms" } as React.CSSProperties} />
+        </Container>
       </section>
 
       {/* ─── 2. In my own words — a bento ─── */}
@@ -219,6 +212,7 @@ export default async function AboutPage() {
             <p id="story-title" className="type-eyebrow text-slate">
               {storyCopy.eyebrow}
             </p>
+            <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="mt-6 h-auto w-full max-w-xs rounded-[1.5rem] border border-black/10 shadow-soft lg:hidden" />
             <div className="mt-8 grid auto-rows-auto grid-cols-1 gap-4 md:grid-cols-6">
               {story.length > 0 && (
                 <Reveal className="md:col-span-4 md:row-span-2">
