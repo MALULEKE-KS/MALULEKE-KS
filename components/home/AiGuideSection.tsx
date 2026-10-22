@@ -75,7 +75,7 @@ function AskCard({ content }: { content: AiGuideContent }) {
                   disabled={busy}
                   className="group/q hover:border-ember/40 focus-visible:outline-ember flex w-full items-start gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-left text-[15px] leading-snug transition-colors hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
                 >
-                  <span className="type-data text-ember/80 mt-0.5 text-xs">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="type-data text-ember mt-0.5 text-xs">{String(i + 1).padStart(2, "0")}</span>
                   <span className="text-paper flex-1">{q}</span>
                   <ArrowUpRight aria-hidden="true" className="text-mist group-hover/q:text-ember mt-0.5 size-4 shrink-0" />
                 </button>

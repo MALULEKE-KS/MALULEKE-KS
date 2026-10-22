@@ -72,7 +72,7 @@ export function Conversation({ onNavigate, className }: { onNavigate?: () => voi
                         onClick={() => send(q)}
                         className="group/q hover:border-ember/40 flex h-full w-full items-start gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 text-left text-[13px] leading-snug transition-colors hover:bg-white/[0.05]"
                       >
-                        <span className="type-data text-ember/80 mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="type-data text-ember mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
                         <span className="flex-1">{q}</span>
                         <ArrowUpRight aria-hidden="true" className="text-mist group-hover/q:text-ember mt-0.5 size-3.5 shrink-0" />
                       </button>
