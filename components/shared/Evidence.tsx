@@ -1,15 +1,18 @@
 // components/shared/Evidence.tsx
 // The evidence a claim carries (docs/EVIDENCE-SPEC.md): a quiet chip beside
-// the claim — "Evidence · 3" — that opens the proof. Overview on the page,
-// detail in the sheet, the code one click further (progressive disclosure).
-// EV-1: no claims → renders nothing. EV-7: status is a word and an icon, never
-// colour alone; it opens on click, tap or Enter — no hover-only content. On
-// phones the sheet rises from the bottom; on wider screens it's a dialog.
+// the claim — "Evidence ↗" over a hairline (D-047; it was a chip) — that opens
+// the proof. Overview on the page, a preview on hover (shadcn Hover Card: the
+// claim and what it proves), detail in the sheet, the code one click further
+// (progressive disclosure). EV-1: no claims → renders nothing. EV-7: status is
+// a word and an icon, never colour alone; it opens on click, tap or Enter — the
+// hover preview only repeats what the sheet shows, it is never the only way in.
+// On phones the sheet rises from the bottom; on wider screens it's a dialog.
 
 "use client";
 
-import { CircleDashed, CircleDot, Clock3, ExternalLink, FileCode2, FlaskConical, GitBranch, Link2, ScrollText, ShieldCheck, Workflow, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, CircleDashed, CircleDot, Clock3, ExternalLink, FileCode2, FlaskConical, GitBranch, Link2, ScrollText, ShieldCheck, Workflow, type LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import type { PublicStatus, ResolvedClaim } from "@/lib/evidence";
 import type { EvidenceKind } from "@/lib/evidence/schema";
 import { cn } from "@/lib/utils";
@@ -107,23 +110,39 @@ export function Evidence({
 }) {
   if (claims.length === 0) return null; // EV-1
   const verified = claims.every((c) => c.status === "verified");
+  const first = claims[0]!;
+  const sources = claims.reduce((n, c) => n + c.links.length, 0);
   return (
     <Dialog>
-      <DialogTrigger
-        className={cn(
-          "hover:border-ember/40 focus-visible:outline-ember inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
-          tone === "dark" ? "text-mist hover:text-paper border-white/12 bg-white/[0.04]" : "text-slate hover:text-ink border-ink/15 bg-ink/[0.03]",
-          className,
-        )}
-      >
-        {verified ? (
-          <ShieldCheck aria-hidden="true" className={cn("size-3.5", tone === "dark" ? "text-[var(--color-signal-finished-on-dark)]" : "text-[var(--color-signal-finished)]")} />
-        ) : (
-          <CircleDot aria-hidden="true" className="text-ember size-3.5" />
-        )}
-        Evidence · {claims.length}
-        <span className="sr-only"> for {label}</span>
-      </DialogTrigger>
+      <HoverCard openDelay={250} closeDelay={120}>
+        <HoverCardTrigger asChild>
+          <DialogTrigger
+            className={cn(
+              "group/ev focus-visible:outline-ember inline-flex items-center gap-1.5 border-b border-dashed pb-0.5 text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4",
+              tone === "dark" ? "text-paper/90 hover:text-paper hover:border-ember border-white/30" : "text-ink/85 hover:text-ink hover:border-ember border-ink/30",
+              className,
+            )}
+          >
+            {verified ? (
+              <ShieldCheck aria-hidden="true" className={cn("size-3.5", tone === "dark" ? "text-[var(--color-signal-finished-on-dark)]" : "text-[var(--color-signal-finished)]")} />
+            ) : (
+              <CircleDot aria-hidden="true" className="text-ember size-3.5" />
+            )}
+            Evidence{claims.length > 1 && <span className="text-mist font-normal tabular-nums">· {claims.length}</span>}
+            <ArrowUpRight aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover/ev:-translate-y-0.5 group-hover/ev:translate-x-0.5 motion-reduce:transition-none" />
+            <span className="sr-only"> for {label}</span>
+          </DialogTrigger>
+        </HoverCardTrigger>
+        <HoverCardContent side="top" align="start" className="hidden sm:block">
+          <StatusBadge status={first.status} />
+          <p className="mt-2.5 text-[14px] leading-snug font-semibold">{first.claim}</p>
+          <p className="text-mist mt-1.5 line-clamp-3 text-[13px] leading-relaxed">{first.proves}</p>
+          <p className="text-line mt-3 font-mono text-[11px]">
+            {sources} {sources === 1 ? "source" : "sources"}
+            {claims.length > 1 && ` · ${claims.length - 1} more ${claims.length === 2 ? "claim" : "claims"}`} · click to open
+          </p>
+        </HoverCardContent>
+      </HoverCard>
       <DialogContent className="top-auto bottom-0 max-w-xl rounded-b-none sm:top-[10vh] sm:bottom-auto sm:rounded-2xl">
         <div className="max-h-[82vh] overflow-y-auto p-5 sm:max-h-[78vh] sm:p-6">
           <p className="text-mist text-[11px] font-medium tracking-wide uppercase">Evidence</p>

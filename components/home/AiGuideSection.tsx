@@ -20,6 +20,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { Accent } from "@/components/shared/Accent";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
@@ -174,18 +175,20 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
         {/* Phone: introduction, the guide, then the points. Larger screens: the guide beside both. */}
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-12">
           <div className="lg:col-span-5 lg:row-start-1">
-            <p className="text-mist flex items-center gap-2 text-sm">
+            {/* The plain label every section opens with (D-047), the AI label kept in it (BR-4.3). */}
+            <HeroLabel>
               <span className="text-ember font-semibold tracking-wide">AI</span>
-              <span aria-hidden="true" className="bg-line h-3 w-px" />
+              <span aria-hidden="true" className="text-line">·</span>
               {content.eyebrow}
-            </p>
-            <h2 id="ai-guide-title" className="mt-4 font-sans text-3xl leading-[1.08] font-semibold tracking-[-0.025em] text-balance md:text-5xl">
+            </HeroLabel>
+            <h2 id="ai-guide-title" className="type-h2 mt-5 text-balance">
               <Accent text={content.heading} className="type-accent text-ember-gradient pr-[0.06em]" />
             </h2>
             {content.lede && <p className="text-mist mt-5 max-w-[52ch] text-lg leading-relaxed text-pretty">{content.lede}</p>}
           </div>
 
-          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
+          {/* Centred against the introduction and the points, so the band ends where its content does. */}
+          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:self-center">
             {live ? <GuideConsole variant="inline" /> : <AskCard content={content} facts={facts} />}
           </div>
 

@@ -56,6 +56,8 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       label: item.label,
       claim: item.claim,
       evidence: claims.length > 0 ? <Evidence claims={claims} label={`${item.value} ${item.label}`} commit={evidence.source.commit} /> : undefined,
+      // The catalogue size opens the catalogue (D-047).
+      href: item.key === "systems" ? "/systems" : undefined,
     };
   });
 

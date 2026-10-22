@@ -31,6 +31,10 @@ const SERVICE_OFF = SERVICE_ENV === "off";
 const SERVICE = SERVICE_ENV && !SERVICE_OFF ? SERVICE_ENV : "https://api.microlink.io/";
 // The page as a visitor first sees it on a laptop.
 const VIEWPORT = { width: 1440, height: 900 };
+// What a first-time visitor sees floating over the page — the privacy banner, this site's
+// guide button — is not part of the site, so it never ends up in a screenshot (D-047: a
+// capture of this site once showed the banner). Marked in the markup; harmless elsewhere.
+const CAPTURE_HIDE_CSS = "[data-capture-hide]{display:none!important}";
 
 export class ScreenshotFailed extends Error {}
 
@@ -48,6 +52,7 @@ export function captureRequestUrl(url: string) {
     "viewport.deviceScaleFactor": "1",
     waitForTimeout: "2500",
     type: "png",
+    styles: CAPTURE_HIDE_CSS,
   });
   return `${SERVICE}?${q}`;
 }

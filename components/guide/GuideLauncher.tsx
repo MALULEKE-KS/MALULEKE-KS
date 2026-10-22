@@ -21,6 +21,7 @@ export function GuideLauncher() {
   return (
     <button
       type="button"
+      data-capture-hide
       onClick={() => setOpen(true)}
       aria-label={`Ask ${ownerFirstName}'s AI guide`}
       aria-hidden={hidden}

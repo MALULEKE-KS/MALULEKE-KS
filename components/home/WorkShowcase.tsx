@@ -1,28 +1,31 @@
 // components/home/WorkShowcase.tsx
-// Home — selected work (PUBLIC-REDESIGN-PLAN §3.3), rebuilt 2026-09-30 at the
-// owner's request ("the best showcasing, at the highest level"). No repeat of
-// the hero's counts; every card is a real system with its real signals:
-//   - the featured system, large: its preview under a Lens (Magic UI), status,
-//     organisation and domain, impact figures, stack with real brand marks,
-//     26 weeks of commits as a sparkline, and its links
-//   - "Now building": the owner's most recently active public repo and its
-//     latest commits arriving as a live feed (Magic UI Animated List)
-//   - the other picks as a list whose preview follows the pointer (21st.dev
+// Home — selected work (PUBLIC-REDESIGN-PLAN §3.3), the second section since the
+// premium pass (D-047, owner-approved 2026-10-23: "proof first"). No repeat of
+// the hero's counts; every case is a real system with its real signals:
+//   - each featured system as a case: one sheet, its live site in a browser
+//     frame under a Lens (Magic UI) beside its story — organisation and domain,
+//     name, what it is, status, impact figures, the first five technologies
+//     with their real marks, 26 weeks of commits as a labelled sparkline, and one
+//     row of actions. Sides alternate on a laptop; on a phone the site comes first
+//   - "Latest commit" / "Building now": a slim strip — the repository and its
+//     latest commits as a live feed (Magic UI Animated List), no screenshot: the
+//     visitor is already on this site (D-047, the owner's choice D2)
+//   - the other picks as a ruled list whose preview follows the pointer (21st.dev
 //     "Project Showcase", adapted — components/ui/project-showcase.tsx)
 // Data: lib/queries/work.ts (public views only).
 
 import Link from "next/link";
 import { activityText } from "@/lib/rules/activity";
-import { ArrowRight, ArrowUpRight, Github, GitCommitHorizontal, Layers, Lock, Radio, Star } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Github, GitCommitHorizontal, Lock, Star } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
 import { Sparkline } from "@/components/shared/Sparkline";
-import { TechChip } from "@/components/shared/TechChip";
+import { techMark } from "@/components/shared/TechChip";
 import { Lens } from "@/components/ui/lens";
-import { MagicCard } from "@/components/ui/magic-card";
 import { AnimatedList } from "@/components/ui/animated-list";
 import { ProjectShowcase } from "@/components/ui/project-showcase";
 import type { SelectedWork } from "@/lib/queries/work";
@@ -31,277 +34,209 @@ import { cn } from "@/lib/utils";
 
 type Work = SelectedWork["featured"][number];
 
-/** Recency only where it's honest — still being built, or moved lately (spec WP-108). */
-function activityLine(w: Work) {
-  return activityText(w) ?? "";
-}
+/** How many technologies a case names; the rest are counted, and listed in the case study. */
+const STACK_SHOWN = 5;
+/** How many commits the strip lists. */
+const COMMITS_SHOWN = 3;
 
 function hasActivity(w: Work) {
   return w.weeks.some((n) => n > 0);
 }
 
-function FeaturedCard({ w }: { w: Work }) {
-  const meta = [w.organization, w.domain].filter(Boolean).join(" / ");
+function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
+  const meta = [w.organization, w.domain].filter(Boolean).join(" · ");
+  const extra = w.techStack.length - STACK_SHOWN;
   return (
-    <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" gradientTo="#ffb547" spotlight="rgb(255 91 31 / 0.05)">
-      <article className="flex h-full flex-col p-5 md:p-7">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-slate text-xs font-medium">{meta}</span>
-          <span className="flex items-center gap-2">
+    <article className="bg-sheet border-ink/[0.07] shadow-soft group/case relative overflow-hidden rounded-[1.75rem] border transition-shadow duration-500 hover:shadow-lift">
+      <div className="grid grid-cols-1 items-center gap-6 p-4 sm:p-6 lg:grid-cols-12 lg:gap-10 lg:p-8">
+        <div className={cn("min-w-0 lg:col-span-7", flip && "lg:order-2")}>
+          <Lens className="rounded-xl">
+            <SystemPreviewFrame screenshotUrl={w.screenshotUrl} liveUrl={w.liveUrl} name={w.name} />
+          </Lens>
+        </div>
+
+        <div className={cn("min-w-0 px-1 pb-2 sm:px-0 lg:col-span-5 lg:pb-0", flip && "lg:order-1")}>
+          {meta && <p className="text-slate font-mono text-xs">{meta}</p>}
+          <h3 className="text-ink mt-3 text-[1.75rem] leading-tight font-semibold tracking-tight md:text-[2rem]">
+            <Link href={`/systems/${w.slug}`} className="focus-visible:outline-ember rounded-sm decoration-ember/60 underline-offset-[6px] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
+              {w.name}
+            </Link>
+          </h3>
+          <p className="text-slate mt-3 max-w-[46ch] leading-relaxed">{w.description}</p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {w.isFlagship && (
-              <span className="bg-ember/10 text-accent inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span className="text-accent inline-flex items-center gap-1 text-xs font-medium">
                 <Star aria-hidden="true" className="size-3 fill-current" />
                 Flagship
               </span>
             )}
             <StatusBadge label={w.status} colorToken={w.statusColorToken} />
-          </span>
-        </header>
-
-        <Lens className="mt-5 rounded-xl">
-          <SystemPreviewFrame screenshotUrl={w.screenshotUrl} liveUrl={w.liveUrl} name={w.name} />
-        </Lens>
-
-        <div className="mt-6 grid flex-1 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_auto]">
-          <div className="min-w-0">
-            <h3 className="text-ink text-2xl font-semibold tracking-tight md:text-[1.75rem]">{w.name}</h3>
-            <p className="text-slate mt-2 max-w-xl leading-relaxed">{w.description}</p>
-            {w.techStack.length > 0 && (
-              <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Stack">
-                {w.techStack.map((t) => (
-                  <li key={t}>
-                    <TechChip name={t} />
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
+
           {w.impacts.length > 0 && (
-            <dl className="grid content-start gap-3 md:min-w-44">
-              {w.impacts.map((i) => (
-                <div key={i.label} className="border-ink/10 rounded-2xl border bg-paper px-4 py-3">
+            <dl className="border-ink/10 mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-t pt-5">
+              {w.impacts.slice(0, 4).map((i) => (
+                <div key={i.label} className="flex flex-col-reverse gap-0.5">
+                  <dt className="text-slate text-xs">{i.label}</dt>
                   <dd className="type-data text-ink text-xl font-semibold">{i.value}</dd>
-                  <dt className="text-slate mt-0.5 text-xs">{i.label}</dt>
                 </div>
               ))}
             </dl>
           )}
-        </div>
 
-        <footer className="border-ink/10 mt-6 flex flex-col gap-4 border-t pt-5 md:flex-row md:items-center md:justify-between">
-          {hasActivity(w) ? (
-            <div className="flex items-center gap-3">
-              <Sparkline values={w.weeks} className="w-28" />
-              <span className="text-slate text-xs">{activityLine(w)}</span>
-            </div>
-          ) : (
-            <span />
+          {w.techStack.length > 0 && (
+            <ul className="text-ink/85 mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]" aria-label="Built with">
+              {w.techStack.slice(0, STACK_SHOWN).map((t) => (
+                <li key={t} className="inline-flex items-center gap-1.5">
+                  {techMark(t)}
+                  {t}
+                </li>
+              ))}
+              {extra > 0 && <li className="text-slate font-mono text-xs">+{extra}</li>}
+            </ul>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            {w.liveUrl && (
-              <a href={w.liveUrl} target="_blank" rel="noopener noreferrer" className="text-slate hover:text-ink inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm transition-colors hover:bg-ink/5">
-                Live <ArrowUpRight aria-hidden="true" className="size-3.5" />
-              </a>
-            )}
-            {w.repoUrl ? (
-              <a href={w.repoUrl} target="_blank" rel="noopener noreferrer" className="text-slate hover:text-ink inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm transition-colors hover:bg-ink/5">
-                <Github aria-hidden="true" className="size-3.5" /> Code
-              </a>
-            ) : w.repoPrivate ? (
-              <span className="text-slate inline-flex h-9 items-center gap-1.5 px-3 text-sm">
-                <Lock aria-hidden="true" className="size-3.5" /> Private repo
+
+          {hasActivity(w) && (
+            <div className="mt-5 flex items-center gap-3">
+              <Sparkline values={w.weeks} className="w-28" />
+              <span className="text-slate text-xs">
+                <span className="text-ink/80 block font-mono text-[11px]">26 weeks of commits</span>
+                {activityText(w)}
               </span>
-            ) : null}
+            </div>
+          )}
+
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Link
               href={`/systems/${w.slug}`}
-              className="group/cta bg-ink text-paper hover:shadow-lift focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium transition-[transform,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:hover:-translate-y-0.5"
+              className="group/cta bg-ink text-paper hover:shadow-lift focus-visible:outline-ember inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition-[transform,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:hover:-translate-y-0.5"
             >
               Read the case study
               <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
+            {w.liveUrl && (
+              <a href={w.liveUrl} target="_blank" rel="noopener noreferrer" className="text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1 border-b pb-0.5 text-sm transition-colors">
+                Live site <ArrowUpRight aria-hidden="true" className="size-3.5" />
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
+            )}
+            {w.repoUrl ? (
+              <a href={w.repoUrl} target="_blank" rel="noopener noreferrer" className="text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1.5 border-b pb-0.5 text-sm transition-colors">
+                <Github aria-hidden="true" className="size-3.5" /> Code
+                <span className="sr-only">(opens GitHub in a new tab)</span>
+              </a>
+            ) : w.repoPrivate ? (
+              <span className="text-slate inline-flex items-center gap-1.5 text-sm">
+                <Lock aria-hidden="true" className="size-3.5" /> Private repo
+              </span>
+            ) : null}
           </div>
-        </footer>
-      </article>
-    </MagicCard>
-  );
-}
-
-function NowBuildingCard({ now, label, strip = false }: { now: NonNullable<SelectedWork["nowBuilding"]>; label: string | null; strip?: boolean }) {
-  const external = !now.onSite;
-  const text = (
-    <>
-      <p className="text-mist relative flex items-center gap-2 text-xs font-medium">
-        <span className="relative flex size-2" aria-hidden="true">
-          <span className="live-ping absolute inset-0 rounded-full bg-ember" />
-          <span className="relative size-2 rounded-full bg-ember" />
-        </span>
-        <Radio aria-hidden="true" className="size-3.5" />
-        {label}
-      </p>
-      <h3 className="relative mt-4 text-xl font-semibold tracking-tight">{now.name}</h3>
-      <p className="text-mist relative mt-1 text-xs">
-        {now.home}{now.lastPush && ` · last commit ${now.lastPush}`}
-        {now.commitsLast4Weeks > 0 && ` · ${now.commitsLast4Weeks} commits in 4 weeks`}
-      </p>
-    </>
-  );
-  // Its live site, as the featured cards show theirs (BR-1.18), when it has one.
-  const site = now.screenshotUrl ? (
-    <div className="relative">
-      <SystemPreviewFrame screenshotUrl={now.screenshotUrl} liveUrl={now.liveUrl} name={now.name} />
-    </div>
-  ) : null;
-  const commits =
-    now.commits.length > 0 ? (
-      <AnimatedList className="relative mt-5">
-        {now.commits.map((c) => (
-          <div key={c.key} className="flex items-start gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.04] px-3 py-2.5">
-            <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px]">{c.message}</span>
-              <span className="text-line block text-[11px]">{c.when}</span>
-            </span>
-          </div>
-        ))}
-      </AnimatedList>
-    ) : null;
-  const link = (
-    <a
-      href={now.url}
-      {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-      className="text-paper hover:text-ember relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-    >
-      {external ? (
-        <>
-          <Github aria-hidden="true" className="size-4" /> {now.fullName}
-        </>
-      ) : (
-        "See the system"
-      )}
-      <ArrowUpRight aria-hidden="true" className="size-3.5" />
-    </a>
-  );
-
-  return (
-    <div className="bg-night text-paper shadow-lift relative h-full overflow-hidden rounded-3xl border border-white/10 p-5 md:p-6">
-      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.22),transparent)]" />
-      {strip ? (
-        // Full width under two or more featured systems: what's moving and its commits, beside its live site.
-        <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-10">
-          <div>
-            {text}
-            {commits}
-            {link}
-          </div>
-          {site}
         </div>
-      ) : (
-        <>
-          {text}
-          {site && <div className="mt-5">{site}</div>}
-          {commits}
-          {link}
-        </>
-      )}
-    </div>
+      </div>
+    </article>
   );
 }
 
-function CompactCard({ w }: { w: Work }) {
+/** What's moving: the repository and its latest commits, as one slim graphite strip. */
+function CommitStrip({ now, label }: { now: NonNullable<SelectedWork["nowBuilding"]>; label: string | null }) {
+  const external = !now.onSite;
+  const commits = now.commits.slice(0, COMMITS_SHOWN);
   return (
-    <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" spotlight="rgb(255 91 31 / 0.05)">
-      <Link href={`/systems/${w.slug}`} className="group/c flex h-full flex-col p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember">
-        <span className="flex items-center justify-between gap-2">
-          <span className="text-slate truncate text-xs">{[w.organization, w.domain].filter(Boolean).join(" / ")}</span>
-          <StatusBadge label={w.status} colorToken={w.statusColorToken} />
-        </span>
-        <span className="text-ink mt-4 flex items-center gap-1.5 text-lg font-semibold tracking-tight">
-          {w.name}
-          <ArrowUpRight aria-hidden="true" className="text-slate group-hover/c:text-accent size-4 transition-all group-hover/c:translate-x-0.5 group-hover/c:-translate-y-0.5" />
-        </span>
-        <span className="text-slate mt-1.5 line-clamp-2 text-sm leading-relaxed">{w.description}</span>
-        {w.techStack.length > 0 && (
-          <span className="mt-4 flex flex-wrap gap-1.5">
-            {w.techStack.slice(0, 3).map((t) => (
-              <TechChip key={t} name={t} />
+    <div className="bg-ink text-paper relative overflow-hidden rounded-[1.5rem] border border-white/[0.06] p-5 shadow-lift sm:p-7">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-10">
+        <div className="min-w-0 lg:col-span-4">
+          {label && (
+            <p className="text-mist flex items-center gap-2 font-mono text-xs">
+              <span className="relative flex size-2" aria-hidden="true">
+                <span className="live-ping bg-ember absolute inset-0 rounded-full" />
+                <span className="bg-ember relative size-2 rounded-full" />
+              </span>
+              {label}
+              {now.lastPush && <span className="text-line">· {now.lastPush}</span>}
+            </p>
+          )}
+          <h3 className="mt-3 text-xl font-semibold tracking-tight">{now.name}</h3>
+          <p className="text-mist mt-1 text-sm">
+            {now.home}
+            {now.commitsLast4Weeks > 0 && ` · ${now.commitsLast4Weeks} commits in 4 weeks`}
+          </p>
+          <a
+            href={now.url}
+            {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+            className="text-paper hover:border-ember mt-5 inline-flex items-center gap-1.5 border-b border-white/25 pb-0.5 text-sm font-medium transition-colors"
+          >
+            {external ? (
+              <>
+                <Github aria-hidden="true" className="size-4" /> {now.fullName}
+              </>
+            ) : (
+              "See the system"
+            )}
+            <ArrowUpRight aria-hidden="true" className="size-3.5" />
+          </a>
+        </div>
+        {commits.length > 0 && (
+          <AnimatedList className="min-w-0 gap-0 lg:col-span-8" delay={420}>
+            {commits.map((c) => (
+              <div key={c.key} className="flex items-start gap-3 border-b border-white/[0.08] py-3 first:pt-0 last:border-b-0 last:pb-0">
+                <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-sm">{c.message}</span>
+                <span className="text-line shrink-0 font-mono text-[11px]">{c.when}</span>
+              </div>
             ))}
-          </span>
+          </AnimatedList>
         )}
-        {hasActivity(w) && (
-          <span className="border-ink/10 mt-auto flex items-center gap-3 border-t pt-4">
-            <Sparkline values={w.weeks} className="w-20" />
-            <span className="text-slate text-[11px]">{activityLine(w)}</span>
-          </span>
-        )}
-      </Link>
-    </MagicCard>
+      </div>
+    </div>
   );
 }
 
 /**
  * Selected work on the home page. The systems the owner features (admin:
- * "Featured on home") lead as large cards — one beside "Now building", or two
- * and more side by side with "Now building" as a strip beneath. Then more work.
+ * "Featured on home") lead as cases, one under another; then what's moving;
+ * then more work.
  */
-export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowLabel }: SelectedWork & { totalPublished: number; /** The owner's wording for the card ("Building now" / "Latest commit") — empty hides it. */ nowLabel: string | null }) {
+export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowLabel }: SelectedWork & { totalPublished: number; /** The owner's wording for the strip ("Building now" / "Latest commit") — empty hides its label. */ nowLabel: string | null }) {
   if (featured.length === 0) return null;
-  const rest = [...more];
-  const single = featured.length === 1;
-  // Beside a single featured system: Now building, or the next pick when nothing moved recently.
-  const side = single && !nowBuilding ? rest.shift() ?? null : null;
-
   return (
     <section aria-labelledby="work-title" className="bg-paper py-20 md:py-28">
       <Container>
         <Reveal>
           <SectionHeader
             copyKey="home.selected-work"
-            icon={Layers}
             eyebrow="Selected work"
             id="work-title"
             title={<Accent text="Shipped, running, and *still moving.*" className="type-accent text-ember-gradient pr-[0.06em]" />}
             description="Each system here is read live from this site's data — its status, its stack, and its commits straight from GitHub."
-            action={{ href: "/systems", label: `All systems (${totalPublished})` }}
+            action={{ href: "/systems", label: `All ${totalPublished} systems` }}
           />
         </Reveal>
 
-        {single ? (
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-            <Reveal className="min-w-0 lg:col-span-8">
-              <FeaturedCard w={featured[0]!} />
+        <div className="grid grid-cols-1 gap-6 md:gap-8">
+          {featured.map((w, i) => (
+            <Reveal key={w.slug} className="min-w-0" delay={i * 80}>
+              <FeaturedCase w={w} flip={i % 2 === 1} />
             </Reveal>
-            <Reveal className="min-w-0 lg:col-span-4" delay={100}>
-              {nowBuilding ? <NowBuildingCard now={nowBuilding} label={nowLabel} /> : side ? <CompactCard w={side} /> : null}
+          ))}
+          {nowBuilding && (
+            <Reveal className="min-w-0" delay={120}>
+              <CommitStrip now={nowBuilding} label={nowLabel} />
             </Reveal>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-              {featured.map((w, i) => (
-                <Reveal key={w.slug} className="min-w-0" delay={i * 100}>
-                  <FeaturedCard w={w} />
-                </Reveal>
-              ))}
-            </div>
-            {nowBuilding && (
-              <Reveal className="mt-5" delay={150}>
-                <NowBuildingCard now={nowBuilding} label={nowLabel} strip />
-              </Reveal>
-            )}
-          </>
-        )}
+          )}
+        </div>
 
-        {rest.length > 0 && (
-          <Reveal className="mt-14" delay={150}>
-            <p className="text-slate mb-2 font-mono text-xs tracking-wide uppercase">More work</p>
+        {more.length > 0 && (
+          <Reveal className="mt-16" delay={120}>
+            <HeroLabel tone="light" className="mb-3">More work</HeroLabel>
             <ProjectShowcase
-              items={rest.map((w) => ({
+              items={more.map((w) => ({
                 key: w.slug,
                 title: w.name,
                 description: w.description,
                 href: `/systems/${w.slug}`,
                 image: w.screenshotUrl,
-                meta: [[w.organization, w.domain].filter(Boolean).join(" / "), hasActivity(w) ? activityLine(w) : null].filter(Boolean).join(" · "),
+                meta: [[w.organization, w.domain].filter(Boolean).join(" · "), hasActivity(w) ? activityText(w) : null].filter(Boolean).join(" · "),
                 aside: <StatusBadge label={w.status} colorToken={w.statusColorToken} />,
               }))}
             />

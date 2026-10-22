@@ -87,19 +87,20 @@ export function SiteFooter({
         {homes.length > 0 && (
           <div className="md:col-span-4">
             <h2 className="font-mono text-xs text-line">Where the code lives</h2>
-            <ul className="mt-4 space-y-2">
+            {/* Plain rows (D-047): the map above already draws the homes; here they are a line each. */}
+            <ul className="mt-4 border-t border-white/10">
               {homes.map((h) => (
-                <li key={h.slug}>
+                <li key={h.slug} className="border-b border-white/10">
                   <a
                     href={h.github[0]?.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 transition-colors hover:border-ember/30 hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-ember"
+                    className="group flex items-center justify-between gap-3 py-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       <FaGithub aria-hidden="true" className="size-4 shrink-0 text-mist transition-colors group-hover:text-paper" />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-paper">{h.name}</span>
+                        <span className="block truncate text-sm font-medium text-paper transition-colors group-hover:text-ember">{h.name}</span>
                         <span className="block text-xs text-line">{h.role ?? (h.kind ? KIND_LABEL[h.kind] ?? null : null) ?? "GitHub"}</span>
                       </span>
                     </span>

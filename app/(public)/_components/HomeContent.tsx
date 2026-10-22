@@ -11,7 +11,6 @@ import { WorkShowcase } from "@/components/home/WorkShowcase";
 import { ago, getSelectedWork } from "@/lib/queries/work";
 import { SystemMap } from "@/components/home/SystemMap";
 import { getSystemMap } from "@/lib/queries/map";
-import { ControlRoom } from "@/components/home/ControlRoom";
 import { getPublicMetrics } from "@/lib/metrics";
 import {
   getAffiliations,
@@ -102,9 +101,14 @@ export async function HomeContent() {
         nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, when: selectedWork.nowBuilding.lastPush, label: nowLabel } : null}
         evidence={evidence}
       />
-      {/* Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css) —
+      {/* The order since the premium pass (D-047): who he is, the proof, a way to question it, how he
+          thinks, how the platform holds together, a way to talk — graphite and bone alternating.
+          Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css) —
           except the AI guide's band: it holds fixed-position UI (the phone's full-screen conversation, the
           "still answering" button), which a content-visibility wrapper would trap inside the section. */}
+      <div className="below-fold">
+        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
+      </div>
       {guideEnabled && aiGuide && (
         <AiGuideSection
           content={aiGuide}
@@ -112,16 +116,10 @@ export async function HomeContent() {
         />
       )}
       <div className="below-fold">
-        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
-      </div>
-      <div className="below-fold">
-        <SystemMap data={systemMap} />
-      </div>
-      <div className="below-fold">
-        <ControlRoom pulse={pulse} numbers={numbers} />
-      </div>
-      <div className="below-fold">
         <PrinciplesBand content={howIBuild} evidence={evidence} />
+      </div>
+      <div className="below-fold">
+        <SystemMap data={systemMap} pulse={pulse} numbers={numbers} />
       </div>
       <div className="below-fold">
         <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />

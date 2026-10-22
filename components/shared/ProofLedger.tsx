@@ -2,11 +2,15 @@
 // The record as a hairline ledger (docs/improvements/HOME-HERO-PLAN.md §10) —
 // part of the kit other pages inherit: computed figures under a rule, no boxes,
 // no tickers. A figure that has evidence behind it carries the quiet
-// "Evidence · n" chip beside it (EV-1: no claims → nothing). Values and labels
+// "Evidence" link under it (EV-1: no claims → nothing); a figure that can be seen
+// in full links its label there (D-047). Every figure has the same anatomy —
+// claim, number, label, then its proof or its link. Values and labels
 // arrive ready-made from the database and the owner's wording; nothing is
 // typed here.
 
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export interface ProofLedgerItem {
   key: string;
@@ -14,8 +18,10 @@ export interface ProofLedgerItem {
   label: string;
   /** The claim this figure proves — set above it, so the record reads as the proof of the statement. */
   claim?: string | null;
-  /** The evidence chip for this figure, when it has claims. */
+  /** The evidence link for this figure, when it has claims. */
   evidence?: ReactNode;
+  /** Where the figure can be seen in full (e.g. the catalogue) — its label becomes the link. */
+  href?: string;
 }
 
 export function ProofLedger({ items, ariaLabel, className, bare = false }: { items: ProofLedgerItem[]; ariaLabel?: string | null; className?: string; /** No rule above it — for a bar that draws its own. */ bare?: boolean }) {
@@ -35,7 +41,14 @@ export function ProofLedger({ items, ariaLabel, className, bare = false }: { ite
                 <span aria-hidden="true" className="mb-1 h-4" />
               )}
               <span className="text-3xl font-medium tracking-tight tabular-nums md:text-4xl">{item.value}</span>
-              <span className="text-mist text-sm">{item.label}</span>
+              {item.href ? (
+                <Link href={item.href} className="group/fl text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-1 self-start text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
+                  {item.label}
+                  <ArrowUpRight aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover/fl:-translate-y-0.5 group-hover/fl:translate-x-0.5 motion-reduce:transition-none" />
+                </Link>
+              ) : (
+                <span className="text-mist text-sm">{item.label}</span>
+              )}
               {item.evidence && <span className="mt-1.5">{item.evidence}</span>}
             </li>
           ))}

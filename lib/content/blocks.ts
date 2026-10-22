@@ -178,7 +178,7 @@ export const CONTENT_BLOCKS = {
   },
   release: {
     title: "Release — the version the site is on",
-    description: "The status line at the foot of every page says which version the site is on and what's next (e.g. \"V1 · V2 on the way\"). The AI guide knows it too.",
+    description: "The status line at the foot of every page says which version the site is on and what's next (e.g. \"V2 in progress\"). The AI guide knows it too.",
     schema: z.object({
       current: Text(20),
       next: z.string().trim().max(20).default(""),

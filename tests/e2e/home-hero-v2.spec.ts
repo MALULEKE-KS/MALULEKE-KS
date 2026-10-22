@@ -80,16 +80,19 @@ for (const vp of VIEWPORTS) {
   });
 }
 
-test("the control room doesn't repeat the hero's record", async ({ page }) => {
+test("the live status line doesn't repeat the hero's record", async ({ page }) => {
   test.setTimeout(120_000);
   await settle(page);
   await page.goto(URL, { waitUntil: "networkidle" });
-  // The hero's ledger shows (and evidences) the pulse's figures; the control room keeps only what is new.
+  // The hero's ledger shows (and evidences) the pulse's figures; the status line above the map (the control
+  // room, merged in — D-047) keeps only what is new.
   const hero = page.locator('section[aria-labelledby="hero-title"]');
   await expect(hero.getByText(/rules the database enforces/i).first()).toBeVisible();
-  const controlRoom = page.locator('section[aria-labelledby="control-title"]');
-  await expect(controlRoom).toBeAttached();
-  await expect(controlRoom.getByText(/rules the database enforces|business rules enforced|changes audited/i)).toHaveCount(0);
+  const status = page.locator('section[aria-labelledby="map-title"] [aria-label="Live status"]');
+  await expect(status).toBeAttached();
+  await expect(status.getByText(/read-only database role/)).toHaveCount(1);
+  await expect(status.getByText(/rules the database enforces|business rules enforced|changes audited/i)).toHaveCount(0);
+  await expect(page.locator('section[aria-labelledby="control-title"]')).toHaveCount(0);
 });
 
 test("reduced motion: the hero holds still", async ({ page }) => {

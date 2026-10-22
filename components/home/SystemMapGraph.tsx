@@ -158,7 +158,8 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
   });
 
   const dim = (id: string) => lit !== null && !lit.has(id);
-  const techShown = data.tech.filter((t, i) => wide || allTech || i < data.techInGraph || lit?.has(t.id));
+  // The most used lead on every screen (D-047: the full list was a wall on a laptop); the rest are a tap away, never dropped.
+  const techShown = data.tech.filter((t, i) => allTech || i < data.techInGraph || lit?.has(t.id));
   const hiddenTech = data.tech.length - techShown.length;
   const shownKey = techShown.map((t) => t.id).join("|");
 
@@ -304,8 +305,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                   );
                 })}
               </ul>
-              {/* Phones: the most used lead; the rest are a tap away, never dropped. */}
-              {!wide && (hiddenTech > 0 || allTech) && (
+              {(hiddenTech > 0 || allTech) && (
                 <button
                   type="button"
                   data-map-bar=""
@@ -359,8 +359,9 @@ function SelectionBar({
     <div data-map-bar="" aria-live="polite" className="sticky top-20 z-20 mb-8 lg:static lg:mb-10">
       <div
         className={cn(
-          "bg-night/85 flex min-h-14 items-center gap-3 rounded-2xl border px-4 py-2.5 shadow-[0_16px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-colors duration-300",
-          node ? "border-ember/40" : "border-white/10",
+          "flex min-h-14 items-center gap-3 rounded-2xl border transition-[background-color,border-color,box-shadow,padding] duration-300",
+          // At rest, one plain line; once something is traced, the bar that names it and opens it (D-047).
+          node ? "bg-night/85 border-ember/40 px-4 py-2.5 shadow-[0_16px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl" : "border-transparent px-0 py-0",
         )}
       >
         {node ? (
@@ -442,7 +443,7 @@ function NodeCard({
       )}
       {icon}
       <span className="min-w-0 flex-1">
-        <span className={cn("block truncate", node.kind === "home" ? "text-paper text-[15px] font-semibold max-lg:text-sm" : node.faint ? "text-mist text-sm max-lg:text-[13px]" : "text-paper text-sm font-medium max-lg:text-[13px]")}>
+        <span className={cn("line-clamp-2 block [overflow-wrap:anywhere]", node.kind === "home" ? "text-paper text-[15px] font-semibold max-lg:text-sm" : node.faint ? "text-mist text-sm max-lg:text-[13px]" : "text-paper text-sm font-medium max-lg:text-[13px]")}>
           {node.label}
         </span>
         {node.sub && <span className={cn("text-line truncate text-[11px]", phoneCompact ? "hidden lg:block" : "block")}>{node.sub}</span>}

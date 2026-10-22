@@ -70,6 +70,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
       {showBanner && (
         <div
           role="region"
+          data-capture-hide
           aria-label="Privacy choices"
           className="no-print bg-night/95 text-paper shadow-lift fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl rounded-2xl border border-white/10 p-5 backdrop-blur-xl md:inset-x-auto md:right-6 md:bottom-6"
         >
