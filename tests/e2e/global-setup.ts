@@ -26,6 +26,10 @@ export default async function globalSetup() {
 
   const db = new PrismaClient();
   try {
+    // The AI guide is on in production, so the suite sees the site as visitors do: the home page's guide band
+    // and the docked guide elsewhere are covered by the phone and accessibility checks (D-043). The seed ships it off (BR-4.4).
+    await db.flag.upsert({ where: { key: "concierge.enabled" }, create: { key: "concierge.enabled", enabled: true }, update: { enabled: true } });
+
     const org = await db.organization.upsert({
       where: { slug: "e2e-stress-studio" },
       create: { name: "E2E Stress Studio", slug: "e2e-stress-studio", githubLogins: [OWNER] },

@@ -2,11 +2,11 @@
 // The AI guide's console (docs/AI-GUIDE-PHASE1-PLAN.md §3–4, §8): one
 // component, two places, the same conversation.
 //
-// - "inline" — the home page's own section. Desktop: the character large on a
-//   stage beside the conversation (GuideStage). Phone: designed for the phone —
-//   the character's bust in a header that stays put while the conversation
-//   scrolls under it, the composer at thumb reach, and "full screen" for a
-//   long conversation (the same console, fixed to the viewport).
+// - "inline" — the home page's own band, beside the owner's introduction
+//   (AiGuideSection). The character's bust in a header that stays put while the
+//   conversation scrolls under it, the composer at thumb reach, and on a phone
+//   "full screen" for a long conversation (the same console, fixed to the
+//   viewport). No large portrait (owner, 2026-10-22, D-043).
 // - "panel" — every other page's docked chat (GuidePanel): the bust in the
 //   header, then the conversation and the composer.
 //
@@ -20,9 +20,8 @@ import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import { Composer } from "@/components/guide/console/Composer";
 import { Conversation } from "@/components/guide/console/Conversation";
-import { GuideBust, GuideStage, useGuideStatus } from "@/components/guide/console/GuideStage";
+import { GuideMark, useGuideStatus } from "@/components/guide/console/GuideStage";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { cn } from "@/lib/utils";
 
 function Header({ variant, full, onFull, onClose }: { variant: "inline" | "panel"; full: boolean; onFull?: () => void; onClose?: () => void }) {
@@ -31,8 +30,8 @@ function Header({ variant, full, onFull, onClose }: { variant: "inline" | "panel
   const { label, busy } = useGuideStatus();
   const icon = "text-mist hover:text-paper grid size-10 place-items-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-ember";
   return (
-    <header className={cn("relative flex items-center gap-3 border-b border-white/[0.07] px-4 py-3", variant === "inline" && !full && "lg:hidden")}>
-      <GuideBust className="size-12" />
+    <header className="relative flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
+      <GuideMark className="size-12" />
       <div className="min-w-0 flex-1">
         <h3 id={`guide-title-${variant}`} className="text-paper flex items-center gap-2 text-sm font-semibold">
           {ownerFirstName}&apos;s AI guide
@@ -87,12 +86,13 @@ export function GuideConsole({ variant, onClose, onNavigate }: { variant: "inlin
   const chat = (
     <div
       className={cn(
-        "bg-night/90 relative flex min-h-0 flex-col overflow-hidden",
+        "relative flex min-h-0 flex-col overflow-hidden",
+        variant === "inline" && full ? "bg-night" : "bg-night/90",
         variant === "panel" && "h-full",
         variant === "inline" &&
           (full
             ? "fixed inset-0 z-[60] h-dvh rounded-none"
-            : "h-[min(36rem,calc(100dvh-7rem))] rounded-3xl border border-white/10 shadow-[0_40px_100px_-50px_rgb(0_0_0/0.95)] lg:h-[38rem]"),
+            : "h-[min(34rem,calc(100dvh-7rem))] rounded-3xl border border-white/10 shadow-[0_30px_80px_-40px_rgb(0_0_0/0.9)]"),
       )}
       role={variant === "inline" && full ? "dialog" : undefined}
       aria-modal={variant === "inline" && full ? true : undefined}
@@ -104,15 +104,8 @@ export function GuideConsole({ variant, onClose, onNavigate }: { variant: "inlin
         onNavigate?.();
       }} />
       <Composer id={`guide-input-${variant}`} ref={input} />
-      {variant === "inline" && !full && <BorderBeam size={160} duration={12} colorFrom="#FF5B1F" colorTo="#FFB547" />}
     </div>
   );
 
-  if (variant === "panel") return chat;
-  return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.5fr)]">
-      <GuideStage className="hidden h-[38rem] lg:flex" />
-      {chat}
-    </div>
-  );
+  return chat;
 }

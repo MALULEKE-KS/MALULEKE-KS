@@ -12,7 +12,6 @@ import { ArrowUpRight, RefreshCw } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { textOf, useGuideChat } from "@/components/guide/GuideChatProvider";
 import { AnswerMessage } from "@/components/guide/console/AnswerMessage";
-import { BlurFade } from "@/components/ui/blur-fade";
 import { TypingAnimation } from "@/components/ui/typing-animation";
 import { cn } from "@/lib/utils";
 
@@ -48,17 +47,15 @@ export function Conversation({ onNavigate, className }: { onNavigate?: () => voi
             </p>
             {lenses.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-2" aria-label="Pick where to start">
-                {lenses.map((l, i) => (
+                {lenses.map((l) => (
                   <li key={l.key}>
-                    <BlurFade delay={0.2 + 0.05 * i} y={4}>
-                      <button
+                    <button
                         type="button"
                         onClick={() => pickLens(l.key, l.label)}
                         className="border-white/12 text-mist hover:text-paper hover:border-ember/40 min-h-9 rounded-full border bg-white/5 px-3.5 py-1.5 text-[13px] transition-colors"
                       >
                         {l.label}
                       </button>
-                    </BlurFade>
                   </li>
                 ))}
               </ul>
@@ -70,17 +67,15 @@ export function Conversation({ onNavigate, className }: { onNavigate?: () => voi
               <ul className="grid gap-2 sm:grid-cols-2">
                 {opening.map((q, i) => (
                   <li key={q}>
-                    <BlurFade delay={0.3 + 0.06 * i} y={4} className="h-full">
-                      <button
+                    <button
                         type="button"
                         onClick={() => send(q)}
                         className="group/q hover:border-ember/40 flex h-full w-full items-start gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 text-left text-[13px] leading-snug transition-colors hover:bg-white/[0.05]"
                       >
-                        <span className="type-data text-ember/80 mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="type-data text-ember mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
                         <span className="flex-1">{q}</span>
                         <ArrowUpRight aria-hidden="true" className="text-mist group-hover/q:text-ember mt-0.5 size-3.5 shrink-0" />
                       </button>
-                    </BlurFade>
                   </li>
                 ))}
               </ul>
