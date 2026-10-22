@@ -71,7 +71,7 @@ maluleke-ks/
 │   ├── ui/                            # shadcn/ui + Magic UI + 21st.dev primitives, converted to the tokens
 │   │                                  # (README.md lists the vendored ones; PUBLIC-REDESIGN-PLAN §7a why)
 │   ├── shared/                        # cross-page: PublicShell, SiteHeader + HeaderFrame + NavLinks, SiteFooter +
-│   │                                  # DitheredWordmark, SearchPalette, PageHero, Consent, SocialLinks, StatCards,
+│   │                                  # DitheredWordmark, SearchPalette, PageHero, Consent, SocialLinks, HeroKit,
 │   │                                  # TechChip (THE one map of brand marks — brandMark/techMark), Prose, …
 │   ├── home/                          # home-page sections (hero, AI guide, work showcase, system map, control room)
 │   ├── systems/                       # catalog: CatalogCard, CatalogFilters + FilterDropdown, SystemsSpotlight

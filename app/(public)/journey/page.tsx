@@ -3,9 +3,10 @@
 // "the journey is about me and my life since day one"). Built to the showcase
 // level (owner, 2026-10-03: "at the highest level … showcasing components"),
 // with a clear structure underneath so it never gets noisy:
-//   1. Hero — ember light rays over graphite; his headline; four live
-//      counters from his own data (years on the journey, chapters, milestones,
-//      chapters happening now).
+//   1. Hero — the shape every inner page shares (D-046): a plain label, his
+//      headline and introduction over his Journey image, then one hairline row
+//      of live figures from his own data (years on the journey, chapters,
+//      milestones, chapters happening now).
 //   2. Chapters — a glass chapter bar that sticks while you read (scroll-spy),
 //      then a scroll-driven timeline: an ember beam filling the rail, a lit
 //      node per chapter, spotlight cards on alternating sides, a shine border
@@ -18,11 +19,10 @@
 
 import Link from "next/link";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
-import { Activity, ArrowRight, BookOpen, CalendarRange, FileText, Flag } from "lucide-react";
-import { StatCards, type Stat } from "@/components/shared/StatCards";
+import { ArrowRight, FileText } from "lucide-react";
+import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/HeroKit";
 import { Container } from "@/components/shared/Container";
 import { Accent } from "@/components/shared/Accent";
-import { LightRays } from "@/components/ui/light-rays";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { DotPattern } from "@/components/ui/dot-pattern";
@@ -68,13 +68,15 @@ export default async function JourneyPage() {
     moments: c.moments.map((m) => ({ id: m.id, when: formatMilestoneDate(m.date, m.precision), title: m.title, detail: m.detail, href: m.href })),
   }));
 
-  // Live counters — computed, never typed.
-  const stats = [
-    { value: Math.max(1, span.now - span.first), label: "years on the journey", icon: CalendarRange },
-    { value: chapters.length, label: chapters.length === 1 ? "chapter" : "chapters", icon: BookOpen },
-    { value: chapters.reduce((n, c) => n + c.moments.length, 0) + (ahead?.moments.length ?? 0), label: "milestones", icon: Flag },
-    { value: chapters.filter((c) => c.current).length, label: "happening now", icon: Activity, live: true },
-  ] satisfies Stat[];
+  // Live counters — computed, never typed; a zero is an absence, not a figure.
+  const stats = (
+    [
+      { value: Math.max(1, span.now - span.first), label: "years on the journey" },
+      { value: chapters.length, label: chapters.length === 1 ? "chapter" : "chapters" },
+      { value: chapters.reduce((n, c) => n + c.moments.length, 0) + (ahead?.moments.length ?? 0), label: "milestones" },
+      { value: chapters.filter((c) => c.current).length, label: "happening now", live: true },
+    ] satisfies HeroFigure[]
+  ).filter((f) => f.value > 0);
 
   // What's next, counted down from his own milestone (computed in getJourney).
   const next = ahead?.moments[0] ?? null;
@@ -82,17 +84,13 @@ export default async function JourneyPage() {
 
   return (
     <>
-      {/* ─── 1. Hero ─── */}
+      {/* ─── 1. Hero — the shape every inner page shares (D-046) ─── */}
       <section aria-labelledby="journey-title" className="hero-field text-paper relative isolate overflow-hidden">
         <PageHeroBackdrop purpose="hero-journey" />
-        <LightRays count={6} length="85vh" />
-        <Container className="relative pt-28 pb-20 md:pt-32 md:pb-24">
-          <div className="rise-in">
-            <p className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
-              <span className="bg-ember size-1.5 rounded-full" />
-              Journey · {span.first} — now
-            </p>
-          </div>
+        <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
+          <HeroLabel className="rise-in">
+            Journey · {span.first} — now
+          </HeroLabel>
           <div className="rise-in" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
             <h1 id="journey-title" className="type-display mt-6 max-w-4xl">
               <Accent text={journey.headline} className="type-accent text-ember-gradient pr-[0.06em]" />
@@ -101,7 +99,7 @@ export default async function JourneyPage() {
           <p className="type-lede text-mist rise-in mt-6 max-w-2xl" style={{ "--rise-delay": "160ms" } as React.CSSProperties}>
             {journey.lede}
           </p>
-          <StatCards stats={stats} delay={240} className="mt-12" />
+          <HeroFigures figures={stats} className="rise-in mt-12 md:mt-16" style={{ "--rise-delay": "240ms" } as React.CSSProperties} />
         </Container>
       </section>
 

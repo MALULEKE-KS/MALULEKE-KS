@@ -12,7 +12,7 @@
 
 import Image from "next/image";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
-import { Mail, MessageSquareText, ShieldCheck } from "lucide-react";
+import { Mail, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { getInquiryTypes, getRetentionMonths, getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
@@ -21,7 +21,7 @@ import { getSetting } from "@/lib/settings";
 import { Accent } from "@/components/shared/Accent";
 import { sectionCopy } from "@/lib/content/copy";
 import { pageMetadata } from "@/lib/seo/metadata";
-import { ShineBorder } from "@/components/ui/shine-border";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { LetsTalk } from "./_components/LetsTalk";
 
 export const dynamic = "force-dynamic";
@@ -75,30 +75,23 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
+      {/* The hero — the shape every inner page shares (D-046): label, headline, one line, then how it goes as a hairline row. */}
       <section aria-labelledby="talk-title" className="hero-field text-paper relative isolate overflow-hidden">
         <PageHeroBackdrop purpose="hero-contact" />
-        <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-1/2 size-[46rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.14),transparent)]" />
         <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
-          <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
+          <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-12 lg:gap-10">
             <div className="min-w-0 lg:col-span-7">
-              <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
-                <MessageSquareText aria-hidden="true" className="text-ember size-3.5" />
-                {hero.eyebrow}
-              </span>
+              <HeroLabel>{hero.eyebrow}</HeroLabel>
               <h1 id="talk-title" className="type-display mt-6">
                 <Accent text={hero.title ?? ""} className="type-accent text-ember-gradient pr-[0.06em]" />
               </h1>
               {hero.description && <p className="type-lede text-mist mt-5 max-w-xl">{hero.description}</p>}
             </div>
             <div className="min-w-0 lg:col-span-5">
-              <div className="relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
-                <ShineBorder borderWidth={1.5} duration={14} />
+              <div className="flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.05] p-4 backdrop-blur-md">
                 <span className="relative shrink-0">
-                  <Image src={face.url} alt={face.alt} width={64} height={64} unoptimized className="size-16 rounded-2xl object-cover object-top" />
-                  <span aria-hidden="true" className="ring-night absolute -right-1 -bottom-1 grid size-4 place-items-center rounded-full ring-2">
-                    <span className="bg-signal-finished/50 absolute inset-0 rounded-full motion-safe:animate-ping" />
-                    <span className="bg-signal-finished relative size-3 rounded-full" />
-                  </span>
+                  <Image src={face.url} alt={face.alt} width={56} height={56} unoptimized className="size-14 rounded-xl object-cover object-top" />
+                  <span aria-hidden="true" className="bg-signal-finished ring-night absolute -right-1 -bottom-1 size-3 rounded-full ring-2" />
                 </span>
                 <span className="min-w-0">
                   <span className="block font-semibold">{profile.name}</span>
@@ -108,15 +101,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             </div>
           </div>
 
-          {/* How it goes: four steps on one line, a light travelling through them from you to him. */}
-          <ol className="relative mt-8 grid grid-cols-2 gap-x-4 gap-y-4 sm:mt-12 sm:gap-y-6 md:grid-cols-4">
-            <span aria-hidden="true" className="from-ember/70 absolute top-4 right-[12.5%] left-[12.5%] hidden h-px overflow-hidden bg-gradient-to-r via-white/20 to-white/10 md:block">
-              <span className="absolute inset-y-0 left-0 w-1/4 bg-[linear-gradient(90deg,transparent,#ff5b1f,#ffb547,transparent)] motion-safe:animate-[flow-light_3.2s_cubic-bezier(0.65,0,0.35,1)_infinite] motion-reduce:hidden" />
-            </span>
+          {/* How it goes: four steps under one hairline, numbered in order — from you to him. */}
+          <ol className="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-white/15 pt-7 md:mt-14 md:grid-cols-4">
             {steps.map((s, i) => (
-              <li key={s.title} className="relative md:text-center">
-                <span className={`relative mx-0 grid size-8 place-items-center rounded-full font-mono text-xs font-semibold md:mx-auto ${i === 0 ? "bg-ember text-ink shadow-glow-ember" : "bg-night border border-white/20 text-paper"}`}>{String(i + 1).padStart(2, "0")}</span>
-                <span className="mt-3 block text-sm font-semibold">{s.title}</span>
+              <li key={s.title} className="min-w-0">
+                <span className={`block font-mono text-xs font-semibold ${i === 0 ? "text-ember" : "text-mist"}`}>{String(i + 1).padStart(2, "0")}</span>
+                <span className="mt-2 block text-sm font-semibold">{s.title}</span>
                 {s.body && <span className="text-mist mt-0.5 hidden text-sm sm:block">{s.body}</span>}
               </li>
             ))}

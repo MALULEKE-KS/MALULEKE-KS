@@ -42,6 +42,8 @@ export interface CoverflowCarouselProps<T> {
   loop?: boolean
   label?: string
   className?: string
+  /** Classes on the frame the ring is drawn in — e.g. a mask that fades its edges. */
+  frameClassName?: string
   cardClassName?: string
 }
 
@@ -64,6 +66,7 @@ export function CoverflowCarousel<T>({
   loop = true,
   label = "Carousel",
   className,
+  frameClassName,
   cardClassName,
 }: CoverflowCarouselProps<T>) {
   const count = slides.length
@@ -260,7 +263,7 @@ export function CoverflowCarousel<T>({
             }
           }}
           aria-describedby={undefined}
-          className="focus-visible:outline-ember cursor-grab overflow-hidden rounded-3xl py-10 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 active:cursor-grabbing"
+          className={cn("focus-visible:outline-ember cursor-grab overflow-hidden rounded-3xl py-10 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 active:cursor-grabbing", frameClassName)}
           style={{ perspective: `calc(var(--cf-card) * ${perspective})`, touchAction: "pan-y" }}
         >
           <div className="relative select-none" style={{ height: `calc(var(--cf-card) / ${aspect})`, transformStyle: "preserve-3d" }}>
