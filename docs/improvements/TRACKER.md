@@ -375,3 +375,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Verified:** typecheck and eslint clean; unit test 4/4; captured on the local dev server at 390 and 1440 px, ready and asked.
 - **For the owner:** a two-line introduction is drafted for his approval (his voice; the current one runs five lines) — not shipped until he says so.
 - **Carried to the page passes:** the illustrated character still shows in the floating launcher (every other page), the "Ask the guide" buttons, About's invite and Let's talk.
+
+### 2026-10-22 · The guide's character retired everywhere; the two-line introduction (D-045; same PR)
+- **Owner:** "use it and switch the character to the mark now".
+- **Done:** the mark in the floating launcher (no spinning glow), the "Ask the guide" buttons and About's invitation (hairline questions, no cross-fading poses); `GuideCharacter` deleted; the approved two-line introduction shipped (migration `20261022120000_ai_guide_intro`).
+- **Verified:** typecheck and eslint clean; captured the home band and About's invitation at phone and desktop width. The local dev server's photo route went to 500 for every slot mid-run (its worker crashed under memory — the same as 2026-10-20; nothing here touches it), so the launcher is checked from CI's page screenshots instead.
+- **For the owner:** About and Let's talk show an illustrated portrait of him because no real About photo is uploaded (Admin → Photos → About) — that portrait is his, not the guide's, so it was left alone.

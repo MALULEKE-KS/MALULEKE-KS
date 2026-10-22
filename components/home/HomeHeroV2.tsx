@@ -110,7 +110,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
               </Button>
             )}
             {copy.secondaryLabel && (
-              <AskGuideButton variant="glass" size="lg" showFace={false} className="bg-night-deep/40 w-full backdrop-blur sm:w-auto">
+              <AskGuideButton variant="glass" size="lg" showMark={false} className="bg-night-deep/40 w-full backdrop-blur sm:w-auto">
                 {copy.secondaryLabel}
               </AskGuideButton>
             )}

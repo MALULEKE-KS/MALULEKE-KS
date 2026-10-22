@@ -1,75 +1,52 @@
 // components/about/GuideInvite.tsx
-// About — the AI guide, smaller, beside the real portrait (owner, 2026-10-02:
-// "both"). The guide's poses cross-fade — wave, point, thinking — every few
-// seconds, inviting a question about him; a question asks it straight away.
-// Only the first pose loads with the page; the others follow once it's idle,
-// so a phone pays for one picture until the card has time to move.
-// Always labelled as AI (BR-4.3). Reduced motion: one pose, still. Hidden
-// when the guide is switched off.
+// About — the AI guide's invitation beside the portrait (owner, 2026-10-02: "both").
+// The guide is shown by the site's own K-S mark, as everywhere else (D-044; the
+// illustrated poses that cross-faded here were retired with it), and three
+// questions about the owner, each asked straight away. Always labelled as AI
+// (BR-4.3). Hidden when the guide is switched off.
 
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useReducedMotion } from "motion/react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { CubeMark } from "@/components/shared/BrandMark";
 import { useGuide } from "@/components/guide/GuideProvider";
-import { cn } from "@/lib/utils";
-
-const POSES = ["/character/guide-wave.webp", "/character/guide-point.webp", "/character/guide-thinking.webp"];
 
 export function GuideInvite({ questions }: { questions: string[] }) {
   const { enabled, ownerFirstName, ask } = useGuide();
-  const reduced = useReducedMotion();
-  const [pose, setPose] = useState(0);
-  const [mounted, setMounted] = useState(1);
-  useEffect(() => {
-    if (reduced) return;
-    const later = setTimeout(() => setMounted(POSES.length), 3000);
-    const t = setInterval(() => setPose((p) => (p + 1) % POSES.length), 5000);
-    return () => (clearTimeout(later), clearInterval(t));
-  }, [reduced]);
   if (!enabled) return null;
+  const list = questions.slice(0, 3);
 
   return (
-    <div className="bg-night-deep text-paper shadow-lift relative overflow-hidden rounded-3xl border border-white/10">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(28rem_18rem_at_20%_100%,rgb(255_91_31/0.18),transparent_70%)]" />
-      <div className="relative grid items-end gap-0 sm:grid-cols-[11rem_minmax(0,1fr)]">
-        <div aria-hidden="true" className="relative mx-auto h-52 w-44 sm:h-60 sm:w-full">
-          {POSES.slice(0, mounted).map((src, i) => (
-            <Image
-              key={src}
-              src={src}
-              alt=""
-              fill
-              sizes="11rem"
-              className={cn("object-contain object-bottom transition-opacity duration-1000 motion-reduce:transition-none", i === pose ? "opacity-100" : "opacity-0")}
-            />
-          ))}
-        </div>
-        <div className="p-6 sm:py-7 sm:pr-7 sm:pl-2">
+    <div className="bg-night-deep text-paper overflow-hidden rounded-[1.25rem] border border-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_30px_80px_-40px_rgb(0_0_0/0.9)]">
+      <div className="flex items-start gap-3.5 px-5 pt-5 pb-4 sm:px-6">
+        <CubeMark spin={false} className="size-11 ring-1 ring-white/12" />
+        <div className="min-w-0">
           <p className="text-mist flex items-center gap-2 text-xs">
             <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
             {ownerFirstName}&rsquo;s guide
           </p>
-          <p className="mt-2 font-sans text-xl font-semibold tracking-tight">Curious about something? Ask me about him.</p>
-          <ul className="mt-4 grid gap-2">
-            {questions.slice(0, 3).map((q) => (
-              <li key={q}>
-                <button
-                  type="button"
-                  onClick={() => ask(q)}
-                  className="group/q hover:border-ember/40 text-mist hover:text-paper flex w-full items-start gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2 text-left text-[13px] leading-snug transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
-                >
-                  <Sparkles aria-hidden="true" className="text-ember mt-0.5 size-3.5 shrink-0" />
-                  <span className="min-w-0 flex-1">{q}</span>
-                  <ArrowUpRight aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 transition-transform group-hover/q:-translate-y-0.5 group-hover/q:translate-x-0.5" />
-                </button>
-              </li>
-            ))}
-          </ul>
+          <p className="mt-1.5 font-sans text-lg leading-snug font-semibold tracking-tight">Curious about something? Ask me about him.</p>
         </div>
       </div>
+      {list.length > 0 && (
+        <ul className="divide-y divide-white/[0.06] border-t border-white/[0.07]">
+          {list.map((q) => (
+            <li key={q}>
+              <button
+                type="button"
+                onClick={() => ask(q)}
+                className="group/q focus-visible:outline-ember flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:-outline-offset-2 sm:px-6"
+              >
+                <span className="text-paper min-w-0 flex-1 text-sm leading-snug">{q}</span>
+                <ArrowRight
+                  aria-hidden="true"
+                  className="text-line group-hover/q:text-ember mt-0.5 size-4 shrink-0 transition-[transform,color] duration-200 group-hover/q:translate-x-0.5 motion-reduce:transition-none"
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
