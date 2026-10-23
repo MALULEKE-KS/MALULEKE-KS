@@ -28,6 +28,9 @@ export const FLAGS = {
   writeups: "writeups.enabled",
   // LT-9: confirmations to applicants — off until a sending domain is verified (Resend only delivers to the owner without one).
   applicantEmails: "notifications.applicant_emails",
+  // D-059: each case study's hero on its system's screenshot (D-054) — off for now (owner, 2026-10-24: "turn off system
+  // hero images and keep them for the future"); the screenshots, their history and the code stay.
+  caseStudyHeroImage: "systems.hero_image",
 } as const;
 
 export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];

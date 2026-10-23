@@ -38,6 +38,7 @@ import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
 import { HeroBackdrop } from "@/components/shared/HeroBackdrop";
 import { AiBadge } from "@/components/guide/AiBadge";
 import { getSetting } from "@/lib/settings";
+import { FLAGS, isFlagOn } from "@/lib/flags";
 import { techMark } from "@/components/shared/TechChip";
 import { SkillIcon } from "@/components/about/skill-icons";
 import { CatalogCard } from "@/components/systems/CatalogCard";
@@ -147,7 +148,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
   ].filter((p): p is { label: string; value: string } => Boolean(p));
 
   // How dark the veil over the screenshot is — the inner pages' own setting (site.pageHero.scrim), so one control tunes every hero image.
-  const heroScrim = await getSetting("site.pageHero.scrim");
+  const [heroScrim, heroImageOn] = await Promise.all([getSetting("site.pageHero.scrim"), isFlagOn(FLAGS.caseStudyHeroImage)]);
   const moving = cs.weeks.some((n) => n > 0);
   const commitsIn26 = cs.weeks.reduce((a, b) => a + b, 0);
 
@@ -156,8 +157,9 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       <JsonLd data={workLd} />
       <section aria-labelledby="system-title" className="hero-field text-paper relative isolate overflow-hidden">
         {/* The system's own screenshot behind its hero (D-054): the one Admin manages (capture, upload, back to
-            automatic, history) — so changing it never needs code. Top-anchored: a site's top is what it is. */}
-        {system.screenshotUrl && (
+            automatic, history) — so changing it never needs code. Top-anchored: a site's top is what it is.
+            Behind a flag, off for now (D-059): Admin → Settings → Flags → systems.hero_image brings it back. */}
+        {heroImageOn && system.screenshotUrl && (
           <HeroBackdrop
             desktop={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}
             mobile={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}

@@ -124,12 +124,12 @@ export function SearchPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="tap-target text-mist hover:text-paper focus-visible:outline-ember inline-flex h-9 items-center gap-2 rounded-full px-3 text-sm transition-colors hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="tap-target text-mist hover:text-paper focus-visible:outline-ember inline-flex h-9 items-center gap-2 rounded-full px-3 text-sm transition-colors hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2 lg:min-w-44 lg:border lg:border-white/12 lg:bg-white/[0.04] lg:pe-1.5 lg:group-data-[scrolled]/header:min-w-36"
         aria-label="Search the site"
       >
         <Search aria-hidden="true" className="size-4" />
-        <span className="hidden xl:inline">Search</span>
-        <kbd className="text-line hidden rounded-md border border-white/10 px-1.5 font-mono text-[0.6875rem] xl:inline">
+        <span className="hidden lg:inline">Search</span>
+        <kbd className="text-line ms-auto hidden rounded-md border border-white/10 px-1.5 font-mono text-[0.6875rem] lg:inline">
           {isMac ? "⌘K" : "Ctrl K"}
         </kbd>
       </button>

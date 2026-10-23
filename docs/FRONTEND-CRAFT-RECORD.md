@@ -145,3 +145,7 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **One tool:** the admin's map is one list (`lib/admin/nav.ts`) read by the sidebar, the phone dock, the breadcrumb and the search, so they can't disagree. Search is shadcn's Command (cmdk + Radix Dialog) over an index the layout already holds — instant, keyboard-first, no request per keystroke.
 - **Information design over decoration:** attention as cards that say what to do; state as pills; the activity log as sentences; a sticky section index (IntersectionObserver) on long pages; tables become cards below md instead of scrolling sideways.
 
+### 2026-10-24 · The header shows the system running (D-058)
+- **Proof in the chrome:** a live chip reads the build Vercel is serving and opens the platform's vital signs from the same public view as the footer — the header states facts the visitor can check, not a tagline. A disclosure (button + card) rather than a hover card, so a tap works on a phone and Escape or a tap outside closes it.
+- **One bar, two states:** the open bar carries the commit, the CV and a readable search field; the scrolled capsule keeps only what moves you on (Live, the nav, search, Let's talk).
+
