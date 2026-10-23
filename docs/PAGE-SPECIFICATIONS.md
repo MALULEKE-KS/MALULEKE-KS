@@ -160,7 +160,7 @@ One page per GitHub home (`PublicHome`): name, the owner's role, its GitHub acco
 
 ## ADMIN (all 2FA-gated, per BR-3.1)
 
-**Shell (#104):** every page below except sign-in sits in one panel — a graphite sidebar grouped by task (Content, Inbox, Quality, Platform), bone content area, a menu on small screens, "View the site" and "Sign out" (`POST /admin/auth/logout`, which ends every session). The layout re-checks the session where pages read data (`requireAdminId`), on top of `proxy.ts`. Removals always ask once ("Remove?") — never a browser dialog.
+**Shell (#104; the admin pass, D-057):** every page below except sign-in sits in one panel — a graphite sidebar grouped by task (Content, Inbox, Quality, Platform) with the count of what waits on each page, a page bar (breadcrumb, "Open on the site" when the page edits one, search), bone content area; on a phone a top bar and a dock (Overview · Inbox · Systems · Content · Menu); search over the whole admin with ⌘K; "View the site" and "Sign out" (`POST /admin/auth/logout`, which ends every session). Long pages carry a section index that sticks under the page bar; a form with unsaved changes asks before a link is followed. The layout re-checks the session where pages read data (`requireAdminId`), on top of `proxy.ts`. Removals always ask once ("Remove?") — never a browser dialog.
 
 ### `/admin/login`
 

@@ -87,7 +87,8 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
       <AdminPageHeader
         icon={Inbox}
         title="Inquiries"
-        description={`Everything sent through Let's Talk. A new message is due for review within ${slaHours} hours (BR-2.2 — a setting).`}
+        description={`Everything sent through Let's Talk. A new message is due for review within ${slaHours} hours — a setting.`}
+        rules={["BR-2.1 the workflow", "BR-2.2 review window"]}
       />
 
       {(!emailConfigured() || failedEmails > 0) && (

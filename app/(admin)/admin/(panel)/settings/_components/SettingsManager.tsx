@@ -2,13 +2,15 @@
 // Four tabs (#105): Platform (each tunable with its rule, default and bounds
 // checked on the server — #67), Lookups (every EXT-1 type with its own extra
 // fields; add, relabel, deprecate — never delete, BR-8.2), Flags
-// (toggled one at a time, no bulk control — BR-4.4) and Lenses.
+// (toggled one at a time, no bulk control — BR-4.4) and Lenses. A filter over
+// the settings and flags matches a key, what it does or its rule (D-057); the
+// admin search (⌘K) opens this page with a setting already filtered.
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Flag, Glasses, ListTree, Pencil, Plus, SlidersHorizontal } from "lucide-react";
+import { Flag, Glasses, ListTree, Pencil, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { adminButton, adminHint, adminInput, adminLabel, EmptyState, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
@@ -62,8 +64,14 @@ const COLOR_TOKENS = ["signal-finished", "signal-progress", "signal-planned"] as
 
 type Tab = "platform" | "lookups" | "flags" | "lenses";
 
-export function SettingsManager({ platform, flags, lenses, lookups }: { platform: PlatformSetting[]; flags: FlagRow[]; lenses: Lens[]; lookups: Record<string, LookupValue[]> }) {
+export function SettingsManager({ platform, flags, lenses, lookups, initialQuery = "" }: { platform: PlatformSetting[]; flags: FlagRow[]; lenses: Lens[]; lookups: Record<string, LookupValue[]>; initialQuery?: string }) {
   const [tab, setTab] = useState<Tab>("platform");
+  const [q, setQ] = useState(initialQuery);
+  const needle = q.trim().toLowerCase();
+  const matches = (...texts: (string | null | undefined)[]) => !needle || texts.some((t) => t?.toLowerCase().includes(needle));
+  const shownSettings = platform.filter((s) => matches(s.key, s.description, s.rule));
+  const shownFlags = flags.filter((f) => matches(f.key, f.notes));
+  const counts: Partial<Record<Tab, number>> = needle ? { platform: shownSettings.length, flags: shownFlags.length } : {};
   const tabs: { key: Tab; label: string; Icon: typeof Flag }[] = [
     { key: "platform", label: "Platform", Icon: SlidersHorizontal },
     { key: "lookups", label: "Lookups", Icon: ListTree },
@@ -72,6 +80,13 @@ export function SettingsManager({ platform, flags, lenses, lookups }: { platform
   ];
   return (
     <div>
+      <div className="relative mb-4 max-w-md">
+        <label htmlFor="settings-q" className="sr-only">
+          Filter settings and flags
+        </label>
+        <Search aria-hidden="true" className="text-slate pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+        <input id="settings-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter: a key, what it does, or a rule" className={cn(adminInput, "ps-10")} />
+      </div>
       <div role="tablist" aria-label="Settings sections" className="mb-5 flex flex-wrap gap-2">
         {tabs.map(({ key, label, Icon }) => (
           <button
@@ -86,12 +101,13 @@ export function SettingsManager({ platform, flags, lenses, lookups }: { platform
             )}
           >
             <Icon aria-hidden="true" className="size-4" /> {label}
+            {counts[key] !== undefined && <span className="font-mono text-xs opacity-70">{counts[key]}</span>}
           </button>
         ))}
       </div>
-      {tab === "platform" && <PlatformSection settings={platform} />}
+      {tab === "platform" && (shownSettings.length > 0 ? <PlatformSection settings={shownSettings} /> : <EmptyState icon={SlidersHorizontal}>No setting matches “{q.trim()}”.</EmptyState>)}
       {tab === "lookups" && <LookupsSection lookups={lookups} />}
-      {tab === "flags" && <FlagsSection flags={flags} />}
+      {tab === "flags" && (shownFlags.length > 0 ? <FlagsSection flags={shownFlags} /> : <EmptyState icon={Flag}>No flag matches “{q.trim()}”.</EmptyState>)}
       {tab === "lenses" && <LensesSection lenses={lenses} />}
     </div>
   );

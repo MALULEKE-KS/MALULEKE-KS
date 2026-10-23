@@ -95,7 +95,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
   }
 
   return (
-    <Panel title="Screenshot" description="The hero image of the case study, and the picture on the home page and the catalogue. Captured from the live site automatically, or your own upload — which always wins. Replacing it keeps the old version below (BR-1.18).">
+    <Panel id="sys-screenshot" title="Screenshot" description="The hero image of the case study, and the picture on the home page and the catalogue. Captured from the live site automatically, or your own upload — which always wins. Replacing it keeps the old version below (BR-1.18).">
       <div className="overflow-hidden rounded-xl border border-ink/10 bg-paper">
         {screenshot ? (
           // eslint-disable-next-line @next/next/no-img-element -- the admin's own preview route, not a static asset

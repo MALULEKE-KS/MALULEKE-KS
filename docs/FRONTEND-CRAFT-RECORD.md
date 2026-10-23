@@ -141,3 +141,7 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **One system, not six pages:** shared pieces replace per-page copies — `AiBadge`, the `.type-micro` label, two radii, two section rhythms, one focus ring, `buttonVariants` everywhere; Reveal only moves (nothing blank at rest); React 19 `ViewTransition` cross-fades pages while the header and the dock keep their own transition names and hold still.
 - **The phone's navigation:** a floating glass dock at the thumb (`BottomDock`), the current page lit by a Motion `layoutId` cell that glides between pages, the guide raised in the middle on the site's mark with its live dot; the full menu sheet opens from its last cell with the same focus and Escape contract. Floating cards lift above it through one CSS rule (`html[data-dock] .above-dock`), so nothing per component guesses its height.
 
+### 2026-10-23 · The admin pass (D-057)
+- **One tool:** the admin's map is one list (`lib/admin/nav.ts`) read by the sidebar, the phone dock, the breadcrumb and the search, so they can't disagree. Search is shadcn's Command (cmdk + Radix Dialog) over an index the layout already holds — instant, keyboard-first, no request per keystroke.
+- **Information design over decoration:** attention as cards that say what to do; state as pills; the activity log as sentences; a sticky section index (IntersectionObserver) on long pages; tables become cards below md instead of scrolling sideways.
+

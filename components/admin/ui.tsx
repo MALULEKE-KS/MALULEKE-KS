@@ -27,11 +27,14 @@ export function AdminPageHeader({
   icon: Icon,
   title,
   description,
+  rules,
   actions,
 }: {
   icon: LucideIcon;
   title: string;
   description?: React.ReactNode;
+  /** The business rules behind the page, as small chips after the plain sentence (D-057): e.g. ["BR-2.2 review window"]. */
+  rules?: string[];
   actions?: React.ReactNode;
 }) {
   return (
@@ -42,6 +45,15 @@ export function AdminPageHeader({
         </span>
         <h1 className="mt-4 font-sans text-3xl font-semibold tracking-tight text-ink">{title}</h1>
         {description && <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate">{description}</p>}
+        {rules && rules.length > 0 && (
+          <ul aria-label="Rules behind this page" className="mt-2.5 flex flex-wrap gap-1.5">
+            {rules.map((r) => (
+              <li key={r} className="rounded-full border border-ink/12 bg-sheet px-2 py-0.5 font-mono text-[12px] text-slate">
+                {r}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </header>
@@ -64,7 +76,7 @@ export function Panel({
   id?: string;
 }) {
   return (
-    <section id={id} className={cn("scroll-mt-24 rounded-2xl border border-ink/10 bg-sheet shadow-soft", className)}>
+    <section id={id} className={cn("scroll-mt-32 rounded-2xl border border-ink/10 bg-sheet shadow-soft", className)}>
       {(title || actions) && (
         <div className="flex flex-col gap-2 border-b border-ink/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
