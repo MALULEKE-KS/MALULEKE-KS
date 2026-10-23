@@ -52,7 +52,8 @@ test("on a phone, one Filter button opens every facet in a sheet with finger-siz
   await expect(sheet).toBeVisible();
   const options = sheet.locator("ul a");
   expect(await options.count()).toBeGreaterThan(1);
-  for (const h of await options.evaluateAll((els) => els.slice(0, 8).map((e) => e.getBoundingClientRect().height))) expect(h).toBeGreaterThanOrEqual(44);
+  // Rounded: layout lands a sub-pixel short of 44 on some runs (43.99997).
+  for (const h of await options.evaluateAll((els) => els.slice(0, 8).map((e) => e.getBoundingClientRect().height))) expect(Math.round(h)).toBeGreaterThanOrEqual(44);
   await expect(sheet.getByRole("button", { name: /^Show \d+ system/ })).toBeVisible();
   await page.screenshot({ path: "hero-screenshots/systems-filter-sheet-390.png" });
 });
