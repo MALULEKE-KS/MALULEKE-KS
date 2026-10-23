@@ -39,8 +39,9 @@ for (const vp of [
       expect(clipped, "a question is cut off").toBe(false);
     }
 
-    // the guide is the site's mark, not an illustrated character
-    await expect(band.locator(".ks-cube").first()).toBeVisible();
+    // the guide wears its own face — the orb (D-060) — not the owner's K-S mark, and not an illustrated character
+    await expect(band.locator("svg.guide-bot").first()).toBeVisible();
+    expect(await band.locator(".ks-cube").count()).toBe(0);
 
     // phone first: the guide comes straight after the introduction, before the trust points
     if (vp.name === "phone") {
