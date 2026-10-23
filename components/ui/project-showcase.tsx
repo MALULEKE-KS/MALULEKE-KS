@@ -126,7 +126,7 @@ export function ProjectShowcase({ items, className }: { items: ShowcaseItem[]; c
             <li key={item.key} className="border-ink/10 border-t last:border-b">
               <Link
                 href={item.href}
-                className="group relative block py-5 focus-visible:outline-none"
+                className="group press relative block py-5 focus-visible:outline-none active:opacity-80"
                 onMouseEnter={(e) => enter(i, e)}
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => enter(i)}

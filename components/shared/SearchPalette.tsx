@@ -124,7 +124,7 @@ export function SearchPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-mist hover:text-paper focus-visible:outline-ember inline-flex h-9 items-center gap-2 rounded-full px-3 text-sm transition-colors hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="tap-target text-mist hover:text-paper focus-visible:outline-ember inline-flex h-9 items-center gap-2 rounded-full px-3 text-sm transition-colors hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2"
         aria-label="Search the site"
       >
         <Search aria-hidden="true" className="size-4" />

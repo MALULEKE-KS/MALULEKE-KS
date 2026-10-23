@@ -60,7 +60,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
     >
       {backdrop}
 
-      <Container className="flex flex-1 flex-col justify-start pt-28 pb-8 md:justify-center md:pt-[5.5rem] md:pb-10">
+      <Container className="flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10">
         {/* One column at the left, so the image's right side has the room. */}
         <div className="flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]">
           {(liveLine || nowBuilding) && (
@@ -79,7 +79,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
               {nowBuilding && (
                 <span className="inline-flex max-w-full min-w-0 flex-wrap items-center gap-x-1.5 max-sm:pl-4">
                   {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
-                  <Link href={nowBuilding.url} className="text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
+                  <Link href={nowBuilding.url} className="tap-target text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
                     {nowBuilding.name}
                   </Link>
                   {nowBuilding.when && <span className="text-line">· {nowBuilding.when}</span>}
@@ -88,23 +88,23 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             </p>
           )}
 
-          <h1 id="hero-title" className="hero-rise type-hero-name mt-6 max-w-[18ch] md:mt-7" style={rise(1)}>
+          <h1 id="hero-title" className="hero-rise type-hero-name mt-5 max-w-[18ch] md:mt-7" style={rise(1)}>
             {name}
           </h1>
 
-          <div className="hero-rise mt-4" style={rise(2)}>
+          <div className="hero-rise mt-3 md:mt-4" style={rise(2)}>
             <p className="text-paper/90 text-xl font-medium md:text-3xl">{role}</p>
             {credential && <p className="text-mist mt-2 max-w-[56ch] text-sm md:text-base">{credential}</p>}
           </div>
 
           {statement && (
-            <p className="hero-rise type-lede text-mist mt-6 max-w-[40ch]" style={rise(3)}>
+            <p className="hero-rise type-lede text-mist mt-4 max-w-[40ch] md:mt-6" style={rise(3)}>
               {statement}
             </p>
           )}
 
           {/* The header already carries the CV and Let's talk, so the hero has no CV button (no duplicate). */}
-          <div className="hero-rise mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row" style={rise(4)}>
+          <div className="hero-rise mt-6 grid w-full grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:flex sm:w-auto md:mt-7" style={rise(4)}>
             {copy.primaryLabel && (
               <Button asChild variant="accent" size="lg" className="w-full sm:w-auto">
                 <Link href="/systems">
@@ -139,8 +139,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
       {/* The record, docked to the bottom of the hero as a frosted instrument bar. */}
       {ledger.length > 0 && (
         <div className="hero-rise border-t border-white/15 bg-night-deep/55 backdrop-blur-md" style={rise(6)}>
-          <Container className="py-6">
-            <ProofLedger items={ledger} ariaLabel={copy.ledgerAria} bare />
+          <Container className="py-5 md:py-6">
+            <ProofLedger items={ledger} ariaLabel={copy.ledgerAria} bare compact />
           </Container>
         </div>
       )}

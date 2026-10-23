@@ -66,7 +66,7 @@ export function PrinciplesBand({
                   className="grid grid-cols-1 gap-x-8 gap-y-3 py-5 md:grid-cols-12 md:items-start md:py-6"
                 >
                   <details className="group/p md:col-span-10">
-                    <summary className="focus-visible:outline-ember grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-start gap-x-6 gap-y-1 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)_auto] [&::-webkit-details-marker]:hidden">
+                    <summary className="focus-visible:outline-ember grid min-h-11 cursor-pointer transition-opacity active:opacity-70 list-none grid-cols-[minmax(0,1fr)_auto] items-start gap-x-6 gap-y-1 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)_auto] [&::-webkit-details-marker]:hidden">
                       <h3 className="text-ink group-hover/p:text-accent text-lg font-semibold tracking-tight transition-colors md:text-xl">
                         {p.name}
                       </h3>

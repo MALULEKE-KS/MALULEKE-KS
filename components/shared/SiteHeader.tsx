@@ -53,7 +53,7 @@ export function SiteHeader({
       <Link
         href="/"
         aria-label={labels?.homeLabel?.trim() || ownerName}
-        className="group flex h-10 shrink-0 items-center gap-2.5 rounded-full pe-2 ps-1.5 focus-visible:outline-2 focus-visible:outline-ember"
+        className="group tap-target flex h-10 shrink-0 items-center gap-2.5 rounded-full pe-2 ps-1.5 focus-visible:outline-2 focus-visible:outline-ember"
       >
         <CubeMark className="size-9" />
       </Link>
@@ -75,7 +75,7 @@ export function SiteHeader({
         {labels?.contactLabel?.trim() && (
           <Link
             href="/contact"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink shadow-glow-ember transition-[filter,transform] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
+            className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink shadow-glow-ember transition-[filter,transform] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
           >
             {labels.contactLabel}
             <ArrowUpRight aria-hidden="true" className="size-4" />

@@ -62,7 +62,7 @@ export async function ContactBand({ inquiryTypes, reviewSlaHours }: ContactBandP
                   <li key={t.value} className="border-ink/12 border-b">
                     <Link
                       href={`/contact?about=${t.value}`}
-                      className="group/t focus-visible:outline-ember relative flex items-center justify-between gap-4 py-4 text-[17px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                      className="group/t press focus-visible:outline-ember relative flex min-h-14 items-center justify-between gap-4 py-4 active:opacity-70 text-[17px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       <span className="relative">
                         {t.label}

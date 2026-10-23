@@ -291,7 +291,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                         aria-pressed={pinned === t.id}
                         {...interact(t)}
                         className={cn(
-                          "focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
+                          "tap-target press focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
                           lead ? "text-paper px-3 py-1.5 text-[13px] font-medium" : "text-mist px-2.5 py-1 text-[11.5px]",
                           pinned === t.id ? "border-ember bg-ember/15" : on ? "border-ember/70" : lead ? "border-white/15 hover:border-ember/50" : "border-white/10 hover:border-ember/50",
                           dim(t.id) && "opacity-30",
@@ -310,7 +310,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                   type="button"
                   data-map-bar=""
                   onClick={() => setAllTech((v) => !v)}
-                  className="text-mist hover:text-paper focus-visible:outline-ember mt-1 inline-flex h-10 items-center self-start rounded-full border border-dashed border-white/15 px-4 text-[13px] focus-visible:outline-2"
+                  className="press text-mist hover:text-paper focus-visible:outline-ember mt-1 inline-flex h-11 items-center self-start rounded-full border border-dashed border-white/15 px-4 text-[13px] focus-visible:outline-2"
                 >
                   {allTech ? "Show the most used" : `Show all ${data.tech.length} — ${hiddenTech} more`}
                 </button>
@@ -453,7 +453,7 @@ function NodeCard({
     </>
   );
   const cls = cn(
-    "group/n relative z-10 flex min-w-0 items-center gap-2.5 rounded-xl border px-3.5 transition-[opacity,border-color,background-color,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember max-lg:min-h-12 max-lg:px-3",
+    "group/n press relative z-10 flex min-w-0 items-center gap-2.5 rounded-xl border px-3.5 transition-[opacity,border-color,background-color,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember max-lg:min-h-12 max-lg:px-3",
     node.kind === "home" ? "py-3.5 max-lg:py-2.5" : "py-2.5 max-lg:py-2",
     node.faint ? "border-dashed border-white/12 bg-night" : "border-white/10 bg-night hover:border-ember/50",
     selected && "border-ember bg-ember/10 shadow-[0_0_0_3px_rgb(255_91_31/0.15)]",

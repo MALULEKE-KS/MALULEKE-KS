@@ -54,7 +54,7 @@ export function SectionLink({ href, label, tone = "light", className }: { href: 
     <Link
       href={href}
       className={cn(
-        "group/sl focus-visible:outline-ember inline-flex shrink-0 items-center gap-2 self-start border-b pb-1 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 md:self-auto",
+        "group/sl tap-target press focus-visible:outline-ember inline-flex shrink-0 items-center gap-2 self-start border-b pb-1 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 md:self-auto",
         dark ? "text-paper hover:border-ember border-white/25" : "text-ink hover:border-ember border-ink/20",
         className,
       )}

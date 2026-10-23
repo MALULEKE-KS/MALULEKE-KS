@@ -110,7 +110,7 @@ export function MobileMenu({
         aria-expanded={open}
         aria-controls="mobile-menu"
         onClick={() => setOpenFor(pathname)}
-        className="text-paper focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3 pe-3.5 text-sm font-medium transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
+        className="tap-target press text-paper focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3 pe-3.5 text-sm font-medium transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
       >
         <Menu aria-hidden="true" className="size-4" />
         {menuLabel}

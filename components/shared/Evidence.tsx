@@ -118,7 +118,7 @@ export function Evidence({
         <HoverCardTrigger asChild>
           <DialogTrigger
             className={cn(
-              "group/ev focus-visible:outline-ember inline-flex items-center gap-1.5 border-b border-dashed pb-0.5 text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4",
+              "group/ev tap-target press focus-visible:outline-ember inline-flex items-center gap-1.5 border-b border-dashed pb-0.5 text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4",
               tone === "dark" ? "text-paper/90 hover:text-paper hover:border-ember border-white/30" : "text-ink/85 hover:text-ink hover:border-ember border-ink/30",
               className,
             )}

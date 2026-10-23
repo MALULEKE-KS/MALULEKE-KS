@@ -58,7 +58,7 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
         <div className={cn("min-w-0 px-1 pb-2 sm:px-0 lg:col-span-5 lg:pb-0", flip && "lg:order-1")}>
           {meta && <p className="text-slate font-mono text-xs">{meta}</p>}
           <h3 className="text-ink mt-3 text-[1.75rem] leading-tight font-semibold tracking-tight md:text-[2rem]">
-            <Link href={`/systems/${w.slug}`} className="focus-visible:outline-ember rounded-sm decoration-ember/60 underline-offset-[6px] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
+            <Link href={`/systems/${w.slug}`} className="tap-target focus-visible:outline-ember rounded-sm decoration-ember/60 underline-offset-[6px] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
               {w.name}
             </Link>
           </h3>
@@ -87,13 +87,14 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
 
           {w.techStack.length > 0 && (
             <ul className="text-ink/85 mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]" aria-label="Built with">
-              {w.techStack.slice(0, STACK_SHOWN).map((t) => (
-                <li key={t} className="inline-flex items-center gap-1.5">
+              {w.techStack.slice(0, STACK_SHOWN).map((t, i, shown) => (
+                <li key={t} className="inline-flex items-center gap-1.5 whitespace-nowrap">
                   {techMark(t)}
                   {t}
+                  {/* The count rides with the last mark, so it never wraps onto a line of its own. */}
+                  {i === shown.length - 1 && extra > 0 && <span className="text-slate ml-1 font-mono text-xs">+{extra}</span>}
                 </li>
               ))}
-              {extra > 0 && <li className="text-slate font-mono text-xs">+{extra}</li>}
             </ul>
           )}
 
@@ -107,22 +108,23 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
             </div>
           )}
 
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+          {/* A phone: the case study as one full-width button, its links on one row beneath. */}
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-4">
             <Link
               href={`/systems/${w.slug}`}
-              className="group/cta bg-ink text-paper hover:shadow-lift focus-visible:outline-ember inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition-[transform,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:hover:-translate-y-0.5"
+              className="group/cta press bg-ink text-paper hover:shadow-lift focus-visible:outline-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 max-sm:w-full sm:h-11 motion-safe:hover:-translate-y-0.5"
             >
               Read the case study
               <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
             {w.liveUrl && (
-              <a href={w.liveUrl} target="_blank" rel="noopener noreferrer" className="text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1 border-b pb-0.5 text-sm transition-colors">
+              <a href={w.liveUrl} target="_blank" rel="noopener noreferrer" className="tap-target text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1 border-b pb-0.5 text-sm transition-colors">
                 Live site <ArrowUpRight aria-hidden="true" className="size-3.5" />
                 <span className="sr-only">(opens in a new tab)</span>
               </a>
             )}
             {w.repoUrl ? (
-              <a href={w.repoUrl} target="_blank" rel="noopener noreferrer" className="text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1.5 border-b pb-0.5 text-sm transition-colors">
+              <a href={w.repoUrl} target="_blank" rel="noopener noreferrer" className="tap-target text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1.5 border-b pb-0.5 text-sm transition-colors">
                 <Github aria-hidden="true" className="size-3.5" /> Code
                 <span className="sr-only">(opens GitHub in a new tab)</span>
               </a>
@@ -164,7 +166,7 @@ function CommitStrip({ now, label }: { now: NonNullable<SelectedWork["nowBuildin
           <a
             href={now.url}
             {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-            className="text-paper hover:border-ember mt-5 inline-flex items-center gap-1.5 border-b border-white/25 pb-0.5 text-sm font-medium transition-colors"
+            className="tap-target text-paper hover:border-ember mt-5 inline-flex items-center gap-1.5 border-b border-white/25 pb-0.5 text-sm font-medium transition-colors"
           >
             {external ? (
               <>

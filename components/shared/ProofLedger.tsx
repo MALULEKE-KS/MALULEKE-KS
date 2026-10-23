@@ -24,12 +24,12 @@ export interface ProofLedgerItem {
   href?: string;
 }
 
-export function ProofLedger({ items, ariaLabel, className, bare = false }: { items: ProofLedgerItem[]; ariaLabel?: string | null; className?: string; /** No rule above it — for a bar that draws its own. */ bare?: boolean }) {
+export function ProofLedger({ items, ariaLabel, className, bare = false, compact = false }: { items: ProofLedgerItem[]; ariaLabel?: string | null; className?: string; /** No rule above it — for a bar that draws its own. */ bare?: boolean; /** Tighter on a phone, so the record starts in the first screen (the home hero, D-048). */ compact?: boolean }) {
   if (items.length === 0) return null;
   return (
     <div className={className}>
       <div className={bare ? undefined : "border-t border-white/15 pt-8"}>
-        <ul aria-label={ariaLabel ?? undefined} className="grid grid-cols-2 gap-x-6 gap-y-8 text-left md:grid-cols-4">
+        <ul aria-label={ariaLabel ?? undefined} className={compact ? "grid grid-cols-2 gap-x-5 gap-y-5 text-left md:grid-cols-4 md:gap-x-6 md:gap-y-8" : "grid grid-cols-2 gap-x-6 gap-y-8 text-left md:grid-cols-4"}>
           {items.map((item) => (
             <li key={item.key} className="flex flex-col gap-1">
               {item.claim ? (
@@ -40,9 +40,9 @@ export function ProofLedger({ items, ariaLabel, className, bare = false }: { ite
               ) : (
                 <span aria-hidden="true" className="mb-1 h-4" />
               )}
-              <span className="text-3xl font-medium tracking-tight tabular-nums md:text-4xl">{item.value}</span>
+              <span className={compact ? "text-[1.75rem] leading-tight font-medium tracking-tight tabular-nums md:text-4xl" : "text-3xl font-medium tracking-tight tabular-nums md:text-4xl"}>{item.value}</span>
               {item.href ? (
-                <Link href={item.href} className="group/fl text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-1 self-start text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
+                <Link href={item.href} className="group/fl tap-target text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-1 self-start text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
                   {item.label}
                   <ArrowUpRight aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover/fl:-translate-y-0.5 group-hover/fl:translate-x-0.5 motion-reduce:transition-none" />
                 </Link>

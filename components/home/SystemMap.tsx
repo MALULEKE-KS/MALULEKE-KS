@@ -80,7 +80,7 @@ export function SystemMap({ data, pulse, numbers }: { data: SystemMapData | null
                 </li>
               ))}
             </ul>
-            <AskGuideButton question="How does this platform enforce its business rules?" variant="glass" size="sm" className="shrink-0 self-start md:self-auto">
+            <AskGuideButton question="How does this platform enforce its business rules?" variant="glass" size="sm" className="tap-target shrink-0 self-start md:self-auto">
               Ask the AI guide how
             </AskGuideButton>
           </div>
