@@ -679,3 +679,20 @@ html {
     font-size: 0.75rem;
   }
 }
+
+/* The catalogue's toolbar (/systems, D-049): it sticks just under the floating header
+   while you scroll, and rises to the top when the header slips away (HeaderFrame sets
+   data-header on <html>). */
+.catalog-toolbar {
+  top: 4.75rem;
+  transition: top 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+html[data-header="hidden"] .catalog-toolbar {
+  top: 0.75rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .catalog-toolbar {
+    transition: none;
+  }
+}
+

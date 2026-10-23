@@ -128,3 +128,6 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 ### 2026-10-23 · The phone pass (D-048)
 - **Method:** a script measured the live page at 360/390/430 px — sideways overflow, every link and button's hit area (including an `::after` hit area), every text node's computed size — and listed each by section; the owner approved the eight fixes before any code.
 - **Built as design-system rules, not one-offs:** `tap-target` (44 × 44 px minimum hit area, invisible), `press` (finger-down feedback, reduced-motion aware), a 12 px type floor on phones, 16 px inputs (no iOS zoom), safe areas through `viewport-fit=cover`, scroll padding under the sticky header, the theme colour for the browser bar.
+### 2026-10-23 · The Systems page's premium pass (D-049)
+- **Method:** audit of the live catalogue at 390/1440 px, a plan with mocks in the real tokens (artifact "MALULEKE-KS Systems Plan"), four owner decisions, built after approval.
+- **Components:** Magic UI **Magic Card** kept as the card's surface (hover light), with the shared `press` feedback; the site's Radix **Dialog** as a bottom sheet for the phone's filters (no new library); Motion-free CSS for the sticky toolbar's rise (it follows the header's state through a data attribute). Cards carry one capsule; the technologies are marks, not pills.

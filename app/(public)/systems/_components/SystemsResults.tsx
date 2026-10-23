@@ -4,10 +4,10 @@
 // Data: lib/queries/catalog.ts — filters, counts and pages from one read.
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, SearchX } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, SearchX, X } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 import { CatalogCard } from "@/components/systems/CatalogCard";
-import { CatalogFilters } from "@/components/systems/CatalogFilters";
+import { CatalogFilters, activeFilters } from "@/components/systems/CatalogFilters";
 import { getCatalog, type Catalog, type CatalogSystem } from "@/lib/queries/catalog";
 import { PaginationQuerySchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
@@ -31,13 +31,20 @@ export async function loadCatalog(params: Params): Promise<Catalog> {
   });
 }
 
-function Grid({ systems, showHome = true }: { systems: CatalogSystem[]; showHome?: boolean }) {
+/**
+ * The cards. A home with one system shows it wide (picture beside story) and two share
+ * the row in halves, so a small home never leaves an empty row (D-049, the owner's
+ * choice D2); three or more use the three-column grid.
+ */
+function Grid({ systems, showHome = true, fit = false }: { systems: CatalogSystem[]; showHome?: boolean; /** Size the row to how many there are (a home's group). */ fit?: boolean }) {
+  const n = systems.length;
+  const cols = fit && n === 1 ? "grid-cols-1" : fit && n === 2 ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-3";
   return (
-    <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <ul className={cn("grid gap-5", cols)}>
       {systems.map((s, i) => (
         <li key={s.slug}>
           <Reveal delay={Math.min(i, 5) * 60} className="h-full">
-            <CatalogCard s={s} showHome={showHome} />
+            <CatalogCard s={s} showHome={showHome} layout={fit && n === 1 ? "wide" : "grid"} />
           </Reveal>
         </li>
       ))}
@@ -58,17 +65,30 @@ function ByHome({ systems, homes }: { systems: CatalogSystem[]; homes: Catalog["
     <div className="space-y-14">
       {groups.map((g) => (
         <section key={g.slug} aria-labelledby={`home-${g.slug}`}>
-          {/* The homes' GitHub links live in the footer ("Where the code lives") — not repeated here. */}
-          <div className="border-ink/10 mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-3">
-            <h2 id={`home-${g.slug}`} className="text-ink text-xl font-semibold tracking-tight md:text-2xl">
-              {g.name}
-            </h2>
-            <p className="text-slate text-sm">
-              {g.role && <span>{g.role} · </span>}
-              <span className="type-data">{g.systems.length}</span> {g.systems.length === 1 ? "system" : "systems"}
-            </p>
+          {/* Each home reads as a chapter: its name, the owner's role there and its count, and its GitHub (D-049). */}
+          <div className="border-ink/10 mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b pb-3">
+            <div className="min-w-0">
+              <h2 id={`home-${g.slug}`} className="text-ink text-xl font-semibold tracking-tight md:text-2xl">
+                {g.name}
+              </h2>
+              <p className="text-slate mt-1 text-sm">
+                {g.role && <span>{g.role} · </span>}
+                <span className="type-data">{g.systems.length}</span> {g.systems.length === 1 ? "system" : "systems"}
+              </p>
+            </div>
+            {g.github[0] && (
+              <a
+                href={g.github[0].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tap-target press text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1 border-b pb-0.5 text-sm transition-colors"
+              >
+                On GitHub <ArrowUpRight aria-hidden="true" className="size-3.5" />
+                <span className="sr-only">({g.name}, opens in a new tab)</span>
+              </a>
+            )}
           </div>
-          <Grid systems={g.systems} showHome={false} />
+          <Grid systems={g.systems} showHome={false} fit />
         </section>
       ))}
       {homeless.length > 0 && <Grid systems={homeless} />}
@@ -90,17 +110,30 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
 
   return (
     <>
-      <CatalogFilters facets={facets} params={params} total={total} />
+      <CatalogFilters facets={facets} params={params} total={total} systemsTotal={catalog.stats.systems} />
 
       {systems.length === 0 ? (
-        // Plainly stated, never a dead end (PAGE-SPECIFICATIONS /systems: one-click clear-filters).
+        // Plainly stated, never a dead end (PAGE-SPECIFICATIONS /systems: one-click clear-filters): it says which
+        // filters matched nothing, each one a tap to remove.
         <div className="border-ink/15 bg-sheet grid place-items-center rounded-3xl border border-dashed px-6 py-20 text-center">
           <SearchX aria-hidden="true" className="text-slate size-8" />
           <p className="text-ink mt-4 text-lg font-medium">{filtered ? "No systems match these filters." : "No systems published yet."}</p>
           {filtered && (
-            <Link href="/systems" className="bg-ink text-paper focus-visible:outline-ember mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
-              Clear filters
-            </Link>
+            <>
+              <ul className="mt-4 flex flex-wrap justify-center gap-2">
+                {activeFilters(params, facets).map((f) => (
+                  <li key={f.param}>
+                    <Link href={f.removeHref} scroll={false} className="press bg-ink text-paper inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px]">
+                      {f.label} <X aria-hidden="true" className="size-3.5" />
+                      <span className="sr-only">(remove this filter)</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/systems" className="press bg-ink text-paper focus-visible:outline-ember mt-5 inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+                Clear all filters
+              </Link>
+            </>
           )}
         </div>
       ) : (
