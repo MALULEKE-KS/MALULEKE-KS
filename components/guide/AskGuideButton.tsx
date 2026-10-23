@@ -5,7 +5,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import { CubeMark } from "@/components/shared/BrandMark";
+import { GuideBot } from "@/components/guide/GuideBot";
 import { Button } from "@/components/ui/button";
 import { useGuide } from "@/components/guide/GuideProvider";
 
@@ -21,7 +21,7 @@ export function AskGuideButton({
   children: React.ReactNode;
   variant?: "glass" | "accent" | "default";
   size?: "default" | "sm" | "lg";
-  /** The guide's mark (the site's K-S cube, D-044) in the button; off where a quieter sign is wanted (the home hero). */
+  /** The guide's face (the orb, D-060) in the button; off where a quieter sign is wanted (the home hero). */
   showMark?: boolean;
   className?: string;
 }) {
@@ -30,7 +30,7 @@ export function AskGuideButton({
   return (
     <Button type="button" variant={variant} size={size} className={className} onClick={() => (question ? ask(question) : setOpen(true))}>
       {showMark ? (
-        <CubeMark spin={false} className="-ml-1 size-6 ring-1 ring-white/20" />
+        <GuideBot size="sm" interactive={false} className="-ml-1 size-6" />
       ) : (
         <Sparkles aria-hidden="true" className="text-ember size-4" />
       )}

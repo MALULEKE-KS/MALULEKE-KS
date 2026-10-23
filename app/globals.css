@@ -757,3 +757,60 @@ html[data-header="hidden"] .under-header {
   animation: none;
 }
 
+
+/* ---- The AI guide's own face (D-060, components/guide/GuideBot.tsx) ----
+   A machined orb: it floats on its contact shadow, blinks, and shows the guide's
+   real state through its eyes, its status light and the glint on its ring. One
+   set of rules for every size; reduced motion keeps it still (the state still
+   shows through the eyes' shape and the light). */
+.guide-bot .gb-float { animation: gb-float 4.6s ease-in-out infinite; transform-box: view-box; transform-origin: 50% 50%; }
+.guide-bot .gb-shadow { animation: gb-shadow 4.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+.guide-bot .gb-eyes { transition: transform 180ms ease-out, opacity 200ms; }
+.guide-bot .gb-eye { transform-box: fill-box; transform-origin: 50% 50%; animation: gb-blink 5.8s infinite; transition: transform 200ms ease-out; }
+.guide-bot .gb-status { transition: fill 300ms; }
+.guide-bot .gb-scan,
+.guide-bot .gb-bars,
+.guide-bot .gb-zz { opacity: 0; }
+.guide-bot .gb-bars rect { transform-box: fill-box; transform-origin: 50% 100%; }
+.guide-bot[data-state="noticing"] .gb-float { animation-duration: 2.8s; }
+.guide-bot[data-state="listening"] .gb-eye { animation: none; transform: scaleY(1.12); }
+.guide-bot[data-state="thinking"] .gb-eye { animation: none; transform: scaleY(0.42); }
+.guide-bot[data-state="thinking"] .gb-scan { opacity: 0.28; animation: gb-scan 1.1s ease-in-out infinite alternate; }
+.guide-bot[data-state="thinking"] .gb-glint { opacity: 0.9; animation: gb-glint 1.6s linear infinite; }
+.guide-bot[data-state="thinking"] .gb-under,
+.guide-bot[data-state="answering"] .gb-under { opacity: 0.35; transition: opacity 400ms; }
+.guide-bot[data-state="answering"] .gb-eyes { opacity: 0; }
+.guide-bot[data-state="answering"] .gb-bars { opacity: 1; }
+.guide-bot[data-state="answering"] .gb-bars rect { animation: gb-eq 0.5s ease-in-out infinite alternate; }
+.guide-bot[data-state="answering"] .gb-bars rect:nth-child(2) { animation-delay: 0.12s; }
+.guide-bot[data-state="answering"] .gb-bars rect:nth-child(3) { animation-delay: 0.24s; }
+.guide-bot[data-state="answering"] .gb-bars rect:nth-child(4) { animation-delay: 0.06s; }
+.guide-bot[data-state="done"] .gb-float { animation: gb-nod 0.9s ease-in-out 1; }
+.guide-bot[data-state="done"] .gb-eye { animation: none; transform: scaleY(0.38) translateY(-1px); }
+.guide-bot[data-state="resting"] .gb-float { animation-duration: 7.5s; }
+.guide-bot[data-state="resting"] .gb-eye { animation: none; transform: scaleY(0.12); }
+.guide-bot[data-state="resting"] .gb-bloom { opacity: 0.2; }
+.guide-bot[data-state="resting"] .gb-zz { animation: gb-zz 3s ease-in-out infinite; }
+.guide-bot[data-state="offline"] .gb-float,
+.guide-bot[data-state="offline"] .gb-shadow,
+.guide-bot[data-state="offline"] .gb-eye { animation: none; }
+.guide-bot[data-state="offline"] .gb-eye { fill: #3b4047; }
+.guide-bot[data-state="offline"] .gb-bloom { opacity: 0; }
+.guide-bot[data-state="error"] .gb-float { animation: gb-tilt 0.7s ease-in-out 1 forwards; }
+.guide-bot[data-state="error"] .gb-eye { animation: none; transform: scaleY(0.6); }
+.guide-bot[data-state="tap"] .gb-float { animation: gb-hop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 1; }
+@keyframes gb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes gb-shadow { 0%, 100% { transform: scaleX(1); opacity: 0.55; } 50% { transform: scaleX(0.84); opacity: 0.32; } }
+@keyframes gb-blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+@keyframes gb-scan { from { transform: translateX(0); } to { transform: translateX(34px); } }
+@keyframes gb-glint { to { stroke-dashoffset: -309; } }
+@keyframes gb-eq { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+@keyframes gb-nod { 0%, 100% { transform: translateY(0) rotate(0); } 35% { transform: translateY(3px) rotate(-4deg); } 70% { transform: translateY(-2px) rotate(2deg); } }
+@keyframes gb-tilt { 0% { transform: rotate(0); } 60% { transform: rotate(7deg); } 100% { transform: rotate(5deg); } }
+@keyframes gb-hop { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-10px) scale(1.04); } }
+@keyframes gb-zz { 0% { transform: translate(0, 0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(8px, -12px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .guide-bot *,
+  .guide-bot .gb-float,
+  .guide-bot .gb-shadow { animation: none !important; transition: none !important; }
+}

@@ -10,11 +10,11 @@
 
 import { usePathname } from "next/navigation";
 import { useGuide } from "@/components/guide/GuideProvider";
-import { CubeMark } from "@/components/shared/BrandMark";
+import { GuideBot } from "@/components/guide/GuideBot";
 import { cn } from "@/lib/utils";
 
 export function GuideLauncher() {
-  const { enabled, ready, open, setOpen, ownerFirstName, mood } = useGuide();
+  const { enabled, open, setOpen, ownerFirstName } = useGuide();
   const pathname = usePathname();
   if (!enabled || pathname === "/") return null;
   const hidden = open;
@@ -33,11 +33,8 @@ export function GuideLauncher() {
         hidden ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100",
       )}
     >
-      {/* The guide is shown by the site's own mark, as everywhere (D-044). */}
-      <span className="relative">
-        <CubeMark spin={false} className="size-11 ring-1 ring-white/12" />
-        <span aria-hidden="true" className={cn("absolute -right-0.5 -bottom-0.5 size-3 rounded-full ring-2 ring-night", !ready ? "bg-line" : mood === "thinking" ? "bg-ember" : "bg-[var(--color-signal-finished-on-dark)]")} />
-      </span>
+      {/* The guide's own face, its state on it (D-060). */}
+      <GuideBot className="size-11" />
       <span className="text-paper hidden text-sm font-medium sm:inline">Ask my AI guide</span>
     </button>
   );

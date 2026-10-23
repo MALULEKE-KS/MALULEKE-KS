@@ -1,15 +1,13 @@
 // components/guide/console/GuideStage.tsx
 // The guide's identity and its state (docs/AI-GUIDE-PHASE1-PLAN.md §8). GuideMark is
-// the site's own K-S cube mark, still, with the guide's state on it — a status dot,
-// and a turning ring while it works — wherever the guide is shown: the home band's
-// card, the console header, the docked panel elsewhere, the "still answering"
-// button. It replaced the illustrated character on the owner's choice
-// (2026-10-22, D-043: "go ahead with the brand mark"); the large desktop portrait
-// (GuideStage) went with the home band's rebuild.
+// the guide's own face — the orb (GuideBot, D-060, the owner's choice 2026-10-24),
+// which draws the guide's state itself — wherever the guide is shown: the home
+// band's card, the console header, the "still answering" button. It replaced the
+// site's K-S mark (D-044), which is the owner's logo, not the guide's face.
 
 "use client";
 
-import { CubeMark } from "@/components/shared/BrandMark";
+import { GuideBot } from "@/components/guide/GuideBot";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
 import type { OrbMode } from "@/components/ui/thinking-orb";
@@ -28,16 +26,6 @@ export function useGuideStatus() {
 }
 
 export function GuideMark({ className }: { className?: string }) {
-  const { busy } = useGuideChat();
-  const { ready } = useGuide();
-  return (
-    <span className={cn("relative inline-block shrink-0", className)}>
-      <CubeMark spin={false} className="size-full ring-1 ring-white/12" />
-      {busy && <span aria-hidden="true" className="border-ember/70 absolute -inset-1 rounded-[32%] border-2 border-t-transparent motion-safe:animate-spin" />}
-      <span
-        aria-hidden="true"
-        className={cn("ring-night absolute -right-0.5 -bottom-0.5 size-3 rounded-full ring-2", busy ? "bg-ember motion-safe:animate-pulse" : ready ? "bg-[var(--color-signal-finished-on-dark)]" : "bg-line")}
-      />
-    </span>
-  );
+  // The guide's own face (D-060): its state — ready, thinking, answering, resting, off — is drawn by the orb itself.
+  return <GuideBot className={cn("shrink-0", className)} />;
 }
