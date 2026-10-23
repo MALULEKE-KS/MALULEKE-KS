@@ -400,7 +400,7 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/systems/{id}/impacts",
       "POST /admin/systems/{id}/impacts",
       "PATCH /admin/impacts/{id}",
-      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore", "POST /admin/systems/{id}/writeup", "GET /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot/capture", "POST /admin/systems/{id}/screenshot/automatic"],
+      "DELETE /admin/impacts/{id}", "GET /admin/systems/{id}/revisions", "POST /admin/systems/{id}/revisions/{revisionId}/restore", "POST /admin/systems/{id}/writeup", "GET /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot", "POST /admin/systems/{id}/screenshot/capture", "POST /admin/systems/{id}/screenshot/automatic", "GET /admin/systems/{id}/screenshot/versions", "GET /admin/systems/{id}/screenshot/versions/{versionId}", "DELETE /admin/systems/{id}/screenshot/versions/{versionId}", "POST /admin/systems/{id}/screenshot/versions/{versionId}/restore"],
     rules: ["BR-1.1", "BR-1.2", "BR-1.8", "BR-1.9", "BR-1.10", "BR-1.11", "BR-1.12", "BR-1.13", "BR-1.14", "BR-1.15", "BR-4.5"],
     frontend: [
       { page: "/admin/systems", section: "List with curation queue, filters" },
@@ -519,6 +519,7 @@ export const CAPABILITIES: Capability[] = [
       "GET /admin/profile/photos/{id}",
       "PATCH /admin/profile/photos/{id}",
       "POST /admin/profile/photos/{id}/restore",
+      "DELETE /admin/profile/photos/{id}",
       "GET /admin/profile/titles",
       "POST /admin/profile/titles",
       "PATCH /admin/profile/titles/{id}",

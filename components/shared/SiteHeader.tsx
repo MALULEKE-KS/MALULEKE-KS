@@ -4,16 +4,18 @@
 // nav in the middle, instant search (⌘K) and the one contact entry, Let's
 // talk, on the right. HeaderFrame turns it from a full-width bar at the top
 // of the page into a single glass capsule once you scroll. Contact is not a
-// nav item: Let's talk is the way in. Below lg the nav becomes MobileMenu, at
-// the far right where a thumb expects it.
+// nav item: Let's talk is the way in. Below lg the nav moves to the foot of the screen,
+// where a thumb rests — the bottom dock (D-056), whose last cell opens the
+// full menu; the bar keeps the mark, search, the CV and Let's talk.
 
 import Link from "next/link";
-import { ArrowUpRight, FileDown } from "lucide-react";
+import { ArrowRight, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
 import { HeaderFrame } from "@/components/shared/HeaderFrame";
 import { MobileMenu } from "@/components/shared/MobileMenu";
+import { BottomDock } from "@/components/shared/BottomDock";
 import type { HeaderSystems } from "@/lib/queries/header";
 import type { SiteLink } from "@/lib/queries/site";
 
@@ -30,6 +32,9 @@ export interface HeaderLabels {
   pageHints?: Record<string, string>;
   systemsPreviewLabel?: string;
   systemsAllLabel?: string;
+  askLabel?: string;
+  askHint?: string;
+  dockLabel?: string;
 }
 
 export function SiteHeader({
@@ -49,6 +54,7 @@ export function SiteHeader({
   systems: HeaderSystems | null;
 }) {
   return (
+    <>
     <HeaderFrame>
       <Link
         href="/"
@@ -75,14 +81,15 @@ export function SiteHeader({
         {labels?.contactLabel?.trim() && (
           <Link
             href="/contact"
-            className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink shadow-glow-ember transition-[filter,transform] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
+            className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink transition-[filter,transform,box-shadow] hover:brightness-105 hover:shadow-glow-ember focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
           >
             {labels.contactLabel}
-            <ArrowUpRight aria-hidden="true" className="size-4" />
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         )}
-        <MobileMenu links={links} reviewSlaHours={reviewSlaHours} cvUrl={cvUrl} labels={labels} ownerName={ownerName} />
       </div>
     </HeaderFrame>
+    <BottomDock labels={labels} menu={<MobileMenu links={links} reviewSlaHours={reviewSlaHours} cvUrl={cvUrl} labels={labels} ownerName={ownerName} variant="dock" />} />
+    </>
   );
 }

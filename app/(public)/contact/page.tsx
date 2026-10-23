@@ -114,7 +114,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
         </Container>
       </section>
 
-      <section className="bg-paper py-12 md:py-20">
+      <section className="bg-paper py-14 md:py-20">
         <Container>
           <LetsTalk
             categories={categories}

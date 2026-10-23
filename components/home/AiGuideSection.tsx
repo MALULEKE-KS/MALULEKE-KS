@@ -21,6 +21,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { HeroLabel } from "@/components/shared/HeroKit";
+import { AiBadge } from "@/components/guide/AiBadge";
 import { Accent } from "@/components/shared/Accent";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
@@ -72,13 +73,13 @@ function AskCard({ content, facts }: { content: AiGuideContent; facts: AiGuideFa
   }, []);
 
   return (
-    <div className="bg-night-deep/60 overflow-hidden rounded-[1.25rem] border border-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_30px_80px_-40px_rgb(0_0_0/0.9)]">
+    <div className="bg-night-deep/60 overflow-hidden rounded-3xl border border-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_30px_80px_-40px_rgb(0_0_0/0.9)]">
       <div className="flex items-start gap-3.5 px-5 pt-5 pb-4 sm:px-6">
         <GuideMark className="size-11" />
         <div className="min-w-0 flex-1">
           <p className="text-paper flex items-center gap-2 text-[15px] font-semibold">
             {ownerFirstName}&apos;s AI guide
-            <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+            <AiBadge />
           </p>
           <p className="text-mist mt-0.5 truncate text-[13px]">{label}</p>
         </div>
@@ -104,7 +105,7 @@ function AskCard({ content, facts }: { content: AiGuideContent; facts: AiGuideFa
 
       {questions.length > 0 && (
         <div className="border-t border-white/[0.07]">
-          {content.tryLabel && <p className="text-line px-5 pt-4 pb-1 font-mono text-[11px] tracking-[0.14em] uppercase sm:px-6">{content.tryLabel}</p>}
+          {content.tryLabel && <p className="text-line px-5 pt-4 pb-1 type-micro sm:px-6">{content.tryLabel}</p>}
           <ul className="divide-y divide-white/[0.06]">
             {questions.map((q, i) => (
               <li key={q}>
@@ -214,7 +215,7 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.95 }}
             onClick={() => section.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })}
-            className="bg-night/90 text-paper focus-visible:outline-ember fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-white/15 py-1.5 pr-4 pl-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl focus-visible:outline-2 sm:right-6 sm:bottom-6"
+            className="above-dock bg-night/90 text-paper focus-visible:outline-ember fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-white/15 py-1.5 pr-4 pl-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl focus-visible:outline-2 sm:right-6 sm:bottom-6"
           >
             <GuideMark className="size-10" />
             <span className="min-w-0 text-left">

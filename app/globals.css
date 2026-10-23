@@ -175,15 +175,14 @@ html {
 }
 
 /* ---- reveal: sections laid down as you reach them ----
-   Progressive enhancement: only hidden when the .js class (set in <head>
-   before paint) is present, so content is never invisible without JS.
-   Reveal.tsx adds .is-visible once, via IntersectionObserver. */
+   Nothing is hidden at rest (D-055, the integration sweep): a section starts
+   visible and a little low, and rises into place once it is reached — a fast
+   scroll, a screenshot or a slow phone never shows a blank band (the owner's
+   "fading inside content"). Only with the .js class (set in <head> before
+   paint); Reveal.tsx adds .is-visible once, via IntersectionObserver. */
 .js [data-reveal] {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 700ms ease-out,
-    transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform: translateY(14px);
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
   transition-delay: var(--delay, 0ms);
 }
 .js [data-reveal].is-visible {
@@ -375,11 +374,14 @@ html {
   letter-spacing: -0.003em;
   text-wrap: pretty;
 }
-.type-eyebrow {
+/* The one micro label (D-055): a small mono label above or beside a value, inside
+   cards, sheets and bars — sentence case, no wide tracking. Section labels are
+   HeroLabel; this is everything smaller. */
+.type-micro {
   font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
 }
 .type-accent {
   font-family: var(--font-ibm-plex-serif), Georgia, serif;
@@ -710,5 +712,47 @@ html[data-header="hidden"] .under-header {
 }
 @keyframes spark-draw {
   to { clip-path: inset(0 -2% 0 0); }
+}
+
+/* One focus ring on every page (D-055): the ember outline, 2 px, offset 2 — for
+   anything focusable that doesn't draw its own. Never removed, only restyled. */
+:where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 2px;
+}
+
+/* Page-to-page cross-fade (D-055): short and quiet, the header still. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-group(site-header) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* The phone's bottom dock (D-056). Below lg, while it's there (BottomDock sets
+   data-dock on <html>): what floats at the foot of a page sits above it, and the
+   page's own end (the footer's last line) scrolls clear of it. */
+@media (width < 64rem) {
+  html[data-dock] {
+    --dock-space: calc(4.5rem + max(0.5rem, env(safe-area-inset-bottom)));
+  }
+  html[data-dock] body {
+    padding-bottom: var(--dock-space);
+  }
+  html[data-dock] .above-dock {
+    bottom: calc(var(--dock-space) + 0.75rem);
+  }
+}
+::view-transition-group(site-dock) {
+  animation: none;
 }
 

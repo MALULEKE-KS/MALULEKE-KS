@@ -62,7 +62,7 @@ export function HeaderFrame({ children }: { children: React.ReactNode }) {
       data-scrolled={scrolled || undefined}
       data-hidden={hidden || undefined}
       className={cn(
-        "group/header pointer-events-none fixed inset-x-0 top-0 z-40 transition-transform duration-300 ease-out motion-reduce:transition-none",
+        "group/header pointer-events-none fixed inset-x-0 top-0 z-40 transition-transform duration-300 ease-out [view-transition-name:site-header] motion-reduce:transition-none",
         // Hide on scroll down — unless focus is inside (the open menu, a focused link).
         "data-[hidden]:[&:not(:focus-within)]:-translate-y-[130%]",
       )}

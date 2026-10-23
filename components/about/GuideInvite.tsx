@@ -9,6 +9,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
+import { AiBadge } from "@/components/guide/AiBadge";
 import { useGuide } from "@/components/guide/GuideProvider";
 
 export function GuideInvite({ questions }: { questions: string[] }) {
@@ -17,12 +18,12 @@ export function GuideInvite({ questions }: { questions: string[] }) {
   const list = questions.slice(0, 3);
 
   return (
-    <div className="bg-night-deep text-paper overflow-hidden rounded-[1.25rem] border border-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_30px_80px_-40px_rgb(0_0_0/0.9)]">
+    <div className="bg-night-deep text-paper overflow-hidden rounded-3xl border border-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_30px_80px_-40px_rgb(0_0_0/0.9)]">
       <div className="flex items-start gap-3.5 px-5 pt-5 pb-4 sm:px-6">
         <CubeMark spin={false} className="size-11 ring-1 ring-white/12" />
         <div className="min-w-0">
           <p className="text-mist flex items-center gap-2 text-xs">
-            <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+            <AiBadge />
             {ownerFirstName}&rsquo;s guide
           </p>
           <p className="mt-1.5 font-sans text-lg leading-snug font-semibold tracking-tight">Curious about something? Ask me about him.</p>

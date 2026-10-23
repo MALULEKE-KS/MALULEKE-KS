@@ -14,6 +14,7 @@
 
 "use client";
 
+import { AiBadge } from "@/components/guide/AiBadge";
 import { useEffect, useRef, useState } from "react";
 import { Maximize2, Minimize2, RotateCcw, X } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
@@ -35,7 +36,7 @@ function Header({ variant, full, onFull, onClose }: { variant: "inline" | "panel
       <div className="min-w-0 flex-1">
         <h3 id={`guide-title-${variant}`} className="text-paper flex items-center gap-2 text-sm font-semibold">
           {ownerFirstName}&apos;s AI guide
-          <span className="border-ember/30 bg-ember/10 text-ember rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+          <AiBadge />
         </h3>
         <p className="mt-0.5 truncate text-[11.5px]">{busy ? <AnimatedShinyText className="text-[11.5px]">{label}…</AnimatedShinyText> : <span className="text-mist">{label}</span>}</p>
       </div>

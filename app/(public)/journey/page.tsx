@@ -19,6 +19,7 @@
 // computed. No GitHub entries — the systems live on /systems.
 
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { ArrowRight, FileText } from "lucide-react";
 import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/HeroKit";
@@ -122,11 +123,11 @@ export default async function JourneyPage() {
                 </h2>
                 <p className="type-lede text-paper/85 mt-5 max-w-2xl">{ahead.body}</p>
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Link href="/contact" className="press bg-ember text-ink focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+                  <Link href="/contact" className={buttonVariants({ variant: "accent", size: "lg" })}>
                     Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
                   </Link>
                   {cv && (
-                    <a href={cv.url} className="press text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+                    <a href={cv.url} className={buttonVariants({ variant: "glass", size: "lg" })}>
                       <FileText aria-hidden="true" className="size-4" /> Get my CV
                     </a>
                   )}

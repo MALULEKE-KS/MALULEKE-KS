@@ -85,11 +85,11 @@ export function CatalogCard({ s, showHome = true, layout = "grid" }: { s: Catalo
   const facts = [showHome && s.home ? s.home : null, s.domain].filter((f): f is string => Boolean(f));
   const extra = s.tech.length - MARKS;
   return (
-    <MagicCard className="shadow-soft hover:shadow-lift h-full rounded-[1.5rem] transition-shadow duration-500" surface="var(--color-sheet)" spotlight="rgb(255 91 31 / 0.05)">
+    <MagicCard className="shadow-soft hover:shadow-lift h-full rounded-3xl transition-shadow duration-500" surface="var(--color-sheet)" spotlight="rgb(255 91 31 / 0.05)">
       <Link
         href={`/systems/${s.slug}`}
         className={cn(
-          "group/c press focus-visible:outline-ember grid h-full overflow-hidden rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-2",
+          "group/c press focus-visible:outline-ember grid h-full overflow-hidden rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-2",
           // A phone: the small square face beside the story; wider: the face on top (or at the left, wide).
           "max-sm:grid-cols-[4.75rem_minmax(0,1fr)]",
           wide ? "sm:grid-cols-1 md:grid-cols-12" : "sm:grid-rows-[auto_1fr]",

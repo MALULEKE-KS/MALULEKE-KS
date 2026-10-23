@@ -13,7 +13,7 @@
 // The new card's anatomy (D-049): status, name, two lines, marks, and the footer every card keeps.
 function SkeletonCard() {
   return (
-    <div className="border-ink/10 bg-sheet shadow-soft flex h-full flex-col rounded-[1.5rem] border">
+    <div className="border-ink/10 bg-sheet shadow-soft flex h-full flex-col rounded-3xl border">
       <div className="flex-1 p-5 md:p-6">
         <div className="bg-ink/10 h-5 w-24 rounded-full" />
         <div className="bg-ink/15 mt-5 h-5 w-2/3 rounded-full" />

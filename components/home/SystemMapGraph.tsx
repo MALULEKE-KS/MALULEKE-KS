@@ -410,7 +410,7 @@ function Column({ title, count, note, className, children }: { title: string; co
   return (
     // Every column starts at the top (D-047): centred, the short ones left tall empty gaps beside the work.
     <div className={cn("relative flex flex-col justify-start gap-3", className)}>
-      <p className="text-mist mb-1 flex items-baseline justify-between gap-3 font-mono text-[11px] tracking-[0.14em] uppercase max-lg:col-span-full max-lg:mb-0 max-lg:border-b max-lg:border-white/10 max-lg:pb-2">
+      <p className="text-mist mb-1 flex items-baseline justify-between gap-3 type-micro max-lg:col-span-full max-lg:mb-0 max-lg:border-b max-lg:border-white/10 max-lg:pb-2">
         {title}
         {count !== undefined && <span className="type-data text-line tracking-normal lg:hidden">{count}</span>}
       </p>

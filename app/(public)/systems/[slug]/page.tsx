@@ -35,6 +35,9 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
+import { HeroBackdrop } from "@/components/shared/HeroBackdrop";
+import { AiBadge } from "@/components/guide/AiBadge";
+import { getSetting } from "@/lib/settings";
 import { techMark } from "@/components/shared/TechChip";
 import { SkillIcon } from "@/components/about/skill-icons";
 import { CatalogCard } from "@/components/systems/CatalogCard";
@@ -77,6 +80,9 @@ function summary(cs: NonNullable<Awaited<ReturnType<typeof getCaseStudy>>>) {
   const readme = cs.writeUp?.source === "readme" ? cs.writeUp.text : null;
   return describe(cs.system.description, cs.system.name, cs.system.slug, readme);
 }
+
+/** A screenshot is captured at a laptop's view (lib/systems/screenshots.ts); the hero covers its band with it whatever the real size. */
+const SCREENSHOT_FRAME = { width: 1440, height: 900 };
 
 /** How many technology marks the hero shows before counting the rest (all are in the story and the side panel). */
 const HERO_MARKS = 8;
@@ -140,14 +146,28 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
     repo && repo.stars > 0 && { label: repo.stars === 1 ? "Star" : "Stars", value: String(repo.stars) },
   ].filter((p): p is { label: string; value: string } => Boolean(p));
 
+  // How dark the veil over the screenshot is — the inner pages' own setting (site.pageHero.scrim), so one control tunes every hero image.
+  const heroScrim = await getSetting("site.pageHero.scrim");
   const moving = cs.weeks.some((n) => n > 0);
   const commitsIn26 = cs.weeks.reduce((a, b) => a + b, 0);
 
   return (
     <>
       <JsonLd data={workLd} />
-      <section aria-labelledby="system-title" className="hero-field text-paper overflow-hidden">
-        <Container className="pt-28 pb-14 md:pt-32 md:pb-20">
+      <section aria-labelledby="system-title" className="hero-field text-paper relative isolate overflow-hidden">
+        {/* The system's own screenshot behind its hero (D-054): the one Admin manages (capture, upload, back to
+            automatic, history) — so changing it never needs code. Top-anchored: a site's top is what it is. */}
+        {system.screenshotUrl && (
+          <HeroBackdrop
+            desktop={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}
+            mobile={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}
+            positionDesktop="50% 0%"
+            positionMobile="30% 0%"
+            scrim={heroScrim}
+            glow={0}
+          />
+        )}
+        <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
           <Link
             href="/systems"
             className="text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-2 rounded-full text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -218,7 +238,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
             <dl className="mt-12 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-5 border-t border-white/10 pt-8 sm:grid-cols-4">
               {proof.map((p) => (
                 <div key={p.label}>
-                  <dt className="type-eyebrow text-mist">{p.label}</dt>
+                  <dt className="type-micro text-mist">{p.label}</dt>
                   <dd className="type-data text-paper mt-1.5 text-lg font-semibold">{p.value}</dd>
                 </div>
               ))}
@@ -227,7 +247,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         </Container>
       </section>
 
-      <section aria-label="The system" className="bg-paper py-16 md:py-24">
+      <section aria-label="The system" className="bg-paper py-20 md:py-28">
         <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
             {(system.screenshotUrl || system.liveUrl) && (
@@ -244,7 +264,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                       Written by AI from {repo ? <a href={repo.url} target="_blank" rel="noopener noreferrer" className="text-ink decoration-ink/30 hover:decoration-ink underline underline-offset-2">the repository</a> : "the repository"}
                       {cs.writeUp.writtenAgo && ` · updated ${cs.writeUp.writtenAgo}`}
                     </span>
-                    <span className="bg-ink text-paper shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">AI</span>
+                    <AiBadge className="shrink-0" />
                   </p>
                 )}
                 <Prose markdown={cs.writeUp.markdown} />
@@ -253,7 +273,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
             {readmeBody && repo && (
               // Honestly labelled: these are the repo's own words, not a written case study.
               <div className={system.screenshotUrl || system.liveUrl ? "mt-12" : undefined}>
-                <p className="type-eyebrow text-slate inline-flex items-center gap-2">
+                <p className="type-micro text-slate inline-flex items-center gap-2">
                   <FaGithub aria-hidden="true" className="size-3.5" /> From its README
                 </p>
                 {/* The same reading type as a case study — paragraphs and lists, not one block of text. */}
@@ -350,9 +370,9 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       {/* The claims this system makes, each with its proof (docs/EVIDENCE-SPEC.md) —
           for MALULEKE-KS, the portfolio as its own case study. */}
       {evidenceClaims.length > 0 && (
-        <section id="evidence" aria-labelledby="evidence-title" className="bg-night-deep text-paper scroll-mt-20 py-16 md:py-24">
+        <section id="evidence" aria-labelledby="evidence-title" className="bg-night-deep text-paper scroll-mt-20 py-20 md:py-28">
           <Container>
-            <p className="type-eyebrow text-mist inline-flex items-center gap-2">
+            <p className="type-micro text-mist inline-flex items-center gap-2">
               <ShieldCheck aria-hidden="true" className="text-ember size-3.5" />
               Evidence
             </p>
@@ -370,7 +390,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       )}
 
       {(moving || cs.commits.length > 0) && (
-        <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-16 md:py-24">
+        <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-20 md:py-28">
           <Container>
             <SectionHeader copyKey="system.activity" eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
@@ -394,7 +414,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
               )}
               {cs.commits.length > 0 && (
                 <div className={moving ? "min-w-0 lg:col-span-5" : "min-w-0 lg:col-span-12"}>
-                  <h3 className="text-mist font-mono text-xs tracking-[0.1em] uppercase">Latest commits</h3>
+                  <h3 className="text-mist type-micro">Latest commits</h3>
                   {/* Ruled rows, not boxes (D-053). */}
                   <ol className="mt-4 divide-y divide-white/[0.08] border-y border-white/[0.08]">
                     {cs.commits.map((c) => (
@@ -415,7 +435,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       )}
 
       {cs.skills.length > 0 && (
-        <section aria-labelledby="proves-title" className="bg-paper py-16 md:py-24">
+        <section aria-labelledby="proves-title" className="bg-paper py-20 md:py-28">
           <Container>
             <SectionHeader copyKey="system.proves" eyebrow="Skills" id="proves-title" title="What it proves." />
             {/* Evidence, not self-rating (FRONTEND-DATA-GUIDE "/systems/[slug]"). */}
@@ -445,7 +465,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
       {system.impacts.length > 0 && (
         // Only rendered when there are impacts — never an empty placeholder (spec).
-        <section aria-labelledby="impact-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
+        <section aria-labelledby="impact-title" className="border-ink/10 bg-paper border-t py-20 md:py-28">
           <Container>
             <SectionHeader copyKey="system.impact" eyebrow="Impact" id="impact-title" title="What it changed." />
             <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -464,7 +484,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
 
       {system.testimonials.length > 0 && (
         // Only testimonials with permission are ever queried (BR-6.1).
-        <section aria-labelledby="words-title" className="hero-field text-paper py-16 md:py-24">
+        <section aria-labelledby="words-title" className="hero-field text-paper py-20 md:py-28">
           <Container>
             <SectionHeader copyKey="system.words" eyebrow="In their words" id="words-title" title="From the people it was built for." tone="dark" />
             <div className="grid gap-5 md:grid-cols-2">
@@ -487,7 +507,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       )}
 
       {cs.related.length > 0 && (
-        <section aria-labelledby="more-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
+        <section aria-labelledby="more-title" className="border-ink/10 bg-paper border-t py-20 md:py-28">
           <Container>
             {/* No "All systems" action here — the hero's back link already is one (no duplicates). */}
             <SectionHeader copyKey="system.more" eyebrow="More systems" id="more-title" title="Related work." />

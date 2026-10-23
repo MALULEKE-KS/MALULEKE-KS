@@ -110,7 +110,7 @@ export function FilterDropdown({ name, hint, options, allHref, current, marks = 
         )}
         aria-label={`${name}: ${selected ? selected.label : "all"}`}
       >
-        <span className={cn("font-mono text-[11px] tracking-wide uppercase", selected ? "text-mist" : "text-slate")}>{name}</span>
+        <span className={cn("type-micro", selected ? "text-mist" : "text-slate")}>{name}</span>
         <span className="flex min-w-0 items-center gap-1.5 font-medium">
           {selected && marks && brandMark(selected.label, "size-3.5 shrink-0")}
           <span className="max-w-[9rem] truncate">{selected ? selected.label : "All"}</span>

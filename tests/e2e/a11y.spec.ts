@@ -3,8 +3,8 @@
 // serious or critical violations — on a phone and on a desktop, and on a case
 // study read from the site's own list. Runs in CI with the phone checks.
 
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { seriousViolations } from "./axe";
 
 const PAGES = ["/", "/systems", "/journey", "/about", "/contact"];
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
@@ -20,12 +20,8 @@ async function settle(page: Page) {
   });
 }
 
-async function serious(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
-  return results.violations
-    .filter((v) => v.impact === "serious" || v.impact === "critical")
-    .map((v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
-}
+// The phone's dock is checked on its own, then set aside while the page is (tests/e2e/axe.ts).
+const serious = (page: Page) => seriousViolations(page, TAGS);
 
 for (const [name, viewport] of [
   ["phone", { width: 390, height: 844 }],

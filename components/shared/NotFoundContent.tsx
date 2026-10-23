@@ -12,53 +12,44 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Compass } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { HeroLabel } from "@/components/shared/HeroKit";
+import { buttonVariants } from "@/components/ui/button";
 
+// The shared hero shape (D-046, D-055): the plain label, the heading, one line, two actions.
+// It fills the screen, so no empty band shows between it and the footer.
 export function NotFoundContent() {
   return (
-    <section aria-labelledby="nf-title" className="hero-field text-paper min-h-[60vh]">
-      <Container className="grid items-center gap-12 py-24 md:py-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+    <section aria-labelledby="nf-title" className="hero-field text-paper flex min-h-svh items-center">
+      <Container className="grid items-center gap-12 pt-28 pb-16 md:pt-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
         <div className="min-w-0">
-        {/* The HTTP status is a literal identifier, which is what mono is for. */}
-        <p className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs">
-          <Compass aria-hidden="true" className="text-ember size-3.5" />
-          404
-        </p>
-        <h1
-          id="nf-title"
-          className="mt-6 font-sans text-4xl font-semibold tracking-tight md:text-6xl"
-        >
-          Nothing lives at this address.
-        </h1>
-        <p className="text-mist mt-5 max-w-xl text-lg leading-relaxed">
-          Check the URL, or start from the home page or the systems catalog.
-        </p>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/"
-            className="bg-ember text-ink shadow-glow-ember focus-visible:outline-paper inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            Home
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
-          <Link
-            href="/systems"
-            className="text-paper focus-visible:outline-ember inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            The systems
-          </Link>
+          {/* The HTTP status is a literal identifier, which is what mono is for. */}
+          <HeroLabel>
+            <span className="font-mono">404</span>
+          </HeroLabel>
+          <h1 id="nf-title" className="type-display mt-6 text-balance">
+            Nothing lives at this address.
+          </h1>
+          <p className="type-lede text-mist mt-5 max-w-xl">Check the URL, or start from the home page or the systems catalog.</p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link href="/" className={buttonVariants({ variant: "accent", size: "lg" })}>
+              Home
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <Link href="/systems" className={buttonVariants({ variant: "glass", size: "lg" })}>
+              The systems
+            </Link>
+          </div>
         </div>
-        </div>
-        <div aria-hidden="true" className="relative mx-auto w-full max-w-[26rem] lg:max-w-none">
-          <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.16),transparent)] blur-2xl" />
+        <div aria-hidden="true" className="relative mx-auto w-full max-w-[22rem] lg:max-w-none">
           <Image
             src="/brand/ks-cube-3d.webp"
             alt=""
             width={820}
             height={789}
             priority
-            sizes="(min-width: 1024px) 40vw, 26rem"
+            sizes="(min-width: 1024px) 40vw, 22rem"
             className="relative h-auto w-full motion-safe:animate-[ks-float_7s_ease-in-out_infinite]"
           />
         </div>

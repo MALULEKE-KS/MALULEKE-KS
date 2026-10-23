@@ -48,7 +48,7 @@ export function Sent({ reference, reviewSlaHours, email, steps }: { reference: s
       </p>
 
       <div className="border-ink/10 bg-sheet relative mt-6 inline-flex flex-wrap items-center gap-3 rounded-2xl border px-5 py-4">
-        <span className="text-slate text-xs tracking-wide uppercase">Reference</span>
+        <span className="text-slate type-micro">Reference</span>
         <span className="type-data text-ink text-xl font-semibold tracking-wider">{reference}</span>
         <button
           type="button"

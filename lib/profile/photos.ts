@@ -174,6 +174,20 @@ export async function restorePhoto(tx: Tx, id: string) {
   return tx.profilePhoto.update({ where: { id }, data: { supersededAt: null }, select: versionFields });
 }
 
+/**
+ * Permanently delete one earlier version — only when the owner asks (BR-1.17 as
+ * amended, D-054). The current photo is refused (replace it first); the database
+ * refuses any delete that doesn't come through here (app.version_delete).
+ */
+export async function deletePhotoVersion(tx: Tx, id: string): Promise<"deleted" | "current" | "missing"> {
+  const target = await tx.profilePhoto.findUnique({ where: { id }, select: { id: true, supersededAt: true } });
+  if (!target) return "missing";
+  if (target.supersededAt === null) return "current";
+  await tx.$executeRaw`SELECT set_config('app.version_delete', 'on', true)`;
+  await tx.profilePhoto.delete({ where: { id } });
+  return "deleted";
+}
+
 export async function listPhotoVersions(tx: Pick<Tx, "profilePhoto">) {
   return tx.profilePhoto.findMany({ select: versionFields, orderBy: [{ purpose: "asc" }, { uploadedAt: "desc" }] });
 }

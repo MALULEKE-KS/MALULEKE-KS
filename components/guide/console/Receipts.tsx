@@ -14,7 +14,7 @@ const ICON: Record<ReceiptKind, LucideIcon> = { system: LayoutGrid, journey: Mil
 export function Receipts({ receipts }: { receipts: Receipt[] }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-line mr-0.5 font-mono text-[10px] tracking-[0.12em] uppercase">{receipts.length ? "Sources" : "Sources · none on this site"}</span>
+      <span className="text-line type-micro mr-0.5">{receipts.length ? "Sources" : "Sources · none on this site"}</span>
       {receipts.map((r) => {
         const Icon = ICON[r.kind];
         return (

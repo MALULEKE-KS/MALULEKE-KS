@@ -1,48 +1,40 @@
 // components/admin/ConfirmDelete.tsx
-// A remove button that asks once (#104): the first press turns it into
-// "Remove?", the second does it; it settles back after a few seconds or when
-// focus leaves. No browser dialogs — they block the page.
+// Permanently deleting an earlier version of an image (BR-1.17 / BR-1.18 as
+// amended, D-054) is the one irreversible action in the image history, so it
+// asks twice: "Delete" turns into "Delete permanently" beside "Keep it", and only
+// the second click acts. Replacing an image never needs this — the old one stays
+// in the history until the owner deletes it here.
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-const SETTLE_MS = 4000;
-
-export function ConfirmDelete({ label, onConfirm, className }: { label: string; onConfirm: () => void | Promise<void>; className?: string }) {
-  const [armed, setArmed] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!armed) return;
-    const t = setTimeout(() => setArmed(false), SETTLE_MS);
-    return () => clearTimeout(t);
-  }, [armed]);
-
-  async function press() {
-    if (!armed) return setArmed(true);
-    setBusy(true);
-    await onConfirm();
-    setBusy(false);
-    setArmed(false);
+export function ConfirmDelete({ onConfirm, busy = false, label = "Delete" }: { onConfirm: () => void; busy?: boolean; label?: string }) {
+  const [asking, setAsking] = useState(false);
+  if (!asking) {
+    return (
+      <button type="button" disabled={busy} onClick={() => setAsking(true)} className="text-slate hover:text-critical inline-flex items-center gap-1 font-medium transition-colors disabled:opacity-50">
+        <Trash2 aria-hidden="true" className="size-3.5" /> {label}
+      </button>
+    );
   }
-
   return (
-    <button
-      type="button"
-      onClick={press}
-      onBlur={() => setArmed(false)}
-      disabled={busy}
-      aria-label={armed ? `Confirm removing ${label}` : `Remove ${label}`}
-      className={cn(
-        "inline-flex items-center gap-1 rounded-lg p-1.5 text-xs font-medium transition-colors disabled:opacity-50",
-        armed ? "bg-critical px-2 text-paper" : "text-slate hover:bg-critical/10 hover:text-critical",
-        className,
-      )}
-    >
-      {armed ? "Remove?" : <Trash2 aria-hidden="true" className="size-4" />}
-    </button>
+    <span role="group" aria-label="Confirm the permanent delete" className="inline-flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => {
+          setAsking(false);
+          onConfirm();
+        }}
+        className="bg-critical text-paper inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium disabled:opacity-50"
+      >
+        <Trash2 aria-hidden="true" className="size-3.5" /> Delete permanently
+      </button>
+      <button type="button" onClick={() => setAsking(false)} className="text-slate hover:text-ink font-medium">
+        Keep it
+      </button>
+    </span>
   );
 }

@@ -89,7 +89,7 @@ Order of sources (CLAUDE.md): **this codebase → shadcn/ui → Magic UI → 21s
 ### Stage 5 — Build
 
 - Server component for the page and data; client components only where interaction needs them.
-- Type system (`app/globals.css`): `type-display` (H1), `type-h2`, `type-lede`, `type-eyebrow`, `type-accent`, `type-data`.
+- Type system (`app/globals.css`): `type-display` (H1), `type-h2`, `type-lede`, `type-micro` (the one micro label, D-055 — section labels are `HeroLabel`), `type-accent`, `type-data`.
 - Layout: `Container`, `SectionHeader` (tone light/dark, one action), `Reveal` / `BlurFade` for entrance.
 - **Mobile-safe grids:** every grid gets `grid-cols-1` before its breakpoint columns, and every grid or flex child that holds text gets `min-w-0` — otherwise a long line stretches the column past the screen (the home page's 811 px bug). Decorative glows sit in a section with `overflow-hidden` or `overflow-x-clip`. Tap targets are at least 40 px; text at least 12 px.
 - One moment of motion per card/section; decorative motion pauses off screen.

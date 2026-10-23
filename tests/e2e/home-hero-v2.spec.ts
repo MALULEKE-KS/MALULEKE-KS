@@ -5,7 +5,7 @@
 // room's figures, holds still for visitors who ask for reduced motion, and has no
 // serious accessibility violations. Runs in CI with the phone and axe checks.
 
-import AxeBuilder from "@axe-core/playwright";
+import { seriousViolations } from "./axe";
 import { expect, test, type Page } from "@playwright/test";
 
 const URL = "/";
@@ -132,10 +132,7 @@ for (const [name, viewport] of [
           .map((a) => a.finished.catch(() => undefined)),
       ),
     );
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
-    const serious = results.violations
-      .filter((v) => v.impact === "serious" || v.impact === "critical")
-      .map((v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
-    expect(serious).toEqual([]);
+    // The phone's dock is checked on its own, then set aside while the page is (tests/e2e/axe.ts).
+    expect(await seriousViolations(page)).toEqual([]);
   });
 }

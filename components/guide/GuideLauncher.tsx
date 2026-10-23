@@ -3,7 +3,8 @@
 // glass ring, bottom right, on every page except the home page — which has
 // the guide's own section, so a floating button there would only duplicate it
 // (owner, 2026-09-30). It steps aside while the chat is open, and doesn't
-// exist while the guide is switched off.
+// exist while the guide is switched off. Below lg it gives way to the bottom
+// dock, whose middle cell is the guide (D-056).
 
 "use client";
 
@@ -27,7 +28,7 @@ export function GuideLauncher() {
       aria-hidden={hidden}
       tabIndex={hidden ? -1 : 0}
       className={cn(
-        "group fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex items-center gap-2.5 rounded-full border border-white/15 bg-night/80 p-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl transition-all duration-300 sm:right-6 sm:bottom-6 sm:pr-4",
+        "group fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 hidden items-center lg:flex gap-2.5 rounded-full border border-white/15 bg-night/80 p-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl transition-all duration-300 sm:right-6 sm:bottom-6 sm:pr-4",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember motion-safe:hover:-translate-y-0.5",
         hidden ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100",
       )}
