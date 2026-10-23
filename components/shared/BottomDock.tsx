@@ -6,8 +6,8 @@
 //
 //   Systems · Journey · [the guide] · About · Menu
 //
-// The guide sits in the middle, raised, on the site's own mark (D-044), with
-// its live dot; while the guide is switched off (BR-4.4) the middle holds Let's
+// The guide sits in the middle, raised — its own face, the orb (D-060), its
+// state on it; while the guide is switched off (BR-4.4) the middle holds Let's
 // talk instead, so the dock never has a hole. The current page is marked by a
 // lit cell that glides between pages (and aria-current, not colour alone).
 // Menu opens the full sheet (MobileMenu) — every page with what it holds, the
@@ -27,7 +27,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { LayoutGrid, MessageSquareText, Route, UserRound } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
-import { CubeMark } from "@/components/shared/BrandMark";
+import { GuideBot } from "@/components/guide/GuideBot";
 import type { HeaderLabels } from "@/components/shared/SiteHeader";
 import { SHEETS } from "@/lib/content/sheets";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ const sheet = (href: string) => SHEETS.find((s) => s.href === href);
 export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** The Menu cell — MobileMenu in its dock form. */ menu: React.ReactNode }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
-  const { enabled, ready, open, setOpen, mood } = useGuide();
+  const { enabled, open, setOpen } = useGuide();
   const word = (s: string | undefined) => s?.trim() || null;
   const askLabel = word(labels?.askLabel);
   const contactLabel = word(labels?.contactLabel);
@@ -105,18 +105,8 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
               aria-label={word(labels?.askHint) ?? askLabel}
               className="press group relative -mt-5 flex flex-col items-center gap-1 text-[12px] font-medium"
             >
-              <span className="relative rounded-full bg-[linear-gradient(160deg,rgb(255_91_31/0.9),rgb(255_255_255/0.12)_45%,rgb(96_130_170/0.5))] p-px shadow-[0_10px_30px_-8px_rgb(255_91_31/0.55)]">
-                <span className="bg-night-deep block rounded-full p-1">
-                  <CubeMark spin={false} className="size-11" />
-                </span>
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "ring-night-deep absolute right-0.5 bottom-0.5 size-3 rounded-full ring-2",
-                    !ready ? "bg-line" : mood === "thinking" ? "bg-ember" : "bg-[var(--color-signal-finished-on-dark)]",
-                  )}
-                />
-              </span>
+              {/* The guide's own face, raised out of the dock (D-060). */}
+              <GuideBot className="size-14 drop-shadow-[0_10px_18px_rgb(0_0_0/0.55)]" />
               <span aria-hidden="true" className="text-paper leading-none">
                 {askLabel}
               </span>

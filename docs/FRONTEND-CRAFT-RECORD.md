@@ -149,3 +149,7 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **Proof in the chrome:** a live chip reads the build Vercel is serving and opens the platform's vital signs from the same public view as the footer — the header states facts the visitor can check, not a tagline. A disclosure (button + card) rather than a hover card, so a tap works on a phone and Escape or a tap outside closes it.
 - **One bar, two states:** the open bar carries the commit, the CV and a readable search field; the scrolled capsule keeps only what moves you on (Live, the nav, search, Let's talk).
 
+### 2026-10-24 · The guide's own face — the orb (D-060)
+- **Drawn as a product, not an illustration:** one hand-built SVG (`GuideBot`) lit like an object — a single key light, a warm rim, a grain filter, a seam, smoked glass over LED eyes with a soft bloom, a metal ring split into a back and a front half so it really passes behind and in front. The earlier glow-halo sketch read as generated and was dropped.
+- **Motion that reports state:** every animation maps to the guide's real state (`botStateOf`); CSS keyframes in globals.css, no animation library; pointer-following through one rAF-throttled listener while on screen; reduced motion stills it.
+
