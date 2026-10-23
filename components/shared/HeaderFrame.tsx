@@ -59,6 +59,7 @@ export function HeaderFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <header
+      data-chrome
       data-scrolled={scrolled || undefined}
       data-hidden={hidden || undefined}
       className={cn(

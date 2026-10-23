@@ -18,7 +18,8 @@ export default async function AdminNumbersPage() {
       <AdminPageHeader
         icon={BarChart3}
         title="Numbers"
-        description="Every number the site states. A new value is only a proposal until you approve it; history is never rewritten (BR-5.3)."
+        description="Every number the site states. A new value is only a proposal until you approve it; history is never rewritten."
+        rules={["BR-5.3 approved numbers"]}
       />
       <NumbersManager metrics={metrics} />
     </>

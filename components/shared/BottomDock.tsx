@@ -86,6 +86,7 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
   return (
     <nav
       data-dock
+      data-chrome
       aria-label={word(labels?.dockLabel) ?? "Pages"}
       data-capture-hide
       className={cn(

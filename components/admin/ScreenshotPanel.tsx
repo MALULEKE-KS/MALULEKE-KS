@@ -14,7 +14,7 @@ import { Camera, ImageUp, RotateCcw } from "lucide-react";
 import { adminButton, adminHint, formatWhen, Panel } from "@/components/admin/ui";
 import { adminRequest, toSignIn } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
-import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { ConfirmPermanentDelete } from "@/components/admin/ConfirmPermanentDelete";
 
 interface Version {
   id: string;
@@ -95,7 +95,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
   }
 
   return (
-    <Panel title="Screenshot" description="The hero image of the case study, and the picture on the home page and the catalogue. Captured from the live site automatically, or your own upload — which always wins. Replacing it keeps the old version below (BR-1.18).">
+    <Panel id="sys-screenshot" title="Screenshot" description="The hero image of the case study, and the picture on the home page and the catalogue. Captured from the live site automatically, or your own upload — which always wins. Replacing it keeps the old version below (BR-1.18).">
       <div className="overflow-hidden rounded-xl border border-ink/10 bg-paper">
         {screenshot ? (
           // eslint-disable-next-line @next/next/no-img-element -- the admin's own preview route, not a static asset
@@ -111,7 +111,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <input ref={file} id={`shot-${systemId}`} type="file" accept="image/png,image/jpeg,image/webp,image/avif" className="sr-only" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+        <input ref={file} id={`shot-${systemId}`} type="file" tabIndex={-1} aria-label="Upload a screenshot" accept="image/png,image/jpeg,image/webp,image/avif" className="sr-only" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         <button type="button" disabled={busy !== null} onClick={() => file.current?.click()} className={adminButton.secondary}>
           <ImageUp aria-hidden="true" /> {busy === "upload" ? "Uploading…" : "Upload"}
         </button>
@@ -134,7 +134,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
         <div className="mt-6">
           <p className="text-ink text-sm font-medium">Earlier versions</p>
           <p className={adminHint}>Kept when the screenshot was replaced. Make one current again, or delete it for good.</p>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {earlier.map((v) => (
               <li key={v.id} className="border-ink/10 bg-paper overflow-hidden rounded-xl border">
                 {/* eslint-disable-next-line @next/next/no-img-element -- the admin's own preview route */}
@@ -147,7 +147,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
                     <button type="button" onClick={() => versionAction(v.id, "restore")} className="text-accent inline-flex items-center gap-1 font-medium hover:underline">
                       <RotateCcw aria-hidden="true" className="size-3.5" /> Make current
                     </button>
-                    <ConfirmDelete onConfirm={() => versionAction(v.id, "delete")} />
+                    <ConfirmPermanentDelete onConfirm={() => versionAction(v.id, "delete")} />
                   </div>
                 </div>
               </li>

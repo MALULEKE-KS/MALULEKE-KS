@@ -45,7 +45,7 @@ export default async function AdminCvPage() {
 
   return (
     <>
-      <AdminPageHeader icon={FileText} title="CV" description="What visitors can download — your uploaded CV, the one generated from the platform, or both (BR-7.1) — and the roles, education and skills the generated one is built from." />
+      <AdminPageHeader icon={FileText} title="CV" description="What visitors can download — your uploaded CV, the one generated from the platform, or both — and the roles, education and skills the generated one is built from." rules={["BR-7.1 download options"]} />
       <CvOptionsPanel key={JSON.stringify(options)} versions={uploads.map(toCvUploadVersion)} options={options} />
       <Panel
         className="mb-6"

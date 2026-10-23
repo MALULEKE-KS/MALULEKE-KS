@@ -41,7 +41,7 @@ function Reauth({ idPrefix, password, code, onPassword, onCode }: { idPrefix: st
 
 export function AccountForms({ recoveryCodesLow }: { recoveryCodesLow: boolean }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <PasswordForm />
       <RecoveryCodesForm low={recoveryCodesLow} />
     </div>
@@ -153,7 +153,7 @@ function RecoveryCodesForm({ low }: { low: boolean }) {
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-4">
-          {low && <p className="rounded-xl border border-ember/30 bg-ember/10 p-3 text-sm text-accent">You&apos;re running low — make a fresh set.</p>}
+          {low && <p className="rounded-xl border border-ember/30 bg-ember/10 p-3 text-sm text-accent-strong">You&apos;re running low — make a fresh set.</p>}
           <Reauth idPrefix="rc" password={current} code={code} onPassword={setCurrent} onCode={setCode} />
           <button type="submit" disabled={!current || code.length !== 6 || busy} className={adminButton.dark}>
             <ShieldCheck aria-hidden="true" /> {busy ? "Generating…" : "Generate new codes"}

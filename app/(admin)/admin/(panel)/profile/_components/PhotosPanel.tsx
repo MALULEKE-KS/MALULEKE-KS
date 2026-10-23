@@ -11,7 +11,7 @@ import { FileUp, ImageIcon, RotateCcw } from "lucide-react";
 import { adminButton, adminHint, adminInput, adminLabel, EmptyState, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest, toSignIn } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
-import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { ConfirmPermanentDelete } from "@/components/admin/ConfirmPermanentDelete";
 
 export interface PhotoVersion {
   id: string;
@@ -77,7 +77,7 @@ export function PhotosPanel({ versions, purposes }: { versions: PhotoVersion[]; 
 
   return (
     <Panel title="Photos" description="Your photos on the site, one current per place, including the image behind each page's hero. Uploading replaces the current one and keeps the old version here — make it current again any time, or delete it for good. Uploads are converted and stripped of hidden data (location, camera) (BR-1.17).">
-      <form onSubmit={upload} className="mb-5 grid gap-3 rounded-xl border border-dashed border-ink/15 p-4 md:grid-cols-[12rem_minmax(0,1fr)]">
+      <form onSubmit={upload} className="mb-5 grid grid-cols-1 gap-3 rounded-xl border border-dashed border-ink/15 p-4 md:grid-cols-[12rem_minmax(0,1fr)]">
         <div>
           <label htmlFor="ph-purpose" className={adminLabel}>Where</label>
           <select id="ph-purpose" className={adminInput} value={purpose} onChange={(e) => setPurpose(e.target.value)}>
@@ -104,7 +104,7 @@ export function PhotosPanel({ versions, purposes }: { versions: PhotoVersion[]; 
       {versions.length === 0 ? (
         <EmptyState icon={ImageIcon}>No photos yet.</EmptyState>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {versions.map((v) => (
             <li key={v.id} className={cn("overflow-hidden rounded-xl border bg-paper", v.current ? "border-ember/40" : "border-ink/10")}>
               {/* eslint-disable-next-line @next/next/no-img-element -- admin preview of a private version; next/image would need the route to be public */}
@@ -121,7 +121,7 @@ export function PhotosPanel({ versions, purposes }: { versions: PhotoVersion[]; 
                     <button type="button" onClick={() => restore(v.id)} className="inline-flex items-center gap-1 font-medium text-accent hover:underline">
                       <RotateCcw aria-hidden="true" className="size-3.5" /> Make current
                     </button>
-                    <ConfirmDelete onConfirm={() => remove(v.id)} />
+                    <ConfirmPermanentDelete onConfirm={() => remove(v.id)} />
                   </div>
                 )}
               </div>

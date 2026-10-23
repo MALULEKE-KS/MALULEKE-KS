@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { CalendarClock, History, Plus, RotateCcw, Save } from "lucide-react";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
 import { ScreenshotPanel, type ScreenshotInfo } from "@/components/admin/ScreenshotPanel";
+import { SectionIndex } from "@/components/admin/SectionIndex";
+import { LeaveGuard } from "@/components/admin/LeaveGuard";
 import { adminButton, adminHint, adminInput, adminLabel, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest, changedFields, fromLocalInput, toLocalInput } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
@@ -165,7 +167,7 @@ function toWire(f: Form, permissionApplies: boolean) {
 
 function Toggle({ checked, onChange, label, hint, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string; disabled?: boolean }) {
   return (
-    <label className={cn("flex items-start gap-3 rounded-xl border border-ink/10 bg-paper p-3", disabled && "opacity-60")}>
+    <label className={cn("flex items-start gap-3 rounded-xl border border-ink/10 bg-paper p-3", disabled && "border-dashed bg-ink/[0.03]")}>
       <input type="checkbox" className="mt-0.5 size-4 accent-ember" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
       <span>
         <span className="block text-sm font-medium text-ink">{label}</span>
@@ -229,6 +231,21 @@ function WriteupStatus({ system }: { system: EditorSystem }) {
   );
 }
 
+// The editor's sections, for the index that sticks under the page bar (D-057).
+const SECTIONS = [
+  { id: "sys-system", label: "The system" },
+  { id: "sys-publishing", label: "Publishing" },
+  { id: "sys-repo", label: "Repo" },
+  { id: "sys-shown", label: "Where it's shown" },
+  { id: "sys-links", label: "Links" },
+  { id: "sys-case-study", label: "Case study" },
+  { id: "sys-screenshot", label: "Screenshot" },
+  { id: "sys-impact", label: "Impact" },
+  { id: "sys-skills", label: "Skills" },
+  { id: "sys-history", label: "History" },
+  { id: "sys-facts", label: "Facts" },
+];
+
 export function SystemEditor({ now, system, options, history }: { now: number; system: EditorSystem; options: Options; history: HistoryData }) {
   const router = useRouter();
   const base = useMemo(() => formFrom(system), [system]);
@@ -264,10 +281,13 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+    <>
+    <SectionIndex sections={SECTIONS} label="Sections of this system" />
+    <LeaveGuard dirty={dirty} changes={Object.keys(patch).length} />
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <form onSubmit={save} className="min-w-0 space-y-6" noValidate>
-        <Panel title="The system" description="Name, address, summary and what it's built with.">
-          <div className="grid gap-4 md:grid-cols-2">
+        <Panel id="sys-system" title="The system" description="Name, address, summary and what it's built with.">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="name" className={adminLabel}>Name</label>
               <input id="name" className={adminInput} value={f.name} maxLength={120} onChange={(e) => set("name", e.target.value)} />
@@ -308,8 +328,8 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           </div>
         </Panel>
 
-        <Panel title="Publishing" description="Who approved it, when it goes live, and who may see what.">
-          <div className="grid gap-4 md:grid-cols-2">
+        <Panel id="sys-publishing" title="Publishing" description="Who approved it, when it goes live, and who may see what.">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="clientVisibility" className={adminLabel}>Client visibility</label>
               <select id="clientVisibility" className={adminInput} value={f.clientVisibility} onChange={(e) => set("clientVisibility", e.target.value as Visibility)}>
@@ -360,8 +380,8 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           )}
         </Panel>
 
-        <Panel title="Repo ownership" description="Whose repo it is, and the owner's answer when it's someone else's.">
-          <div className="grid gap-4 md:grid-cols-2">
+        <Panel id="sys-repo" title="Repo ownership" description="Whose repo it is, and the owner's answer when it's someone else's.">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="repoRelationship" className={adminLabel}>Relationship</label>
               <select id="repoRelationship" className={adminInput} value={f.repoRelationship} onChange={(e) => set("repoRelationship", e.target.value)}>
@@ -391,8 +411,8 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           </div>
         </Panel>
 
-        <Panel title="Where it's shown" description="Order and placement across the site and the CV. Only published systems ever appear.">
-          <div className="grid gap-4 md:grid-cols-3">
+        <Panel id="sys-shown" title="Where it's shown" description="Order and placement across the site and the CV. Only published systems ever appear.">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="space-y-3">
               <Toggle checked={f.isFlagship} onChange={(v) => set("isFlagship", v)} label="Flagship" />
               <div>
@@ -417,8 +437,8 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           </div>
         </Panel>
 
-        <Panel title="Links">
-          <div className="grid gap-4 md:grid-cols-2">
+        <Panel id="sys-links" title="Links">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="liveUrl" className={adminLabel}>Live site</label>
               <input id="liveUrl" type="url" className={adminInput} value={f.liveUrl} onChange={(e) => set("liveUrl", e.target.value)} placeholder="https://" />
@@ -436,13 +456,13 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           </div>
         </Panel>
 
-        <Panel title="Case study" description="Markdown. Every saved version is kept — see History.">
+        <Panel id="sys-case-study" title="Case study" description="Markdown. Every saved version is kept — see History.">
           <WriteupStatus system={system} />
           <label htmlFor="caseStudyBody" className="sr-only">Case study</label>
           <textarea id="caseStudyBody" rows={16} className={cn(adminInput, "font-mono text-[0.8125rem] leading-relaxed")} value={f.caseStudyBody} onChange={(e) => set("caseStudyBody", e.target.value)} />
         </Panel>
 
-        <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-3 rounded-2xl border border-ink/10 bg-sheet/95 p-3 shadow-lift backdrop-blur">
+        <div data-chrome className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 -mx-1 flex flex-wrap items-center gap-3 rounded-2xl lg:bottom-3 border border-ink/10 bg-sheet/95 p-3 shadow-lift backdrop-blur">
           <button type="submit" disabled={saving} className={adminButton.primary}>
             <Save aria-hidden="true" /> {saving ? "Saving…" : dirty ? "Save changes" : "Save"}
           </button>
@@ -465,6 +485,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         <FactsPanel system={system} history={history} />
       </aside>
     </div>
+    </>
   );
 }
 
@@ -494,7 +515,7 @@ function ImpactsPanel({ systemId, initial }: { systemId: string; initial: Editor
   }
 
   return (
-    <Panel title="Impact" description="Measured outcomes, on the case study and the CV.">
+    <Panel id="sys-impact" title="Impact" description="Measured outcomes, on the case study and the CV.">
       {impacts.length > 0 && (
         <ul className="mb-4 space-y-2">
           {impacts.map((i) => (
@@ -545,7 +566,7 @@ function SkillsPanel({ systemId, skills, initial }: { systemId: string; skills: 
   }
 
   return (
-    <Panel title="Skills it proves" description={`${selected.size} selected — evidence once published.`}>
+    <Panel id="sys-skills" title="Skills it proves" description={`${selected.size} selected — evidence once published.`}>
       {skills.length === 0 ? (
         <p className="text-sm text-slate">Add skills on the CV page first.</p>
       ) : (
@@ -610,7 +631,7 @@ function RevisionsPanel({ systemId }: { systemId: string }) {
   }
 
   return (
-    <Panel title="History" description="Every version of the case study and summary (BR-1.15).">
+    <Panel id="sys-history" title="History" description="Every version of the case study and summary (BR-1.15).">
       <div className="mb-3 flex gap-2">
         {(["caseStudyBody", "description"] as const).map((which) => (
           <button key={which} type="button" onClick={() => load(which)} className={cn(adminButton.ghost, "px-3 py-1.5", revisions && field === which && "bg-ink/5 text-ink")}>
@@ -650,7 +671,7 @@ function FactsPanel({ system, history }: { system: EditorSystem; history: Histor
   const g = system.github;
   const languages = g.languages ? Object.entries(g.languages).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name]) => name) : [];
   return (
-    <Panel title="Facts" description="Sourced, not typed — refreshed by the GitHub sync.">
+    <Panel id="sys-facts" title="Facts" description="Sourced, not typed — refreshed by the GitHub sync.">
       <dl className="space-y-2 text-sm">
         {g.fullName ? (
           <>

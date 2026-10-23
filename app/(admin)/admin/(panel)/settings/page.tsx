@@ -14,7 +14,8 @@ import { SettingsManager } from "./_components/SettingsManager";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSettingsPage() {
+export default async function AdminSettingsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
   const [platform, flags, lenses, lookupLists] = await Promise.all([
     listSettings(),
     db.flag.findMany({ orderBy: { key: "asc" } }),
@@ -34,6 +35,7 @@ export default async function AdminSettingsPage() {
         flags={flags.map((f) => ({ id: f.id, key: f.key, enabled: f.enabled, notes: f.notes }))}
         lenses={lenses.map((l) => ({ id: l.id, key: l.key, label: l.label, aiFramingPrompt: l.aiFramingPrompt, sortOrder: l.sortOrder, priorityContent: l.priorityContent as Record<string, unknown> }))}
         lookups={Object.fromEntries(LOOKUP_TYPES.map((type, i) => [type, lookupLists[i] ?? []]))}
+        initialQuery={q?.trim().slice(0, 120) ?? ""}
       />
     </>
   );

@@ -168,7 +168,7 @@ export function MessageComposer({ id, disabled }: { id: string; disabled: boolea
       </label>
       <textarea id="msg" value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} rows={3} placeholder="What the applicant will read" className={adminInput} />
       {kind === "info-request" && (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="items" className={adminLabel}>
               What you need (one per line)
@@ -209,7 +209,7 @@ export function MeetingScheduler({ id, defaultTimeZone }: { id: string; defaultT
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
   return (
     <form
-      className="border-ink/10 grid gap-3 rounded-2xl border p-4 sm:grid-cols-2"
+      className="border-ink/10 grid grid-cols-1 gap-3 rounded-2xl border p-4 sm:grid-cols-2"
       onSubmit={async (e) => {
         e.preventDefault();
         const ok = await run(`/inquiries/${id}/meetings`, "POST", {

@@ -77,7 +77,7 @@ export function CvOptionsPanel({ versions, options }: { versions: CvUploadVersio
   }
 
   return (
-    <div className="mb-6 grid gap-6 xl:grid-cols-2">
+    <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
       <Panel title="Uploaded CV" description="PDF or Word (.docx). A new upload replaces the current file of the same format; earlier versions are kept.">
         <div className="flex flex-wrap items-center gap-3">
           <label className={cn(adminButton.secondary, "cursor-pointer")}>
@@ -118,7 +118,7 @@ export function CvOptionsPanel({ versions, options }: { versions: CvUploadVersio
       </Panel>
 
       <Panel title="What visitors can download" description="At least one option stays on; the first one listed must be shown (BR-7.5).">
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {(["generated", "uploaded"] as const).map((kind) => {
             const show = kind === "generated" ? "showGenerated" : "showUploaded";
             const label = kind === "generated" ? "generatedLabel" : "uploadedLabel";

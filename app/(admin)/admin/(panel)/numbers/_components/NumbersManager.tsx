@@ -72,7 +72,7 @@ export function NumbersManager({ metrics }: { metrics: Metric[] }) {
       {metrics.length === 0 ? (
         <EmptyState icon={BarChart3}>No numbers defined yet.</EmptyState>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {metrics.map((m) => <MetricCard key={`${m.key}:${m.pending?.id ?? ""}:${m.current?.id ?? ""}`} metric={m} />)}
         </div>
       )}
@@ -116,7 +116,7 @@ function MetricCard({ metric }: { metric: Metric }) {
           </button>
         </span>
       }
-      className={cn(!metric.active && "opacity-75")}
+      className={cn(!metric.active && "border-ink/15 rounded-2xl border border-dashed")}
     >
       {editing ? (
         <EditMetric metric={metric} onDone={() => { setEditing(false); router.refresh(); }} />
@@ -130,7 +130,7 @@ function MetricCard({ metric }: { metric: Metric }) {
             </div>
             {metric.pending && (
               <div className="rounded-xl border border-ember/30 bg-ember/10 p-3 text-right">
-                <p className="text-xs text-accent">Proposed ({metric.pending.source})</p>
+                <p className="text-xs text-accent-strong">Proposed ({metric.pending.source})</p>
                 <p className="font-sans text-xl font-semibold text-ink">{fmt(metric.pending.value)}{unit}</p>
                 <div className="mt-2 flex justify-end gap-1.5">
                   <button type="button" onClick={() => act(`/metrics/snapshots/${metric.pending!.id}/approve`)} className={cn(adminButton.primary, "px-3 py-1.5")}>
@@ -186,7 +186,7 @@ function MetricCard({ metric }: { metric: Metric }) {
 
 function MetricFields({ draft, set, withKey }: { draft: Record<string, string>; set: (k: string, v: string) => void; withKey?: boolean }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {withKey && (
         <div className="sm:col-span-2">
           <label htmlFor="m-key" className={adminLabel}>Key</label>

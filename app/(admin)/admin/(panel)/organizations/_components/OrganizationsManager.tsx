@@ -104,7 +104,7 @@ function OrganizationForm({ org, kinds, onDone, onCancel }: { org?: Organization
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div><label htmlFor="o-name" className={adminLabel}>Name</label><input id="o-name" maxLength={160} className={adminInput} value={f.name} onChange={(e) => setF((p) => ({ ...p, name: e.target.value }))} /></div>
         <div><label htmlFor="o-slug" className={adminLabel}>Slug</label><input id="o-slug" className={cn(adminInput, "font-mono")} value={f.slug} onChange={(e) => setF((p) => ({ ...p, slug: e.target.value.toLowerCase() }))} placeholder="lowercase-words" /></div>
         <div><label htmlFor="o-role" className={adminLabel}>Your role <span className="font-normal text-slate">(optional)</span></label><input id="o-role" maxLength={80} className={adminInput} value={f.role} onChange={(e) => setF((p) => ({ ...p, role: e.target.value }))} placeholder="Founder, Co-founder…" /></div>

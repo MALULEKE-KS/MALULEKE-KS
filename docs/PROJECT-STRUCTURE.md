@@ -78,7 +78,7 @@ maluleke-ks/
 │   ├── journey/, about/               # ChapterTimeline + ChapterNav; SkillOrbit, skill-icons, GuideInvite
 │   ├── guide/                         # the AI guide: GuideProvider (character state), GuideChatProvider (the one conversation, as every view sees it) + GuideChatEngine (the AI SDK side, loaded after the first view — WP-102) + chat-types,
 │   │   └── console/                   # the console: stage/bust, conversation, answer, trail, receipts, cards, composer; GuidePanel wraps it off home
-│   └── admin/                         # AdminNav, ui.tsx (the admin kit), ConfirmDelete, ActivityLogTable
+│   └── admin/                         # AdminShell (sidebar, page bar, phone dock), AdminSearch (⌘K), ui.tsx (the admin kit), ConfirmDelete (remove a list entry, asks once), ConfirmPermanentDelete (an earlier image version, asks twice), ActivityLogTable — the map is lib/admin/nav.ts
 │
 ├── app/
 │   ├── layout.tsx, not-found.tsx, globals.css

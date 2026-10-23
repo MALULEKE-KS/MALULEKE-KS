@@ -2,9 +2,14 @@
 // Page content blocks (#106): site copy that used to live in code, edited
 // here. Each block's body is validated against its schema on save
 // (lib/content/blocks.ts); the public pages read it through PublicSiteContent.
+// Since the admin pass (D-057) the blocks are grouped by where they appear,
+// with an index that sticks under the page bar and a link to each page — and
+// every block has an editor (the section copy had none).
 
-import { PenLine } from "lucide-react";
+import { ArrowUpRight, PenLine } from "lucide-react";
 import { AdminPageHeader, formatWhen, Panel } from "@/components/admin/ui";
+import { SectionIndex } from "@/components/admin/SectionIndex";
+import { CONTENT_PLACES as PLACES } from "@/lib/admin/content-places";
 import { db } from "@/lib/db";
 import { CONTENT_BLOCKS, type ContentKey } from "@/lib/content/blocks";
 import { HowIBuildEditor } from "./_components/HowIBuildEditor";
@@ -114,63 +119,59 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
   ],
 };
 
+// The nested blocks, edited as JSON against the same schema the server checks.
+const JSON_HINTS: Partial<Record<ContentKey, string>> = {
+  evidence:
+    "Each claim: id, claim, where (principle:<name>, pulse:<key> or system:<slug>), status (verified, partial, planned), proves, doesNotProve, 1–6 evidence links, reviewedAt (YYYY-MM-DD). Links: repo:<path>, /public-route or actions:<workflow>.yml. A verified claim shows “Review due” on its own once its review is older than the evidence.reviewDays setting.",
+  "guide-tours":
+    "spotlightSeconds (1–15), tours: key (letters, digits, dashes), label, summary, stops (1–10): path (a site path, e.g. /systems), section (optional — a heading on that page, e.g. skills), say (one line, ≤220). Stops on pages the site doesn't have are skipped.",
+  journey:
+    "headline (≤160, *word* for the accent), lede, chapters: id, from (year), to (year or null for ongoing), title, place (optional), body (≤1200) — then ahead: title, body. Drafted from your CV and your answers: read it, change anything, then set reviewed to true.",
+  "page-copy":
+    "One entry per section, keyed page.section (home.map, about.skills, contact.steps…): eyebrow (≤60), title (≤160, *word* for the accent), description (≤400), items (up to 8: title, body). Fill-ins: {reviewSlaHours}, {owner}. A section without an entry keeps its shipped words.",
+};
+
 export default async function AdminContentPage() {
   const rows = await db.siteContent.findMany();
   const byKey = new Map(rows.map((r) => [r.key, r]));
   const howIBuild = byKey.get("how-i-build");
   const parsed = CONTENT_BLOCKS["how-i-build"].schema.safeParse(howIBuild?.body);
-  const evidence = byKey.get("evidence");
-  const journey = byKey.get("journey");
-  const tours = byKey.get("guide-tours");
+
+  const editor = (key: ContentKey) => {
+    const row = byKey.get(key);
+    if (key === "how-i-build") return <HowIBuildEditor key={howIBuild?.updatedAt.toISOString() ?? "new"} initial={parsed.success ? parsed.data : null} />;
+    if (FIELDS[key]) {
+      const body = CONTENT_BLOCKS[key].schema.safeParse(row?.body);
+      return <FieldsBlockEditor key={row?.updatedAt.toISOString() ?? "new"} blockKey={key} fields={FIELDS[key]!} initial={body.success ? (body.data as Record<string, unknown>) : null} />;
+    }
+    if (key === "evidence" || key === "journey" || key === "page-copy" || key === "guide-tours") {
+      return <JsonBlockEditor blockKey={key} key={row?.updatedAt.toISOString() ?? "new"} initial={row?.body ?? null} hint={JSON_HINTS[key]} />;
+    }
+    return null;
+  };
 
   return (
     <>
-      <AdminPageHeader icon={PenLine} title="Page content" description="Words on the site that aren't tied to a system, a role or the profile." />
-      <div className="space-y-6">
-        {(Object.keys(FIELDS) as ContentKey[]).map((key) => {
-          const row = byKey.get(key);
-          const body = CONTENT_BLOCKS[key].schema.safeParse(row?.body);
-          return (
-            <Panel key={key} title={CONTENT_BLOCKS[key].title} description={`${CONTENT_BLOCKS[key].description} Last changed ${formatWhen(row?.updatedAt)}.`}>
-              <FieldsBlockEditor
-                key={row?.updatedAt.toISOString() ?? "new"}
-                blockKey={key}
-                fields={FIELDS[key]!}
-                initial={body.success ? (body.data as Record<string, unknown>) : null}
-              />
-            </Panel>
-          );
-        })}
-        <Panel
-          title={CONTENT_BLOCKS["how-i-build"].title}
-          description={`${CONTENT_BLOCKS["how-i-build"].description} Last changed ${formatWhen(howIBuild?.updatedAt)}.`}
-        >
-          <HowIBuildEditor key={howIBuild?.updatedAt.toISOString() ?? "new"} initial={parsed.success ? parsed.data : null} />
-        </Panel>
-        <Panel title={CONTENT_BLOCKS.evidence.title} description={`${CONTENT_BLOCKS.evidence.description} Last changed ${formatWhen(evidence?.updatedAt)}.`}>
-          <JsonBlockEditor
-            blockKey="evidence"
-            key={evidence?.updatedAt.toISOString() ?? "new"}
-            initial={evidence?.body ?? null}
-            hint="Each claim: id, claim, where (principle:<name>, pulse:<key> or system:<slug>), status (verified, partial, planned), proves, doesNotProve, 1–6 evidence links, reviewedAt (YYYY-MM-DD). Links: repo:<path>, /public-route or actions:<workflow>.yml. A verified claim shows “Review due” on its own once its review is older than the evidence.reviewDays setting."
-          />
-        </Panel>
-        <Panel title={CONTENT_BLOCKS["guide-tours"].title} description={`${CONTENT_BLOCKS["guide-tours"].description} Last changed ${formatWhen(tours?.updatedAt)}.`}>
-          <JsonBlockEditor
-            blockKey="guide-tours"
-            key={tours?.updatedAt.toISOString() ?? "new"}
-            initial={tours?.body ?? null}
-            hint="spotlightSeconds (1–15), tours: key (letters, digits, dashes), label, summary, stops (1–10): path (a site path, e.g. /systems), section (optional — a heading on that page, e.g. skills), say (one line, ≤220). Stops on pages the site doesn't have are skipped."
-          />
-        </Panel>
-        <Panel title={CONTENT_BLOCKS.journey.title} description={`${CONTENT_BLOCKS.journey.description} Last changed ${formatWhen(journey?.updatedAt)}.`}>
-          <JsonBlockEditor
-            blockKey="journey"
-            key={journey?.updatedAt.toISOString() ?? "new"}
-            initial={journey?.body ?? null}
-            hint="headline (≤160, *word* for the accent), lede, chapters: id, from (year), to (year or null for ongoing), title, place (optional), body (≤1200) — then ahead: title, body. Drafted from your CV and your answers: read it, change anything, then set reviewed to true."
-          />
-        </Panel>
+      <AdminPageHeader icon={PenLine} title="Page content" description="Words on the site that aren't tied to a system, a role or the profile — grouped by the page they appear on." />
+      <SectionIndex sections={PLACES.map((p) => ({ id: p.id, label: p.label }))} label="Pages" />
+      <div className="space-y-12">
+        {PLACES.map((place) => (
+          <section key={place.id} id={place.id} aria-labelledby={`${place.id}-title`} className="scroll-mt-32 space-y-6">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id={`${place.id}-title`} className="text-ink text-xl font-semibold tracking-tight">
+                {place.label}
+              </h2>
+              <a href={place.path} className="text-slate hover:text-ink inline-flex items-center gap-1 text-sm font-medium">
+                Open the page <ArrowUpRight aria-hidden="true" className="size-4" />
+              </a>
+            </div>
+            {place.keys.map((key) => (
+              <Panel key={key} id={`block-${key}`} title={CONTENT_BLOCKS[key].title} description={`${CONTENT_BLOCKS[key].description} Last changed ${formatWhen(byKey.get(key)?.updatedAt)}.`}>
+                {editor(key)}
+              </Panel>
+            ))}
+          </section>
+        ))}
       </div>
     </>
   );

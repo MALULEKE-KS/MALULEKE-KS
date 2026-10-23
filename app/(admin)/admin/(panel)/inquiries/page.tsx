@@ -87,7 +87,8 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
       <AdminPageHeader
         icon={Inbox}
         title="Inquiries"
-        description={`Everything sent through Let's Talk. A new message is due for review within ${slaHours} hours (BR-2.2 — a setting).`}
+        description={`Everything sent through Let's Talk. A new message is due for review within ${slaHours} hours — a setting.`}
+        rules={["BR-2.1 the workflow", "BR-2.2 review window"]}
       />
 
       {(!emailConfigured() || failedEmails > 0) && (
@@ -117,7 +118,7 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
           </Link>
         ))}
         <Link href={href({ overdue: params.overdue === "1" ? undefined : "1" })} aria-current={params.overdue === "1" ? "page" : undefined} className={pill(params.overdue === "1")}>
-          Overdue <span className={cn("font-mono text-xs", overdueCount > 0 ? "text-accent" : "text-slate/70")}>{overdueCount}</span>
+          Overdue <span className={cn("font-mono text-xs", overdueCount > 0 ? "text-accent" : "text-slate")}>{overdueCount}</span>
         </Link>
         <Link href={href({ duplicates: params.duplicates === "1" ? undefined : "1" })} className={pill(params.duplicates === "1")}>
           <Copy aria-hidden="true" className="size-3.5" /> Possible duplicates
@@ -128,7 +129,7 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
           All categories
         </Link>
         {types.map((t) => (
-          <Link key={t.id} href={href({ inquiryType: t.key })} className={cn(pill(params.inquiryType === t.key), "px-3 py-1 text-xs", !t.active && "opacity-70")}>
+          <Link key={t.id} href={href({ inquiryType: t.key })} className={cn(pill(params.inquiryType === t.key), "px-3 py-1 text-xs", !t.active && "border-dashed")}>
             {t.label}
             {!t.active && " (retired)"}
           </Link>

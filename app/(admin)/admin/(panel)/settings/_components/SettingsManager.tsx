@@ -2,13 +2,15 @@
 // Four tabs (#105): Platform (each tunable with its rule, default and bounds
 // checked on the server — #67), Lookups (every EXT-1 type with its own extra
 // fields; add, relabel, deprecate — never delete, BR-8.2), Flags
-// (toggled one at a time, no bulk control — BR-4.4) and Lenses.
+// (toggled one at a time, no bulk control — BR-4.4) and Lenses. A filter over
+// the settings and flags matches a key, what it does or its rule (D-057); the
+// admin search (⌘K) opens this page with a setting already filtered.
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Flag, Glasses, ListTree, Pencil, Plus, SlidersHorizontal } from "lucide-react";
+import { Flag, Glasses, ListTree, Pencil, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { adminButton, adminHint, adminInput, adminLabel, EmptyState, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
@@ -62,8 +64,14 @@ const COLOR_TOKENS = ["signal-finished", "signal-progress", "signal-planned"] as
 
 type Tab = "platform" | "lookups" | "flags" | "lenses";
 
-export function SettingsManager({ platform, flags, lenses, lookups }: { platform: PlatformSetting[]; flags: FlagRow[]; lenses: Lens[]; lookups: Record<string, LookupValue[]> }) {
+export function SettingsManager({ platform, flags, lenses, lookups, initialQuery = "" }: { platform: PlatformSetting[]; flags: FlagRow[]; lenses: Lens[]; lookups: Record<string, LookupValue[]>; initialQuery?: string }) {
   const [tab, setTab] = useState<Tab>("platform");
+  const [q, setQ] = useState(initialQuery);
+  const needle = q.trim().toLowerCase();
+  const matches = (...texts: (string | null | undefined)[]) => !needle || texts.some((t) => t?.toLowerCase().includes(needle));
+  const shownSettings = platform.filter((s) => matches(s.key, s.description, s.rule));
+  const shownFlags = flags.filter((f) => matches(f.key, f.notes));
+  const counts: Partial<Record<Tab, number>> = needle ? { platform: shownSettings.length, flags: shownFlags.length } : {};
   const tabs: { key: Tab; label: string; Icon: typeof Flag }[] = [
     { key: "platform", label: "Platform", Icon: SlidersHorizontal },
     { key: "lookups", label: "Lookups", Icon: ListTree },
@@ -72,6 +80,13 @@ export function SettingsManager({ platform, flags, lenses, lookups }: { platform
   ];
   return (
     <div>
+      <div className="relative mb-4 max-w-md">
+        <label htmlFor="settings-q" className="sr-only">
+          Filter settings and flags
+        </label>
+        <Search aria-hidden="true" className="text-slate pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+        <input id="settings-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter: a key, what it does, or a rule" className={cn(adminInput, "ps-10")} />
+      </div>
       <div role="tablist" aria-label="Settings sections" className="mb-5 flex flex-wrap gap-2">
         {tabs.map(({ key, label, Icon }) => (
           <button
@@ -86,12 +101,13 @@ export function SettingsManager({ platform, flags, lenses, lookups }: { platform
             )}
           >
             <Icon aria-hidden="true" className="size-4" /> {label}
+            {counts[key] !== undefined && <span className="font-mono text-xs">{counts[key]}</span>}
           </button>
         ))}
       </div>
-      {tab === "platform" && <PlatformSection settings={platform} />}
+      {tab === "platform" && (shownSettings.length > 0 ? <PlatformSection settings={shownSettings} /> : <EmptyState icon={SlidersHorizontal}>No setting matches “{q.trim()}”.</EmptyState>)}
       {tab === "lookups" && <LookupsSection lookups={lookups} />}
-      {tab === "flags" && <FlagsSection flags={flags} />}
+      {tab === "flags" && (shownFlags.length > 0 ? <FlagsSection flags={shownFlags} /> : <EmptyState icon={Flag}>No flag matches “{q.trim()}”.</EmptyState>)}
       {tab === "lenses" && <LensesSection lenses={lenses} />}
     </div>
   );
@@ -136,7 +152,7 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
   }
 
   return (
-    <li className="grid gap-3 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <li className="grid grid-cols-1 gap-3 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <div className="min-w-0">
         <p className="text-sm text-ink">{setting.description}</p>
         <p className="mt-0.5 font-mono text-xs text-slate">
@@ -173,7 +189,7 @@ function LookupsSection({ lookups }: { lookups: Record<string, LookupValue[]> })
   const meta = LOOKUP_META[type] ?? { label: type, hint: "" };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
       <nav aria-label="Lookup types" className="flex flex-row flex-wrap gap-1 lg:flex-col">
         {types.map((t) => (
           <button
@@ -184,7 +200,7 @@ function LookupsSection({ lookups }: { lookups: Record<string, LookupValue[]> })
             className={cn("flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm transition-colors", t === type ? "bg-ink text-paper" : "text-slate hover:bg-ink/5 hover:text-ink")}
           >
             {LOOKUP_META[t]?.label ?? t}
-            <span className={cn("font-mono text-xs", t === type ? "text-mist" : "text-slate/70")}>{lookups[t]?.filter((v) => v.active).length ?? 0}</span>
+            <span className={cn("font-mono text-xs", t === type ? "text-mist" : "text-slate")}>{lookups[t]?.filter((v) => v.active).length ?? 0}</span>
           </button>
         ))}
       </nav>
@@ -269,7 +285,7 @@ function LookupRow({ type, value }: { type: string; value: LookupValue }) {
   return (
     <li className="py-2.5 first:pt-0">
       {editing ? (
-        <form onSubmit={save} className="grid gap-3 rounded-xl border border-ink/10 bg-paper p-3 sm:grid-cols-3">
+        <form onSubmit={save} className="grid grid-cols-1 gap-3 rounded-xl border border-ink/10 bg-paper p-3 sm:grid-cols-3">
           <div>
             <label className={adminLabel} htmlFor={`${value.id}-label`}>Label</label>
             <input id={`${value.id}-label`} className={adminInput} value={draft.label ?? ""} onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))} />
@@ -323,7 +339,7 @@ function NewLookup({ type }: { type: string }) {
   }
 
   return (
-    <form onSubmit={add} className="grid gap-3 rounded-xl border border-dashed border-ink/15 p-4 sm:grid-cols-3">
+    <form onSubmit={add} className="grid grid-cols-1 gap-3 rounded-xl border border-dashed border-ink/15 p-4 sm:grid-cols-3">
       <div>
         <label className={adminLabel} htmlFor={`${type}-new-key`}>Key</label>
         <input id={`${type}-new-key`} className={cn(adminInput, "font-mono")} value={draft.key ?? ""} onChange={(e) => setDraft((d) => ({ ...d, key: e.target.value.toLowerCase() }))} placeholder="lowercase_or-hyphen" />
@@ -465,7 +481,7 @@ function LensForm({ lens, onDone, onCancel }: { lens?: Lens; onDone: () => void;
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-[1fr_1fr_6rem]">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_6rem]">
         <div><label htmlFor="lens-key" className={adminLabel}>Key</label><input id="lens-key" className={cn(adminInput, "font-mono")} value={key} onChange={(e) => setKey(e.target.value)} /></div>
         <div><label htmlFor="lens-label" className={adminLabel}>Label</label><input id="lens-label" className={adminInput} value={label} onChange={(e) => setLabel(e.target.value)} /></div>
         <div><label htmlFor="lens-order" className={adminLabel}>Order</label><input id="lens-order" inputMode="numeric" className={cn(adminInput, "font-mono")} value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} /></div>

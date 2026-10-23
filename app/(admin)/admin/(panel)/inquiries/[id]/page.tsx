@@ -90,7 +90,7 @@ export default async function InquiryPage({ params }: { params: Promise<{ id: st
         description={`${i.category.label}${i.subtype ? ` — ${i.subtype.label}${i.subtypeOther ? `: ${i.subtypeOther}` : ""}` : ""} · sent ${formatWhen(i.submittedAt)}`}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-6">
           <Panel title={`Status: ${i.statusLabel}`} description="Only the moves the workflow allows are offered; the database refuses any other. A decision can be reopened — the history stays.">
             <div className="space-y-4">
@@ -111,7 +111,7 @@ export default async function InquiryPage({ params }: { params: Promise<{ id: st
           <Panel title="What they wrote">
             <p className="text-ink text-sm leading-relaxed whitespace-pre-wrap">{i.message}</p>
             {(Object.keys(fields).length > 0 || comp) && (
-              <dl className="border-ink/10 mt-5 grid gap-x-6 gap-y-3 border-t pt-5 text-sm sm:grid-cols-2">
+              <dl className="border-ink/10 mt-5 grid grid-cols-1 gap-x-6 gap-y-3 border-t pt-5 text-sm sm:grid-cols-2">
                 {Object.entries(fields).map(([k, v]) =>
                   v === undefined || v === null || v === "" ? null : (
                     <div key={k} className="min-w-0">

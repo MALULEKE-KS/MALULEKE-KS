@@ -24,7 +24,7 @@ export default async function AdminAccountPage() {
     <>
       <AdminPageHeader icon={KeyRound} title="Account" description="Your sign-in. Changing the password ends every other session." />
       <Panel title="Sign-in" className="mb-6">
-        <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <dt className="text-xs text-slate">Email</dt>
             <dd className="mt-1 break-all font-medium text-ink">{admin.email}</dd>
