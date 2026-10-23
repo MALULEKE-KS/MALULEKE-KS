@@ -311,7 +311,7 @@ export function CoverflowCarousel<T>({
               type="button"
               aria-label="Previous slide"
               onClick={() => nudge(-1)}
-              className="bg-night/70 text-paper hover:bg-night focus-visible:outline-ember absolute top-1/2 left-2 z-[200] grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 backdrop-blur transition focus-visible:outline-2 sm:left-4"
+              className="bg-night/70 text-paper hover:bg-night focus-visible:outline-ember tap-target press absolute top-1/2 left-2 z-[200] grid size-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 backdrop-blur transition focus-visible:outline-2 sm:left-4"
             >
               <ChevronLeft aria-hidden="true" className="size-5" />
             </button>
@@ -319,7 +319,7 @@ export function CoverflowCarousel<T>({
               type="button"
               aria-label="Next slide"
               onClick={() => nudge(1)}
-              className="bg-night/70 text-paper hover:bg-night focus-visible:outline-ember absolute top-1/2 right-2 z-[200] grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 backdrop-blur transition focus-visible:outline-2 sm:right-4"
+              className="bg-night/70 text-paper hover:bg-night focus-visible:outline-ember tap-target press absolute top-1/2 right-2 z-[200] grid size-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 backdrop-blur transition focus-visible:outline-2 sm:right-4"
             >
               <ChevronRight aria-hidden="true" className="size-5" />
             </button>

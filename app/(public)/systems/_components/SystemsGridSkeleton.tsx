@@ -10,19 +10,24 @@
 // status even though the rendered content is correct. Scoping the skeleton
 // to only the catalog's own async section avoids that entirely.
 
+// The new card's anatomy (D-049): status, name, two lines, marks, and the footer every card keeps.
 function SkeletonCard() {
   return (
-    <div className="border-ink/10 bg-sheet shadow-soft h-full rounded-2xl border p-6">
-      <div className="flex justify-between">
-        <div className="bg-ink/10 h-3 w-28 rounded-full" />
-        <div className="bg-ink/10 h-5 w-16 rounded-full" />
+    <div className="border-ink/10 bg-sheet shadow-soft flex h-full flex-col rounded-[1.5rem] border">
+      <div className="flex-1 p-5 md:p-6">
+        <div className="bg-ink/10 h-5 w-24 rounded-full" />
+        <div className="bg-ink/15 mt-5 h-5 w-2/3 rounded-full" />
+        <div className="bg-ink/10 mt-3 h-3 w-full rounded-full" />
+        <div className="bg-ink/10 mt-2 h-3 w-4/5 rounded-full" />
+        <div className="mt-5 flex gap-3">
+          <div className="bg-ink/10 h-3.5 w-14 rounded-full" />
+          <div className="bg-ink/10 h-3.5 w-16 rounded-full" />
+          <div className="bg-ink/10 h-3.5 w-12 rounded-full" />
+        </div>
       </div>
-      <div className="bg-ink/15 mt-6 h-5 w-2/3 rounded-full" />
-      <div className="bg-ink/10 mt-4 h-3 w-full rounded-full" />
-      <div className="bg-ink/10 mt-2 h-3 w-4/5 rounded-full" />
-      <div className="mt-8 flex gap-1.5">
-        <div className="bg-ink/10 h-5 w-16 rounded-full" />
-        <div className="bg-ink/10 h-5 w-14 rounded-full" />
+      <div className="border-ink/10 mx-5 flex min-h-14 items-center justify-between border-t md:mx-6">
+        <div className="bg-ink/10 h-5 w-20 rounded-full" />
+        <div className="bg-ink/10 h-3.5 w-16 rounded-full" />
       </div>
     </div>
   );
@@ -31,10 +36,14 @@ function SkeletonCard() {
 export function SystemsGridSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading systems" className="motion-safe:animate-pulse">
-      <div className="mb-10 flex gap-2.5">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="bg-ink/10 h-10 w-40 rounded-full" />
+      {/* The toolbar's place, so nothing moves when it arrives. */}
+      <div className="border-ink/10 bg-sheet/85 mb-10 flex h-[3.75rem] items-center gap-2 rounded-2xl border p-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="bg-ink/10 hidden h-10 w-32 rounded-full md:block" />
         ))}
+        <div className="bg-ink/10 h-11 w-28 rounded-full md:hidden" />
+        <div className="flex-1" />
+        <div className="bg-ink/10 h-9 w-44 rounded-full" />
       </div>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (

@@ -52,6 +52,11 @@ export function HeaderFrame({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Whether the header is showing, for what sticks below it (the catalogue's toolbar rises when it slips away).
+  useEffect(() => {
+    document.documentElement.dataset.header = hidden ? "hidden" : "shown";
+  }, [hidden]);
+
   return (
     <header
       data-scrolled={scrolled || undefined}

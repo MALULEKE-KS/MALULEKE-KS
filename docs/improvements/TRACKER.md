@@ -403,3 +403,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Verified:** re-measured at 390 and 430 px on the local server — 0 tap targets under 44 px, 0 labels under 12 px, no sideways scroll; typecheck clean. Then the local database stalled under memory (10 s for `select 1`, every page 500 with P1001) — the server was stopped; the rest is verified on CI and the PR's preview.
 - **Next:** the desktop check on the preview (1024–1920 px), fixes if any, CI green, merge, deploy; then the Systems page is planned the same way.
 
+
+### 2026-10-23 · The Systems page's premium pass — planned, approved, built locally (D-049; branch `sprint-2/systems-premium`)
+- **Owner:** "after it deploys lets move to other pages and do step by step exactly how we did it for the homepage"; approved the Systems plan in full ("cook it at the highest level").
+- **Built (not pushed):** the card's one anatomy with real screenshots, the home groups (wide card for one, halves for two, "On GitHub ↗"), the sticky toolbar with chips, the phone's filter sheet, the empty state, the skeleton; e2e `systems-catalog.spec.ts` (rows end together, one capsule, the in-site arrow, the toolbar stays in reach, the sheet's 44 px options, the empty state).
+- **Kept from WP-108:** a quiet card says nothing about its quiet (the plan's mock had "No commits in 26 weeks").
+- **Next:** typecheck/lint clean; the owner's local review (memory permitting), then push, CI, merge; then Journey, planned the same way.

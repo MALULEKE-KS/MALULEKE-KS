@@ -73,7 +73,8 @@ export function MagicCard({
       style={{ background: border }}
     >
       <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: glow }} />
-      <div className="relative z-10">{children}</div>
+      {/* Fills the card, so what it holds can stretch to the card's height (a row of cards ends together, D-049). */}
+      <div className="relative z-10 h-full">{children}</div>
     </motion.div>
   )
 }
