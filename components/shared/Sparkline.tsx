@@ -6,7 +6,7 @@
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 
-export function Sparkline({ values, className, stroke = "var(--color-ember)" }: { values: number[]; className?: string; stroke?: string }) {
+export function Sparkline({ values, className, stroke = "var(--color-ember)", draw = false }: { values: number[]; className?: string; stroke?: string; /** Uncover the chart from left to right as it scrolls into view (inside a Reveal; CSS only, never under reduced motion). */ draw?: boolean }) {
   const id = useId();
   if (values.length < 2) return null;
   const w = 120;
@@ -18,7 +18,7 @@ export function Sparkline({ values, className, stroke = "var(--color-ember)" }: 
   const area = `${line} L${w},${h} L0,${h} Z`;
   const last = pts[pts.length - 1]!;
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true" className={cn("h-8 w-full overflow-visible", className)}>
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true" className={cn("h-8 w-full overflow-visible", draw && "spark-draw", className)}>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={stroke} stopOpacity="0.28" />

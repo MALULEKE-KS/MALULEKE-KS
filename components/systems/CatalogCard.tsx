@@ -57,12 +57,12 @@ function Face({ s, wide }: { s: CatalogSystem; wide: boolean }) {
   return (
     <span aria-hidden="true" className={frame}>
       <span className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1px)] [background-size:14px_14px] [mask-image:linear-gradient(to_bottom,#000,transparent_85%)]" />
-      <span className="absolute -top-12 -right-10 size-40 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.18),transparent)]" />
+      <span className="absolute -top-12 -right-10 size-40 rounded-full bg-[radial-gradient(closest-side,rgb(255_91_31/0.18),transparent)] transition-[opacity,transform] duration-700 group-hover/c:scale-125 group-hover/c:opacity-100 motion-reduce:transition-none sm:opacity-70" />
       {moving ? (
         // Its 26 weeks of commits, drawn across the face — the work's own shape.
         <span className="absolute inset-x-2.5 top-2.5 bottom-3 flex flex-col sm:inset-x-5 sm:top-4 sm:bottom-5">
           <span className="text-mist hidden font-mono text-[11px] sm:block">26 weeks of commits</span>
-          <Sparkline values={s.weeks} className="mt-auto h-[55%] w-full" />
+          <Sparkline values={s.weeks} draw className="mt-auto h-[55%] w-full" />
         </span>
       ) : (
         // Nothing moved: what it is built with, as its marks.

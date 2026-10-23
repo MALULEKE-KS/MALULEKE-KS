@@ -696,3 +696,19 @@ html[data-header="hidden"] .catalog-toolbar {
   }
 }
 
+/* A card's 26 weeks of commits draw themselves in, once, as the card arrives
+   (/systems, D-049): the chart is uncovered from left to right — a sweep, not a
+   dash, so a stretched line always ends whole. Only with script and motion;
+   otherwise it is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] .spark-draw {
+    clip-path: inset(0 100% 0 0);
+  }
+  .js [data-reveal].is-visible .spark-draw {
+    animation: spark-draw 1400ms cubic-bezier(0.22, 1, 0.36, 1) 200ms forwards;
+  }
+}
+@keyframes spark-draw {
+  to { clip-path: inset(0 -2% 0 0); }
+}
+
