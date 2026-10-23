@@ -95,6 +95,15 @@ export const CONTENT_BLOCKS = {
       askLabel: z.string().trim().max(16).optional(),
       askHint: z.string().trim().max(60).optional(),
       dockLabel: z.string().trim().max(40).optional(),
+      // The live chip beside the mark (D-058): its word on production and on a preview build, and its card's lines.
+      liveLabel: z.string().trim().max(16).optional(),
+      previewLabel: z.string().trim().max(16).optional(),
+      vitalsTitle: z.string().trim().max(60).optional(),
+      vitalsBuild: z.string().trim().max(40).optional(),
+      vitalsSync: z.string().trim().max(40).optional(),
+      vitalsRules: z.string().trim().max(40).optional(),
+      vitalsAudited: z.string().trim().max(40).optional(),
+      vitalsLink: z.string().trim().max(40).optional(),
     }),
   },
   "systems-page": {

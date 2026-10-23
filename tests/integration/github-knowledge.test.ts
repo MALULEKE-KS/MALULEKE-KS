@@ -164,6 +164,9 @@ describe("the AI guide's corpus", () => {
     const full = await getGuideCorpus(150_000);
     // Just under the full size, so shortening has to kick in.
     const tight = await getGuideCorpus(full.tokens - 1);
-    expect(tight.text.length).toBeLessThan(full.text.length);
+    // Other test files add systems while this runs, so the data can grow between the two builds; a full build
+    // after it bounds that growth, and the shortened corpus must still come out shorter.
+    const after = await getGuideCorpus(150_000);
+    expect(tight.text.length).toBeLessThan(Math.max(full.text.length, after.text.length));
   });
 });

@@ -133,6 +133,8 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
             ownerName={profile.name}
             labels={siteHeader ?? null}
             systems={headerSystems}
+            pulse={pulse.deployment ? { commit: pulse.deployment.commit, environment: pulse.deployment.environment, lastGithubSyncAt: pulse.lastGithubSyncAt, rulesEnforcedByDatabase: pulse.rulesEnforcedByDatabase, auditEventsLast7Days: pulse.auditEventsLast7Days } : null}
+            liveLink={release?.link || null}
           />
           {/* At least a screen tall: while a page streams in, the footer stays below the fold instead of sitting in view and being pushed down (layout shift). */}
           <main id="main" className="min-h-svh flex-1">
