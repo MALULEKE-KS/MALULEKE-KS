@@ -415,3 +415,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Owner (away):** pre-approved the remaining passes — plan, build, polish, push, merge, deploy, next — with every PR merged before the next phase; "premium styling preserved … and improved".
 - **Journey:** plan published ("MALULEKE-KS Journey Plan"); built per D-050 with a polish pass (numerals that fill, the Now wash, row hover); e2e `journey.spec.ts`; phone 5,923 → 4,660 px, 0 small taps, 0 tiny text.
 - **Next:** PR, CI, merge, verify; then About.
+
+### 2026-10-23 · Journey shipped (PR #246, live ad3c2bb); the About pass (D-051; branch `sprint-2/about-premium`)
+- **Journey:** merged after CI; production verified.
+- **About:** plan published ("MALULEKE-KS About Plan"); built per D-051, polish pass (masonry skills); e2e `about.spec.ts`; locally 0 small taps, 0 text under 12 px, no sideways scroll at 360/390/430; phone ≈ 9,000 px (the proof rows are taller than the chips they replace; the weaker categories fold).
+- **Next:** PR, CI, merge, verify; then Let's talk.

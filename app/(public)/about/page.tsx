@@ -7,15 +7,17 @@
 //      introduction; Let's talk and his CV; his portrait beside it from a laptop
 //      up; then the record as one hairline row of live figures (years building,
 //      published systems, proven skills, companies) — every number computed.
-//   2. In my own words — on a phone his portrait first; the rest of his
-//      introduction, word for word, then a bento card per fact (based
-//      in, building since, studying, each company), spotlight on hover.
-//   3. Method (#method) — the mission as a pull quote, then the principles as
-//      spotlight cards on graphite, the first carrying a border beam, each
-//      opening its evidence.
+//   2. In my own words (premium pass, D-051) — on a phone his portrait first;
+//      the rest of his introduction, word for word, on a Magic Card, beside one
+//      fact sheet of ruled rows (based in, building since, studying, each
+//      company with its published systems) — no icon tiles.
+//   3. Method (#method) — the mission as a pull quote, then each principle a
+//      full-width row-card on graphite (number, name and its line; the full
+//      text and its evidence), the first carrying a border beam.
 //   4. Skills (#skills) — the skills published systems prove, orbiting the K-S
 //      mark (Magic UI Orbiting Circles), beside a card per category: proven
-//      skills with their mark and count (linked to the systems), the rest listed.
+//      skills as rows with their mark and count (linked to the systems), the
+//      rest one quiet line; on a phone each category opens in place.
 //   5. Close — his AI guide's invitation and the way to reach him.
 // Every word is data (profile, page-copy, how-i-build, evidence); his
 // organisations live in the footer, not repeated here.
@@ -23,7 +25,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
-import { ArrowRight, Building2, CalendarDays, FileText, GraduationCap, MapPin, Rocket, type LucideIcon } from "lucide-react";
+import { ArrowRight, ChevronDown, FileText } from "lucide-react";
 import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/HeroKit";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
@@ -32,10 +34,10 @@ import { Evidence } from "@/components/shared/Evidence";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { MagicCard } from "@/components/ui/magic-card";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { DotPattern } from "@/components/ui/dot-pattern";
 import { GuideInvite } from "@/components/about/GuideInvite";
 import { SkillOrbit } from "@/components/about/SkillOrbit";
 import { SkillIcon } from "@/components/about/skill-icons";
+import { SkillCategory } from "@/components/about/SkillCategory";
 import { getSiteProfile } from "@/lib/queries/site";
 import { getPublicHomes, getPublicPhotos, getPublicTitles } from "@/lib/queries/profile";
 import { getSkillEvidence } from "@/lib/queries/evidence";
@@ -59,21 +61,6 @@ export async function generateMetadata() {
 }
 
 const ACCENT = "type-accent text-ember-gradient pr-[0.06em]";
-
-// The bento's column spans on a six-column grid: the first two facts sit beside
-// the story; the rest fill whole rows — threes, then pairs for what is left —
-// so however many facts the data holds, no row ends in a gap.
-const SPAN = { 2: "md:col-span-2", 3: "md:col-span-3", 6: "md:col-span-6" } as const;
-function factSpan(i: number, count: number, besideStory: boolean): string {
-  const lead = besideStory ? Math.min(2, count) : 0;
-  if (i < lead) return SPAN[2];
-  const n = count - lead;
-  const k = i - lead;
-  if (n === 1) return SPAN[6];
-  // Pairs cover the tail when threes would leave one or two over.
-  const pairs = n % 3 === 0 ? 0 : n % 3 === 2 ? 2 : 4;
-  return k >= n - pairs ? SPAN[3] : SPAN[2];
-}
 
 export default async function AboutPage() {
   const [profile, titles, photos, homes, row, method, evidence, skills, categories, guide, cv, published] = await Promise.all([
@@ -112,11 +99,11 @@ export default async function AboutPage() {
 
   // Bento facts — each from data; a missing fact is simply not shown.
   const facts = [
-    profile.location && { icon: MapPin, label: "Based in", value: profile.location, note: null },
-    row?.buildingSinceYear && { icon: CalendarDays, label: "Building since", value: String(row.buildingSinceYear), note: null },
-    study && { icon: GraduationCap, label: "Studying", value: study.label, note: study.detail },
-    ...companies.map((c) => ({ icon: Building2, label: c.role!, value: c.name, note: `${c.publishedSystems} published ${c.publishedSystems === 1 ? "system" : "systems"}` })),
-  ].filter((f): f is { icon: LucideIcon; label: string; value: string; note: string | null } => Boolean(f));
+    profile.location && { label: "Based in", value: profile.location, note: null },
+    row?.buildingSinceYear && { label: "Building since", value: String(row.buildingSinceYear), note: null },
+    study && { label: "Studying", value: study.label, note: study.detail },
+    ...companies.map((c) => ({ label: c.role!, value: c.name, note: `${c.publishedSystems} published ${c.publishedSystems === 1 ? "system" : "systems"}` })),
+  ].filter((f): f is { label: string; value: string; note: string | null } => Boolean(f));
 
   // Skills by category, the strongest evidence first — no typed-in order (D-012).
   const provenSkills = skills.filter((s) => s.systemCount > 0).sort((a, b) => b.systemCount - a.systemCount || a.name.localeCompare(b.name));
@@ -204,19 +191,18 @@ export default async function AboutPage() {
         </Container>
       </section>
 
-      {/* ─── 2. In my own words — a bento ─── */}
+      {/* ─── 2. In my own words — the story beside one fact sheet (D-051) ─── */}
       {(story.length > 0 || facts.length > 0) && (
         <section aria-labelledby="story-title" className="bg-paper relative py-20 md:py-28">
-          <DotPattern width={22} height={22} cr={1} className="pointer-events-none absolute inset-x-0 top-0 h-72 fill-[rgb(11_12_14/0.07)] [mask-image:linear-gradient(to_bottom,#000,transparent)]" />
           <Container className="relative">
-            <p id="story-title" className="type-eyebrow text-slate">
-              {storyCopy.eyebrow}
-            </p>
-            <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="mt-6 h-auto w-full max-w-xs rounded-[1.5rem] border border-black/10 shadow-soft lg:hidden" />
-            <div className="mt-8 grid auto-rows-auto grid-cols-1 gap-4 md:grid-cols-6">
+            <HeroLabel tone="light">
+              <span id="story-title">{storyCopy.eyebrow}</span>
+            </HeroLabel>
+            <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="shadow-soft mt-6 h-auto w-full max-w-xs rounded-[1.5rem] border border-black/10 lg:hidden" />
+            <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-12">
               {story.length > 0 && (
-                <Reveal className="md:col-span-4 md:row-span-2">
-                  <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={360}>
+                <Reveal className="lg:col-span-7">
+                  <MagicCard className="shadow-soft h-full rounded-3xl" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={360}>
                     <article className="space-y-5 p-7 md:p-10">
                       {story.map((p, i) => (
                         <p key={i} className={i === 0 ? "text-ink font-serif text-xl leading-snug md:text-2xl md:leading-snug" : "text-ink/80 font-serif text-lg leading-relaxed"}>
@@ -227,22 +213,23 @@ export default async function AboutPage() {
                   </MagicCard>
                 </Reveal>
               )}
-              {facts.map((f, i) => (
-                <Reveal key={`${f.label}:${f.value}`} delay={i * 70} className={factSpan(i, facts.length, story.length > 0)}>
-                  <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={260}>
-                    <div className="flex h-full items-start gap-4 p-6">
-                      <span className="bg-ink text-paper grid size-11 shrink-0 place-items-center rounded-2xl">
-                        <f.icon aria-hidden="true" className="size-5" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="text-slate block text-xs font-medium tracking-wide uppercase">{f.label}</span>
-                        <span className="text-ink mt-1 block font-sans text-lg font-semibold leading-snug">{f.value}</span>
-                        {f.note && <span className="text-slate mt-1 block text-sm">{f.note}</span>}
-                      </span>
-                    </div>
+              {facts.length > 0 && (
+                <Reveal delay={80} className={story.length > 0 ? "lg:col-span-5" : "lg:col-span-12"}>
+                  <MagicCard className="shadow-soft h-full rounded-3xl" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={300}>
+                    <dl className="divide-ink/10 flex h-full flex-col justify-center divide-y px-7 py-3 md:px-8">
+                      {facts.map((f) => (
+                        <div key={`${f.label}:${f.value}`} className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-4">
+                          <dt className="text-slate pt-0.5 font-mono text-xs">{f.label}</dt>
+                          <dd className="min-w-0">
+                            <span className="text-ink block font-sans text-[17px] leading-snug font-semibold">{f.value}</span>
+                            {f.note && <span className="text-slate mt-0.5 block text-sm">{f.note}</span>}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </MagicCard>
                 </Reveal>
-              ))}
+              )}
             </div>
           </Container>
         </section>
@@ -255,10 +242,8 @@ export default async function AboutPage() {
           <Container className="relative">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
               <div className="min-w-0 lg:col-span-5">
-                <p className="text-mist inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase">
-                  <Rocket aria-hidden="true" className="text-ember size-3.5" /> {methodCopy.eyebrow}
-                </p>
-                <h2 id="method-title" className="type-h2 mt-4">
+                <HeroLabel>{methodCopy.eyebrow}</HeroLabel>
+                <h2 id="method-title" className="type-h2 mt-5">
                   <Accent text={methodCopy.title ?? ""} className={ACCENT} />
                 </h2>
               </div>
@@ -266,20 +251,25 @@ export default async function AboutPage() {
                 <p className="text-paper/90 font-serif text-xl leading-snug italic md:text-2xl">&ldquo;{method.mission}&rdquo;</p>
               </blockquote>
             </div>
-            <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Each principle a full row, so the grid never leaves a hole (D-051). */}
+            <ol className="mt-12 grid grid-cols-1 gap-4">
               {method.principles.map((p, i) => {
                 const claims = claimsFor(evidence.claims, `principle:${p.name}`);
                 return (
-                  <li key={p.name} className={i === 0 ? "md:col-span-2 lg:col-span-2" : undefined}>
+                  <li key={p.name}>
                     <Reveal delay={i * 70} className="h-full">
-                      <MagicCard className="relative h-full rounded-3xl" surface="rgb(16 18 22 / 0.94)" gradientSize={240}>
-                        {i === 0 && <BorderBeam size={160} duration={10} colorFrom="#FF5B1F" colorTo="#FFB547" />}
-                        <div className="flex h-full flex-col p-6 md:p-7">
-                          <span className="text-ember font-mono text-sm">{String(i + 1).padStart(2, "0")}</span>
-                          <h3 className="mt-3 font-sans text-xl font-semibold tracking-tight">{p.name}</h3>
-                          <p className="text-ember/90 mt-1 font-serif italic">{p.summary}</p>
-                          <p className="text-mist mt-3 leading-relaxed">{p.body}</p>
-                          {claims.length > 0 && <Evidence claims={claims} label={p.name} commit={evidence.source.commit} className="mt-5 self-start" />}
+                      <MagicCard className="relative h-full rounded-3xl" surface="rgb(16 18 22 / 0.94)" gradientSize={300}>
+                        {i === 0 && <BorderBeam size={180} duration={10} colorFrom="#FF5B1F" colorTo="#FFB547" />}
+                        <div className="grid grid-cols-1 gap-x-10 gap-y-3 p-6 md:p-8 lg:grid-cols-12">
+                          <div className="min-w-0 lg:col-span-5">
+                            <span className="text-ember font-mono text-sm">{String(i + 1).padStart(2, "0")}</span>
+                            <h3 className="mt-2 font-sans text-xl font-semibold tracking-tight md:text-2xl">{p.name}</h3>
+                            <p className="text-ember/90 mt-1.5 font-serif text-[17px] italic">{p.summary}</p>
+                          </div>
+                          <div className="min-w-0 lg:col-span-7 lg:pt-7">
+                            <p className="text-mist leading-relaxed md:text-[17px]">{p.body}</p>
+                            {claims.length > 0 && <Evidence claims={claims} label={p.name} commit={evidence.source.commit} className="mt-5" />}
+                          </div>
                         </div>
                       </MagicCard>
                     </Reveal>
@@ -297,8 +287,8 @@ export default async function AboutPage() {
           <Container>
             <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
               <div className="min-w-0 lg:col-span-5">
-                <p className="type-eyebrow text-slate">{skillsCopy.eyebrow}</p>
-                <h2 id="skills-title" className="type-h2 text-ink mt-4">
+                <HeroLabel tone="light">{skillsCopy.eyebrow}</HeroLabel>
+                <h2 id="skills-title" className="type-h2 text-ink mt-5">
                   <Accent text={skillsCopy.title ?? ""} className={ACCENT} />
                 </h2>
                 {skillsCopy.description && <p className="text-slate mt-5 max-w-md leading-relaxed">{skillsCopy.description}</p>}
@@ -307,40 +297,60 @@ export default async function AboutPage() {
                 <SkillOrbit skills={provenSkills.map((s) => ({ name: s.name, count: s.systemCount }))} />
               </div>
             </div>
-            <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {groups.map((g, gi) => (
-                <Reveal key={g.key} delay={gi * 60} className="h-full">
-                  <MagicCard className="h-full rounded-3xl shadow-soft" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={260}>
-                    <div className="p-6">
-                      <h3 className="text-ink flex items-baseline justify-between gap-3 font-sans text-base font-semibold">
-                        {g.label}
-                        <span className="text-slate font-mono text-xs font-normal">{g.skills.filter((s) => s.systemCount > 0).length}/{g.skills.length} proven</span>
-                      </h3>
-                      <ul className="mt-4 flex flex-wrap gap-2">
-                        {g.skills.map((s) => (
-                          <li key={s.skillId}>
-                            {s.systemCount > 0 ? (
-                              <Link
-                                href={`/systems?tech=${encodeURIComponent(s.name)}`}
-                                aria-label={`${s.name} — used in ${s.systemCount} published system${s.systemCount === 1 ? "" : "s"}`}
-                                className="border-ink/15 bg-paper text-ink hover:border-ember/50 focus-visible:outline-ember inline-flex items-center gap-2 rounded-full border py-1 pr-1 pl-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
-                              >
-                                <SkillIcon name={s.name} className="size-3.5" />
-                                {s.name}
-                                <span aria-hidden="true" className="bg-ember/15 text-accent rounded-full px-1.5 font-mono text-[11px]">
-                                  {s.systemCount}
-                                </span>
-                              </Link>
-                            ) : (
-                              <span className="border-ink/10 text-slate inline-flex items-center rounded-full border border-dashed px-2.5 py-1 text-sm">{s.name}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </MagicCard>
-                </Reveal>
-              ))}
+            {/* Masonry columns: each category at its own height, so a long list never leaves its neighbours with empty cards (D-051). */}
+            <div className="mt-12 gap-4 md:columns-2 xl:columns-3 [&>*]:mb-4 [&>*]:break-inside-avoid">
+              {groups.map((g, gi) => {
+                const proven = g.skills.filter((s) => s.systemCount > 0);
+                const rest = g.skills.filter((s) => s.systemCount === 0);
+                return (
+                  <Reveal key={g.key} delay={gi * 60}>
+                    <MagicCard className="shadow-soft rounded-3xl" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.06)" gradientSize={260}>
+                      {/* A phone: each category opens in place, the two strongest open (D-051). Wider: always open. */}
+                      <SkillCategory
+                        openOnPhone={gi < 2}
+                        summary={
+                          <summary className="press flex min-h-14 cursor-pointer list-none items-baseline justify-between gap-3 px-6 pt-5 pb-4 md:pointer-events-none md:cursor-default [&::-webkit-details-marker]:hidden">
+                            <h3 className="text-ink font-sans text-base font-semibold">{g.label}</h3>
+                            <span className="text-slate flex items-center gap-2 font-mono text-xs">
+                              {proven.length}/{g.skills.length} proven
+                              <ChevronDown aria-hidden="true" className="size-4 transition-transform duration-300 group-open/s:rotate-180 md:hidden" />
+                            </span>
+                          </summary>
+                        }
+                      >
+                        <div className="px-6 pb-6">
+                          {proven.length > 0 && (
+                            <ul className="border-ink/10 divide-ink/10 divide-y border-t">
+                              {proven.map((s) => (
+                                <li key={s.skillId}>
+                                  <Link
+                                    href={`/systems?tech=${encodeURIComponent(s.name)}`}
+                                    aria-label={`${s.name} — used in ${s.systemCount} published system${s.systemCount === 1 ? "" : "s"}`}
+                                    className="group/k press text-ink focus-visible:outline-ember flex min-h-11 items-center gap-3 py-2 text-[15px] focus-visible:outline-2 focus-visible:-outline-offset-2"
+                                  >
+                                    <SkillIcon name={s.name} className="size-4 shrink-0" />
+                                    <span className="group-hover/k:text-accent min-w-0 flex-1 transition-colors">{s.name}</span>
+                                    <span className="text-slate font-mono text-xs tabular-nums">
+                                      {s.systemCount} {s.systemCount === 1 ? "system" : "systems"}
+                                    </span>
+                                    <ArrowRight aria-hidden="true" className="text-slate group-hover/k:text-accent size-3.5 shrink-0 transition-[transform,color] group-hover/k:translate-x-0.5" />
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {rest.length > 0 && (
+                            <p className="text-slate mt-3 text-sm leading-relaxed">
+                              <span className="text-ink/70 font-medium">Also: </span>
+                              {rest.map((s) => s.name).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      </SkillCategory>
+                    </MagicCard>
+                  </Reveal>
+                );
+              })}
             </div>
           </Container>
         </section>
@@ -354,10 +364,10 @@ export default async function AboutPage() {
               <Accent text={closeCopy.title ?? ""} className={ACCENT} />
             </h2>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/contact" className="bg-ember text-ink shadow-glow-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium">
+              <Link href="/contact" className="press bg-ember text-ink shadow-glow-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium">
                 Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
-              <Link href="/journey" className="text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+              <Link href="/journey" className="press text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
                 The journey
               </Link>
             </div>
