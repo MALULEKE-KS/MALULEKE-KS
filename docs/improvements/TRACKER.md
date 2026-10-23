@@ -409,3 +409,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Built (not pushed):** the card's one anatomy with real screenshots, the home groups (wide card for one, halves for two, "On GitHub ↗"), the sticky toolbar with chips, the phone's filter sheet, the empty state, the skeleton; e2e `systems-catalog.spec.ts` (rows end together, one capsule, the in-site arrow, the toolbar stays in reach, the sheet's 44 px options, the empty state).
 - **Kept from WP-108:** a quiet card says nothing about its quiet (the plan's mock had "No commits in 26 weeks").
 - **Next:** typecheck/lint clean; the owner's local review (memory permitting), then push, CI, merge; then Journey, planned the same way.
+
+### 2026-10-23 · Systems shipped (PR #244, live cf4ebf3); the Journey pass (D-050; branch `sprint-2/journey-premium`)
+- **Systems:** merged after CI (one real failure caught by the new e2e — Magic Card's content didn't fill the card, so footers in a row didn't line up; fixed for every Magic Card); production verified.
+- **Owner (away):** pre-approved the remaining passes — plan, build, polish, push, merge, deploy, next — with every PR merged before the next phase; "premium styling preserved … and improved".
+- **Journey:** plan published ("MALULEKE-KS Journey Plan"); built per D-050 with a polish pass (numerals that fill, the Now wash, row hover); e2e `journey.spec.ts`; phone 5,923 → 4,660 px, 0 small taps, 0 tiny text.
+- **Next:** PR, CI, merge, verify; then About.

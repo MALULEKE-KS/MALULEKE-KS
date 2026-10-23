@@ -680,18 +680,18 @@ html {
   }
 }
 
-/* The catalogue's toolbar (/systems, D-049): it sticks just under the floating header
-   while you scroll, and rises to the top when the header slips away (HeaderFrame sets
-   data-header on <html>). */
-.catalog-toolbar {
+/* What sticks under the floating header — the catalogue's toolbar (/systems, D-049),
+   Journey's chapter index (D-050): just under the header while you scroll, rising to
+   the top when the header slips away (HeaderFrame sets data-header on <html>). */
+.under-header {
   top: 4.75rem;
   transition: top 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-html[data-header="hidden"] .catalog-toolbar {
+html[data-header="hidden"] .under-header {
   top: 0.75rem;
 }
 @media (prefers-reduced-motion: reduce) {
-  .catalog-toolbar {
+  .under-header {
     transition: none;
   }
 }

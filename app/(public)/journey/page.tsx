@@ -7,12 +7,13 @@
 //      headline and introduction over his Journey image, then one hairline row
 //      of live figures from his own data (years on the journey, chapters,
 //      milestones, chapters happening now).
-//   2. Chapters — a glass chapter bar that sticks while you read (scroll-spy),
-//      then a scroll-driven timeline: an ember beam filling the rail, a lit
-//      node per chapter, spotlight cards on alternating sides, a shine border
-//      on the chapters he's living now, moments fading in one by one.
-//   3. What's next — a glass card with a shine border, his ambition, a live
-//      "months to go" to what's next, Let's talk and his CV.
+//   2. Chapters (premium pass, D-050) — a quiet index that sticks under the
+//      header while you read (scroll-spy), then one editorial column: the years
+//      and place in a margin beside each chapter, a rail whose ember beam grows
+//      with the scroll and lights each chapter's dot, the moments as a ruled list.
+//   3. What's next — an open graphite band: his ambition, the actions, and the
+//      next milestone once, large — a live "months to go" when its month is
+//      known, its year when only the year is.
 // Words are his content block (Admin → Page content → Journey) and the
 // page-copy block; dates are his milestones (Admin → Journey); every number is
 // computed. No GitHub entries — the systems live on /systems.
@@ -24,8 +25,6 @@ import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/Her
 import { Container } from "@/components/shared/Container";
 import { Accent } from "@/components/shared/Accent";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { DotPattern } from "@/components/ui/dot-pattern";
 import { ChapterNav } from "@/components/journey/ChapterNav";
 import { ChapterTimeline, type TimelineChapter } from "@/components/journey/ChapterTimeline";
 import { getJourney } from "@/lib/queries/journey";
@@ -104,62 +103,54 @@ export default async function JourneyPage() {
       </section>
 
       {/* ─── 2. Chapters ─── */}
-      <section aria-label="The chapters" className="bg-paper relative pb-20 md:pb-28">
-        <DotPattern width={22} height={22} cr={1} className="pointer-events-none absolute inset-x-0 top-0 h-72 fill-[rgb(11_12_14/0.07)] [mask-image:linear-gradient(to_bottom,#000,transparent)]" />
+      <section aria-label="The chapters" className="bg-paper relative pt-10 pb-12 md:pt-14 md:pb-16">
         <Container className="relative">
           <ChapterNav chapters={timeline.map((c) => ({ id: c.id, years: c.years, title: c.title, current: c.current }))} aheadTitle={ahead?.title ?? null} />
           <ChapterTimeline chapters={timeline} />
         </Container>
       </section>
 
-      {/* ─── 3. What's next ─── */}
+      {/* ─── 3. What's next — an open band; the next milestone said once (D-050) ─── */}
       {ahead && (
         <section id="ahead" aria-labelledby="ahead-title" className="hero-field text-paper relative scroll-mt-24 overflow-hidden py-20 md:py-28">
           <Container className="relative">
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl md:p-12">
-              <ShineBorder borderWidth={1.5} duration={16} />
-              <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end">
-                <div className="min-w-0 lg:col-span-8">
-                  <p className="text-mist inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase">
-                    <span className="border-ember/60 size-2 rounded-full border border-dashed" />
-                    {aheadCopy.eyebrow}
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-end lg:gap-16">
+              <div className="min-w-0 lg:col-span-7">
+                <HeroLabel>{aheadCopy.eyebrow}</HeroLabel>
+                <h2 id="ahead-title" className="type-h2 mt-5">
+                  {ahead.title}
+                </h2>
+                <p className="type-lede text-paper/85 mt-5 max-w-2xl">{ahead.body}</p>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/contact" className="press bg-ember text-ink focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+                    Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
+                  </Link>
+                  {cv && (
+                    <a href={cv.url} className="press text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+                      <FileText aria-hidden="true" className="size-4" /> Get my CV
+                    </a>
+                  )}
+                </div>
+              </div>
+              {next && (
+                <div id={`entry-${next.id}`} className="min-w-0 scroll-mt-28 border-t border-white/15 pt-6 lg:col-span-5">
+                  {/* A countdown only when the date is known to the month; a year-only milestone shows its year (never an invented day). */}
+                  <p className="type-data text-ember-gradient text-7xl font-semibold tracking-tight md:text-8xl">
+                    {monthsToGo !== null && monthsToGo > 0 ? <NumberTicker value={monthsToGo} /> : formatMilestoneDate(next.date, next.precision)}
                   </p>
-                  <h2 id="ahead-title" className="type-h2 mt-4">
-                    {ahead.title}
-                  </h2>
-                  <p className="type-lede text-paper/85 mt-5 max-w-2xl">{ahead.body}</p>
-                  {ahead.moments.length > 0 && (
-                    <ul className="mt-7 flex flex-wrap gap-2">
-                      {ahead.moments.map((m) => (
-                        <li key={m.id} id={`entry-${m.id}`} className="rounded-full border border-dashed border-white/25 px-4 py-2 text-sm">
-                          <span className="text-ember font-mono">{formatMilestoneDate(m.date, m.precision)}</span> <span className="text-paper">{m.title}</span>
+                  <p className="text-mist mt-3 text-sm">{monthsToGo !== null && monthsToGo > 0 ? `months to go · ${next.title}` : next.title}</p>
+                  {ahead.moments.length > 1 && (
+                    <ul aria-label="Further milestones" className="mt-6 border-t border-white/10">
+                      {ahead.moments.slice(1).map((m) => (
+                        <li key={m.id} id={`entry-${m.id}`} className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-4 border-b border-white/10 py-3 text-sm">
+                          <span className="text-ember font-mono text-xs">{formatMilestoneDate(m.date, m.precision)}</span>
+                          <span className="text-paper">{m.title}</span>
                         </li>
                       ))}
                     </ul>
                   )}
-                  <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                    <Link href="/contact" className="bg-ember text-ink shadow-glow-ember focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
-                      Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
-                    </Link>
-                    {cv && (
-                      <a href={cv.url} className="text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
-                        <FileText aria-hidden="true" className="size-4" /> Get my CV
-                      </a>
-                    )}
-                  </div>
                 </div>
-                {next && (
-                  <div className="min-w-0 lg:col-span-4">
-                    <div className="bg-night/60 rounded-3xl border border-white/10 p-6 text-center">
-                      {/* A countdown only when the date is known to the month; a year-only milestone shows its year (never an invented day). */}
-                      <p className="type-data text-ember-gradient text-6xl font-semibold tracking-tight md:text-7xl">
-                        {monthsToGo !== null && monthsToGo > 0 ? <NumberTicker value={monthsToGo} /> : formatMilestoneDate(next.date, next.precision)}
-                      </p>
-                      <p className="text-mist mt-2 text-sm">{monthsToGo !== null && monthsToGo > 0 ? `months to go · ${next.title}` : next.title}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </Container>
         </section>
