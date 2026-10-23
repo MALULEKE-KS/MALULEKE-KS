@@ -9,6 +9,7 @@
 // block, never a flex column — in a flex column a child's `mx-auto` turns
 // off stretch and the page collapses to its content width.
 
+import { ViewTransition } from "react";
 import { connection } from "next/server";
 import { SiteHeader } from "@/components/shared/SiteHeader";
 import { SiteFooter } from "@/components/shared/SiteFooter";
@@ -135,7 +136,10 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
           />
           {/* At least a screen tall: while a page streams in, the footer stays below the fold instead of sitting in view and being pushed down (layout shift). */}
           <main id="main" className="min-h-svh flex-1">
-            {children}
+            {/* Moving between pages is one quiet cross-fade (D-055, the owner's choice D1): React's ViewTransition on the
+                browser's View Transitions; the header holds still (its own transition name). No support, or reduced
+                motion: pages switch as before. */}
+            <ViewTransition>{children}</ViewTransition>
           </main>
           <SiteFooter
             profile={profile}

@@ -430,3 +430,7 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Let's talk:** merged after CI; production verified.
 - **Case studies:** plan published ("MALULEKE-KS Case Study Plan"); built per D-053; e2e `case-study.spec.ts`. The local dev server was stopped by the machine's memory guard mid-session, so this one is verified on CI (its e2e, mobile and accessibility runs and screenshots).
 - **Next:** PR, CI, merge, verify — then the premium pass is complete across every public page (home, Systems, Journey, About, Let's talk, case studies).
+
+### 2026-10-23 · Integration sweep in progress (D-054, D-055; branch `sprint-2/integration`, not pushed)
+- **Done (committed locally):** U13 — image versions replaced, never deleted unless the owner asks (migration `20261023120000_version_delete_on_request`, BR-1.17/1.18 amended, DELETE routes with `{ confirm: true }`, screenshot history + restore + delete in Admin, `ConfirmDelete`, `tests/integration/image-history.test.ts` 4/4), each case study's hero is its screenshot; U1–U9, U11 (shared buttons, `AiBadge`, `type-micro`, two radii, two spacing rhythms, → / ↗, Reveal visible at rest, one focus ring, 404/error on the hero shape, the guide's question rows and one line of fine print); U10 page cross-fade (React ViewTransition, header held still).
+- **Open:** D-054/D-055 rows in DECISIONS.md; U12 header + phone navigation waits for the owner's D2 (bottom dock A vs richer menu B); then verify (typecheck clean; run unit, integration, e2e on CI), push, PR, merge; then the Admin audit and plan.
