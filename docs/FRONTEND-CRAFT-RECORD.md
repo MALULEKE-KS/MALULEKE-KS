@@ -134,3 +134,5 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 ### 2026-10-23 · The Journey page's premium pass (D-050)
 - **Method:** the same audit → published plan → build → polish loop, on the owner's advance approval.
 - **Motion with meaning:** Motion `useScroll` drives the rail's beam, each chapter's dot and its margin numeral (an outline that fills with ember once reached); the chapter index's underline follows the reader (IntersectionObserver) and slides into view on a phone. The current chapters' faint ember wash replaces the shining borders. Magic Card, Shine Border and Dot Pattern leave the page.
+### 2026-10-23 · The About page's premium pass (D-051)
+- **Premium kept, then raised:** Magic UI Magic Card surfaces, Border Beam and Orbiting Circles (the skill orbit) stay; the bento of icon tiles becomes one ruled fact sheet; the method becomes full-width row-cards; the chip walls become proof rows in CSS masonry columns; native `<details>` fold the weaker skill categories on a phone (a small client component folds them after load, so the server and no-script views stay complete).
