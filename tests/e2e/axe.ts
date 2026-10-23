@@ -33,6 +33,10 @@ async function settleSections(page: Page) {
 }
 
 export async function seriousViolations(page: Page, tags: string[] = AXE_TAGS): Promise<string[]> {
+  // The site scrolls smoothly (globals.css). Axe scrolls each element into view and samples what is under it at
+  // once — mid-glide, that's whichever band is passing (night, night-deep), not the element's own. Scrolling is
+  // made instant while axe measures; it's an animation, not a colour.
+  const instant = await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
   await settleSections(page);
   const found: string[] = [];
   const chrome = (await page.locator(CHROME).count()) > 0;
@@ -40,5 +44,6 @@ export async function seriousViolations(page: Page, tags: string[] = AXE_TAGS): 
   const aside = chrome ? await page.addStyleTag({ content: `${CHROME} { visibility: hidden !important; }` }) : null;
   found.push(...serious((await new AxeBuilder({ page }).withTags(tags).analyze()).violations));
   await aside?.evaluate((el) => (el as Element).remove());
+  await instant.evaluate((el) => (el as Element).remove());
   return found;
 }
