@@ -40,11 +40,11 @@ export function CategoryPicker({ categories, fromGuide, onChoose, title, descrip
           const Icon = CATEGORY_ICON[form];
           return (
             <li key={c.value} className={cn(i === categories.length - 1 && categories.length % 2 === 1 && "sm:col-span-2")}>
-              <MagicCard className="h-full rounded-2xl" surface="var(--color-paper)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.08)" gradientSize={240}>
+              <MagicCard className="shadow-soft hover:shadow-lift h-full rounded-2xl transition-[box-shadow,transform] duration-300 motion-safe:hover:-translate-y-0.5" surface="var(--color-sheet)" rest="rgb(11 12 14 / 0.1)" spotlight="rgb(255 91 31 / 0.08)" gradientSize={240}>
                 <button
                   type="button"
                   onClick={() => onChoose(c.value)}
-                  className="group/tile focus-visible:outline-ember flex h-full w-full items-start gap-4 rounded-2xl p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="group/tile press focus-visible:outline-ember flex h-full w-full items-start gap-4 rounded-2xl p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
                 >
                   <span className="bg-ink text-paper group-hover/tile:bg-ember group-hover/tile:text-ink grid size-11 shrink-0 place-items-center rounded-xl transition-colors">
                     <Icon aria-hidden="true" className="size-5" />

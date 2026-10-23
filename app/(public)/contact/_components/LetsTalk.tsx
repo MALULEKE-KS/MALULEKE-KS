@@ -143,10 +143,12 @@ export function LetsTalk({ categories, initialCategory, email, ownerFirstName, r
 
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-      <div ref={top} className="border-ink/10 bg-sheet shadow-soft min-w-0 scroll-mt-24 rounded-3xl border p-5 sm:p-8 md:p-10 lg:col-span-8">
+      {/* The topics stand on the page; once one is chosen, the form gets its working sheet (D-052). */}
+      <div ref={top} className={cn("min-w-0 scroll-mt-24 lg:col-span-8", filling && "border-ink/10 bg-sheet shadow-soft rounded-3xl border p-5 sm:p-8 md:p-10")}>
         {body}
       </div>
-      <aside className="min-w-0 space-y-5 lg:sticky lg:top-24 lg:col-span-4">
+      {/* Sticks under the floating header, rising when it slips away (.under-header, D-052). */}
+      <aside className="under-header min-w-0 space-y-5 lg:sticky lg:col-span-4">
         {filling && (
           <nav aria-label="Your progress" className="bg-night text-paper shadow-lift relative overflow-hidden rounded-2xl border border-white/10 p-6">
             {/* Everything it needs is there: the card lights up. */}
