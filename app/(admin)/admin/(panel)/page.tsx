@@ -18,7 +18,6 @@ import { siteUrl } from "@/lib/site-url";
 import { FLAGS, isFlagOn } from "@/lib/flags";
 import { describeActivity, describeActor } from "@/lib/admin/activity";
 import { STATUS_LABEL } from "@/lib/rules/inquiries";
-import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -159,29 +158,48 @@ export default async function AdminDashboardPage() {
         <Stat label="CV readiness" value={`${overview.cv.score}%`} href="/admin/cv" tone={overview.cv.ready ? "good" : "attention"} />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Panel title="Recent inquiries" actions={<Link href="/admin/inquiries" className="text-accent text-xs font-medium">All inquiries</Link>}>
-          {recentInquiries.length === 0 ? (
-            <p className="text-slate text-sm">No inquiries yet.</p>
-          ) : (
-            <ul className="divide-ink/10 divide-y">
-              {recentInquiries.map((i) => (
-                <li key={i.id} className="py-2.5 first:pt-0 last:pb-0">
-                  <Link href={`/admin/inquiries/${i.id}`} className="group flex items-center justify-between gap-3">
-                    <span className="min-w-0">
-                      <span className="text-ink group-hover:text-accent block truncate text-sm font-medium">{i.anonymizedAt ? "Anonymised" : i.name}</span>
-                      <span className="text-slate block text-xs">
-                        {i.inquiryType.label} · {formatWhen(i.createdAt)}
+      {/* Two columns that each keep their own height: inquiries over activity, the curation queue beside them. */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
+          <Panel title="Recent inquiries" actions={<Link href="/admin/inquiries" className="text-accent text-xs font-medium">All inquiries</Link>}>
+            {recentInquiries.length === 0 ? (
+              <p className="text-slate text-sm">No inquiries yet.</p>
+            ) : (
+              <ul className="divide-ink/10 divide-y">
+                {recentInquiries.map((i) => (
+                  <li key={i.id} className="py-2.5 first:pt-0 last:pb-0">
+                    <Link href={`/admin/inquiries/${i.id}`} className="group flex items-center justify-between gap-3">
+                      <span className="min-w-0">
+                        <span className="text-ink group-hover:text-accent block truncate text-sm font-medium">{i.anonymizedAt ? "Anonymised" : i.name}</span>
+                        <span className="text-slate block text-xs">
+                          {i.inquiryType.label} · {formatWhen(i.createdAt)}
+                        </span>
                       </span>
-                    </span>
-                    <Pill tone={i.status === "NEW" ? "attention" : "neutral"}>{STATUS_LABEL[i.status]}</Pill>
-                  </Link>
+                      <Pill tone={i.status === "NEW" ? "attention" : "neutral"}>{STATUS_LABEL[i.status]}</Pill>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title="Recent activity"
+            description={`${overview.audit.changesLast7Days} changes in the last 7 days`}
+            actions={<Link href="/admin/activity-log" className="text-accent text-xs font-medium">Full log</Link>}
+          >
+            <ul className="divide-ink/10 divide-y">
+              {recentActivity.map((e) => (
+                <li key={e.id} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                  <span className="text-ink min-w-0 truncate text-sm">{describeActivity(e.action).sentence}</span>
+                  <span className="text-slate shrink-0 text-xs">
+                    {describeActor(e.actorType, e.adminUser?.email ?? null)} · {formatWhen(e.createdAt)}
+                  </span>
                 </li>
               ))}
             </ul>
-          )}
-        </Panel>
-
+          </Panel>
+        </div>
         {curation.length > 0 && (
           <Panel title="Waiting to be looked over" description="Synced from GitHub; opening and saving clears the flag (BR-1.8)">
             <ul className="divide-ink/10 divide-y">
@@ -197,23 +215,6 @@ export default async function AdminDashboardPage() {
           </Panel>
         )}
 
-        <Panel
-          title="Recent activity"
-          description={`${overview.audit.changesLast7Days} changes in the last 7 days`}
-          actions={<Link href="/admin/activity-log" className="text-accent text-xs font-medium">Full log</Link>}
-          className={cn(curation.length === 0 && "lg:col-span-1")}
-        >
-          <ul className="divide-ink/10 divide-y">
-            {recentActivity.map((e) => (
-              <li key={e.id} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
-                <span className="text-ink min-w-0 truncate text-sm">{describeActivity(e.action).sentence}</span>
-                <span className="text-slate shrink-0 text-xs">
-                  {describeActor(e.actorType, e.adminUser?.email ?? null)} · {formatWhen(e.createdAt)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Panel>
       </div>
     </>
   );

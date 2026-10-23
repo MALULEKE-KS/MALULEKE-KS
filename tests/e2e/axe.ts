@@ -20,7 +20,20 @@ function serious(violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violati
     .map((v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}${v.nodes[0]?.any[0]?.message ? ` — ${v.nodes[0].any[0].message}` : ""}`);
 }
 
+/** Scroll through the page once, as a reader does, so every section has risen into place (Reveal) before axe measures it. */
+async function settleSections(page: Page) {
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += 500) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    window.scrollTo(0, 0);
+    await new Promise((r) => setTimeout(r, 800)); // the rise is 700 ms
+  });
+}
+
 export async function seriousViolations(page: Page, tags: string[] = AXE_TAGS): Promise<string[]> {
+  await settleSections(page);
   const found: string[] = [];
   const chrome = (await page.locator(CHROME).count()) > 0;
   if (chrome) found.push(...serious((await new AxeBuilder({ page }).withTags(tags).include(CHROME).analyze()).violations).map((v) => `chrome: ${v}`));
