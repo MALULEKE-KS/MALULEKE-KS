@@ -107,7 +107,7 @@ export function CatalogFilters({ facets, params, total, systemsTotal }: { facets
               href={href(params, { sort: key === "featured" ? undefined : key })}
               scroll={false}
               aria-current={sort === key ? "true" : undefined}
-              className={cn("press inline-flex min-h-9 items-center rounded-full px-3 transition-colors", sort === key ? "bg-ink text-paper" : "text-slate hover:text-ink")}
+              className={cn("tap-target press inline-flex min-h-9 items-center rounded-full px-3 transition-colors", sort === key ? "bg-ink text-paper" : "text-slate hover:text-ink")}
             >
               {label}
             </Link>
