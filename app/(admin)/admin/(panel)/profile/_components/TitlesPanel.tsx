@@ -81,7 +81,7 @@ export function TitlesPanel({ initial, kinds, education }: { initial: AdminTitle
       actions={editing === null ? <button type="button" onClick={() => start()} className={adminButton.secondary}><Plus aria-hidden="true" /> Add</button> : undefined}
     >
       {editing !== null && (
-        <form onSubmit={save} className="mb-4 grid gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
+        <form onSubmit={save} className="mb-4 grid grid-cols-1 gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label htmlFor="t-label" className={adminLabel}>Title</label>
             <input id="t-label" maxLength={120} className={adminInput} value={draft.label} onChange={(e) => set("label", e.target.value)} placeholder="Software & AI Engineer" />

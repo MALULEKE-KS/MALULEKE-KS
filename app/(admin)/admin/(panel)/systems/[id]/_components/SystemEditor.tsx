@@ -167,7 +167,7 @@ function toWire(f: Form, permissionApplies: boolean) {
 
 function Toggle({ checked, onChange, label, hint, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string; disabled?: boolean }) {
   return (
-    <label className={cn("flex items-start gap-3 rounded-xl border border-ink/10 bg-paper p-3", disabled && "opacity-60")}>
+    <label className={cn("flex items-start gap-3 rounded-xl border border-ink/10 bg-paper p-3", disabled && "border-dashed bg-ink/[0.03]")}>
       <input type="checkbox" className="mt-0.5 size-4 accent-ember" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
       <span>
         <span className="block text-sm font-medium text-ink">{label}</span>
@@ -284,10 +284,10 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
     <>
     <SectionIndex sections={SECTIONS} label="Sections of this system" />
     <LeaveGuard dirty={dirty} changes={Object.keys(patch).length} />
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <form onSubmit={save} className="min-w-0 space-y-6" noValidate>
         <Panel id="sys-system" title="The system" description="Name, address, summary and what it's built with.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="name" className={adminLabel}>Name</label>
               <input id="name" className={adminInput} value={f.name} maxLength={120} onChange={(e) => set("name", e.target.value)} />
@@ -329,7 +329,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         </Panel>
 
         <Panel id="sys-publishing" title="Publishing" description="Who approved it, when it goes live, and who may see what.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="clientVisibility" className={adminLabel}>Client visibility</label>
               <select id="clientVisibility" className={adminInput} value={f.clientVisibility} onChange={(e) => set("clientVisibility", e.target.value as Visibility)}>
@@ -381,7 +381,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         </Panel>
 
         <Panel id="sys-repo" title="Repo ownership" description="Whose repo it is, and the owner's answer when it's someone else's.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="repoRelationship" className={adminLabel}>Relationship</label>
               <select id="repoRelationship" className={adminInput} value={f.repoRelationship} onChange={(e) => set("repoRelationship", e.target.value)}>
@@ -412,7 +412,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         </Panel>
 
         <Panel id="sys-shown" title="Where it's shown" description="Order and placement across the site and the CV. Only published systems ever appear.">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="space-y-3">
               <Toggle checked={f.isFlagship} onChange={(v) => set("isFlagship", v)} label="Flagship" />
               <div>
@@ -438,7 +438,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
         </Panel>
 
         <Panel id="sys-links" title="Links">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="liveUrl" className={adminLabel}>Live site</label>
               <input id="liveUrl" type="url" className={adminInput} value={f.liveUrl} onChange={(e) => set("liveUrl", e.target.value)} placeholder="https://" />
@@ -462,7 +462,7 @@ export function SystemEditor({ now, system, options, history }: { now: number; s
           <textarea id="caseStudyBody" rows={16} className={cn(adminInput, "font-mono text-[0.8125rem] leading-relaxed")} value={f.caseStudyBody} onChange={(e) => set("caseStudyBody", e.target.value)} />
         </Panel>
 
-        <div className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 -mx-1 flex flex-wrap items-center gap-3 rounded-2xl lg:bottom-3 border border-ink/10 bg-sheet/95 p-3 shadow-lift backdrop-blur">
+        <div data-chrome className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 -mx-1 flex flex-wrap items-center gap-3 rounded-2xl lg:bottom-3 border border-ink/10 bg-sheet/95 p-3 shadow-lift backdrop-blur">
           <button type="submit" disabled={saving} className={adminButton.primary}>
             <Save aria-hidden="true" /> {saving ? "Saving…" : dirty ? "Save changes" : "Save"}
           </button>

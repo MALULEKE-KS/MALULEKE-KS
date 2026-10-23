@@ -101,7 +101,7 @@ export function CvManager({ now, experience, education, skills, categories, allS
             )}
           >
             <Icon aria-hidden="true" className="size-4" /> {label}
-            <span className={cn("font-mono text-xs", tab === key ? "text-mist" : "text-slate/70")}>{count}</span>
+            <span className={cn("font-mono text-xs", tab === key ? "text-mist" : "text-slate")}>{count}</span>
           </button>
         ))}
       </div>
@@ -292,7 +292,7 @@ function ExperienceForm({ entry, allSkills, onDone, onCancel }: { entry?: Experi
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div><label htmlFor="x-title" className={adminLabel}>Title</label><input id="x-title" className={adminInput} value={f.title} onChange={(e) => set("title", e.target.value)} /></div>
         <div><label htmlFor="x-org" className={adminLabel}>Organisation</label><input id="x-org" className={adminInput} value={f.organization} onChange={(e) => set("organization", e.target.value)} /></div>
         <div><label htmlFor="x-loc" className={adminLabel}>Location <span className="font-normal text-slate">(optional)</span></label><input id="x-loc" className={adminInput} value={f.location} onChange={(e) => set("location", e.target.value)} /></div>
@@ -406,7 +406,7 @@ function EducationForm({ entry, allSkills, onDone, onCancel }: { entry?: Educati
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div><label htmlFor="e-inst" className={adminLabel}>Institution</label><input id="e-inst" className={adminInput} value={f.institution} onChange={(e) => set("institution", e.target.value)} /></div>
         <div><label htmlFor="e-qual" className={adminLabel}>Qualification</label><input id="e-qual" className={adminInput} value={f.qualification} onChange={(e) => set("qualification", e.target.value)} /></div>
         <div><label htmlFor="e-field" className={adminLabel}>Field of study <span className="font-normal text-slate">(optional)</span></label><input id="e-field" className={adminInput} value={f.fieldOfStudy} onChange={(e) => set("fieldOfStudy", e.target.value)} /></div>
@@ -505,7 +505,7 @@ function SkillForm({ entry, categories, onDone, onCancel }: { entry?: SkillEntry
 
   return (
     <form onSubmit={submit} className="space-y-3 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div><label htmlFor="s-name" className={adminLabel}>Name</label><input id="s-name" className={adminInput} value={name} onChange={(e) => setName(e.target.value)} /></div>
         <div>
           <label htmlFor="s-cat" className={adminLabel}>Category</label>

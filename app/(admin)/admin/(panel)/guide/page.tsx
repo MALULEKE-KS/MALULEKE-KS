@@ -69,7 +69,7 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
               </span>
               <span className="text-xs text-slate">{formatWhen(latest.at)}{latest.model ? ` · ${latest.model}` : ""}</span>
             </p>
-            <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
+            <ul className="mt-3 grid grid-cols-1 gap-1.5 text-sm sm:grid-cols-2">
               {latest.results.map((r) => (
                 <li key={r.id} className="flex items-start gap-2">
                   <Pill tone={r.pass === true ? "good" : r.pass === false ? "critical" : "neutral"}>{r.pass === true ? "pass" : r.pass === false ? "fail" : "n/a"}</Pill>
@@ -106,7 +106,7 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
             <Stat label="Claims the site doesn't contain" value={`${s.claimsFlagged} · ${pct(s.answersFlaggedShare)} of answers`} tone={s.answersFlaggedShare > 0.1 ? "attention" : "neutral"} />
           </div>
 
-          <div className="mb-6 grid gap-4 lg:grid-cols-3">
+          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Panel title="Questions per day" description="Failed turns (busy or error) in the darker part." className="lg:col-span-2">
               <ol className="flex h-32 items-end gap-1" aria-label="Questions per day">
                 {perDay.map((d) => (
@@ -185,7 +185,7 @@ export default async function AdminGuideHealthPage({ searchParams }: { searchPar
           </Panel>
 
           <Panel title="Latest questions" description="Timings and tools only.">
-            <div className="-m-5 overflow-x-auto">
+            <div tabIndex={0} role="region" aria-label="Latest questions, scrolls sideways" className="-m-5 overflow-x-auto focus-visible:outline-2 focus-visible:outline-ember">
               <table className="w-full min-w-[40rem] text-sm">
                 <thead>
                   <tr className="border-b border-ink/10 text-left text-xs text-slate">

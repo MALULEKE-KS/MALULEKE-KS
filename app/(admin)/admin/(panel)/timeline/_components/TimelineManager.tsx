@@ -181,7 +181,7 @@ function TimelineForm({ entry, milestoneTypes, onDone, onCancel }: { entry?: Tim
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="t-type" className={adminLabel}>Milestone type</label>
           <select id="t-type" className={adminInput} value={milestoneTypeId} onChange={(e) => setMilestoneTypeId(e.target.value)}>

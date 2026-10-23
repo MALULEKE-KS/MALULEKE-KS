@@ -191,7 +191,7 @@ export function AdminShell({ data, children }: { data: AdminShellData; children:
 
       <div className="min-w-0 flex-1">
         {/* Phone: the top bar. */}
-        <div className="bg-night-deep text-paper sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-white/10 px-4 lg:hidden">
+        <div data-chrome className="bg-night-deep text-paper sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-white/10 px-4 lg:hidden">
           <Link href="/admin" aria-label="Admin overview" className="flex items-center">
             <BrandMark cut="heavy" className="text-paper h-5" />
           </Link>
@@ -205,7 +205,7 @@ export function AdminShell({ data, children }: { data: AdminShellData; children:
         </div>
 
         {/* Laptop: the page bar — where you are, the public page, search. */}
-        <div className="border-ink/[0.07] bg-paper/85 sticky top-0 z-30 hidden h-14 items-center gap-4 border-b px-8 backdrop-blur lg:flex">
+        <div data-chrome className="border-ink/[0.07] bg-paper/85 sticky top-0 z-30 hidden h-14 items-center gap-4 border-b px-8 backdrop-blur lg:flex">
           <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
             <ol className="text-slate flex items-center gap-1.5 text-sm">
               {group?.label && (
@@ -251,7 +251,7 @@ export function AdminShell({ data, children }: { data: AdminShellData; children:
       </div>
 
       {/* Phone: the dock at the thumb. */}
-      <nav data-dock aria-label="Admin quick navigation" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+      <nav data-dock data-chrome aria-label="Admin quick navigation" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
         <ul className="bg-night-deep/90 mx-auto grid h-16 max-w-md grid-cols-5 items-center rounded-full border border-white/10 p-1 shadow-[0_18px_50px_-14px_rgb(0_0_0/0.6)] backdrop-blur-xl">
           {ADMIN_DOCK.map((href) => {
             const p = ADMIN_PAGES.find((x) => x.href === href)!;

@@ -129,8 +129,8 @@ export function Pill({ children, tone = "neutral" }: { children: React.ReactNode
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-        tone === "attention" && "bg-ember/10 text-accent",
-        tone === "good" && "bg-signal-finished/10 text-signal-finished",
+        tone === "attention" && "bg-ember/10 text-accent-strong",
+        tone === "good" && "bg-signal-finished/10 text-signal-finished-strong",
         tone === "critical" && "bg-critical/10 text-critical",
         tone === "neutral" && "bg-ink/[0.06] text-slate",
       )}

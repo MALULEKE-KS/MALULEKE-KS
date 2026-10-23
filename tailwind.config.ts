@@ -28,10 +28,11 @@ const config: Config = {
           DEFAULT: "#FF5B1F", // on dark (6.31:1) and as a fill with ink text (5.95:1)
           soft: "#FFB547", // gradient partner only
         },
-        accent: { DEFAULT: "#C2410C" }, // ember as text on light (4.63:1 paper, 5.01:1 sheet)
+        accent: { DEFAULT: "#C2410C", strong: "#9A3412" }, // ember as text on light (4.63:1 paper, 5.01:1 sheet); strong: on an ember wash (6.4:1 on ember/10, D-057)
         // Status — data, never decoration (Status.colorToken)
         signal: {
           finished: "#0F7A4B",
+          "finished-strong": "#0B5E3A", // on a finished wash (7:1 on finished/10, D-057)
           progress: "#C2410C",
           planned: "#5B616A",
         },

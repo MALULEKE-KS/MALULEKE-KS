@@ -101,7 +101,7 @@ export function SettingsManager({ platform, flags, lenses, lookups, initialQuery
             )}
           >
             <Icon aria-hidden="true" className="size-4" /> {label}
-            {counts[key] !== undefined && <span className="font-mono text-xs opacity-70">{counts[key]}</span>}
+            {counts[key] !== undefined && <span className="font-mono text-xs">{counts[key]}</span>}
           </button>
         ))}
       </div>
@@ -152,7 +152,7 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
   }
 
   return (
-    <li className="grid gap-3 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <li className="grid grid-cols-1 gap-3 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <div className="min-w-0">
         <p className="text-sm text-ink">{setting.description}</p>
         <p className="mt-0.5 font-mono text-xs text-slate">
@@ -189,7 +189,7 @@ function LookupsSection({ lookups }: { lookups: Record<string, LookupValue[]> })
   const meta = LOOKUP_META[type] ?? { label: type, hint: "" };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
       <nav aria-label="Lookup types" className="flex flex-row flex-wrap gap-1 lg:flex-col">
         {types.map((t) => (
           <button
@@ -200,7 +200,7 @@ function LookupsSection({ lookups }: { lookups: Record<string, LookupValue[]> })
             className={cn("flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm transition-colors", t === type ? "bg-ink text-paper" : "text-slate hover:bg-ink/5 hover:text-ink")}
           >
             {LOOKUP_META[t]?.label ?? t}
-            <span className={cn("font-mono text-xs", t === type ? "text-mist" : "text-slate/70")}>{lookups[t]?.filter((v) => v.active).length ?? 0}</span>
+            <span className={cn("font-mono text-xs", t === type ? "text-mist" : "text-slate")}>{lookups[t]?.filter((v) => v.active).length ?? 0}</span>
           </button>
         ))}
       </nav>
@@ -285,7 +285,7 @@ function LookupRow({ type, value }: { type: string; value: LookupValue }) {
   return (
     <li className="py-2.5 first:pt-0">
       {editing ? (
-        <form onSubmit={save} className="grid gap-3 rounded-xl border border-ink/10 bg-paper p-3 sm:grid-cols-3">
+        <form onSubmit={save} className="grid grid-cols-1 gap-3 rounded-xl border border-ink/10 bg-paper p-3 sm:grid-cols-3">
           <div>
             <label className={adminLabel} htmlFor={`${value.id}-label`}>Label</label>
             <input id={`${value.id}-label`} className={adminInput} value={draft.label ?? ""} onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))} />
@@ -339,7 +339,7 @@ function NewLookup({ type }: { type: string }) {
   }
 
   return (
-    <form onSubmit={add} className="grid gap-3 rounded-xl border border-dashed border-ink/15 p-4 sm:grid-cols-3">
+    <form onSubmit={add} className="grid grid-cols-1 gap-3 rounded-xl border border-dashed border-ink/15 p-4 sm:grid-cols-3">
       <div>
         <label className={adminLabel} htmlFor={`${type}-new-key`}>Key</label>
         <input id={`${type}-new-key`} className={cn(adminInput, "font-mono")} value={draft.key ?? ""} onChange={(e) => setDraft((d) => ({ ...d, key: e.target.value.toLowerCase() }))} placeholder="lowercase_or-hyphen" />
@@ -481,7 +481,7 @@ function LensForm({ lens, onDone, onCancel }: { lens?: Lens; onDone: () => void;
 
   return (
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-ink/10 bg-paper p-4">
-      <div className="grid gap-4 sm:grid-cols-[1fr_1fr_6rem]">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_6rem]">
         <div><label htmlFor="lens-key" className={adminLabel}>Key</label><input id="lens-key" className={cn(adminInput, "font-mono")} value={key} onChange={(e) => setKey(e.target.value)} /></div>
         <div><label htmlFor="lens-label" className={adminLabel}>Label</label><input id="lens-label" className={adminInput} value={label} onChange={(e) => setLabel(e.target.value)} /></div>
         <div><label htmlFor="lens-order" className={adminLabel}>Order</label><input id="lens-order" inputMode="numeric" className={cn(adminInput, "font-mono")} value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} /></div>

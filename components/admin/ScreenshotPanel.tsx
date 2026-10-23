@@ -111,7 +111,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <input ref={file} id={`shot-${systemId}`} type="file" accept="image/png,image/jpeg,image/webp,image/avif" className="sr-only" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+        <input ref={file} id={`shot-${systemId}`} type="file" tabIndex={-1} aria-label="Upload a screenshot" accept="image/png,image/jpeg,image/webp,image/avif" className="sr-only" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         <button type="button" disabled={busy !== null} onClick={() => file.current?.click()} className={adminButton.secondary}>
           <ImageUp aria-hidden="true" /> {busy === "upload" ? "Uploading…" : "Upload"}
         </button>
@@ -134,7 +134,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
         <div className="mt-6">
           <p className="text-ink text-sm font-medium">Earlier versions</p>
           <p className={adminHint}>Kept when the screenshot was replaced. Make one current again, or delete it for good.</p>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {earlier.map((v) => (
               <li key={v.id} className="border-ink/10 bg-paper overflow-hidden rounded-xl border">
                 {/* eslint-disable-next-line @next/next/no-img-element -- the admin's own preview route */}

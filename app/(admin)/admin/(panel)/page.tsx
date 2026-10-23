@@ -92,14 +92,14 @@ export default async function AdminDashboardPage() {
           </p>
         </Panel>
       ) : (
-        <ul className="mb-6 grid gap-3 sm:grid-cols-2">
+        <ul className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {attention.map((item) => (
             <li key={item.href + item.title}>
               <Link
                 href={item.href}
                 className="group border-ink/10 bg-sheet shadow-soft hover:border-ember/40 hover:shadow-lift flex h-full items-start gap-4 rounded-2xl border p-4 transition-[border-color,box-shadow]"
               >
-                <span className="bg-ember/10 text-accent grid size-10 shrink-0 place-items-center rounded-xl font-mono text-sm font-semibold">{item.count}</span>
+                <span className="bg-ember/10 text-accent-strong grid size-10 shrink-0 place-items-center rounded-xl font-mono text-sm font-semibold">{item.count}</span>
                 <span className="min-w-0 flex-1">
                   <span className="text-ink block text-sm font-semibold">{item.title}</span>
                   {item.detail && <span className="text-slate mt-0.5 block text-xs leading-relaxed">{item.detail}</span>}
@@ -152,14 +152,14 @@ export default async function AdminDashboardPage() {
         )}
       </Panel>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Shipped" value={overview.systems.pipeline.shipped} href="/admin/systems" />
         <Stat label="In progress" value={overview.systems.pipeline.building} href="/admin/systems" />
         <Stat label="Queued" value={overview.systems.pipeline.queued} href="/admin/systems" />
         <Stat label="CV readiness" value={`${overview.cv.score}%`} href="/admin/cv" tone={overview.cv.ready ? "good" : "attention"} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Panel title="Recent inquiries" actions={<Link href="/admin/inquiries" className="text-accent text-xs font-medium">All inquiries</Link>}>
           {recentInquiries.length === 0 ? (
             <p className="text-slate text-sm">No inquiries yet.</p>

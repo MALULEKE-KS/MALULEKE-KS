@@ -106,7 +106,7 @@ export function ProfileManager({
       <TitlesPanel initial={titles} kinds={titleKinds} education={education} />
       <PhotosPanel versions={photos} purposes={photoPurposes} />
       <ProfileForm profile={profile} />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <LinksPanel initial={profile.links} />
         <AchievementsPanel now={now} initial={achievements} systems={systems} />
       </div>
@@ -138,7 +138,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
   return (
     <Panel title="Profile">
       <form onSubmit={save} noValidate>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {TEXT_FIELDS.map((field) => (
             <div key={field.key} className={field.long ? "md:col-span-2" : undefined}>
               <label htmlFor={`p-${field.key}`} className={adminLabel}>
@@ -212,7 +212,7 @@ function LinksPanel({ initial }: { initial: Link[] }) {
       actions={editing === null ? <button type="button" onClick={() => start()} className={adminButton.secondary}><Plus aria-hidden="true" /> Add link</button> : undefined}
     >
       {editing !== null && (
-        <form onSubmit={save} className="mb-4 grid gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
+        <form onSubmit={save} className="mb-4 grid grid-cols-1 gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
           <div>
             <label htmlFor="l-kind" className={adminLabel}>Kind</label>
             <input id="l-kind" className={cn(adminInput, "font-mono")} value={draft.kind} onChange={(e) => setDraft((d) => ({ ...d, kind: e.target.value.toLowerCase() }))} placeholder="github" />
@@ -319,7 +319,7 @@ function AchievementsPanel({ now, initial, systems }: { now: number; initial: Ac
       actions={editing === null ? <button type="button" onClick={() => start()} className={adminButton.secondary}><Plus aria-hidden="true" /> Add</button> : undefined}
     >
       {editing !== null && (
-        <form onSubmit={save} className="mb-4 grid gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
+        <form onSubmit={save} className="mb-4 grid grid-cols-1 gap-3 rounded-xl border border-ink/10 bg-paper p-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label htmlFor="a-title" className={adminLabel}>Title</label>
             <input id="a-title" className={adminInput} maxLength={200} value={draft.title} onChange={(e) => set("title", e.target.value)} />

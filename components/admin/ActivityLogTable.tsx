@@ -87,7 +87,7 @@ export function ActivityLogTable({ entries, page, totalPages, kind }: { entries:
               {expanded && (
                 <dl className="mt-3 space-y-2">
                   {keys.map((k) => (
-                    <div key={k} className="border-ink/10 bg-paper grid gap-2 rounded-xl border p-3 font-mono text-xs md:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1fr)]">
+                    <div key={k} className="border-ink/10 bg-paper grid grid-cols-1 gap-2 rounded-xl border p-3 font-mono text-xs md:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1fr)]">
                       <dt className="text-slate">{k}</dt>
                       <dd className="text-critical decoration-critical/40 break-words whitespace-pre-wrap line-through">{show(entry.before?.[k])}</dd>
                       <dd className="text-signal-finished break-words whitespace-pre-wrap">{show(entry.after?.[k])}</dd>

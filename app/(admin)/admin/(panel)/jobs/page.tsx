@@ -37,7 +37,7 @@ export default async function AdminJobsPage({ searchParams }: { searchParams: Pr
     <>
       <AdminPageHeader icon={ListChecks} title="Jobs" description={`The daily run (${DAILY_CRON_SCHEDULE} UTC) runs the scheduled jobs in order. Any job can also be run now; one run of a job at a time.`} />
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {Object.entries(JOBS).map(([name, def]) => {
           const last = lastByJob.get(name);
           return (
@@ -65,7 +65,7 @@ export default async function AdminJobsPage({ searchParams }: { searchParams: Pr
         {runs.length === 0 ? (
           <EmptyState icon={ListChecks}>No runs yet.</EmptyState>
         ) : (
-          <div className="-m-5 overflow-x-auto">
+          <div tabIndex={0} role="region" aria-label="Recent runs, scrolls sideways" className="-m-5 overflow-x-auto focus-visible:outline-2 focus-visible:outline-ember">
             <table className="w-full min-w-[40rem] text-sm">
               <thead>
                 <tr className="border-b border-ink/10 text-left text-xs text-slate">

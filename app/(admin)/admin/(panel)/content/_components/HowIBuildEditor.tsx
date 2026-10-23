@@ -74,7 +74,7 @@ export function HowIBuildEditor({ initial }: { initial: Body | null }) {
                 )}
               </span>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
                 <label htmlFor={`p${i}-name`} className={adminLabel}>Name</label>
                 <input id={`p${i}-name`} maxLength={80} className={adminInput} value={p.name} onChange={(e) => setPrinciple(i, { name: e.target.value })} />

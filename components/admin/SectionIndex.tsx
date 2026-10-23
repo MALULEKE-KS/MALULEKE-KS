@@ -36,7 +36,7 @@ export function SectionIndex({ sections, label = "On this page", className }: { 
 
   if (sections.length < 2) return null;
   return (
-    <nav aria-label={label} className={cn("bg-paper/90 sticky top-14 z-20 -mx-5 mb-6 border-ink/[0.07] border-b px-5 py-2 backdrop-blur md:-mx-8 md:px-8", className)}>
+    <nav data-chrome aria-label={label} className={cn("bg-paper/90 sticky top-14 z-20 -mx-5 mb-6 border-ink/[0.07] border-b px-5 py-2 backdrop-blur md:-mx-8 md:px-8", className)}>
       <ol ref={row} className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
         {sections.map((s) => (
           <li key={s.id} className="shrink-0">

@@ -87,7 +87,7 @@ export default async function AdminSystemsListPage({ searchParams }: { searchPar
   );
   const live = (r: Row) =>
     r.s.contentStatus === "PUBLISHED" && !r.scheduled ? (
-      <a href={`/systems/${r.s.slug}`} className="text-slate hover:text-ink inline-flex items-center gap-1 text-xs font-medium">
+      <a href={`/systems/${r.s.slug}`} className="text-slate hover:text-ink inline-flex min-h-6 items-center gap-1 text-xs font-medium">
         On the site <ArrowUpRight aria-hidden="true" className="size-3.5" />
       </a>
     ) : null;
@@ -157,7 +157,7 @@ export default async function AdminSystemsListPage({ searchParams }: { searchPar
             </ul>
 
             {/* Laptop: the dense table. */}
-            <div className="-m-5 hidden overflow-x-auto md:block">
+            <div tabIndex={0} role="region" aria-label="Systems table" className="-m-5 hidden overflow-x-auto focus-visible:outline-2 focus-visible:outline-ember md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-ink/10 text-slate border-b text-left text-xs">
@@ -175,7 +175,7 @@ export default async function AdminSystemsListPage({ searchParams }: { searchPar
                         <span className="flex items-center gap-3">
                           {thumb(r, "h-10 w-16")}
                           <span className="min-w-0">
-                            <Link href={`/admin/systems/${r.s.id}`} className="text-ink hover:text-accent font-medium">
+                            <Link href={`/admin/systems/${r.s.id}`} className="text-ink hover:text-accent inline-flex min-h-6 items-center font-medium">
                               {r.s.name}
                             </Link>
                             <span className="text-slate flex items-center gap-2 text-xs">
