@@ -11,7 +11,7 @@ import { FileUp, ImageIcon, RotateCcw } from "lucide-react";
 import { adminButton, adminHint, adminInput, adminLabel, EmptyState, formatWhen, Panel, Pill } from "@/components/admin/ui";
 import { adminRequest, toSignIn } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
-import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { ConfirmPermanentDelete } from "@/components/admin/ConfirmPermanentDelete";
 
 export interface PhotoVersion {
   id: string;
@@ -121,7 +121,7 @@ export function PhotosPanel({ versions, purposes }: { versions: PhotoVersion[]; 
                     <button type="button" onClick={() => restore(v.id)} className="inline-flex items-center gap-1 font-medium text-accent hover:underline">
                       <RotateCcw aria-hidden="true" className="size-3.5" /> Make current
                     </button>
-                    <ConfirmDelete onConfirm={() => remove(v.id)} />
+                    <ConfirmPermanentDelete onConfirm={() => remove(v.id)} />
                   </div>
                 )}
               </div>

@@ -14,7 +14,7 @@ import { Camera, ImageUp, RotateCcw } from "lucide-react";
 import { adminButton, adminHint, formatWhen, Panel } from "@/components/admin/ui";
 import { adminRequest, toSignIn } from "@/lib/admin/request";
 import { cn } from "@/lib/utils";
-import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { ConfirmPermanentDelete } from "@/components/admin/ConfirmPermanentDelete";
 
 interface Version {
   id: string;
@@ -147,7 +147,7 @@ export function ScreenshotPanel({ systemId, liveUrl, screenshot }: { systemId: s
                     <button type="button" onClick={() => versionAction(v.id, "restore")} className="text-accent inline-flex items-center gap-1 font-medium hover:underline">
                       <RotateCcw aria-hidden="true" className="size-3.5" /> Make current
                     </button>
-                    <ConfirmDelete onConfirm={() => versionAction(v.id, "delete")} />
+                    <ConfirmPermanentDelete onConfirm={() => versionAction(v.id, "delete")} />
                   </div>
                 </div>
               </li>
