@@ -64,7 +64,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
         {/* One column at the left, so the image's right side has the room. */}
         <div className="flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]">
           {(liveLine || nowBuilding) && (
-            <p className="hero-rise text-mist flex max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-xs" style={rise(0)}>
+            // A phone sets the two facts one under the other; wider screens run them on one line.
+            <p className="hero-rise text-mist flex max-w-full flex-col items-start gap-y-1.5 font-mono text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2.5" style={rise(0)}>
               {liveLine && (
                 <span className="inline-flex min-w-0 items-center gap-2">
                   <span className="relative flex size-2 shrink-0" aria-hidden="true">
@@ -74,9 +75,9 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
                   <span className="text-paper/85">{liveLine}</span>
                 </span>
               )}
-              {liveLine && nowBuilding && <span aria-hidden="true" className="text-line">·</span>}
+              {liveLine && nowBuilding && <span aria-hidden="true" className="text-line hidden sm:inline">·</span>}
               {nowBuilding && (
-                <span className="inline-flex min-w-0 flex-wrap items-center gap-x-1.5">
+                <span className="inline-flex max-w-full min-w-0 flex-wrap items-center gap-x-1.5 max-sm:pl-4">
                   {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
                   <Link href={nowBuilding.url} className="text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
                     {nowBuilding.name}
