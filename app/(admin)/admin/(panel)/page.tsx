@@ -136,13 +136,21 @@ export default async function AdminDashboardPage() {
           <li>
             <Pill tone={guideOn ? "good" : "neutral"}>{guideOn ? "AI guide on" : "AI guide off"}</Pill>
           </li>
-          {overview.jobs.map((j) => (
-            <li key={j.job}>
-              <Pill tone={j.status === "failed" ? "critical" : j.status === "succeeded" ? "good" : "neutral"}>
-                <span className="font-mono">{j.job}</span>&nbsp;· {j.status === "succeeded" ? "ok" : j.status} {formatWhen(j.startedAt)}
-              </Pill>
+          {/* The jobs that ran fine as one count; only the ones that need a look by name. */}
+          {overview.jobs.some((j) => j.status === "succeeded") && (
+            <li>
+              <Pill tone="good">{plural(overview.jobs.filter((j) => j.status === "succeeded").length, "job ran fine", "jobs ran fine")}</Pill>
             </li>
-          ))}
+          )}
+          {overview.jobs
+            .filter((j) => j.status !== "succeeded")
+            .map((j) => (
+              <li key={j.job}>
+                <Pill tone={j.status === "failed" ? "critical" : "neutral"}>
+                  <span className="font-mono">{j.job}</span>&nbsp;· {j.status} {formatWhen(j.startedAt)}
+                </Pill>
+              </li>
+            ))}
         </ul>
         {failedJobs.length > 0 && (
           <p className="text-critical mt-3 text-xs">

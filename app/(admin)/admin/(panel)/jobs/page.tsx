@@ -14,6 +14,12 @@ export const dynamic = "force-dynamic";
 
 const RUNS_SHOWN = 30;
 
+/** "0 3 * * *" → "every day at 03:00" — the daily schedule in words; anything else is shown as written. */
+function inWords(cron: string) {
+  const m = cron.match(/^(\d{1,2}) (\d{1,2}) \* \* \*$/);
+  return m ? `every day at ${m[2]!.padStart(2, "0")}:${m[1]!.padStart(2, "0")}` : cron;
+}
+
 function duration(ms: number | null) {
   if (ms === null) return "—";
   return ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`;
@@ -35,7 +41,7 @@ export default async function AdminJobsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <AdminPageHeader icon={ListChecks} title="Jobs" description={`The daily run (${DAILY_CRON_SCHEDULE} UTC) runs the scheduled jobs in order. Any job can also be run now; one run of a job at a time.`} />
+      <AdminPageHeader icon={ListChecks} title="Jobs" description={`The daily run, ${inWords(DAILY_CRON_SCHEDULE)} UTC, runs the scheduled jobs in order. Any job can also be run now; one run of a job at a time.`} />
 
       <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {Object.entries(JOBS).map(([name, def]) => {
@@ -56,6 +62,8 @@ export default async function AdminJobsPage({ searchParams }: { searchParams: Pr
                 </span>
                 <RunNowButton job={name} />
               </div>
+              {/* Why the last run failed, where the owner first looks — the full error is in the runs below. */}
+              {last?.status === "FAILED" && last.error && <p className="border-critical/20 bg-critical/5 text-critical mt-3 line-clamp-3 rounded-xl border px-3 py-2 font-mono text-xs break-words">{last.error}</p>}
             </Panel>
           );
         })}

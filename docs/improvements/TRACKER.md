@@ -449,3 +449,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **D-059:** case study hero images behind `systems.hero_image`, off.
 - **Also:** `github-knowledge.test.ts`'s corpus check no longer races other test files adding systems.
 - **Next:** PR, CI, merge, verify; then A8/A9 across the remaining admin pages from the CI screenshots.
+
+### 2026-10-24 · Header and orb shipped; the admin pass, last slice (D-057; branch `sprint-2/admin-rest`)
+- **Shipped:** #258 (header live chip D-058, case study hero images off D-059) as `89789bb`; #260 (the guide's own face, the orb, D-060) as `77c48d4`; production verified both (the chip's markup, the hero without a backdrop, `svg.guide-bot` on the live pages).
+- **This slice (from the CI screenshots):** Jobs — the schedule in words, the last failure's reason on its card, Run now on one line; Numbers — proposals waiting first; Today — healthy jobs as one count, only the ones needing a look by name. Inquiries, Journey, CV, Profile, Freshness, Guide health and Account read well (the delete-button regression was already fixed in #256).
+- **Open:** PR #6 (Docker, 2026-09-17) conflicts and predates the local Postgres setup — the owner decides whether to close it.

@@ -26,7 +26,7 @@ export function RunNowButton({ job }: { job: string }) {
 
   return (
     <span className="flex flex-col items-end gap-1">
-      <button type="button" onClick={run} disabled={busy} className={cn(adminButton.secondary, "px-3 py-1.5")}>
+      <button type="button" onClick={run} disabled={busy} className={cn(adminButton.secondary, "px-3 py-1.5 whitespace-nowrap")}>
         <Play aria-hidden="true" /> {busy ? "Running…" : "Run now"}
       </button>
       {note && <span role="status" className="max-w-48 text-right text-xs text-critical">{note}</span>}
