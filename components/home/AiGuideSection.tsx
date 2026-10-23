@@ -20,6 +20,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { Accent } from "@/components/shared/Accent";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { useGuideChat } from "@/components/guide/GuideChatProvider";
@@ -111,7 +112,7 @@ function AskCard({ content, facts }: { content: AiGuideContent; facts: AiGuideFa
                   type="button"
                   onClick={() => send(q)}
                   disabled={busy}
-                  className="group/q focus-visible:outline-ember flex w-full items-start gap-3.5 px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:opacity-60 sm:px-6"
+                  className="group/q focus-visible:outline-ember flex w-full items-start gap-3.5 px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03] active:bg-white/[0.06] focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:opacity-60 sm:px-6"
                 >
                   <span className="type-data text-ember mt-[3px] text-xs">{String(i + 1).padStart(2, "0")}</span>
                   <span className="text-paper flex-1 text-[15px] leading-snug">{q}</span>
@@ -174,18 +175,20 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
         {/* Phone: introduction, the guide, then the points. Larger screens: the guide beside both. */}
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-12">
           <div className="lg:col-span-5 lg:row-start-1">
-            <p className="text-mist flex items-center gap-2 text-sm">
+            {/* The plain label every section opens with (D-047), the AI label kept in it (BR-4.3). */}
+            <HeroLabel>
               <span className="text-ember font-semibold tracking-wide">AI</span>
-              <span aria-hidden="true" className="bg-line h-3 w-px" />
+              <span aria-hidden="true" className="text-line">·</span>
               {content.eyebrow}
-            </p>
-            <h2 id="ai-guide-title" className="mt-4 font-sans text-3xl leading-[1.08] font-semibold tracking-[-0.025em] text-balance md:text-5xl">
+            </HeroLabel>
+            <h2 id="ai-guide-title" className="type-h2 mt-5 text-balance">
               <Accent text={content.heading} className="type-accent text-ember-gradient pr-[0.06em]" />
             </h2>
             {content.lede && <p className="text-mist mt-5 max-w-[52ch] text-lg leading-relaxed text-pretty">{content.lede}</p>}
           </div>
 
-          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
+          {/* Centred against the introduction and the points, so the band ends where its content does. */}
+          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:self-center">
             {live ? <GuideConsole variant="inline" /> : <AskCard content={content} facts={facts} />}
           </div>
 
@@ -211,7 +214,7 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.95 }}
             onClick={() => section.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })}
-            className="bg-night/90 text-paper focus-visible:outline-ember fixed right-4 bottom-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-white/15 py-1.5 pr-4 pl-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl focus-visible:outline-2 sm:right-6 sm:bottom-6"
+            className="bg-night/90 text-paper focus-visible:outline-ember fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-white/15 py-1.5 pr-4 pl-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl focus-visible:outline-2 sm:right-6 sm:bottom-6"
           >
             <GuideMark className="size-10" />
             <span className="min-w-0 text-left">

@@ -12,7 +12,7 @@
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { VisitorLensProvider } from "@/components/shared/VisitorLensProvider";
 import { getSiteProfile } from "@/lib/queries/site";
 import { siteUrl } from "@/lib/site-url";
@@ -60,6 +60,17 @@ const ibmPlexMono = localFont({
 // description built from the owner's profile (admin-editable) rather than
 // typed-in copy. If the database is unreachable, metadata falls back to
 // static defaults instead of failing every page.
+// The page runs edge to edge on a phone (viewport-fit=cover), so the fixed
+// launcher, banner and footer can keep clear of the home bar and notch with
+// env(safe-area-inset-*) (D-048); the browser's bar takes the graphite of the
+// header. Zoom stays allowed (accessibility).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0b0c0e",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   let name = "MALULEKE-KS";
   let description = "A full-stack, database-backed platform — the systems, the journey, the CV.";

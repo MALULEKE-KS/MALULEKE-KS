@@ -5,8 +5,9 @@
 // frosted bar docked to the bottom — all on one cover image behind the whole
 // hero (HeroBackdrop; the owner's direction, same day), the two giving each
 // other room: on larger screens the type sits at the left, in the image's quiet
-// zone, and the right of the image shows at full strength; on phones the type is
-// centred over the image, which shows behind the whole hero under an even veil.
+// zone, and the right of the image shows at full strength; on phones the type sits
+// at the left too (the shape every page shares, D-046/D-047), over the image under
+// an even veil. Above the name, one plain live line — a dot and words, no capsules.
 //
 // Nothing is typed in here. The name and role are the profile's; the statement,
 // every label, the image's credit and focal points are the owner's "home-hero"
@@ -51,7 +52,6 @@ interface HomeHeroV2Props {
 const rise = (i: number): CSSProperties => ({ "--i": i }) as CSSProperties;
 
 export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, ledger, backdrop, entrance }: HomeHeroV2Props) {
-  const chip = "text-mist bg-night-deep/50 inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-xs whitespace-nowrap backdrop-blur";
   return (
     <section
       aria-labelledby="hero-title"
@@ -60,47 +60,51 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
     >
       {backdrop}
 
-      <Container className="flex flex-1 flex-col justify-start pt-28 pb-8 md:justify-center md:pt-[5.5rem] md:pb-10">
-        {/* One column: centred on a phone, set at the left on larger screens so the image's right side has the room. */}
-        <div className="flex max-w-[46rem] flex-col items-center text-center max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)] md:items-start md:text-left">
-          <div className="hero-rise flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-start" style={rise(0)}>
-            {liveLine && (
-              <p className={chip}>
-                <span className="relative flex size-2" aria-hidden="true">
-                  <span className="live-ping absolute inset-0 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
-                  <span className="relative size-2 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
+      <Container className="flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10">
+        {/* One column at the left, so the image's right side has the room. */}
+        <div className="flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]">
+          {(liveLine || nowBuilding) && (
+            // A phone sets the two facts one under the other; wider screens run them on one line.
+            <p className="hero-rise text-mist flex max-w-full flex-col items-start gap-y-1.5 font-mono text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2.5" style={rise(0)}>
+              {liveLine && (
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <span className="relative flex size-2 shrink-0" aria-hidden="true">
+                    <span className="live-ping absolute inset-0 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
+                    <span className="relative size-2 rounded-full bg-[var(--color-signal-finished-on-dark)]" />
+                  </span>
+                  <span className="text-paper/85">{liveLine}</span>
                 </span>
-                <span className="min-w-0 truncate">{liveLine}</span>
-              </p>
-            )}
-            {nowBuilding && (
-              <p className={chip}>
-                {nowBuilding.label && <span className="text-line shrink-0">{nowBuilding.label}</span>}
-                <Link href={nowBuilding.url} className="text-paper hover:text-ember min-w-0 truncate underline-offset-2 hover:underline">
-                  {nowBuilding.name}
-                </Link>
-                {nowBuilding.when && <span className="text-line shrink-0">· {nowBuilding.when}</span>}
-              </p>
-            )}
-          </div>
+              )}
+              {liveLine && nowBuilding && <span aria-hidden="true" className="text-line hidden sm:inline">·</span>}
+              {nowBuilding && (
+                <span className="inline-flex max-w-full min-w-0 flex-wrap items-center gap-x-1.5 max-sm:pl-4">
+                  {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
+                  <Link href={nowBuilding.url} className="tap-target text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
+                    {nowBuilding.name}
+                  </Link>
+                  {nowBuilding.when && <span className="text-line">· {nowBuilding.when}</span>}
+                </span>
+              )}
+            </p>
+          )}
 
-          <h1 id="hero-title" className="hero-rise type-hero-name mt-6 max-w-[18ch] md:mt-7" style={rise(1)}>
+          <h1 id="hero-title" className="hero-rise type-hero-name mt-5 max-w-[18ch] md:mt-7" style={rise(1)}>
             {name}
           </h1>
 
-          <div className="hero-rise mt-4" style={rise(2)}>
+          <div className="hero-rise mt-3 md:mt-4" style={rise(2)}>
             <p className="text-paper/90 text-xl font-medium md:text-3xl">{role}</p>
             {credential && <p className="text-mist mt-2 max-w-[56ch] text-sm md:text-base">{credential}</p>}
           </div>
 
           {statement && (
-            <p className="hero-rise type-lede text-mist mt-6 max-w-[40ch]" style={rise(3)}>
+            <p className="hero-rise type-lede text-mist mt-4 max-w-[40ch] md:mt-6" style={rise(3)}>
               {statement}
             </p>
           )}
 
           {/* The header already carries the CV and Let's talk, so the hero has no CV button (no duplicate). */}
-          <div className="hero-rise mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row" style={rise(4)}>
+          <div className="hero-rise mt-6 grid w-full grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:flex sm:w-auto md:mt-7" style={rise(4)}>
             {copy.primaryLabel && (
               <Button asChild variant="accent" size="lg" className="w-full sm:w-auto">
                 <Link href="/systems">
@@ -135,8 +139,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
       {/* The record, docked to the bottom of the hero as a frosted instrument bar. */}
       {ledger.length > 0 && (
         <div className="hero-rise border-t border-white/15 bg-night-deep/55 backdrop-blur-md" style={rise(6)}>
-          <Container className="py-6">
-            <ProofLedger items={ledger} ariaLabel={copy.ledgerAria} bare />
+          <Container className="py-5 md:py-6">
+            <ProofLedger items={ledger} ariaLabel={copy.ledgerAria} bare compact />
           </Container>
         </div>
       )}

@@ -1,13 +1,17 @@
 // components/home/ContactBand.tsx
-// Home, section 4 (DESIGN-SYSTEM.md v3 §7.4): the final call to action — one
-// large dark card on the light page with an ember glow. States the real
-// BR-2.2 review window, lists the inquiry types the form accepts (the
-// InquiryType lookup, #99), and offers the owner's real links. Nothing invented.
+// Home, the last section (DESIGN-SYSTEM.md v3 §7.4): the call to action. Since
+// the premium pass (D-047, owner-approved 2026-10-23 — his choice D4) an open
+// bone band, so the page ends light before the graphite footer — no card, no
+// glow. The plain label, his heading, one line, the real BR-2.2 review window
+// (a setting), one action; beside it the inquiry types the form accepts (the
+// InquiryType lookup, #99) as a ruled list of links, each opening Let's talk
+// with that topic already chosen (?about=). Nothing invented.
 
 import Link from "next/link";
 import { Accent } from "@/components/shared/Accent";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { sectionCopy } from "@/lib/content/copy";
-import { ArrowRight, Clock, MessageSquareText } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/Container";
 import { Reveal } from "@/components/shared/Reveal";
@@ -26,64 +30,53 @@ export async function ContactBand({ inquiryTypes, reviewSlaHours }: ContactBandP
     description: "Tell me what it is. Every inquiry goes through one form, and I review each one.",
   });
   return (
-    <section aria-labelledby="contact-title" className="bg-paper overflow-x-clip py-20 md:py-28">
+    <section aria-labelledby="contact-title" className="bg-paper text-ink border-ink/[0.07] border-t py-20 md:py-28">
       <Container>
-        <Reveal>
-          <div className="border-ink/10 bg-night-deep text-paper shadow-lift relative isolate overflow-hidden rounded-3xl border px-6 py-14 md:px-14 md:py-20">
-            <div
-              aria-hidden="true"
-              className="bg-ember/25 absolute -top-24 -right-24 -z-10 size-[28rem] rounded-full blur-3xl"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute -bottom-32 -left-20 -z-10 size-[24rem] rounded-full bg-[rgb(96_130_170/0.18)] blur-3xl"
-            />
-
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-7">
-                <span className="text-mist inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium">
-                  <MessageSquareText aria-hidden="true" className="text-ember size-3.5" />
-                  {copy.eyebrow}
-                </span>
-                <h2 id="contact-title" className="type-display mt-6">
-                  <Accent text={copy.title ?? ""} className="type-accent text-ember-gradient pr-[0.06em]" />
-                </h2>
-                {copy.description && <p className="type-lede text-mist mt-6 max-w-xl">{copy.description}</p>}
-                <p className="text-paper mt-4 inline-flex items-center gap-2 text-sm">
-                  <Clock aria-hidden="true" className="text-ember size-4" />
-                  Reviewed within {reviewSlaHours} hours
-                </p>
-
-                <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                  <Button asChild variant="accent" size="lg">
-                    <Link href="/contact">
-                      Start a conversation
-                      <ArrowRight />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="lg:col-span-5">
-                <p className="text-mist text-sm">What you can reach out about</p>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {/* Each one opens Let's Talk already on that category (?about=). */}
-                  {inquiryTypes.map((t) => (
-                    <li key={t.value}>
-                      <Link
-                        href={`/contact?about=${t.value}`}
-                        className="text-paper hover:border-ember/50 focus-visible:outline-ember inline-flex rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2"
-                      >
-                        {t.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                {/* The social links live in the footer, one screen below — not repeated here (no duplicates). */}
-              </div>
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-16">
+          <Reveal className="lg:col-span-6">
+            <HeroLabel tone="light">{copy.eyebrow}</HeroLabel>
+            <h2 id="contact-title" className="type-display mt-6 text-balance">
+              <Accent text={copy.title ?? ""} className="type-accent text-ember-gradient pr-[0.06em]" />
+            </h2>
+            {copy.description && <p className="type-lede text-slate mt-6 max-w-xl">{copy.description}</p>}
+            <p className="text-ink mt-5 inline-flex items-center gap-2.5 text-sm font-medium">
+              <span aria-hidden="true" className="size-2 rounded-full bg-[var(--color-signal-finished)] shadow-[0_0_0_4px_rgb(15_122_75/0.12)]" />
+              Reviewed within {reviewSlaHours} hours
+            </p>
+            <div className="mt-9">
+              <Button asChild variant="accent" size="lg">
+                <Link href="/contact">
+                  Start a conversation
+                  <ArrowRight />
+                </Link>
+              </Button>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+
+          {inquiryTypes.length > 0 && (
+            <Reveal className="lg:col-span-6" delay={100}>
+              <p className="text-slate mb-3 text-sm">What you can reach out about</p>
+              <ul className="border-ink/12 border-t">
+                {/* Each one opens Let's Talk already on that category (?about=). */}
+                {inquiryTypes.map((t) => (
+                  <li key={t.value} className="border-ink/12 border-b">
+                    <Link
+                      href={`/contact?about=${t.value}`}
+                      className="group/t press focus-visible:outline-ember relative flex min-h-14 items-center justify-between gap-4 py-4 active:opacity-70 text-[17px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                    >
+                      <span className="relative">
+                        {t.label}
+                        <span aria-hidden="true" className="bg-ember absolute -bottom-1 left-0 h-px w-0 transition-[width] duration-300 ease-out group-hover/t:w-full motion-reduce:transition-none" />
+                      </span>
+                      <ArrowRight aria-hidden="true" className="text-slate group-hover/t:text-ember size-4 shrink-0 transition-[transform,color] duration-300 group-hover/t:translate-x-1 motion-reduce:transition-none" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {/* The social links live in the footer, just below — not repeated here (no duplicates). */}
+            </Reveal>
+          )}
+        </div>
       </Container>
     </section>
   );

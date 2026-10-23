@@ -4,7 +4,7 @@
 // no preview is captured yet — never a fake screenshot or a broken image
 // (DESIGN-SYSTEM.md §4.1).
 
-import { ImageOff } from "lucide-react";
+import { ImageOff, Lock } from "lucide-react";
 
 interface SystemPreviewFrameProps {
   screenshotUrl: string | null;
@@ -26,8 +26,10 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name, eager = false
           <span className="size-2.5 rounded-full bg-white/15" />
           <span className="size-2.5 rounded-full bg-white/15" />
         </span>
-        <span className="text-mist min-w-0 flex-1 truncate rounded-md bg-white/5 px-3 py-1 text-center font-mono text-xs">
-          {host ?? `${name.toLowerCase().replace(/\s+/g, "-")}.preview`}
+        {/* The address bar, as a browser shows it (after Magic UI's Safari mockup): the padlock for a live https site. */}
+        <span className="text-mist inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-white/5 px-3 py-1 font-mono text-xs">
+          {liveUrl?.startsWith("https://") && <Lock aria-hidden="true" className="text-line size-3 shrink-0" />}
+          <span className="truncate">{host ?? `${name.toLowerCase().replace(/\s+/g, "-")}.preview`}</span>
         </span>
       </div>
 

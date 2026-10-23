@@ -39,11 +39,12 @@ describe("home hero — content", () => {
     expect(block?.previewLabel).toMatch(/\{date\}/);
     expect(block?.previewLabel).toMatch(/\{commit\}/);
     expect(block?.localLabel).toBeTruthy();
-    // The record is the proof of the statement: three claims over their figures; the catalogue size supports.
+    // The record is the proof of the statement: three claims over their figures; the catalogue size has its own
+    // heading since the premium pass, so all four figures share one anatomy (D-047, the owner's choice D5).
     expect(block?.ledgerLabels?.shipped?.claim).toBe("Runs in production");
     expect(block?.ledgerLabels?.rules?.claim).toBe("Enforces its own rules");
     expect(block?.ledgerLabels?.audited?.claim).toBe("Shows its proof");
-    expect(block?.ledgerLabels?.systems?.claim).toBeUndefined();
+    expect(block?.ledgerLabels?.systems?.claim).toBe("Published");
     expect(heroCopy(block).ledgerLabels.rules?.claim).toBe("Enforces its own rules");
     // No credit is shown on the image unless the owner writes one (his decision, 2026-10-20).
     expect(block?.imageCredit).toBeUndefined();
@@ -102,10 +103,14 @@ describe("home hero — the figures and lines it states are the real ones (D-039
 
   it("names the repo with the latest real commit as what is current — never the latest push", async () => {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const latest = await dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+    const latestNow = () => dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+    // Other test files write commits while this runs (the suites share one test database), so the latest
+    // commit is read just before and just after: what the home page names must be one of the two.
+    const before = await latestNow();
     const { nowBuilding } = await getSelectedWork(0);
-    if (!latest) expect(nowBuilding).toBeNull();
-    else expect(nowBuilding?.fullName).toBe(latest.fullName);
+    const after = await latestNow();
+    if (!before && !after) expect(nowBuilding).toBeNull();
+    else expect([before?.fullName, after?.fullName]).toContain(nowBuilding?.fullName);
   });
 });
 

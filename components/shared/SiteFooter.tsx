@@ -77,7 +77,7 @@ export function SiteFooter({
 
       <Container className="grid gap-12 pb-12 pt-20 md:grid-cols-12">
         <div className="md:col-span-5">
-          <Link href="/" className="inline-flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-ember">
+          <Link href="/" className="tap-target inline-flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-ember">
             <BrandMark className="h-8 text-paper" />
             <Wordmark className="font-mono text-sm font-medium" />
           </Link>
@@ -87,19 +87,20 @@ export function SiteFooter({
         {homes.length > 0 && (
           <div className="md:col-span-4">
             <h2 className="font-mono text-xs text-line">Where the code lives</h2>
-            <ul className="mt-4 space-y-2">
+            {/* Plain rows (D-047): the map above already draws the homes; here they are a line each. */}
+            <ul className="mt-4 border-t border-white/10">
               {homes.map((h) => (
-                <li key={h.slug}>
+                <li key={h.slug} className="border-b border-white/10">
                   <a
                     href={h.github[0]?.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 transition-colors hover:border-ember/30 hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-ember"
+                    className="group flex items-center justify-between gap-3 py-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       <FaGithub aria-hidden="true" className="size-4 shrink-0 text-mist transition-colors group-hover:text-paper" />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-paper">{h.name}</span>
+                        <span className="block truncate text-sm font-medium text-paper transition-colors group-hover:text-ember">{h.name}</span>
                         <span className="block text-xs text-line">{h.role ?? (h.kind ? KIND_LABEL[h.kind] ?? null : null) ?? "GitHub"}</span>
                       </span>
                     </span>
@@ -118,14 +119,15 @@ export function SiteFooter({
         <div className="md:col-span-3">
           <h2 className="font-mono text-xs text-line">Let&rsquo;s talk</h2>
           <p className="mt-4 text-sm text-mist">Every inquiry is reviewed within {reviewSlaHours} hours.</p>
-          <Link href="/contact" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ember hover:underline">
+          <Link href="/contact" className="tap-target mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ember hover:underline">
             Start a conversation <ArrowUpRight aria-hidden="true" className="size-4" />
           </Link>
         </div>
       </Container>
 
       <Container>
-        <p className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-5 font-mono text-xs text-line">
+        {/* A phone stacks the facts, one a line, without separators; wider screens run them on one line. */}
+        <p className="flex flex-col items-start gap-y-1.5 border-t border-white/10 pt-5 font-mono text-xs text-line sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1">
           <span className="inline-flex items-center gap-2 text-mist">
             <span aria-hidden="true" className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--color-signal-finished-on-dark)]/60 motion-reduce:animate-none" />
@@ -133,13 +135,21 @@ export function SiteFooter({
             </span>
             {pulse.rulesEnforcedByDatabase} business rules enforced by the database
           </span>
-          {pulse.lastGithubSyncAt && <span>· synced with GitHub {ago(pulse.lastGithubSyncAt, now)}</span>}
-          {pulse.deployment && <span>· build {pulse.deployment.commit}</span>}
+          {pulse.lastGithubSyncAt && (
+            <span>
+              <span aria-hidden="true" className="hidden sm:inline">· </span>synced with GitHub {ago(pulse.lastGithubSyncAt, now)}
+            </span>
+          )}
+          {pulse.deployment && (
+            <span>
+              <span aria-hidden="true" className="hidden sm:inline">· </span>build {pulse.deployment.commit}
+            </span>
+          )}
           {release && (
             <span>
-              ·{" "}
+              <span aria-hidden="true" className="hidden sm:inline">· </span>
               {release.link ? (
-                <Link href={release.link} className="underline-offset-4 transition-colors hover:text-paper hover:underline">
+                <Link href={release.link} className="tap-target underline-offset-4 transition-colors hover:text-paper hover:underline">
                   {release.current}
                   {release.next && ` · ${release.next}${release.nextNote ? ` ${release.nextNote}` : ""}`}
                 </Link>
@@ -157,13 +167,13 @@ export function SiteFooter({
       <DitheredWordmark text="MALULEKE-KS" />
 
       <div className="border-t border-white/10">
-        <Container className="flex flex-col gap-3 py-5 font-mono text-xs text-line md:flex-row md:items-center md:justify-between">
+        <Container className="flex flex-col gap-3 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] font-mono text-xs text-line md:flex-row md:items-center md:justify-between">
           <p>
             &copy; {now.getFullYear()} {profile.name}.{profile.location ? ` Engineered in ${profile.location}.` : ""}
           </p>
-          <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <PrivacyChoicesButton className="underline-offset-4 transition-colors hover:text-paper hover:underline" />
-            <a href="#main" className="inline-flex items-center gap-1 transition-colors hover:text-paper">
+          <p className="flex flex-wrap items-center gap-x-6 gap-y-1">
+            <PrivacyChoicesButton className="tap-target underline-offset-4 transition-colors hover:text-paper hover:underline" />
+            <a href="#main" className="tap-target inline-flex items-center gap-1 transition-colors hover:text-paper">
               Back to top <ArrowUp aria-hidden="true" className="size-3" />
             </a>
           </p>

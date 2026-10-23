@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 // tinted shadow (the ember button glows). A trailing icon nudges forward on
 // hover. Focus is a 2px ember outline with offset — visible on light and dark.
 const buttonVariants = cva(
-  "group/btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-sans text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5 active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg:last-child]:transition-transform motion-safe:hover:[&_svg:last-child]:translate-x-0.5",
+  "group/btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-sans text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5 active:translate-y-0 motion-safe:active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg:last-child]:transition-transform motion-safe:hover:[&_svg:last-child]:translate-x-0.5",
   {
     variants: {
       variant: {

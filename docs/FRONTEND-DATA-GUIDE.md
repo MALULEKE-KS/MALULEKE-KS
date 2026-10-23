@@ -101,12 +101,12 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
-**Platform pulse** — Control room
+**Platform pulse** — How it all connects: the live status line
 
 - Call `GET /platform/pulse`
 - Aggregates only — no rows, no actors. deployment is null outside Vercel.
 
-**Homepage** — Hero ledger (years building, organizations founded, shipped / in progress / queued); Featured work (the admin's picks, in order); Control room: approved figures (approved metrics only)
+**Homepage** — Hero ledger (years building, organizations founded, shipped / in progress / queued); Featured work (the admin's picks, in order); How it all connects: approved figures (approved metrics only)
 
 - Call `GET /home`
 - Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).

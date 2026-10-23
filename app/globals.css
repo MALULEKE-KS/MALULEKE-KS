@@ -457,6 +457,15 @@ html {
   to { opacity: 1; transform: none; }
 }
 
+/* A principle opening in place (home, D-047): its full text settles in. */
+@media (prefers-reduced-motion: no-preference) {
+  details[open] > .principle-open { animation: principle-open 360ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
+@keyframes principle-open {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Let's Talk, sent: the check draws itself, then a few embers rise from it. */
 @keyframes draw-check {
   from { stroke-dashoffset: 1; }
@@ -618,5 +627,55 @@ html {
   }
   50% {
     outline-offset: 14px;
+  }
+}
+
+/* ---- Phones: touch and type (D-048, owner-approved 2026-10-23) ----
+   One set of rules for every page, so the phone is never an afterthought:
+   - tap-target: a hit area of at least 44 × 44 px around small links and
+     buttons (Apple's and Google's touch minimum), invisible — the look stays.
+   - press: a slight press while a finger is down, so a tap answers (no grey
+     flash: the browser's highlight is off). Nothing under reduced motion.
+   - jumps to a section land below the sticky header.
+   - a type floor: nothing under 12 px on a phone (the 10–11.5 px mono labels
+     that read on a laptop are 12 px there). Outside every layer on purpose, so
+     it wins over the size utilities it corrects. */
+html {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  scroll-padding-top: 5.5rem;
+}
+@utility tap-target {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    transform: translate(-50%, -50%);
+  }
+}
+@utility press {
+  transition-property: transform, color, background-color, border-color, opacity, box-shadow;
+  transition-duration: 160ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  &:active {
+    transform: scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .press:active {
+    transform: none;
+  }
+}
+@media (max-width: 639.98px) {
+  .text-\[9px\],
+  .text-\[10px\],
+  .text-\[10\.5px\],
+  .text-\[11px\],
+  .text-\[11\.5px\] {
+    font-size: 0.75rem;
   }
 }

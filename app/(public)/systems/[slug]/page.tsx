@@ -361,7 +361,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       {(moving || cs.commits.length > 0) && (
         <section aria-labelledby="activity-title" className="bg-night-deep text-paper py-16 md:py-24">
           <Container>
-            <SectionHeader copyKey="system.activity" icon={Activity} eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
+            <SectionHeader copyKey="system.activity" eyebrow="Activity" id="activity-title" title="How it's moving." tone="dark" />
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
               {moving && (
                 <div className="min-w-0 lg:col-span-7">
@@ -403,7 +403,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
       {cs.skills.length > 0 && (
         <section aria-labelledby="proves-title" className="bg-paper py-16 md:py-24">
           <Container>
-            <SectionHeader copyKey="system.proves" icon={Award} eyebrow="Skills" id="proves-title" title="What it proves." />
+            <SectionHeader copyKey="system.proves" eyebrow="Skills" id="proves-title" title="What it proves." />
             {/* Evidence, not self-rating (FRONTEND-DATA-GUIDE "/systems/[slug]"). */}
             <ul className="flex flex-wrap gap-3">
               {cs.skills.map((s) => (
@@ -427,7 +427,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         // Only rendered when there are impacts — never an empty placeholder (spec).
         <section aria-labelledby="impact-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
           <Container>
-            <SectionHeader copyKey="system.impact" icon={Star} eyebrow="Impact" id="impact-title" title="What it changed." />
+            <SectionHeader copyKey="system.impact" eyebrow="Impact" id="impact-title" title="What it changed." />
             <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {system.impacts.map((impact, i) => (
                 <Reveal key={impact.label} delay={i * 80}>
@@ -446,7 +446,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         // Only testimonials with permission are ever queried (BR-6.1).
         <section aria-labelledby="words-title" className="hero-field text-paper py-16 md:py-24">
           <Container>
-            <SectionHeader copyKey="system.words" icon={Quote} eyebrow="In their words" id="words-title" title="From the people it was built for." tone="dark" />
+            <SectionHeader copyKey="system.words" eyebrow="In their words" id="words-title" title="From the people it was built for." tone="dark" />
             <div className="grid gap-5 md:grid-cols-2">
               {system.testimonials.map((t, i) => (
                 <Reveal key={i} delay={i * 80}>
@@ -470,7 +470,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
         <section aria-labelledby="more-title" className="border-ink/10 bg-paper border-t py-16 md:py-24">
           <Container>
             {/* No "All systems" action here — the hero's back link already is one (no duplicates). */}
-            <SectionHeader copyKey="system.more" icon={Boxes} eyebrow="More systems" id="more-title" title="Related work." />
+            <SectionHeader copyKey="system.more" eyebrow="More systems" id="more-title" title="Related work." />
             <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {cs.related.map((r, i) => (
                 <li key={r.slug}>

@@ -1,20 +1,21 @@
 // components/shared/SectionHeader.tsx
-// Section header (DESIGN-SYSTEM.md v3 §6): a pill micro-badge with an icon
-// sets the context, then the title, an optional one-line description and an
-// optional right-aligned link. Sentence case — no all-caps eyebrows.
+// Section header (DESIGN-SYSTEM.md v3 §6), in the shape every page now shares
+// (D-046, D-047): the plain label (an ember hairline and the words — no pill,
+// no icon), the title with the owner's accent word, an optional one-line
+// description and an optional link set at the right on wide screens.
 // With a copyKey, the eyebrow, title and description come from the
 // "page-copy" content block (lib/content/copy.ts); the props are the fallback.
 
 import Link from "next/link";
-import { ArrowRight, type LucideIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accent } from "@/components/shared/Accent";
+import { HeroLabel } from "@/components/shared/HeroKit";
 import { sectionCopy } from "@/lib/content/copy";
 
 interface SectionHeaderProps {
   /** The section's key in the page-copy block, e.g. "home.map". */
   copyKey?: string;
-  icon: LucideIcon;
   eyebrow: string;
   title: React.ReactNode;
   description?: string;
@@ -26,51 +27,40 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-export async function SectionHeader({ copyKey, icon: Icon, eyebrow: eyebrowProp, title: titleProp, description: descriptionProp, action, tone = "light", id, wide = false, className }: SectionHeaderProps) {
+export async function SectionHeader({ copyKey, eyebrow: eyebrowProp, title: titleProp, description: descriptionProp, action, tone = "light", id, wide = false, className }: SectionHeaderProps) {
   const dark = tone === "dark";
   const copy = copyKey ? await sectionCopy(copyKey, {}) : {};
   const eyebrow = copy.eyebrow ?? eyebrowProp;
   const title = copy.title ? <Accent text={copy.title} className="type-accent text-ember-gradient pr-[0.06em]" /> : titleProp;
   const description = copy.description ?? descriptionProp;
   return (
-    <div className={cn("mb-12 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between", className)}>
+    <div className={cn("mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between", className)}>
       <div className={wide ? "max-w-4xl" : "max-w-2xl"}>
-        <span
-          className={cn(
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
-            dark ? "border-white/10 bg-white/5 text-mist" : "border-ink/10 bg-sheet text-slate shadow-soft",
-          )}
-        >
-          <Icon aria-hidden="true" className={cn("size-3.5", dark ? "text-ember" : "text-accent")} />
-          {eyebrow}
-        </span>
-        <h2
-          id={id}
-          className={cn(
-            "mt-5 font-sans text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl",
-            dark ? "text-paper" : "text-ink",
-          )}
-        >
+        <HeroLabel tone={dark ? "dark" : "light"}>{eyebrow}</HeroLabel>
+        <h2 id={id} className={cn("type-h2 mt-5 text-balance", dark ? "text-paper" : "text-ink")}>
           {title}
         </h2>
-        {description && (
-          <p className={cn("mt-4 text-lg leading-relaxed", dark ? "text-mist" : "text-slate")}>{description}</p>
-        )}
+        {description && <p className={cn("type-lede mt-4 max-w-[60ch]", dark ? "text-mist" : "text-slate")}>{description}</p>}
       </div>
-      {action && (
-        <Link
-          href={action.href}
-          className={cn(
-            "group inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember",
-            dark
-              ? "border-white/15 text-paper hover:border-white/30 hover:bg-white/5"
-              : "border-ink/15 bg-sheet text-ink shadow-soft hover:border-ink/30",
-          )}
-        >
-          {action.label}
-          <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      )}
+      {action && <SectionLink href={action.href} label={action.label} tone={tone} />}
     </div>
+  );
+}
+
+/** The section's one link onward ("All systems", "The full method"): words and an arrow over a hairline — no capsule. */
+export function SectionLink({ href, label, tone = "light", className }: { href: string; label: string; tone?: "light" | "dark"; className?: string }) {
+  const dark = tone === "dark";
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group/sl tap-target press focus-visible:outline-ember inline-flex shrink-0 items-center gap-2 self-start border-b pb-1 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 md:self-auto",
+        dark ? "text-paper hover:border-ember border-white/25" : "text-ink hover:border-ember border-ink/20",
+        className,
+      )}
+    >
+      {label}
+      <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-200 group-hover/sl:translate-x-1 motion-reduce:transition-none" />
+    </Link>
   );
 }

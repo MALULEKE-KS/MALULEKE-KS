@@ -4,7 +4,8 @@
 // hero's — a plain label, the headline, one or two lines, then the record as a
 // hairline row of live figures. No pills, no icon tiles, no glowing borders.
 //
-// HeroLabel  — the page's label: an ember hairline and the words, no capsule.
+// HeroLabel  — the page's label: an ember hairline and the words, no capsule. The
+//               home page's sections open with it too (SectionHeader, D-047).
 // HeroFigures — the hero's live figures under a hairline (the home hero's ledger
 //               style, ProofLedger): computed by the page from data, never typed;
 //               a zero is an absence, not a figure, so it is never passed in.
@@ -12,9 +13,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export function HeroLabel({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+export function HeroLabel({ children, className, style, tone = "dark" }: { children: ReactNode; className?: string; style?: CSSProperties; /** The surface it sits on — graphite (default) or bone. */ tone?: "dark" | "light" }) {
   return (
-    <p className={cn("text-mist flex items-center gap-2.5 text-sm font-medium", className)} style={style}>
+    <p className={cn("flex items-center gap-2.5 text-sm font-medium", tone === "dark" ? "text-mist" : "text-slate", className)} style={style}>
       <span aria-hidden="true" className="bg-ember h-px w-5" />
       {children}
     </p>

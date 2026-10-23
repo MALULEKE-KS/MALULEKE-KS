@@ -158,7 +158,8 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
   });
 
   const dim = (id: string) => lit !== null && !lit.has(id);
-  const techShown = data.tech.filter((t, i) => wide || allTech || i < data.techInGraph || lit?.has(t.id));
+  // The most used lead on every screen (D-047: the full list was a wall on a laptop); the rest are a tap away, never dropped.
+  const techShown = data.tech.filter((t, i) => allTech || i < data.techInGraph || lit?.has(t.id));
   const hiddenTech = data.tech.length - techShown.length;
   const shownKey = techShown.map((t) => t.id).join("|");
 
@@ -290,7 +291,7 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                         aria-pressed={pinned === t.id}
                         {...interact(t)}
                         className={cn(
-                          "focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
+                          "tap-target press focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
                           lead ? "text-paper px-3 py-1.5 text-[13px] font-medium" : "text-mist px-2.5 py-1 text-[11.5px]",
                           pinned === t.id ? "border-ember bg-ember/15" : on ? "border-ember/70" : lead ? "border-white/15 hover:border-ember/50" : "border-white/10 hover:border-ember/50",
                           dim(t.id) && "opacity-30",
@@ -304,13 +305,12 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                   );
                 })}
               </ul>
-              {/* Phones: the most used lead; the rest are a tap away, never dropped. */}
-              {!wide && (hiddenTech > 0 || allTech) && (
+              {(hiddenTech > 0 || allTech) && (
                 <button
                   type="button"
                   data-map-bar=""
                   onClick={() => setAllTech((v) => !v)}
-                  className="text-mist hover:text-paper focus-visible:outline-ember mt-1 inline-flex h-10 items-center self-start rounded-full border border-dashed border-white/15 px-4 text-[13px] focus-visible:outline-2"
+                  className="press text-mist hover:text-paper focus-visible:outline-ember mt-1 inline-flex h-11 items-center self-start rounded-full border border-dashed border-white/15 px-4 text-[13px] focus-visible:outline-2"
                 >
                   {allTech ? "Show the most used" : `Show all ${data.tech.length} — ${hiddenTech} more`}
                 </button>
@@ -359,8 +359,9 @@ function SelectionBar({
     <div data-map-bar="" aria-live="polite" className="sticky top-20 z-20 mb-8 lg:static lg:mb-10">
       <div
         className={cn(
-          "bg-night/85 flex min-h-14 items-center gap-3 rounded-2xl border px-4 py-2.5 shadow-[0_16px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-colors duration-300",
-          node ? "border-ember/40" : "border-white/10",
+          "flex min-h-14 items-center gap-3 rounded-2xl border transition-[background-color,border-color,box-shadow,padding] duration-300",
+          // At rest, one plain line; once something is traced, the bar that names it and opens it (D-047).
+          node ? "bg-night/85 border-ember/40 px-4 py-2.5 shadow-[0_16px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl" : "border-transparent px-0 py-0",
         )}
       >
         {node ? (
@@ -407,7 +408,8 @@ function SelectionBar({
 
 function Column({ title, count, note, className, children }: { title: string; count?: number; note?: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn("relative flex flex-col justify-center gap-3", className)}>
+    // Every column starts at the top (D-047): centred, the short ones left tall empty gaps beside the work.
+    <div className={cn("relative flex flex-col justify-start gap-3", className)}>
       <p className="text-mist mb-1 flex items-baseline justify-between gap-3 font-mono text-[11px] tracking-[0.14em] uppercase max-lg:col-span-full max-lg:mb-0 max-lg:border-b max-lg:border-white/10 max-lg:pb-2">
         {title}
         {count !== undefined && <span className="type-data text-line tracking-normal lg:hidden">{count}</span>}
@@ -442,7 +444,7 @@ function NodeCard({
       )}
       {icon}
       <span className="min-w-0 flex-1">
-        <span className={cn("block truncate", node.kind === "home" ? "text-paper text-[15px] font-semibold max-lg:text-sm" : node.faint ? "text-mist text-sm max-lg:text-[13px]" : "text-paper text-sm font-medium max-lg:text-[13px]")}>
+        <span className={cn("line-clamp-2 block [overflow-wrap:anywhere]", node.kind === "home" ? "text-paper text-[15px] font-semibold max-lg:text-sm" : node.faint ? "text-mist text-sm max-lg:text-[13px]" : "text-paper text-sm font-medium max-lg:text-[13px]")}>
           {node.label}
         </span>
         {node.sub && <span className={cn("text-line truncate text-[11px]", phoneCompact ? "hidden lg:block" : "block")}>{node.sub}</span>}
@@ -451,7 +453,7 @@ function NodeCard({
     </>
   );
   const cls = cn(
-    "group/n relative z-10 flex min-w-0 items-center gap-2.5 rounded-xl border px-3.5 transition-[opacity,border-color,background-color,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember max-lg:min-h-12 max-lg:px-3",
+    "group/n press relative z-10 flex min-w-0 items-center gap-2.5 rounded-xl border px-3.5 transition-[opacity,border-color,background-color,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember max-lg:min-h-12 max-lg:px-3",
     node.kind === "home" ? "py-3.5 max-lg:py-2.5" : "py-2.5 max-lg:py-2",
     node.faint ? "border-dashed border-white/12 bg-night" : "border-white/10 bg-night hover:border-ember/50",
     selected && "border-ember bg-ember/10 shadow-[0_0_0_3px_rgb(255_91_31/0.15)]",

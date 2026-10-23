@@ -143,7 +143,7 @@ export const CAPABILITIES: Capability[] = [
     db: ["PublicPlatformPulse", "ActivityLog", "JobRun"],
     endpoints: ["GET /platform/pulse"],
     rules: ["BR-3.4"],
-    frontend: [{ page: "/", section: "Control room" }, { page: "(every page)", section: "Footer status line" }],
+    frontend: [{ page: "/", section: "How it all connects: the live status line" }, { page: "(every page)", section: "Footer status line" }],
     notes: ["Aggregates only — no rows, no actors. deployment is null outside Vercel."],
   },
   {
@@ -157,7 +157,7 @@ export const CAPABILITIES: Capability[] = [
     frontend: [
       { page: "/", section: "Hero ledger (years building, organizations founded, shipped / in progress / queued)" },
       { page: "/", section: "Featured work (the admin's picks, in order)" },
-      { page: "/", section: "Control room: approved figures (approved metrics only)" },
+      { page: "/", section: "How it all connects: approved figures (approved metrics only)" },
     ],
     notes: [
       "Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).",

@@ -15,7 +15,7 @@ import { POST as automatic } from "@/app/api/v1/admin/systems/[id]/screenshot/au
 import { db } from "@/lib/db";
 import { createSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { getPublicSystemBySlug } from "@/lib/queries/systems";
-import { runSystemScreenshots } from "@/lib/systems/screenshots";
+import { captureRequestUrl, runSystemScreenshots } from "@/lib/systems/screenshots";
 
 const RUN = `ss${Date.now().toString(36)}`;
 const DAY = 86_400_000;
@@ -150,5 +150,13 @@ describe("BR-1.18 — the owner's upload wins", () => {
     const shot = (await current(s.id))!;
     await expect(db.systemScreenshot.delete({ where: { id: shot.id } })).rejects.toThrow(/BR-1\.18/);
     await expect(db.systemScreenshot.update({ where: { id: shot.id }, data: { width: 2 } })).rejects.toThrow(/BR-1\.18/);
+  });
+});
+
+describe("the capture request (D-047)", () => {
+  it("hides what floats over a page — the privacy banner, the guide button — so it never ends up in a screenshot", () => {
+    const q = new URL(captureRequestUrl("https://example.com")).searchParams;
+    expect(q.get("styles")).toBe("[data-capture-hide]{display:none!important}");
+    expect(q.get("url")).toBe("https://example.com");
   });
 });

@@ -67,7 +67,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string; compact?: 
             placeholder={`Ask about ${ownerFirstName}'s work — or anything`}
             className={cn(
               "placeholder:text-line max-h-32 flex-1 resize-none bg-transparent px-2 outline-none [field-sizing:content]",
-              compact ? "min-h-11 py-2.5 text-base" : "min-h-10 py-2 text-[15px] sm:text-sm",
+              compact ? "min-h-11 py-2.5 text-base" : "min-h-10 py-2 text-base sm:text-sm",
             )}
           />
           {busy ? (
@@ -78,7 +78,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string; compact?: 
             <button
               type="submit"
               disabled={!input.trim() || tooLong}
-              className="bg-ember text-ink shadow-glow-ember grid size-10 shrink-0 place-items-center rounded-full transition-[transform,opacity] hover:scale-105 disabled:opacity-40 disabled:shadow-none disabled:hover:scale-100"
+              className="bg-ember text-ink shadow-glow-ember grid size-11 shrink-0 place-items-center rounded-full transition-[transform,opacity] hover:scale-105 active:scale-95 sm:size-10 disabled:opacity-40 disabled:shadow-none disabled:hover:scale-100"
               aria-label="Send"
             >
               <ArrowUp aria-hidden="true" className="size-4" />
