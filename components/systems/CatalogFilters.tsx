@@ -3,8 +3,7 @@
 // filtered view is a shareable link), rebuilt in the premium pass (D-049,
 // owner-approved 2026-10-23) to stay in reach:
 //   - one glass bar that sticks under the header while you scroll the catalogue
-//     (it rises to the top when the header slips away — HeaderFrame's
-//     data-header on <html>), with how many systems match and the sort;
+//     (it rises to the top when the header slips away — .under-header), with how many systems match and the sort;
 //   - on a laptop the four facets as dropdowns in it (home, status, technology,
 //     domain), with counts; on a phone one "Filter" button with the number of
 //     active filters, opening a sheet from the bottom (FilterSheet, the owner's
@@ -80,7 +79,7 @@ export function CatalogFilters({ facets, params, total, systemsTotal }: { facets
   })).filter((g) => g.options.length > 1 || g.options.some((o) => o.on));
 
   return (
-    <div className="catalog-toolbar sticky z-30 mb-10">
+    <div className="catalog-toolbar under-header sticky z-30 mb-10">
       <div className="bg-sheet/85 border-ink/10 flex flex-wrap items-center gap-2 rounded-2xl border p-2 shadow-[0_18px_40px_-28px_rgb(18_20_23/0.55)] backdrop-blur-xl">
         {/* A laptop: the four dropdowns. A phone with script: the sheet's button instead; without script, the dropdowns. */}
         <div className="hidden flex-wrap gap-2 md:flex [html:not(.js)_&]:flex">

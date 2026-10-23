@@ -131,3 +131,6 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 ### 2026-10-23 · The Systems page's premium pass (D-049)
 - **Method:** audit of the live catalogue at 390/1440 px, a plan with mocks in the real tokens (artifact "MALULEKE-KS Systems Plan"), four owner decisions, built after approval.
 - **Components:** Magic UI **Magic Card** kept as the card's surface (hover light), with the shared `press` feedback; the site's Radix **Dialog** as a bottom sheet for the phone's filters (no new library); Motion-free CSS for the sticky toolbar's rise (it follows the header's state through a data attribute). Cards carry one capsule; the technologies are marks, not pills.
+### 2026-10-23 · The Journey page's premium pass (D-050)
+- **Method:** the same audit → published plan → build → polish loop, on the owner's advance approval.
+- **Motion with meaning:** Motion `useScroll` drives the rail's beam, each chapter's dot and its margin numeral (an outline that fills with ember once reached); the chapter index's underline follows the reader (IntersectionObserver) and slides into view on a phone. The current chapters' faint ember wash replaces the shining borders. Magic Card, Shine Border and Dot Pattern leave the page.
