@@ -1,14 +1,17 @@
-// GET/PATCH /api/v1/admin/profile/photos/{id} — preview any version (the
-// image itself), or change its alt text — the only thing about a photo that
-// can change (BR-1.17). See openapi-contract.yaml.
+// GET/PATCH/DELETE /api/v1/admin/profile/photos/{id} — preview any version (the
+// image itself), change its alt text — the only thing about a photo that can
+// change — or, only when the owner asks, permanently delete an earlier version
+// (never the current one; BR-1.17 as amended, D-054). See openapi-contract.yaml.
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withAdmin } from "@/lib/auth/with-admin";
 import { db } from "@/lib/db";
-import { toPhotoVersion } from "@/lib/profile/photos";
+import { deletePhotoVersion, toPhotoVersion } from "@/lib/profile/photos";
 
 const AltTextSchema = z.object({ altText: z.string().trim().min(1).max(300) });
+/** A delete says so in its body — nothing is removed by a stray request. */
+const ConfirmSchema = z.object({ confirm: z.literal(true) });
 
 function notFound() {
   return NextResponse.json({ error: { code: "NOT_FOUND", message: "Photo not found", details: null } }, { status: 404 });
@@ -32,4 +35,17 @@ export const PATCH = withAdmin<{ id: string }>(async (request, { write }, { para
   if (!(await db.profilePhoto.findUnique({ where: { id }, select: { id: true } }))) return notFound();
   const photo = await write((tx) => tx.profilePhoto.update({ where: { id }, data: { altText: parsed.data.altText } }));
   return NextResponse.json(toPhotoVersion(photo));
+});
+
+export const DELETE = withAdmin<{ id: string }>(async (request, { write }, { params }) => {
+  const { id } = await params;
+  if (!ConfirmSchema.safeParse(await request.json().catch(() => null)).success) {
+    return NextResponse.json({ error: { code: "VALIDATION_ERROR", message: "Body must be { confirm: true } — a photo is deleted only on purpose", details: null } }, { status: 400 });
+  }
+  const outcome = await write((tx) => deletePhotoVersion(tx, id));
+  if (outcome === "missing") return notFound();
+  if (outcome === "current") {
+    return NextResponse.json({ error: { code: "CURRENT_VERSION", message: "This is the current photo — replace it first, then delete the old version.", details: null } }, { status: 409 });
+  }
+  return new NextResponse(null, { status: 204 });
 });

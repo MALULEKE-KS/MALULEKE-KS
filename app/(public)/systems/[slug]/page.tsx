@@ -35,6 +35,8 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
+import { HeroBackdrop } from "@/components/shared/HeroBackdrop";
+import { getSetting } from "@/lib/settings";
 import { techMark } from "@/components/shared/TechChip";
 import { SkillIcon } from "@/components/about/skill-icons";
 import { CatalogCard } from "@/components/systems/CatalogCard";
@@ -77,6 +79,9 @@ function summary(cs: NonNullable<Awaited<ReturnType<typeof getCaseStudy>>>) {
   const readme = cs.writeUp?.source === "readme" ? cs.writeUp.text : null;
   return describe(cs.system.description, cs.system.name, cs.system.slug, readme);
 }
+
+/** A screenshot is captured at a laptop's view (lib/systems/screenshots.ts); the hero covers its band with it whatever the real size. */
+const SCREENSHOT_FRAME = { width: 1440, height: 900 };
 
 /** How many technology marks the hero shows before counting the rest (all are in the story and the side panel). */
 const HERO_MARKS = 8;
@@ -140,14 +145,28 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
     repo && repo.stars > 0 && { label: repo.stars === 1 ? "Star" : "Stars", value: String(repo.stars) },
   ].filter((p): p is { label: string; value: string } => Boolean(p));
 
+  // How dark the veil over the screenshot is — the inner pages' own setting (site.pageHero.scrim), so one control tunes every hero image.
+  const heroScrim = await getSetting("site.pageHero.scrim");
   const moving = cs.weeks.some((n) => n > 0);
   const commitsIn26 = cs.weeks.reduce((a, b) => a + b, 0);
 
   return (
     <>
       <JsonLd data={workLd} />
-      <section aria-labelledby="system-title" className="hero-field text-paper overflow-hidden">
-        <Container className="pt-28 pb-14 md:pt-32 md:pb-20">
+      <section aria-labelledby="system-title" className="hero-field text-paper relative isolate overflow-hidden">
+        {/* The system's own screenshot behind its hero (D-054): the one Admin manages (capture, upload, back to
+            automatic, history) — so changing it never needs code. Top-anchored: a site's top is what it is. */}
+        {system.screenshotUrl && (
+          <HeroBackdrop
+            desktop={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}
+            mobile={{ url: system.screenshotUrl, width: SCREENSHOT_FRAME.width, height: SCREENSHOT_FRAME.height }}
+            positionDesktop="50% 0%"
+            positionMobile="30% 0%"
+            scrim={heroScrim}
+            glow={0}
+          />
+        )}
+        <Container className="relative pt-28 pb-14 md:pt-32 md:pb-20">
           <Link
             href="/systems"
             className="text-mist hover:text-paper focus-visible:outline-ember inline-flex items-center gap-2 rounded-full text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"

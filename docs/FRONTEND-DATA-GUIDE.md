@@ -546,6 +546,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /admin/profile/photos/{id}`
 - Call `PATCH /admin/profile/photos/{id}`
 - Call `POST /admin/profile/photos/{id}/restore`
+- Call `DELETE /admin/profile/photos/{id}`
 - Call `GET /admin/profile/titles`
 - Call `POST /admin/profile/titles`
 - Call `PATCH /admin/profile/titles/{id}`
@@ -601,6 +602,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/systems/{id}/screenshot`
 - Call `POST /admin/systems/{id}/screenshot/capture`
 - Call `POST /admin/systems/{id}/screenshot/automatic`
+- Call `GET /admin/systems/{id}/screenshot/versions`
+- Call `GET /admin/systems/{id}/screenshot/versions/{versionId}`
+- Call `DELETE /admin/systems/{id}/screenshot/versions/{versionId}`
+- Call `POST /admin/systems/{id}/screenshot/versions/{versionId}/restore`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
@@ -629,6 +634,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `POST /admin/systems/{id}/screenshot`
 - Call `POST /admin/systems/{id}/screenshot/capture`
 - Call `POST /admin/systems/{id}/screenshot/automatic`
+- Call `GET /admin/systems/{id}/screenshot/versions`
+- Call `GET /admin/systems/{id}/screenshot/versions/{versionId}`
+- Call `DELETE /admin/systems/{id}/screenshot/versions/{versionId}`
+- Call `POST /admin/systems/{id}/screenshot/versions/{versionId}/restore`
 - 409 CLIENT_APPROVAL_REQUIRED / OWNER_PERMISSION_REQUIRED: show the reason and the switch that fixes it.
 - Systems are never deleted — offer Archive (BR-1.9).
 - Testimonials are read-only here until V1.1.
@@ -711,6 +720,10 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `POST /admin/systems/{id}/screenshot` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems/{id}/screenshot/capture` | Systems — curate, publish, feature | admin |
 | `POST /admin/systems/{id}/screenshot/automatic` | Systems — curate, publish, feature | admin |
+| `GET /admin/systems/{id}/screenshot/versions` | Systems — curate, publish, feature | admin |
+| `GET /admin/systems/{id}/screenshot/versions/{versionId}` | Systems — curate, publish, feature | admin |
+| `DELETE /admin/systems/{id}/screenshot/versions/{versionId}` | Systems — curate, publish, feature | admin |
+| `POST /admin/systems/{id}/screenshot/versions/{versionId}/restore` | Systems — curate, publish, feature | admin |
 | `GET /admin/organizations` | Organizations | admin |
 | `POST /admin/organizations` | Organizations | admin |
 | `PATCH /admin/organizations/{id}` | Organizations | admin |
@@ -758,6 +771,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 | `GET /admin/profile/photos/{id}` | Profile, links and achievements | admin |
 | `PATCH /admin/profile/photos/{id}` | Profile, links and achievements | admin |
 | `POST /admin/profile/photos/{id}/restore` | Profile, links and achievements | admin |
+| `DELETE /admin/profile/photos/{id}` | Profile, links and achievements | admin |
 | `GET /admin/profile/titles` | Profile, links and achievements | admin |
 | `POST /admin/profile/titles` | Profile, links and achievements | admin |
 | `PATCH /admin/profile/titles/{id}` | Profile, links and achievements | admin |

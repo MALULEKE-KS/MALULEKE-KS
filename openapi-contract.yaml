@@ -1491,6 +1491,13 @@ paths:
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { type: object, required: [altText], properties: { altText: { type: string, maxLength: 300 } } } } } }
       responses: { "200": { description: The version }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } }
+    delete:
+      tags: [Profile (Admin)]
+      summary: "Permanently delete an earlier version — only on the owner's explicit request; never the current photo (BR-1.17 as amended, D-054)"
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [confirm], properties: { confirm: { type: boolean, enum: [true] } } } } } }
+      responses: { "204": { description: Deleted }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "CURRENT_VERSION — replace it first" } }
   /admin/profile/photos/{id}/restore:
     post: { tags: [Profile (Admin)], summary: "Make an earlier version current again (BR-1.17)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: The version }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/profile/titles:
@@ -1597,6 +1604,19 @@ paths:
     post: { tags: [Systems (Admin)], summary: "Capture now — take the screenshot from the system's live site right away; retires an uploaded one (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ screenshot }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "NO_LIVE_SITE — the system has no live address" }, "502": { description: "CAPTURE_FAILED — the site or the screenshot service failed; nothing changed" } } }
   /admin/systems/{id}/screenshot/automatic:
     post: { tags: [Systems (Admin)], summary: "Back to automatic — retire the owner's uploaded screenshot so the daily job captures the live site again (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ retired, screenshot }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/screenshot/versions:
+    get: { tags: [Systems (Admin)], summary: "Every version of the system's screenshot, newest first, without the bytes — the history (BR-1.18; D-054)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ data: [{ id, source, sourceUrl, width, height, byteSize, createdAt, supersededAt, current }] }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+  /admin/systems/{id}/screenshot/versions/{versionId}:
+    get: { tags: [Systems (Admin)], summary: "One version's image — the admin's preview (BR-1.18)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: versionId, in: path, required: true, schema: { type: string } }], responses: { "200": { description: image/webp }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
+    delete:
+      tags: [Systems (Admin)]
+      summary: "Permanently delete an earlier version — only on the owner's explicit request; never the current screenshot (BR-1.18 as amended, D-054)"
+      security: [{ adminSession: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: versionId, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [confirm], properties: { confirm: { type: boolean, enum: [true] } } } } } }
+      responses: { "204": { description: Deleted }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { description: "CURRENT_VERSION — replace it first" } }
+  /admin/systems/{id}/screenshot/versions/{versionId}/restore:
+    post: { tags: [Systems (Admin)], summary: "Make an earlier screenshot current again (BR-1.18; D-054)", security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: versionId, in: path, required: true, schema: { type: string } }], responses: { "200": { description: "{ id, current }" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }
   /admin/systems/{id}/impacts:
     get: { tags: [Systems (Admin)], summary: List a system's impacts, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Impacts }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { tags: [Systems (Admin)], summary: Add a system impact, security: [{ adminSession: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImpactInput" } } } }, responses: { "201": { description: Created }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { $ref: "#/components/responses/NotFound" } } }

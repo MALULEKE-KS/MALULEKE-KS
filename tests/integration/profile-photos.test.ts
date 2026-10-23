@@ -95,7 +95,7 @@ describe("BR-1.17 — uploading a photo", () => {
     expect(restored.current).toBe(true);
   });
 
-  it("only the alt text of a version can change — never its image, never deleted", async () => {
+  it("only the alt text of a version can change — never its image; never deleted except on the owner's explicit request (D-054)", async () => {
     const res = await patchPhoto(
       new NextRequest(`http://localhost/api/v1/admin/profile/photos/${firstId}`, { method: "PATCH", body: JSON.stringify({ altText: "Renamed" }), headers: { "Content-Type": "application/json", cookie: `${SESSION_COOKIE_NAME}=${cookie}` } }),
       { params: Promise.resolve({ id: firstId }) },

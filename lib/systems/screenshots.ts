@@ -91,6 +91,39 @@ export async function backToAutomatic(tx: Tx, systemId: string) {
   return count > 0;
 }
 
+/** Every version of a system's screenshot, newest first, without the bytes — the admin's history (D-054). */
+export async function listScreenshotVersions(systemId: string) {
+  const rows = await db.systemScreenshot.findMany({
+    where: { systemId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, source: true, sourceUrl: true, width: true, height: true, byteSize: true, createdAt: true, supersededAt: true },
+  });
+  return rows.map((r) => ({ ...r, current: r.supersededAt === null, createdAt: r.createdAt.toISOString(), supersededAt: r.supersededAt?.toISOString() ?? null }));
+}
+
+/** Make an earlier version current again (BR-1.18 — superseded, never altered). Null when it isn't this system's. */
+export async function restoreScreenshot(tx: Tx, systemId: string, id: string) {
+  const target = await tx.systemScreenshot.findFirst({ where: { id, systemId }, select: { id: true, supersededAt: true } });
+  if (!target) return null;
+  if (target.supersededAt === null) return target;
+  await tx.systemScreenshot.updateMany({ where: { systemId, supersededAt: null }, data: { supersededAt: new Date() } });
+  return tx.systemScreenshot.update({ where: { id }, data: { supersededAt: null }, select: { id: true, supersededAt: true } });
+}
+
+/**
+ * Permanently delete one earlier version — only when the owner asks (BR-1.18 as
+ * amended, D-054). The current screenshot is refused; the database refuses any
+ * delete that doesn't come through here (app.version_delete).
+ */
+export async function deleteScreenshotVersion(tx: Tx, systemId: string, id: string): Promise<"deleted" | "current" | "missing"> {
+  const target = await tx.systemScreenshot.findFirst({ where: { id, systemId }, select: { id: true, supersededAt: true } });
+  if (!target) return "missing";
+  if (target.supersededAt === null) return "current";
+  await tx.$executeRaw`SELECT set_config('app.version_delete', 'on', true)`;
+  await tx.systemScreenshot.delete({ where: { id } });
+  return "deleted";
+}
+
 /** The current screenshot's facts (no bytes), for the admin. */
 export async function currentScreenshot(systemId: string) {
   const s = await db.systemScreenshot.findFirst({

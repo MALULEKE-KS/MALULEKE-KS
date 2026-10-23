@@ -4,7 +4,7 @@
 
 Every capability the platform has: the database objects behind it, the endpoints that serve it, and the business rules it enforces. Nothing in the database is left without an endpoint unless it's listed under *Not exposed*, with the reason. The frontend view of the same map is `docs/FRONTEND-DATA-GUIDE.md`.
 
-**34 capabilities · 140 endpoints.**
+**34 capabilities · 145 endpoints.**
 
 ## Public
 
@@ -574,6 +574,10 @@ Every system unmasked: edit everything but the slug, publish under BR-1.1/1.11, 
 - `POST /admin/systems/{id}/screenshot`
 - `POST /admin/systems/{id}/screenshot/capture`
 - `POST /admin/systems/{id}/screenshot/automatic`
+- `GET /admin/systems/{id}/screenshot/versions`
+- `GET /admin/systems/{id}/screenshot/versions/{versionId}`
+- `DELETE /admin/systems/{id}/screenshot/versions/{versionId}`
+- `POST /admin/systems/{id}/screenshot/versions/{versionId}/restore`
 
 **Database**
 
@@ -752,6 +756,7 @@ The owner's details, social links (and which go on the CV), certifications and a
 - `GET /admin/profile/photos/{id}`
 - `PATCH /admin/profile/photos/{id}`
 - `POST /admin/profile/photos/{id}/restore`
+- `DELETE /admin/profile/photos/{id}`
 - `GET /admin/profile/titles`
 - `POST /admin/profile/titles`
 - `PATCH /admin/profile/titles/{id}`
