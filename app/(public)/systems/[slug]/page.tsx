@@ -21,7 +21,7 @@ import { cache } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { Activity, ArrowLeft, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, ShieldCheck, Sparkles, Star, Tag } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, ShieldCheck, Sparkles, Star, Tag } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
@@ -35,7 +35,8 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SystemPreviewFrame } from "@/components/shared/SystemPreviewFrame";
-import { TechChip } from "@/components/shared/TechChip";
+import { techMark } from "@/components/shared/TechChip";
+import { SkillIcon } from "@/components/about/skill-icons";
 import { CatalogCard } from "@/components/systems/CatalogCard";
 import { ActivityBars, LanguageBar } from "@/components/systems/DossierParts";
 import { getCaseStudy } from "@/lib/queries/case-study";
@@ -76,6 +77,9 @@ function summary(cs: NonNullable<Awaited<ReturnType<typeof getCaseStudy>>>) {
   const readme = cs.writeUp?.source === "readme" ? cs.writeUp.text : null;
   return describe(cs.system.description, cs.system.name, cs.system.slug, readme);
 }
+
+/** How many technology marks the hero shows before counting the rest (all are in the story and the side panel). */
+const HERO_MARKS = 8;
 
 // An unknown or unpublished slug gets no title of its own — the page then
 // calls notFound() and both fall through to the same generic 404 (BR-1.3/1.4).
@@ -155,7 +159,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <StatusBadge label={system.status} colorToken={system.statusColorToken} onDark />
             {system.isFlagship && (
-              <span className="bg-ember/15 text-ember inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span className="text-ember inline-flex items-center gap-1 text-xs font-medium">
                 <Star aria-hidden="true" className="size-3 fill-current" />
                 Flagship
               </span>
@@ -170,11 +174,18 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
           </h1>
           {what && <p className="type-lede text-mist mt-5 max-w-2xl">{what}</p>}
 
+          {/* What it's built with, as one line of marks — the first eight, then a count (D-053); every one is in the story and the side panel. */}
           {cs.tech.length > 0 && (
-            <ul className="mt-8 flex flex-wrap gap-2" aria-label="Built with">
-              {cs.tech.map((t) => (
-                <li key={t}>
-                  <TechChip name={t} tone="dark" />
+            <ul className="text-paper/85 mt-8 flex flex-wrap items-center gap-x-5 gap-y-2.5 text-sm" aria-label="Built with">
+              {cs.tech.slice(0, HERO_MARKS).map((t, i, shown) => (
+                <li key={t} className="inline-flex items-center gap-2 whitespace-nowrap">
+                  {techMark(t)}
+                  {t}
+                  {i === shown.length - 1 && cs.tech.length > HERO_MARKS && (
+                    <span title={cs.tech.slice(HERO_MARKS).join(", ")} className="text-mist ml-0.5 font-mono text-xs">
+                      +{cs.tech.length - HERO_MARKS}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -262,7 +273,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
           </div>
 
           <aside className="min-w-0 lg:col-span-4" aria-labelledby="glance-title">
-            <div className="border-ink/10 bg-sheet shadow-soft rounded-3xl border p-6 lg:sticky lg:top-24">
+            <div className="under-header border-ink/10 bg-sheet shadow-soft rounded-3xl border p-6 lg:sticky">
               <SectionIndex sections={sections} className="border-ink/10 mb-6 hidden border-b pb-5 lg:block" />
               <h2 id="glance-title" className="text-slate inline-flex items-center gap-2 text-xs font-medium">
                 <Boxes aria-hidden="true" className="text-accent size-4" />
@@ -366,30 +377,33 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
               {moving && (
                 <div className="min-w-0 lg:col-span-7">
                   <ActivityBars weeks={cs.weeks} startLabel={`${cs.weeks.length} weeks ago`} endLabel="this week" />
-                  <p className="text-mist mt-6 text-sm">
-                    <span className="type-data text-paper font-semibold">{commitsIn26}</span> commits in the last 26 weeks
+                  {/* The counts as figures under a hairline (the hero's ledger style), so the column holds its weight (D-053). */}
+                  <dl className="mt-8 grid grid-cols-2 gap-x-6 border-t border-white/12 pt-6">
+                    <div className="flex flex-col-reverse gap-1">
+                      <dt className="text-mist text-sm">commits in the last 26 weeks</dt>
+                      <dd className="text-paper text-3xl font-medium tracking-tight tabular-nums md:text-4xl">{commitsIn26}</dd>
+                    </div>
                     {cs.commitsLast4Weeks > 0 && (
-                      <>
-                        {" · "}
-                        <span className="type-data text-paper font-semibold">{cs.commitsLast4Weeks}</span> in the last 4
-                      </>
+                      <div className="flex flex-col-reverse gap-1">
+                        <dt className="text-mist text-sm">in the last 4 weeks</dt>
+                        <dd className="text-paper text-3xl font-medium tracking-tight tabular-nums md:text-4xl">{cs.commitsLast4Weeks}</dd>
+                      </div>
                     )}
-                  </p>
+                  </dl>
                 </div>
               )}
               {cs.commits.length > 0 && (
                 <div className={moving ? "min-w-0 lg:col-span-5" : "min-w-0 lg:col-span-12"}>
-                  <h3 className="type-eyebrow text-mist">Latest commits</h3>
-                  <ol className="mt-4 space-y-3">
+                  <h3 className="text-mist font-mono text-xs tracking-[0.1em] uppercase">Latest commits</h3>
+                  {/* Ruled rows, not boxes (D-053). */}
+                  <ol className="mt-4 divide-y divide-white/[0.08] border-y border-white/[0.08]">
                     {cs.commits.map((c) => (
-                      <li key={c.at + c.title} className="flex items-start gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.03] px-4 py-3">
+                      <li key={c.at + c.title} className="flex items-start gap-3 py-3">
                         <GitCommitHorizontal aria-hidden="true" className="text-ember mt-0.5 size-4 shrink-0" />
-                        <span className="min-w-0 flex-1">
-                          <span className="text-paper block truncate text-sm">{c.title}</span>
-                          <time dateTime={c.at} className="text-mist font-mono text-[11px]">
-                            {c.when}
-                          </time>
-                        </span>
+                        <span className="text-paper min-w-0 flex-1 truncate text-sm">{c.title}</span>
+                        <time dateTime={c.at} className="text-line shrink-0 font-mono text-[11px]">
+                          {c.when}
+                        </time>
                       </li>
                     ))}
                   </ol>
@@ -405,16 +419,22 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
           <Container>
             <SectionHeader copyKey="system.proves" eyebrow="Skills" id="proves-title" title="What it proves." />
             {/* Evidence, not self-rating (FRONTEND-DATA-GUIDE "/systems/[slug]"). */}
-            <ul className="flex flex-wrap gap-3">
+            {/* Proof rows in ruled columns — the same rows as About (D-053). */}
+            <ul className="border-ink/12 grid grid-cols-1 gap-x-10 border-t sm:grid-cols-2 lg:grid-cols-3">
               {cs.skills.map((s) => (
-                <li key={s.name}>
+                <li key={s.name} className="border-ink/12 border-b">
                   {/* Each skill opens the other systems that prove it. */}
-                  <Link href={`/systems?tech=${encodeURIComponent(s.name)}`} className="border-ink/10 bg-sheet shadow-soft hover:border-ember/40 focus-visible:outline-ember block rounded-2xl border px-4 py-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
-                    <span className="text-ink font-medium">{s.name}</span>
-                    <span className="text-slate mt-0.5 block text-xs">
-                      used in {s.systems} {s.systems === 1 ? "system" : "systems"}
-                      {s.roles > 0 && `, ${s.roles} ${s.roles === 1 ? "role" : "roles"}`}
+                  <Link
+                    href={`/systems?tech=${encodeURIComponent(s.name)}`}
+                    className="group/k press text-ink focus-visible:outline-ember flex min-h-12 items-center gap-3 py-2.5 focus-visible:outline-2 focus-visible:-outline-offset-2"
+                  >
+                    <SkillIcon name={s.name} className="size-4 shrink-0" />
+                    <span className="group-hover/k:text-accent min-w-0 flex-1 text-[15px] font-medium transition-colors">{s.name}</span>
+                    <span className="text-slate font-mono text-xs tabular-nums">
+                      {s.systems} {s.systems === 1 ? "system" : "systems"}
+                      {s.roles > 0 && ` · ${s.roles} ${s.roles === 1 ? "role" : "roles"}`}
                     </span>
+                    <ArrowRight aria-hidden="true" className="text-slate group-hover/k:text-accent size-3.5 shrink-0 transition-[transform,color] group-hover/k:translate-x-0.5" />
                   </Link>
                 </li>
               ))}
