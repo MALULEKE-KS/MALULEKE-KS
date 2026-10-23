@@ -87,7 +87,7 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
           <HeroExtras spotlight={showSpotlight} />
         </Suspense>
       </PageHero>
-      <section className="bg-paper py-12 md:py-16">
+      <section className="bg-paper py-14 md:py-20">
         <Container>
           <Suspense fallback={<SystemsGridSkeleton />}>
             <SystemsResults searchParams={params} />

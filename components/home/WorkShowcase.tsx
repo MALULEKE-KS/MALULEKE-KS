@@ -31,6 +31,7 @@ import { ProjectShowcase } from "@/components/ui/project-showcase";
 import type { SelectedWork } from "@/lib/queries/work";
 import { Accent } from "@/components/shared/Accent";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 type Work = SelectedWork["featured"][number];
 
@@ -47,7 +48,7 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
   const meta = [w.organization, w.domain].filter(Boolean).join(" · ");
   const extra = w.techStack.length - STACK_SHOWN;
   return (
-    <article className="bg-sheet border-ink/[0.07] shadow-soft group/case relative overflow-hidden rounded-[1.75rem] border transition-shadow duration-500 hover:shadow-lift">
+    <article className="bg-sheet border-ink/[0.07] shadow-soft group/case relative overflow-hidden rounded-3xl border transition-shadow duration-500 hover:shadow-lift">
       <div className="grid grid-cols-1 items-center gap-6 p-4 sm:p-6 lg:grid-cols-12 lg:gap-10 lg:p-8">
         <div className={cn("min-w-0 lg:col-span-7", flip && "lg:order-2")}>
           <Lens className="rounded-xl">
@@ -112,7 +113,7 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
           <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-4">
             <Link
               href={`/systems/${w.slug}`}
-              className="group/cta press bg-ink text-paper hover:shadow-lift focus-visible:outline-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 max-sm:w-full sm:h-11 motion-safe:hover:-translate-y-0.5"
+              className={cn(buttonVariants({ variant: "default", size: "lg" }), "max-sm:w-full sm:h-11 sm:px-6 sm:text-sm")}
             >
               Read the case study
               <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover/cta:translate-x-0.5" />
@@ -145,7 +146,7 @@ function CommitStrip({ now, label }: { now: NonNullable<SelectedWork["nowBuildin
   const external = !now.onSite;
   const commits = now.commits.slice(0, COMMITS_SHOWN);
   return (
-    <div className="bg-ink text-paper relative overflow-hidden rounded-[1.5rem] border border-white/[0.06] p-5 shadow-lift sm:p-7">
+    <div className="bg-ink text-paper relative overflow-hidden rounded-3xl border border-white/[0.06] p-5 shadow-lift sm:p-7">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-10">
         <div className="min-w-0 lg:col-span-4">
           {label && (

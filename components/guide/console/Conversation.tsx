@@ -8,7 +8,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, RefreshCw } from "lucide-react";
+import { ArrowUpRight, RefreshCw, ArrowRight } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { textOf, useGuideChat } from "@/components/guide/GuideChatProvider";
 import { AnswerMessage } from "@/components/guide/console/AnswerMessage";
@@ -63,19 +63,20 @@ export function Conversation({ onNavigate, className }: { onNavigate?: () => voi
           </div>
           {opening.length > 0 && (
             <div>
-              <p className="text-line mb-2 font-mono text-[10.5px] tracking-[0.14em] uppercase">Try asking</p>
-              <ul className="grid gap-2 sm:grid-cols-2">
+              <p className="text-line type-micro mb-2">Try asking</p>
+              {/* The home band's question rows (D-044, D-055): one list, hairlines, an arrow that moves on hover. */}
+              <ul className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
                 {opening.map((q, i) => (
                   <li key={q}>
                     <button
-                        type="button"
-                        onClick={() => send(q)}
-                        className="group/q hover:border-ember/40 flex h-full w-full items-start gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 text-left text-[13px] leading-snug transition-colors hover:bg-white/[0.05]"
-                      >
-                        <span className="type-data text-ember mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="flex-1">{q}</span>
-                        <ArrowUpRight aria-hidden="true" className="text-mist group-hover/q:text-ember mt-0.5 size-3.5 shrink-0" />
-                      </button>
+                      type="button"
+                      onClick={() => send(q)}
+                      className="group/q press flex min-h-11 w-full items-start gap-3 py-3 text-left text-[14px] leading-snug transition-colors hover:bg-white/[0.03]"
+                    >
+                      <span className="type-data text-ember mt-px text-[11px]">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="flex-1">{q}</span>
+                      <ArrowRight aria-hidden="true" className="text-line group-hover/q:text-ember mt-0.5 size-4 shrink-0 transition-[transform,color] duration-200 group-hover/q:translate-x-0.5 motion-reduce:transition-none" />
+                    </button>
                   </li>
                 ))}
               </ul>

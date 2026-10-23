@@ -187,7 +187,7 @@ export function GuideText({ text, onNavigate, hosts = ["github.com"] }: { text: 
         part.code ? (
           <div key={i} className="group/code relative overflow-hidden rounded-xl border border-white/10 bg-black/40">
             <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-1">
-              <span className="text-mist font-mono text-[10px] tracking-wide uppercase">{part.lang ?? "code"}</span>
+              <span className="text-mist type-micro">{part.lang ?? "code"}</span>
               <CopyButton text={part.body} />
             </div>
             <pre className="overflow-x-auto px-3 py-2.5 font-mono text-[12px] leading-relaxed">

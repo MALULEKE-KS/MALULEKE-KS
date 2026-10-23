@@ -32,7 +32,7 @@ function Group({ g }: { g: SheetGroup }) {
   const shown = all || !long ? g.options : g.options.filter((o, i) => i < FIRST || o.on);
   return (
     <section aria-labelledby={`sheet-${g.param}`} className="border-t border-white/[0.08] pt-4 first:border-t-0 first:pt-0">
-      <h3 id={`sheet-${g.param}`} className="text-line font-mono text-xs tracking-[0.1em] uppercase">
+      <h3 id={`sheet-${g.param}`} className="text-line type-micro">
         {g.name}
       </h3>
       <ul className="mt-3 flex flex-wrap gap-2">

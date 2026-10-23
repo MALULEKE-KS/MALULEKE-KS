@@ -16,24 +16,29 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/Container";
+import { HeroLabel } from "@/components/shared/HeroKit";
 
 export default function PublicError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     console.error(error);
   }, [error]);
 
+  // The shared hero shape (D-055): label, heading, one line, the action — and the reference to quote.
   return (
-    <Container>
-      <section className="max-w-2xl py-16">
-        <h1 className="text-ink mb-4 font-sans text-2xl font-semibold">This page failed to load</h1>
-        <p className="text-ink mb-6 font-sans">
-          The data behind it could not be read. Try again; if it keeps failing, come back in a few minutes.
-        </p>
-        {error.digest && <p className="text-slate mb-6 font-mono text-xs">Reference: {error.digest}</p>}
-        <Button type="button" onClick={() => retry()}>
-          Try again
-        </Button>
-      </section>
-    </Container>
+    <section aria-labelledby="err-title" className="hero-field text-paper flex min-h-svh items-center">
+      <Container className="pt-28 pb-16 md:pt-32">
+        <div className="max-w-2xl">
+          <HeroLabel>Something went wrong</HeroLabel>
+          <h1 id="err-title" className="type-display mt-6 text-balance">
+            This page failed to load.
+          </h1>
+          <p className="type-lede text-mist mt-5">The data behind it could not be read. Try again; if it keeps failing, come back in a few minutes.</p>
+          {error.digest && <p className="text-line type-micro mt-4">Reference: {error.digest}</p>}
+          <Button type="button" variant="accent" size="lg" className="mt-9" onClick={() => retry()}>
+            Try again
+          </Button>
+        </div>
+      </Container>
+    </section>
   );
 }

@@ -56,11 +56,11 @@ function ClaimCard({ c }: { c: ResolvedClaim }) {
       {note && <p className="text-mist mt-1 text-xs">{note}</p>}
       <dl className="mt-3 grid gap-2 text-[13px] leading-relaxed">
         <div>
-          <dt className="text-mist text-[11px] font-medium tracking-wide uppercase">What it proves</dt>
+          <dt className="text-mist type-micro font-medium">What it proves</dt>
           <dd className="mt-0.5">{c.proves}</dd>
         </div>
         <div>
-          <dt className="text-mist text-[11px] font-medium tracking-wide uppercase">What it doesn&rsquo;t prove</dt>
+          <dt className="text-mist type-micro font-medium">What it doesn&rsquo;t prove</dt>
           <dd className="text-mist mt-0.5">{c.doesNotProve}</dd>
         </div>
       </dl>
@@ -145,7 +145,7 @@ export function Evidence({
       </HoverCard>
       <DialogContent className="top-auto bottom-0 max-w-xl rounded-b-none sm:top-[10vh] sm:bottom-auto sm:rounded-2xl">
         <div className="max-h-[82vh] overflow-y-auto p-5 sm:max-h-[78vh] sm:p-6">
-          <p className="text-mist text-[11px] font-medium tracking-wide uppercase">Evidence</p>
+          <p className="text-mist type-micro font-medium">Evidence</p>
           <DialogTitle className="mt-1 pr-8 text-lg font-semibold tracking-tight">{label}</DialogTitle>
           <DialogDescription className="text-mist mt-1 text-[13px]">
             {commit ? `Links open the source at build ${commit.slice(0, 7)} — the code serving this page.` : "Links open the latest source."}

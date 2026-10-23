@@ -244,7 +244,7 @@ export default async function CvPage() {
         />
       </div>
 
-      <section className="bg-paper py-12 md:py-16">
+      <section className="bg-paper py-14 md:py-20">
         <Container className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
           {/* The dock: downloads first on phones, sticky beside the sheet on wide screens. */}
           <aside className="no-print min-w-0 lg:order-2 lg:col-span-4">
@@ -252,7 +252,7 @@ export default async function CvPage() {
               <DownloadCvButton options={options} />
               {cv && index.length > 1 && (
                 <nav aria-label="On this CV" className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-5">
-                  <p className="text-slate text-xs font-medium tracking-wide uppercase">On this CV</p>
+                  <p className="text-slate type-micro font-medium">On this CV</p>
                   <ol className="-mx-1 mt-3 flex flex-wrap gap-1.5 lg:flex-col lg:gap-0.5">
                     {index.map((x, i) => (
                       <li key={x.id}>
@@ -275,7 +275,7 @@ export default async function CvPage() {
 
           {cv && (
             // The sheet: the CV as a document, with its own header — the part that prints.
-            <article className="cv-page border-ink/10 bg-sheet shadow-lift min-w-0 rounded-[1.75rem] border p-6 sm:p-10 md:p-14 lg:order-1 lg:col-span-8 print:rounded-none print:border-0 print:p-0">
+            <article className="cv-page border-ink/10 bg-sheet shadow-lift min-w-0 rounded-3xl border p-6 sm:p-10 md:p-14 lg:order-1 lg:col-span-8 print:rounded-none print:border-0 print:p-0">
               {/* A div, not <header>: the print stylesheet hides every header element. */}
               <div className="border-ink/10 mb-10 border-b pb-8">
                 <h2 className="text-ink font-sans text-3xl font-semibold tracking-tight md:text-4xl">{cv.name}</h2>

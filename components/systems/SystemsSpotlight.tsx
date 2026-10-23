@@ -46,7 +46,7 @@ function Face({ s, active }: { s: Slide; active: boolean }) {
       <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.06)_1px,transparent_1px)] [background-size:16px_16px] [mask-image:linear-gradient(to_bottom,#000,transparent_70%)]" />
       <span className="relative flex items-center justify-between gap-2">
         <StatusBadge label={s.status} colorToken={s.statusColorToken} onDark />
-        {s.home && <span className="text-mist truncate font-mono text-[10px] tracking-wide uppercase">{s.home}</span>}
+        {s.home && <span className="text-mist truncate type-micro">{s.home}</span>}
       </span>
       <span className="relative">
         <span className="block font-sans text-xl leading-tight font-semibold tracking-tight sm:text-2xl">{s.name}</span>

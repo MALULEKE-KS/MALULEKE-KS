@@ -24,6 +24,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { ArrowRight, ChevronDown, FileText } from "lucide-react";
 import { HeroFigures, HeroLabel, type HeroFigure } from "@/components/shared/HeroKit";
@@ -170,11 +171,11 @@ export default async function AboutPage() {
                 </p>
               )}
               <div className="rise-in mt-8 flex flex-col gap-3 sm:flex-row" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
-                <Link href="/contact" className="bg-ember text-ink focus-visible:outline-paper inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+                <Link href="/contact" className={buttonVariants({ variant: "accent", size: "lg" })}>
                   Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
                 </Link>
                 {cv && (
-                  <a href={cv.url} className="text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+                  <a href={cv.url} className={buttonVariants({ variant: "glass", size: "lg" })}>
                     <FileText aria-hidden="true" className="size-4" /> Get my CV
                   </a>
                 )}
@@ -183,7 +184,7 @@ export default async function AboutPage() {
 
             {/* The portrait sits beside the words from a laptop up; on a phone it opens the story instead, so the hero stays one screen. */}
             <figure className="rise-in hidden w-full max-w-md justify-self-end lg:col-span-5 lg:block" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
-              <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized priority className="h-auto w-full rounded-[1.75rem] border border-white/10 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.9)]" />
+              <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized priority className="h-auto w-full rounded-3xl border border-white/10 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.9)]" />
             </figure>
           </div>
 
@@ -198,7 +199,7 @@ export default async function AboutPage() {
             <HeroLabel tone="light">
               <span id="story-title">{storyCopy.eyebrow}</span>
             </HeroLabel>
-            <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="shadow-soft mt-6 h-auto w-full max-w-xs rounded-[1.5rem] border border-black/10 lg:hidden" />
+            <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized className="shadow-soft mt-6 h-auto w-full max-w-xs rounded-3xl border border-black/10 lg:hidden" />
             <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-12">
               {story.length > 0 && (
                 <Reveal className="lg:col-span-7">
@@ -357,17 +358,17 @@ export default async function AboutPage() {
       )}
 
       {/* ─── 5. Close ─── */}
-      <section aria-labelledby="close-title" className="hero-field text-paper py-20 md:py-24">
+      <section aria-labelledby="close-title" className="hero-field text-paper py-20 md:py-28">
         <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-6">
             <h2 id="close-title" className="type-h2">
               <Accent text={closeCopy.title ?? ""} className={ACCENT} />
             </h2>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/contact" className="press bg-ember text-ink shadow-glow-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-medium">
+              <Link href="/contact" className={buttonVariants({ variant: "accent", size: "lg" })}>
                 Let&rsquo;s talk <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
-              <Link href="/journey" className="press text-paper inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 font-medium transition-colors hover:bg-white/10">
+              <Link href="/journey" className={buttonVariants({ variant: "glass", size: "lg" })}>
                 The journey
               </Link>
             </div>

@@ -8,7 +8,7 @@
 // the far right where a thumb expects it.
 
 import Link from "next/link";
-import { ArrowUpRight, FileDown } from "lucide-react";
+import { ArrowRight, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";
 import { SearchPalette } from "@/components/shared/SearchPalette";
@@ -75,10 +75,10 @@ export function SiteHeader({
         {labels?.contactLabel?.trim() && (
           <Link
             href="/contact"
-            className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink shadow-glow-ember transition-[filter,transform] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
+            className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full bg-ember px-4 text-sm font-medium text-ink transition-[filter,transform,box-shadow] hover:brightness-105 hover:shadow-glow-ember focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ember active:scale-[0.98] motion-reduce:transition-none"
           >
             {labels.contactLabel}
-            <ArrowUpRight aria-hidden="true" className="size-4" />
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         )}
         <MobileMenu links={links} reviewSlaHours={reviewSlaHours} cvUrl={cvUrl} labels={labels} ownerName={ownerName} />

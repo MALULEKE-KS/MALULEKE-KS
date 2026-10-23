@@ -17,7 +17,7 @@ import { warmGuide } from "@/lib/guide/warm-client";
 
 export const Composer = forwardRef<HTMLTextAreaElement, { id: string; compact?: boolean }>(function Composer({ id, compact = false }, ref) {
   const { ownerFirstName, lookAt, setMood, mood } = useGuide();
-  const { busy, send, stop, maxQuestionCharacters, privacyNote, checkNote } = useGuideChat();
+  const { busy, send, stop, maxQuestionCharacters, privacyNote } = useGuideChat();
   const [input, setInput] = useState("");
   const tooLong = input.length > maxQuestionCharacters;
 
@@ -91,15 +91,14 @@ export const Composer = forwardRef<HTMLTextAreaElement, { id: string; compact?: 
           <ShieldCheck aria-hidden="true" className="mt-px size-3 shrink-0" />
           <span>
             AI · answers from this site&apos;s data · can make mistakes
-            {compact && privacyNote && <>. {privacyNote}</>}
+            {privacyNote && <>. {privacyNote}</>}
           </span>
         </span>
         <span className={cn(input.length > maxQuestionCharacters * 0.8 ? "" : "invisible", tooLong && "text-[var(--color-ember)]")}>
           {input.length}/{maxQuestionCharacters}
         </span>
       </p>
-      {!compact && checkNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{checkNote}</p>}
-      {!compact && privacyNote && <p className="text-line mt-1 px-1 text-[11px] leading-snug">{privacyNote}</p>}
+      {/* One line of small print everywhere (D-055): the AI label, then what is kept. The nightly self-check is shown up in the band's card. */}
     </form>
   );
 });

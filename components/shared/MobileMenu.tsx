@@ -170,7 +170,7 @@ export function MobileMenu({
                             {active ? (
                               <span aria-hidden="true" className="bg-ember size-2.5 shrink-0 rounded-full shadow-[0_0_14px_rgb(255_91_31/0.8)]" />
                             ) : (
-                              <ArrowUpRight aria-hidden="true" className="text-line size-5 shrink-0 transition-transform group-active:translate-x-0.5 group-active:-translate-y-0.5" />
+                              <ArrowRight aria-hidden="true" className="text-line size-5 shrink-0 transition-transform group-active:translate-x-0.5" />
                             )}
                           </Link>
                         </motion.li>

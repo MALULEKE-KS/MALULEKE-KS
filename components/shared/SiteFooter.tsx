@@ -15,7 +15,7 @@
 // with what's next, from the "release" content block.
 
 import Link from "next/link";
-import { ArrowUp, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { BrandMark, Wordmark } from "@/components/shared/BrandMark";
 import { Container } from "@/components/shared/Container";
@@ -120,7 +120,7 @@ export function SiteFooter({
           <h2 className="font-mono text-xs text-line">Let&rsquo;s talk</h2>
           <p className="mt-4 text-sm text-mist">Every inquiry is reviewed within {reviewSlaHours} hours.</p>
           <Link href="/contact" className="tap-target mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ember hover:underline">
-            Start a conversation <ArrowUpRight aria-hidden="true" className="size-4" />
+            Start a conversation <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         </div>
       </Container>
