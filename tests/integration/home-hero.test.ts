@@ -103,10 +103,14 @@ describe("home hero — the figures and lines it states are the real ones (D-039
 
   it("names the repo with the latest real commit as what is current — never the latest push", async () => {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const latest = await dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+    const latestNow = () => dbPublic.publicRepoCommit.findFirst({ where: { committedAt: { gte: since } }, orderBy: { committedAt: "desc" } });
+    // Other test files write commits while this runs (the suites share one test database), so the latest
+    // commit is read just before and just after: what the home page names must be one of the two.
+    const before = await latestNow();
     const { nowBuilding } = await getSelectedWork(0);
-    if (!latest) expect(nowBuilding).toBeNull();
-    else expect(nowBuilding?.fullName).toBe(latest.fullName);
+    const after = await latestNow();
+    if (!before && !after) expect(nowBuilding).toBeNull();
+    else expect([before?.fullName, after?.fullName]).toContain(nowBuilding?.fullName);
   });
 });
 
