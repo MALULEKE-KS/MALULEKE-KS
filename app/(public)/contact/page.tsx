@@ -127,25 +127,26 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             picker={{ title: picker.title ?? "", description: picker.description ?? null }}
             steps={steps}
             aside={
-              <>
-                <div className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-6">
+              // One side sheet (D-052): the other way in, then what happens to what you send.
+              <div className="border-ink/10 bg-sheet shadow-soft divide-ink/10 divide-y rounded-2xl border">
+                <div className="p-6">
                   <p className="flex items-center gap-2">
                     <Mail aria-hidden="true" className="text-accent size-5" />
                     <span className="text-ink font-sans text-base font-semibold">{emailCard.title}</span>
                   </p>
-                  <a href={`mailto:${profile.email}`} className="text-accent mt-3 inline-block text-sm font-medium break-all underline underline-offset-4">
+                  <a href={`mailto:${profile.email}`} className="tap-target text-accent mt-3 inline-block text-sm font-medium break-all underline underline-offset-4">
                     {profile.email}
                   </a>
                   <SocialLinks links={profile.links} tone="light" className="mt-5" />
                 </div>
-                <div className="border-ink/10 bg-sheet shadow-soft rounded-2xl border p-6">
+                <div className="p-6">
                   <p className="flex items-center gap-2">
                     <ShieldCheck aria-hidden="true" className="text-signal-finished size-5" />
                     <span className="text-ink font-sans text-base font-semibold">{detailsCard.title}</span>
                   </p>
                   {detailsCard.description && <p className="text-slate mt-3 text-sm leading-relaxed">{detailsCard.description}</p>}
                 </div>
-              </>
+              </div>
             }
           />
         </Container>

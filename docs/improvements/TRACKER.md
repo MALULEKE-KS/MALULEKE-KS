@@ -420,3 +420,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Journey:** merged after CI; production verified.
 - **About:** plan published ("MALULEKE-KS About Plan"); built per D-051, polish pass (masonry skills); e2e `about.spec.ts`; locally 0 small taps, 0 text under 12 px, no sideways scroll at 360/390/430; phone ≈ 9,000 px (the proof rows are taller than the chips they replace; the weaker categories fold).
 - **Next:** PR, CI, merge, verify; then Let's talk.
+
+### 2026-10-23 · About shipped (PR #248, live f058ae7); the Let's talk pass (D-052; branch `sprint-2/contact-premium`)
+- **About:** merged after CI; production verified.
+- **Let's talk:** plan published ("MALULEKE-KS Let's Talk Plan"); built per D-052; e2e `contact-frame.spec.ts`; locally 0 small taps, 0 text under 12 px.
+- **Next:** PR, CI, merge, verify; then the case studies.
