@@ -39,11 +39,12 @@ describe("home hero — content", () => {
     expect(block?.previewLabel).toMatch(/\{date\}/);
     expect(block?.previewLabel).toMatch(/\{commit\}/);
     expect(block?.localLabel).toBeTruthy();
-    // The record is the proof of the statement: three claims over their figures; the catalogue size supports.
+    // The record is the proof of the statement: three claims over their figures; the catalogue size has its own
+    // heading since the premium pass, so all four figures share one anatomy (D-047, the owner's choice D5).
     expect(block?.ledgerLabels?.shipped?.claim).toBe("Runs in production");
     expect(block?.ledgerLabels?.rules?.claim).toBe("Enforces its own rules");
     expect(block?.ledgerLabels?.audited?.claim).toBe("Shows its proof");
-    expect(block?.ledgerLabels?.systems?.claim).toBeUndefined();
+    expect(block?.ledgerLabels?.systems?.claim).toBe("Published");
     expect(heroCopy(block).ledgerLabels.rules?.claim).toBe("Enforces its own rules");
     // No credit is shown on the image unless the owner writes one (his decision, 2026-10-20).
     expect(block?.imageCredit).toBeUndefined();
