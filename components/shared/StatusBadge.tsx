@@ -19,10 +19,13 @@ export function StatusBadge({ label, colorToken, onDark = false }: StatusBadgePr
     ? `var(--color-${colorToken}-on-dark, var(--color-${colorToken}))`
     : `var(--color-${colorToken})`;
 
+  // The badge's own 10% wash lowers the contrast of its label, so on a light surface the label is the
+  // token taken a little darker — In progress's orange measured 4.3:1 on its wash, under AA (D-055).
+  const labelColor = onDark ? colorVar : `color-mix(in srgb, ${colorVar} 82%, #000)`;
   return (
     <span
       className="relative inline-flex shrink-0 items-center gap-1.5 overflow-hidden rounded-full border px-2.5 py-0.5 text-xs font-medium"
-      style={{ color: colorVar, borderColor: `color-mix(in srgb, ${colorVar} 35%, transparent)` }}
+      style={{ color: labelColor, borderColor: `color-mix(in srgb, ${colorVar} 35%, transparent)` }}
     >
       <span
         aria-hidden="true"

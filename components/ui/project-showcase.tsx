@@ -152,7 +152,7 @@ export function ProjectShowcase({ items, className }: { items: ShowcaseItem[]; c
                       />
                     </span>
                     <span className={cn("mt-1 line-clamp-3 text-sm leading-relaxed transition-colors duration-300 md:line-clamp-none", on ? "text-ink/75" : "text-slate")}>{item.description}</span>
-                    {item.meta && <span className="text-slate/80 mt-1.5 block font-mono text-[11px]">{item.meta}</span>}
+                    {item.meta && <span className="text-slate mt-1.5 block font-mono text-[12px]">{item.meta}</span>}
                   </span>
                   {item.aside && <span className="shrink-0">{item.aside}</span>}
                 </span>
