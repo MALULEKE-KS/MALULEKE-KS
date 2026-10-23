@@ -738,3 +738,21 @@ html[data-header="hidden"] .under-header {
   }
 }
 
+/* The phone's bottom dock (D-056). Below lg, while it's there (BottomDock sets
+   data-dock on <html>): what floats at the foot of a page sits above it, and the
+   page's own end (the footer's last line) scrolls clear of it. */
+@media (width < 64rem) {
+  html[data-dock] {
+    --dock-space: calc(4.5rem + max(0.5rem, env(safe-area-inset-bottom)));
+  }
+  html[data-dock] body {
+    padding-bottom: var(--dock-space);
+  }
+  html[data-dock] .above-dock {
+    bottom: calc(var(--dock-space) + 0.75rem);
+  }
+}
+::view-transition-group(site-dock) {
+  animation: none;
+}
+

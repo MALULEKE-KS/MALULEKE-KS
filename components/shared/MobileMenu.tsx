@@ -1,7 +1,8 @@
 // components/shared/MobileMenu.tsx
 // The phone and tablet menu (below lg; owner, 2026-10-01: "the nav and its
 // navigation should be done at the highest level for mobile"). One button at
-// the right of the bar opens a full-screen sheet:
+// the right of the bar opens a full-screen sheet. Since D-056 the button is the
+// last cell of the phone's bottom dock (BottomDock, variant "dock"):
 //
 //   top       the mark and a close button, where the bar was
 //   middle    every page as a large numbered line with what it holds; the
@@ -39,6 +40,7 @@ export function MobileMenu({
   cvUrl = null,
   labels,
   ownerName,
+  variant = "bar",
 }: {
   links: SiteLink[];
   reviewSlaHours: number;
@@ -46,6 +48,8 @@ export function MobileMenu({
   /** The owner's wording ("site-header" block). A label left empty hides its part — nothing is typed in here. */
   labels: HeaderLabels | null;
   ownerName: string;
+  /** "dock": the button drawn as a cell of the phone's bottom dock (icon over label). */
+  variant?: "bar" | "dock";
 }) {
   const word = (s: string | undefined) => s?.trim() || null;
   const menuLabel = word(labels?.menuLabel);
@@ -103,17 +107,21 @@ export function MobileMenu({
 
   if (!menuLabel) return null;
   return (
-    <div className="lg:hidden">
+    <div className={cn("lg:hidden", variant === "dock" && "flex flex-1")}>
       <button
         ref={button}
         type="button"
         aria-expanded={open}
         aria-controls="mobile-menu"
         onClick={() => setOpenFor(pathname)}
-        className="tap-target press text-paper focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3 pe-3.5 text-sm font-medium transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
+        className={
+          variant === "dock"
+            ? "press text-mist hover:text-paper flex min-h-14 flex-1 flex-col items-center justify-center gap-1 rounded-full text-[12px] font-medium transition-colors"
+            : "tap-target press text-paper focus-visible:outline-ember inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3 pe-3.5 text-sm font-medium transition-colors hover:bg-white/[0.09] focus-visible:outline-2"
+        }
       >
-        <Menu aria-hidden="true" className="size-4" />
-        {menuLabel}
+        <Menu aria-hidden="true" className={variant === "dock" ? "size-5" : "size-4"} strokeWidth={variant === "dock" ? 1.8 : 2} />
+        <span className={variant === "dock" ? "leading-none" : undefined}>{menuLabel}</span>
       </button>
 
       {mounted &&

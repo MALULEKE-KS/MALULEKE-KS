@@ -72,7 +72,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
           role="region"
           data-capture-hide
           aria-label="Privacy choices"
-          className="no-print bg-night/95 text-paper shadow-lift fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 mx-auto max-w-xl rounded-2xl border border-white/10 p-5 backdrop-blur-xl md:inset-x-auto md:right-6 md:bottom-6"
+          className="above-dock no-print bg-night/95 text-paper shadow-lift fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 mx-auto max-w-xl rounded-2xl border border-white/10 p-5 backdrop-blur-xl md:inset-x-auto md:right-6 md:bottom-6"
         >
           <div className="flex gap-4">
             <ShieldCheck aria-hidden="true" className="text-ember mt-0.5 size-5 shrink-0" />
