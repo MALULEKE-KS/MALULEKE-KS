@@ -425,3 +425,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **About:** merged after CI; production verified.
 - **Let's talk:** plan published ("MALULEKE-KS Let's Talk Plan"); built per D-052; e2e `contact-frame.spec.ts`; locally 0 small taps, 0 text under 12 px.
 - **Next:** PR, CI, merge, verify; then the case studies.
+
+### 2026-10-23 · Let's talk shipped (PR #250, live 153e9c9); the case study template (D-053; branch `sprint-2/casestudy-premium`) — the last page of the premium pass
+- **Let's talk:** merged after CI; production verified.
+- **Case studies:** plan published ("MALULEKE-KS Case Study Plan"); built per D-053; e2e `case-study.spec.ts`. The local dev server was stopped by the machine's memory guard mid-session, so this one is verified on CI (its e2e, mobile and accessibility runs and screenshots).
+- **Next:** PR, CI, merge, verify — then the premium pass is complete across every public page (home, Systems, Journey, About, Let's talk, case studies).
