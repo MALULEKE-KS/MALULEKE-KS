@@ -66,20 +66,21 @@ export function PrinciplesBand({
                   className="grid grid-cols-1 gap-x-8 gap-y-3 py-5 md:grid-cols-12 md:items-start md:py-6"
                 >
                   <details className="group/p md:col-span-10">
-                    <summary className="focus-visible:outline-ember grid min-h-11 cursor-pointer transition-opacity active:opacity-70 list-none grid-cols-[minmax(0,1fr)_auto] items-start gap-x-6 gap-y-1 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)_auto] [&::-webkit-details-marker]:hidden">
+                    {/* The marker leads the row, as an accordion reads: name, then its one line (D-048 desktop review). */}
+                    <summary className="focus-visible:outline-ember grid min-h-11 cursor-pointer list-none grid-cols-[1rem_minmax(0,1fr)] items-start gap-x-4 gap-y-1 rounded-md transition-opacity active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 md:grid-cols-[1rem_minmax(0,5fr)_minmax(0,6fr)] md:gap-x-6 [&::-webkit-details-marker]:hidden">
+                      <Plus
+                        aria-hidden="true"
+                        className="text-slate group-hover/p:text-accent mt-1.5 size-4 transition-[transform,color] duration-300 group-open/p:rotate-45 motion-reduce:transition-none"
+                      />
                       <h3 className="text-ink group-hover/p:text-accent text-lg font-semibold tracking-tight transition-colors md:text-xl">
                         {p.name}
                       </h3>
-                      <Plus
-                        aria-hidden="true"
-                        className="text-slate col-start-2 row-start-1 mt-1 size-4 transition-transform duration-300 group-open/p:rotate-45 motion-reduce:transition-none md:col-start-3"
-                      />
-                      <p className="text-slate col-span-1 leading-relaxed md:col-start-2 md:row-start-1">
+                      <p className="text-slate col-start-2 leading-relaxed md:col-start-3 md:row-start-1">
                         {p.summary}
                       </p>
                     </summary>
                     {p.body && (
-                      <p className="text-ink/80 principle-open mt-4 max-w-[68ch] leading-relaxed md:ml-[calc(5/11*100%)]">
+                      <p className="text-ink/80 principle-open mt-4 ml-8 max-w-[68ch] leading-relaxed md:ml-10">
                         {p.body}
                       </p>
                     )}
