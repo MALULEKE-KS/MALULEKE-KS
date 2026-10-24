@@ -171,11 +171,19 @@ export default async function InquiryPage({ params }: { params: Promise<{ id: st
               {contactRows.map(([k, v]) => (
                 <div key={k} className="flex gap-3">
                   <dt className="text-slate w-24 shrink-0 text-xs">{k}</dt>
-                  <dd className="text-ink min-w-0 break-all">{v}</dd>
+                  <dd className="text-ink min-w-0 break-all">
+                    {v}
+                    {/* LT-13: an applicant's link is text, never a link by itself; opening it is an explicit act, in a new tab that can't reach back. */}
+                    {(k === "Website" || k === "Profile") && /^https?:\/\//i.test(v) && (
+                      <a href={v} target="_blank" rel="noopener noreferrer nofollow" className="text-slate hover:text-ink ml-2 text-xs underline underline-offset-2">
+                        Open
+                      </a>
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>
-            <p className="text-slate mt-3 text-xs">Links are shown as text — open them only if you trust them.</p>
+            <p className="text-slate mt-3 text-xs">Links are shown as text — open them (Open) only if you trust them.</p>
           </Panel>
 
           {i.documents.length > 0 && (
