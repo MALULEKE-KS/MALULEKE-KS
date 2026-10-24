@@ -37,6 +37,8 @@ const KEYS = [
   "factShare",
   "shareValue",
   "factLinked",
+  "touchHint",
+  "pointerHint",
 ] as const satisfies readonly (keyof Block)[];
 
 export type OrbitCopy = Record<(typeof KEYS)[number], string | null>;
