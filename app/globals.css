@@ -431,6 +431,16 @@ html {
 .orbit-x:hover { border-color: rgb(255 91 31 / 0.55); }
 .orbit-x:focus-visible, .orbit-go:focus-visible, .orbit-step button:focus-visible, .orbit-again:focus-visible, .orbit-explore-inline:focus-visible { outline: 2px solid var(--color-ember); outline-offset: 2px; }
 
+/* Inside a world (D-072): a small panel with the way back, and its technologies' moons named where they fly. */
+.orbit-enter { font-size: 12.5px; font-weight: 600; color: #170803; background: var(--color-ember); border-radius: 999px; padding: 5px 12px; }
+.orbit-enter:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 2px; }
+.orbit-inside { position: absolute; z-index: 6; left: 12px; right: 12px; bottom: 12px; padding: 12px 14px; border-radius: 16px; background: rgb(14 15 18 / 0.62); border: 1px solid rgb(255 255 255 / 0.1); backdrop-filter: blur(14px) saturate(150%); color: var(--color-paper); animation: orbit-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both; }
+.orbit-inside-line { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: var(--color-mist); max-width: 46ch; }
+.orbit-inside .orbit-card-foot { justify-content: flex-start; gap: 16px; }
+.orbit-moons { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.orbit-moon { position: absolute; left: 0; top: 0; font-family: var(--font-ibm-plex-mono), ui-monospace, monospace; font-size: 10.5px; color: #ffcdb2; text-shadow: 0 1px 8px rgb(0 0 0 / 0.95); white-space: nowrap; opacity: 0; transition: opacity 300ms; will-change: transform; }
+.ks-orbit[data-inside] .orbit-hint { opacity: 0 !important; }
+
 /* The one line under the stage. */
 .orbit-bar { position: relative; z-index: 5; display: grid; gap: 10px; padding: 12px max(1.5rem, env(safe-area-inset-right)) 16px max(1.5rem, env(safe-area-inset-left)); border-top: 1px solid rgb(255 255 255 / 0.07); }
 html:has(nav[data-dock="site"]) .orbit-bar { padding-bottom: calc(var(--dock-space, 0px) + 0.75rem); }
@@ -461,6 +471,7 @@ html:has(nav[data-dock="site"]) .orbit-bar { padding-bottom: calc(var(--dock-spa
   .orbit-stage[data-hint] .orbit-hint-pointer { opacity: 1; }
   .ks-orbit[data-open] .orbit-hint-pointer { opacity: 0; }
   .orbit-card { left: auto; right: max(2rem, env(safe-area-inset-right)); bottom: 18px; width: 300px; }
+  .orbit-inside { left: auto; right: max(2rem, env(safe-area-inset-right)); bottom: 18px; width: 340px; }
   .orbit-bar { height: var(--orbit-bar-h); grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 28px; padding: 10px max(2rem, env(safe-area-inset-right)) 16px max(1.5rem, env(safe-area-inset-left)); overflow: hidden; background: linear-gradient(180deg, rgb(11 12 14 / 0.55), var(--color-night-deep)); }
 }
 @media (prefers-reduced-motion: reduce) {

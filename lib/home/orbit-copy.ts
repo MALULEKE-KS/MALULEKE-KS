@@ -39,6 +39,9 @@ const KEYS = [
   "factLinked",
   "touchHint",
   "pointerHint",
+  "enterLabel",
+  "backLabel",
+  "insideLine",
 ] as const satisfies readonly (keyof Block)[];
 
 export type OrbitCopy = Record<(typeof KEYS)[number], string | null>;

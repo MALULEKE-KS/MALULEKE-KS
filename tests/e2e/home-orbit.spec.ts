@@ -81,6 +81,20 @@ for (const vp of [
         await expect(panel.getByRole("heading", { level: 3 })).not.toHaveText(first);
       }
 
+      // the card takes you inside the world, and Escape brings you back out (D-072)
+      const goIn = panel.locator(".orbit-enter");
+      if (await goIn.count()) {
+        await goIn.click();
+        const insideView = orbit.locator(".orbit-inside");
+        await expect(insideView).toBeVisible();
+        await page.waitForTimeout(1200);
+        await page.screenshot({ path: `hero-screenshots/orbit-${vp.width}x${vp.height}-${vp.name}-inside.png` });
+        await page.keyboard.press("Escape");
+        await expect(insideView).toHaveCount(0);
+        await explore.click();
+        await expect(panel).toBeVisible();
+      }
+
       // its close button closes it, and the address forgets it; Escape closes one too
       await panel.locator(".orbit-x").click();
       await expect(orbit.getByRole("dialog")).toHaveCount(0);

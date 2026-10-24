@@ -59,6 +59,10 @@ export function OrbitStage({
   const engine = useRef<OrbitEngine | null>(null);
   const [live, setLive] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
+  // Inside a world (D-072): a name opens its card; the world itself, or the card's "go inside", takes you in.
+  const [inside, setInside] = useState<number | null>(null);
+  const insideRef = useRef<number | null>(null);
+  const moonEls = useRef<(HTMLSpanElement | null)[]>([]);
   const openRef = useRef<number | null>(null);
   const relayout = useRef<(() => void) | null>(null);
   // the desktop hint: shown while the pointer is over the orbit's zone, gone for good once it has been used
@@ -124,6 +128,24 @@ export function OrbitStage({
     [sys]
   );
 
+  const enterWorld = useCallback(
+    (i: number) => {
+      openRef.current = null;
+      setOpen(null);
+      insideRef.current = i;
+      setInside(i);
+      engine.current?.enter(i);
+      if (!matchMedia(DESKTOP).matches)
+        stage.current?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    },
+    []
+  );
+  const exitWorld = useCallback(() => {
+    insideRef.current = null;
+    setInside(null);
+    engine.current?.enter(null);
+  }, []);
+
   // ---- placing the plates so nothing overlaps: the words, the header's corner, the panel, the edges, each other
   const sizes = useRef<{ w: number; h: number }[]>([]);
   const placed = useRef<{ x: number | null; y: number | null; cand: number }[]>(
@@ -182,6 +204,7 @@ export function OrbitStage({
       const byTech = (i: number) => tech !== null && sys[i]!.stack.includes(tech);
       const want = sys
         .map((_, i) => i)
+        .filter(() => insideRef.current === null)
         .filter((i) => i === lit || byTech(i) || (sys[i]!.flagship && (desktop || opened === null)))
         .filter((i) => desktop || opened === null || i === opened)
         .sort(
@@ -264,6 +287,13 @@ export function OrbitStage({
 
       // the lens follows the core
       const glow = (0.6 + f.core.flash * 0.4) * (opened !== null ? 0.6 : 1);
+      const inT = f.inside.t;
+      moonEls.current.forEach((el, m) => {
+        if (!el) return;
+        const mo = f.inside.moons[m];
+        el.style.opacity = mo && inT > 0.6 ? String(Math.min(1, (inT - 0.6) * 2.5)) : "0";
+        if (mo) el.style.transform = `translate(${(mo.x + 10).toFixed(1)}px, ${(mo.y - 8).toFixed(1)}px)`;
+      });
       blooms.current.forEach((b, k) => {
         if (!b) return;
         if (k === 3) {
@@ -561,7 +591,11 @@ export function OrbitStage({
       lastTap = now;
       used.current = true;
       setHint(false);
-      openWorld(h !== null ? h : null);
+      if (insideRef.current !== null) {
+        if (h === null) exitWorld();
+        else if (h !== insideRef.current) enterWorld(h);
+      } else if (h !== null) enterWorld(h);
+      else openWorld(null);
     };
     const onCancel = (e: PointerEvent) => {
       touches.delete(e.pointerId);
@@ -576,7 +610,9 @@ export function OrbitStage({
       }
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && openRef.current !== null) openWorld(null);
+      if (e.key !== "Escape") return;
+      if (insideRef.current !== null) exitWorld();
+      else if (openRef.current !== null) openWorld(null);
     };
     cv.addEventListener("pointerdown", onDown);
     cv.addEventListener("pointermove", onMove);
@@ -592,7 +628,7 @@ export function OrbitStage({
       cv.removeEventListener("pointerleave", onLeave);
       removeEventListener("keydown", onKey);
     };
-  }, [openWorld]);
+  }, [enterWorld, exitWorld, openWorld]);
 
   const step = (by: number) => {
     if (open === null) return;
@@ -608,6 +644,7 @@ export function OrbitStage({
       data-open={open !== null ? "" : undefined}
       data-live={live ? "" : undefined}
       data-over-photo={overPhoto ? "" : undefined}
+      data-inside={inside !== null ? "" : undefined}
     >
       <div ref={stage} className="orbit-stage" data-hint={hint ? "" : undefined}>
         {/* How to play with it: a heading over the orbit on a phone; on a desktop only while the pointer is over the orbit, until it's used. */}
@@ -746,6 +783,11 @@ export function OrbitStage({
                 )}
               </dl>
               <div className="orbit-card-foot">
+                {copy.enterLabel && (
+                  <button type="button" className="orbit-enter" onClick={() => enterWorld(open)}>
+                    {copy.enterLabel}
+                  </button>
+                )}
                 {copy.openLabel && (
                   <a href={`/systems/${s.slug}`} className="orbit-go">
                     {copy.openLabel}
@@ -785,6 +827,35 @@ export function OrbitStage({
               </button>
             </>
           )}
+        </div>
+        {/* Inside a world: its name, what you're looking at, its case study, and the way back. */}
+        {inside !== null && (
+          <div className="orbit-inside" role="dialog" aria-modal="false" aria-labelledby="orbit-inside-title">
+            <p className="orbit-card-k">{homeLabels[sys[inside]!.home]}</p>
+            <h3 id="orbit-inside-title" className="orbit-card-name">{sys[inside]!.name}</h3>
+            {copy.insideLine && <p className="orbit-inside-line">{fillIn(copy.insideLine, { commits: n0(totals[inside]!) })}</p>}
+            <div className="orbit-card-foot">
+              {copy.backLabel && (
+                <button type="button" className="orbit-enter" onClick={() => exitWorld()}>
+                  ← {copy.backLabel}
+                </button>
+              )}
+              {copy.openLabel && (
+                <a href={`/systems/${sys[inside]!.slug}`} className="orbit-go">
+                  {copy.openLabel}
+                  <ArrowRight className="size-3.5" aria-hidden="true" />
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+        <div className="orbit-moons" aria-hidden="true">
+          {inside !== null &&
+            sys[inside]!.stack.map((t, m) => (
+              <span key={t} ref={(el) => { moonEls.current[m] = el; }} className="orbit-moon">
+                {t}
+              </span>
+            ))}
         </div>
         <div className="orbit-grain" aria-hidden="true" />
       </div>
