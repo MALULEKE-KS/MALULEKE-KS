@@ -938,7 +938,7 @@ The registered jobs — retention and pruning, number proposals, the GitHub sync
 **Notes**
 
 - Run now answers 409 ALREADY_RUNNING while a run holds the lock; a failed run answers 500 with its recorded error.
-- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing; retried next run) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
+- github.sync summaries list unmappedOwners (map them via an Organization's githubLogins), activityPending (GitHub still computing after the run asked again three times; retried next run, D-068) and accountErrors (an account that refused the token, with GitHub's reason — the other accounts still sync).
 
 ### AI guide health
 
