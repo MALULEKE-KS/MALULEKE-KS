@@ -64,7 +64,7 @@ export function SearchPalette() {
       >
         <Search aria-hidden="true" className="size-4" />
         <span className="hidden lg:inline">Search</span>
-        <kbd className="text-line ms-auto hidden rounded-md border border-white/10 px-1.5 font-mono text-[0.6875rem] lg:inline">
+        <kbd aria-hidden="true" className="text-line ms-auto hidden rounded-md border border-white/10 px-1.5 font-mono text-[0.6875rem] lg:inline">
           {isMac ? "⌘K" : "Ctrl K"}
         </kbd>
       </button>

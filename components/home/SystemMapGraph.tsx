@@ -291,8 +291,9 @@ export function SystemMapGraph({ data }: { data: SystemMapData }) {
                         aria-pressed={pinned === t.id}
                         {...interact(t)}
                         className={cn(
-                          "tap-target press focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
-                          lead ? "text-paper px-3 py-1.5 text-[13px] font-medium" : "text-mist px-2.5 py-1 text-[11.5px]",
+                          // At least 28 px tall on its own, no stretched hit area reaching into the next chip (D-062; WCAG 2.5.8).
+                          "press focus-visible:outline-ember bg-night relative z-10 inline-flex items-center gap-1.5 rounded-full border transition-[opacity,border-color,background-color] duration-300 focus-visible:outline-2",
+                          lead ? "text-paper min-h-8 px-3 py-1.5 text-[13px] font-medium" : "text-mist min-h-7 px-2.5 py-1 text-[11.5px]",
                           pinned === t.id ? "border-ember bg-ember/15" : on ? "border-ember/70" : lead ? "border-white/15 hover:border-ember/50" : "border-white/10 hover:border-ember/50",
                           dim(t.id) && "opacity-30",
                         )}
