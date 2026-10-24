@@ -109,6 +109,7 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "insideLine", label: "Inside a world: what you're looking at", max: 200, kind: "text", hint: "Fill-in: {commits} — its commits over the 26 weeks." },
     { name: "coreLabel", label: "The core's name", max: 30, kind: "line", hint: "It opens your GitHub. Empty hides the label." },
     { name: "coreSub", label: "Under the core's name", max: 60, kind: "line" },
+    { name: "playLabel", label: "Phone hero: the button that plays the Orbit", max: 40, kind: "line", hint: "In Let's talk's place (the header has Let's talk). Empty brings Let's talk back." },
   ],
   "page-xray": [
     { name: "receiptLabel", label: "The receipt's name", max: 24, kind: "line", hint: "First word of the strip. Empty hides the receipt." },

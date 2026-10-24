@@ -44,6 +44,7 @@ const KEYS = [
   "insideLine",
   "coreLabel",
   "coreSub",
+  "playLabel",
 ] as const satisfies readonly (keyof Block)[];
 
 export type OrbitCopy = Record<(typeof KEYS)[number], string | null>;

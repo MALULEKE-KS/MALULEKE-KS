@@ -46,8 +46,13 @@ for (const vp of VIEWPORTS) {
       expect(await items.first().textContent()).toMatch(/\d+/);
       await expect(hero.locator("[data-record]")).toHaveCount(0);
 
-      // on a phone the hero ends with Let's talk (and the CV when one is switched on); from a tablet up the header has them
-      if (vp.width < 640) await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
+      // on a phone the hero ends with the CV (when one is switched on) and — with the Orbit — its play button, or else
+      // Let's talk (the header carries Let's talk; owner, 2026-10-25); from a tablet up the header has them
+      if (vp.width < 640) {
+        const orbitOn = (await hero.locator(".ks-orbit").count()) > 0;
+        if (orbitOn) await expect(hero.getByRole("button", { name: /Watch 26 weeks/ })).toBeVisible();
+        else await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
+      }
 
       // the cover image: the phone crop on phones, the wide crop on larger screens — kept under the Orbit (D-069)
       const img = hero.locator("picture img");
@@ -108,7 +113,8 @@ test("reduced motion: the hero holds still", async ({ page }) => {
   await settle(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(URL, { waitUntil: "networkidle" });
-  const name = await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName);
+  // the name never moves (it is the first paint); the parts that settle in hold still too
+  const name = await page.locator("section[aria-labelledby='hero-title'] .hero-rise").first().evaluate((e) => getComputedStyle(e).animationName);
   expect(name).toBe("none");
 });
 
@@ -117,8 +123,10 @@ test("with motion allowed, each part settles in", async ({ page }) => {
   await settle(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto(URL, { waitUntil: "networkidle" });
-  const name = await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName);
-  expect(name).toBe("hero-rise");
+  // the parts around the name settle in; the name itself is there from the first frame (it is the largest paint)
+  const part = await page.locator("section[aria-labelledby='hero-title'] .hero-rise").first().evaluate((e) => getComputedStyle(e).animationName);
+  expect(part).toBe("hero-rise");
+  expect(await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName)).toBe("none");
 });
 
 for (const [name, viewport] of [
