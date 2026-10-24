@@ -10,7 +10,6 @@
 // off stretch and the page collapses to its content width.
 
 import { ViewTransition } from "react";
-import { connection } from "next/server";
 import { SiteHeader } from "@/components/shared/SiteHeader";
 import { SiteFooter } from "@/components/shared/SiteFooter";
 import { ConsentProvider } from "@/components/shared/Consent";
@@ -35,10 +34,9 @@ import { SHEETS } from "@/lib/content/sheets";
 import type { GuideSiteIndex } from "@/lib/guide/receipts";
 
 export async function PublicShell({ children }: { children: React.ReactNode }) {
-  // The chrome reads live data, so it renders per request — never prerendered
-  // at build (the root 404 would otherwise be baked with build-time data, or
-  // fail where the build has no database, as CI's doesn't).
-  await connection();
+  // The chrome reads live data and is cached with the page it wraps (D-062): rendered ahead,
+  // refreshed at once by any admin change or job, and in the background every few minutes.
+  // Every build has a database (Vercel's environments; CI's build job has its own).
   // The owner's details for the footer, from the admin-editable profile (#99).
   // The review promise is the admin setting, never typed-in copy (BR-2.2).
   // The footer's homes and status line are data too (F5c, D11).

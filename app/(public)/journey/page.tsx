@@ -35,7 +35,7 @@ import { getContentBlock } from "@/lib/content/blocks";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { sectionCopy } from "@/lib/content/copy";
 
-export const dynamic = "force-dynamic";
+// Rendered ahead and refreshed by the (public) layout's cache (D-062).
 // The description is his own introduction to the page (data), never typed here.
 export async function generateMetadata() {
   const block = await getContentBlock("journey");

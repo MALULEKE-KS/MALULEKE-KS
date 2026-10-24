@@ -17,7 +17,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ purp
   const versioned = new URL(request.url).searchParams.get("v") === photo.sha256.slice(0, 12);
   const headers = {
     ETag: etag,
-    "Cache-Control": versioned ? "public, max-age=31536000, immutable" : "public, max-age=300, stale-while-revalidate=86400",
+    // Versioned links are kept by the CDN too (s-maxage), so the visitor's nearest edge serves the photo (D-062).
+    "Cache-Control": versioned ? "public, max-age=31536000, s-maxage=31536000, immutable" : "public, max-age=300, stale-while-revalidate=86400",
   };
   if (request.headers.get("if-none-match") === etag) return new NextResponse(null, { status: 304, headers });
   return new NextResponse(new Uint8Array(photo.fileData), { headers: { ...headers, "Content-Type": photo.mimeType, "Content-Length": String(photo.byteSize) } });

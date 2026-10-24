@@ -12,7 +12,7 @@
 
 "use client";
 
-import { useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -30,7 +30,6 @@ import { useInquiryForm } from "./use-inquiry-form";
 
 interface Props {
   categories: InquiryTypeOption[];
-  initialCategory: string | null;
   email: string;
   ownerFirstName: string;
   reviewSlaHours: number;
@@ -43,11 +42,20 @@ interface Props {
   aside: React.ReactNode;
 }
 
-export function LetsTalk({ categories, initialCategory, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, picker, steps: journey, aside }: Props) {
+export function LetsTalk({ categories, email, ownerFirstName, reviewSlaHours, retentionMonths, documents, picker, steps: journey, aside }: Props) {
   const uid = useId();
   const reduced = useReducedMotion();
   const top = useRef<HTMLDivElement>(null);
-  const f = useInquiryForm({ categories, initialCategory, maxFiles: documents.maxFiles, maxMegabytes: documents.maxMegabytes });
+  const f = useInquiryForm({ categories, initialCategory: null, maxFiles: documents.maxFiles, maxMegabytes: documents.maxMegabytes });
+  // A link that names a topic (?about=recruitment) opens its form: read here, in the browser, so the page itself can be
+  // served from the cache (D-062). Once, on arrival; a topic the visitor picks afterwards is theirs.
+  const linked = useRef(false);
+  useEffect(() => {
+    if (linked.current) return;
+    linked.current = true;
+    const about = new URLSearchParams(window.location.search).get("about");
+    if (about && categories.some((c) => c.value === about)) f.choose(about);
+  }, [categories, f]);
   const scrollTop = () => requestAnimationFrame(() => top.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }));
 
   const choose = (key: string | null) => {

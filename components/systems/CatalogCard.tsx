@@ -28,6 +28,7 @@ import { Sparkline } from "@/components/shared/Sparkline";
 import { brandMark, techMark } from "@/components/shared/TechChip";
 import type { CatalogSystem } from "@/lib/queries/catalog";
 import { cn } from "@/lib/utils";
+import { screenshotSrc } from "@/lib/media/screenshot-src";
 
 /** How many technologies a card names; the rest are counted (all of them are on the case study). */
 const MARKS = 4;
@@ -44,7 +45,7 @@ function Face({ s, wide }: { s: CatalogSystem; wide: boolean }) {
       <span className={frame}>
         {/* eslint-disable-next-line @next/next/no-img-element -- the screenshot route is ours, versioned by content hash */}
         <img
-          src={s.screenshotUrl}
+          {...screenshotSrc(s.screenshotUrl, wide ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1024px) 380px, (min-width: 768px) 50vw, 100vw")}
           alt=""
           loading="lazy"
           decoding="async"

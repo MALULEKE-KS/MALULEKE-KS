@@ -5,6 +5,7 @@
 // (DESIGN-SYSTEM.md §4.1).
 
 import { ImageOff, Lock } from "lucide-react";
+import { screenshotSrc } from "@/lib/media/screenshot-src";
 
 interface SystemPreviewFrameProps {
   screenshotUrl: string | null;
@@ -39,7 +40,7 @@ export function SystemPreviewFrame({ screenshotUrl, liveUrl, name, eager = false
           // with no fixed host to whitelist in next.config.ts remotePatterns.
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={screenshotUrl}
+            {...screenshotSrc(screenshotUrl, "(min-width: 1024px) 720px, 100vw")}
             alt={`${name} homepage`}
             loading={eager ? "eager" : "lazy"}
             decoding="async"

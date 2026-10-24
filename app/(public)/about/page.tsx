@@ -53,7 +53,7 @@ import { siteUrl } from "@/lib/site-url";
 import { sectionCopy } from "@/lib/content/copy";
 import { pageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+// Rendered ahead and refreshed by the (public) layout's cache (D-062).
 // The description is the opening of his own introduction (data), never typed here.
 export async function generateMetadata() {
   const row = await dbPublic.publicProfile.findFirst({ select: { bio: true, summary: true } });

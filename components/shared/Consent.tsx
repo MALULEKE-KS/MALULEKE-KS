@@ -50,8 +50,11 @@ interface ConsentContextValue {
 const ConsentContext = createContext<ConsentContextValue>({ reopen: () => {} });
 
 export function ConsentProvider({ children }: { children: React.ReactNode }) {
-  // Server render and hydration: undefined ("not known yet") — neither the
-  // banner nor analytics; the stored choice is read once on the client.
+  // Server render and hydration: undefined ("not known yet"). The banner is in
+  // that first HTML, so it paints with the page instead of arriving after the
+  // scripts (it was the late, largest paint on a first visit — D-062); the head
+  // script hides it at once when a choice is already stored (globals.css).
+  // Analytics waits for the stored choice, read once on the client.
   const choice = useSyncExternalStore(subscribe, getSnapshot, () => undefined);
   const [open, setOpen] = useState(false);
 
@@ -61,7 +64,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     setOpen(false);
   };
 
-  const showBanner = choice === null || (choice !== undefined && open);
+  const showBanner = choice === undefined || choice === null || open;
 
   return (
     <ConsentContext.Provider value={{ reopen }}>
@@ -71,6 +74,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
         <div
           role="region"
           data-capture-hide
+          data-consent-banner={open ? "reopened" : ""}
           aria-label="Privacy choices"
           data-chrome
           className="above-dock no-print bg-night/95 text-paper shadow-lift fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 mx-auto max-w-xl rounded-2xl border border-white/10 p-5 backdrop-blur-xl md:inset-x-auto md:right-6 md:bottom-6"

@@ -97,8 +97,9 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             {credential && <p className="text-mist mt-2 max-w-[56ch] text-sm md:text-base">{credential}</p>}
           </div>
 
+          {/* The statement is the page's largest paint, so it is there from the first frame — no entrance (D-062). */}
           {statement && (
-            <p className="hero-rise type-lede text-mist mt-4 max-w-[40ch] md:mt-6" style={rise(3)}>
+            <p className="type-lede text-mist mt-4 max-w-[40ch] md:mt-6">
               {statement}
             </p>
           )}
