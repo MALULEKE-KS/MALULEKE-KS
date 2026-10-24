@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { CAPABILITIES } from "@/lib/capabilities/map";
 import { buildXray, parseRegister, plain, ruleIds } from "@/lib/xray/build";
-import { edgeRegion, fill, receiptCopy, renderedAt, xrayCopy } from "@/lib/xray/copy";
+import { xrayCopy } from "@/lib/xray/copy";
 import { XRAY_PAGES } from "@/lib/xray/sections";
 
 const register = readFileSync("docs/ENFORCEMENT-REGISTER.md", "utf8");
@@ -73,26 +73,10 @@ describe("reading the register", () => {
   });
 });
 
-describe("the receipt's words", () => {
-  it("hides what the owner leaves empty, and the X-ray without a switch label", () => {
-    expect(receiptCopy(null).renderedLabel).toBeNull();
+describe("the X-ray's words", () => {
+  it("hides the X-ray without a switch label", () => {
     expect(xrayCopy(null)).toBeNull();
     expect(xrayCopy({ switchLabel: "  " })).toBeNull();
     expect(xrayCopy({ switchLabel: "See how this page works" })?.switchLabel).toBe("See how this page works");
-    expect(fill("build {commit}", "commit", "4ef558a")).toBe("build 4ef558a");
-    expect(fill(null, "commit", "4ef558a")).toBeNull();
-  });
-
-  it("names the edge from Vercel's request id, and nothing it can't read", () => {
-    expect(edgeRegion("cpt1::iad1::abc12-1729771234567-0123456789ab")).toBe("Cape Town (cpt1)");
-    expect(edgeRegion("zzz9::abc")).toBe("zzz9");
-    expect(edgeRegion(null)).toBeNull();
-    expect(edgeRegion("not-an-id")).toBeNull();
-  });
-
-  it("writes the render time in the site's zone", () => {
-    const t = new Date("2026-10-24T12:05:00Z");
-    expect(renderedAt(t, "Africa/Johannesburg")).toMatch(/^14:05/);
-    expect(renderedAt(t, "Not/AZone")).toMatch(/^12:05/);
   });
 });

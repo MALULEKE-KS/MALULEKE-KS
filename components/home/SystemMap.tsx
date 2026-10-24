@@ -16,6 +16,8 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import { SystemMapGraph } from "@/components/home/SystemMapGraph";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
+import { XraySwitch } from "@/components/xray/XraySwitch";
+import type { XrayCopy } from "@/lib/xray/copy";
 import type { SystemMapData } from "@/lib/queries/map";
 import { ago } from "@/lib/queries/work";
 import { Accent } from "@/components/shared/Accent";
@@ -47,7 +49,7 @@ export function statusLine(pulse: MapPulse): string[] {
   ].filter((p): p is string => Boolean(p));
 }
 
-export function SystemMap({ data, pulse, numbers }: { data: SystemMapData | null; pulse: MapPulse; numbers: CuratedNumber[] }) {
+export function SystemMap({ data, pulse, numbers, xray }: { data: SystemMapData | null; pulse: MapPulse; numbers: CuratedNumber[]; xray?: { copy: XrayCopy; source: { repository: string; commit: string | null } } | null }) {
   if (!data) return null;
   const status = statusLine(pulse);
   return (
@@ -80,9 +82,13 @@ export function SystemMap({ data, pulse, numbers }: { data: SystemMapData | null
                 </li>
               ))}
             </ul>
-            <AskGuideButton question="How does this platform enforce its business rules?" variant="glass" size="sm" className="tap-target shrink-0 self-start md:self-auto">
-              Ask the AI guide how
-            </AskGuideButton>
+            <div className="flex shrink-0 flex-wrap items-center gap-3 self-start md:self-auto">
+              {/* "See how this page works" (D-067), here since D-069: the hero holds the Orbit. */}
+              {xray && <XraySwitch copy={xray.copy} source={xray.source} />}
+              <AskGuideButton question="How does this platform enforce its business rules?" variant="glass" size="sm" className="tap-target shrink-0">
+                Ask the AI guide how
+              </AskGuideButton>
+            </div>
           </div>
         </Reveal>
 

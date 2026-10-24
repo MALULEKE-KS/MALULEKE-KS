@@ -84,7 +84,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
 - photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
 
-**GitHub homes** — How it all connects: homes → systems → technologies
+**GitHub homes** — How it all connects: homes → systems → technologies; Hero: the Orbit's rings, one per home (D-069)
 
 - Call `GET /homes`
 - Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
@@ -95,7 +95,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Call `GET /github/commits`
 - The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
 
-**Weekly build activity** — Selected work: a sparkline on each system
+**Weekly build activity** — Selected work: a sparkline on each system; Hero: the Orbit — each world's mass, its 26 weeks replayed as sparks, the timeline (D-069)
 
 - Call `GET /activity`
 - Only systems that are live on the site; no commit content, no authors.
@@ -114,7 +114,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
-**Platform pulse** — Hero: the live line (the build that is running) and the page's receipt; How I build: rules the database enforces, changes audited this week; How it all connects: the live status line
+**Platform pulse** — Hero: the live line (the build that is running); How I build: rules the database enforces, changes audited this week; How it all connects: the live status line
 
 - Call `GET /platform/pulse`
 - Aggregates only — no rows, no actors. deployment is null outside Vercel.
@@ -125,10 +125,18 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).
 - featured falls back to flagship-first until the admin picks some; never empty while anything is published.
 
-**Page content blocks** — Hero: the statement and every label ("home-hero"), the receipt and the X-ray's words ("page-xray"); Selected work: what each flagship achieved ("flagship-outcomes"); The AI guide's band ("ai-guide"); How I build: the mission and principles ("how-i-build")
+**Page content blocks** — Hero: the statement and every label ("home-hero"), the Orbit's words ("home-orbit") and the flagships' lines in its panel ("flagship-outcomes"); How it all connects: the X-ray's words ("page-xray"); Selected work: what each flagship achieved ("flagship-outcomes"); The AI guide's band ("ai-guide"); How I build: the mission and principles ("how-i-build")
 
 - Call `GET /content/{key}`
 - 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
+
+**Systems catalog** — Hero: the Orbit's worlds — every published system, its status and stack, its panel (D-069)
+
+- Call `GET /systems`
+- Call `GET /organizations`
+- organization may be a masked label ("a fintech client") — show it as text, never link it.
+- repoPrivate = true means repoUrl is null: show a private-repository lock and a Request access action (to /contact).
+- Status colour comes from statusColorToken — never map status keys to colours in code (EXT-1).
 
 **Case study** — Selected work: each system's screenshot and case-study link
 

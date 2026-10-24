@@ -31,6 +31,8 @@ export const FLAGS = {
   // D-059: each case study's hero on its system's screenshot (D-054) — off for now (owner, 2026-10-24: "turn off system
   // hero images and keep them for the future"); the screenshots, their history and the code stay.
   caseStudyHeroImage: "systems.hero_image",
+  // D-069: the home hero's Orbit — every published system around the platform's core, its 26 weeks replayed. Off = the cover photo.
+  homeOrbit: "home.orbit",
 } as const;
 
 export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];

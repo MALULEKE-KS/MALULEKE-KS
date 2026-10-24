@@ -1,15 +1,15 @@
 // app/(public)/_components/HomeHeroV2Section.tsx
 // The rebuilt home hero with its data (docs/improvements/HOME-HERO-PLAN.md §7):
 // gathers what only this hero needs — the photo slots, the entrance's and the
-// glow's settings, the phone's CV and contact buttons, the receipt and the X-ray's words
-// (D-067) — and hands HomeHeroV2 ready values. The record it used to carry is in How I build (homeRecord, D-065). It is the home hero (the flag and the previous hero are gone — D-038).
+// glow's settings, the phone's CV and contact buttons, and the Orbit with its words over the photo (D-069) —
+// and hands HomeHeroV2 ready values. The record it used to carry is in How I build (homeRecord, D-065). It is the home hero (the flag and the previous hero are gone — D-038).
 
 import { Evidence } from "@/components/shared/Evidence";
 import { HeroBackdrop, type HeroImageSource } from "@/components/shared/HeroBackdrop";
 import type { ProofLedgerItem } from "@/components/shared/ProofLedger";
 import { HomeHeroV2 } from "@/components/home/HomeHeroV2";
 import type { ContentBody } from "@/lib/content/blocks";
-import { claimsFor, evidenceSource, type ResolvedClaim } from "@/lib/evidence";
+import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
 import { getSkillEvidence } from "@/lib/queries/evidence";
 import { heroAsOf, heroCopy, heroCredential, heroLedger, heroLiveLine, heroStack } from "@/lib/home/hero";
 import { getPublicPhotos } from "@/lib/queries/profile";
@@ -17,8 +17,10 @@ import type { SiteProfile } from "@/lib/queries/site";
 import { getSetting } from "@/lib/settings";
 import { getUploadedCvLink } from "@/lib/cv/options";
 import { getContentBlock } from "@/lib/content/blocks";
-import { PageReceipt } from "@/components/xray/PageReceipt";
-import { receiptCopy, renderedAt, xrayCopy } from "@/lib/xray/copy";
+import { OrbitStage } from "@/components/home/orbit/OrbitStage";
+import { getOrbit } from "@/lib/queries/orbit";
+import { orbitCopy } from "@/lib/home/orbit-copy";
+import { FLAGS, getFlags } from "@/lib/flags";
 
 interface HomeHeroV2SectionProps {
   profile: SiteProfile;
@@ -63,7 +65,7 @@ export function homeRecord(
 }
 
 export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
-  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories, timeZone, cv, header, xrayBlock, repo] = await Promise.all([
+  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories, timeZone, cv, header, flags, orbitBlock, outcomes, weekMs] = await Promise.all([
     getPublicPhotos(),
     getSkillEvidence(),
     getSetting("home.hero.entrance.durationMs"),
@@ -75,9 +77,13 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
     getSetting("site.timeZone"),
     getUploadedCvLink(),
     getContentBlock("site-header"),
-    getContentBlock("page-xray"),
-    evidenceSource(),
+    getFlags(),
+    getContentBlock("home-orbit"),
+    getContentBlock("flagship-outcomes"),
+    getSetting("home.orbit.weekMs"),
   ]);
+  // D-069: the Orbit in the cover photo's place (flag "home.orbit"; off brings the photo back).
+  const orbitData = flags[FLAGS.homeOrbit] === true ? await getOrbit(outcomes?.outcomes ?? {}) : null;
 
   const copy = heroCopy(block);
   const source = (purpose: string): HeroImageSource | null => {
@@ -88,18 +94,8 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
   const mobile = source("hero-mobile");
 
   const role = profile.headline ?? profile.role;
-  // The receipt (D-067): when this cached copy was made, in the site's zone — written here, so the browser shows the same words.
-  const commit = pulse.deployment?.commit ?? null;
-  const footer = (
-    <PageReceipt
-      copy={receiptCopy(xrayBlock)}
-      rendered={renderedAt(new Date(), timeZone)}
-      build={commit ? { commit: commit.slice(0, 7), url: `https://github.com/${repo.repository}/commit/${repo.commit ?? commit}` } : null}
-      rules={pulse.rulesEnforcedByDatabase}
-      xray={xrayCopy(xrayBlock)}
-      source={repo}
-    />
-  );
+  // The cover photo stays behind the hero (owner, 2026-10-24); the Orbit floats over it.
+  const orbit = orbitData ? <OrbitStage data={orbitData} copy={orbitCopy(orbitBlock)} weekMs={weekMs} overPhoto={Boolean(desktop || mobile)} /> : null;
   return (
     <HomeHeroV2
       name={profile.name}
@@ -110,7 +106,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       nowBuilding={nowBuilding}
       stack={heroStack(skills, stackCategories, stackCount)}
       copy={copy}
-      footer={footer}
+      orbit={orbit}
       phoneActions={{ cvUrl: cv?.url ?? null, cvLabel: header?.cvMenuLabel?.trim() || null, contactLabel: header?.contactLabel?.trim() || null }}
       entrance={{ durationMs, staggerMs }}
       backdrop={

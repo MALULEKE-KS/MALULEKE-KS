@@ -2,8 +2,9 @@
 // Home, section 1 — Direction C, chosen by the owner on 2026-10-20
 // (docs/improvements/HOME-HERO-PLAN.md §5–6): the name large, one plain
 // statement, two actions (on a phone, the CV and Let's talk), the technologies you build
-// with — the record moved to How I build (D-065); at its foot the page's receipt and the
-// "See how this page works" X-ray (D-067) — all on one cover image behind the whole
+// with — the record moved to How I build (D-065) — and, since D-069, the Orbit over the cover image:
+// every published system around the platform's core, its instrument bar at the hero's foot (the
+// receipt and X-ray left the hero; the X-ray is in How it all connects) — all on one cover image behind the whole
 // hero (HeroBackdrop; the owner's direction, same day), the two giving each
 // other room: on larger screens the type sits at the left, in the image's quiet
 // zone, and the right of the image shows at full strength; on phones the type sits
@@ -26,6 +27,7 @@ import { Container } from "@/components/shared/Container";
 import { TechChip } from "@/components/shared/TechChip";
 import { Button } from "@/components/ui/button";
 import { heroEntranceVars, type HeroCopy } from "@/lib/home/hero";
+import { cn } from "@/lib/utils";
 
 interface HomeHeroV2Props {
   name: string;
@@ -44,8 +46,8 @@ interface HomeHeroV2Props {
   copy: HeroCopy;
   /** The phone's two actions (owner, 2026-10-24): the uploaded CV — the phone's header has no room for it — and Let's talk. */
   phoneActions: { cvUrl: string | null; cvLabel: string | null; contactLabel: string | null };
-  /** The strip at the foot of the hero — the page's receipt and the X-ray switch (PageReceipt, D-067) — or null. */
-  footer: ReactNode | null;
+  /** The Orbit (OrbitStage, D-069): the stage beside the words, over the cover photo, and its instrument bar at the hero's foot — or null. */
+  orbit: ReactNode | null;
   /** The cover image behind everything (HeroBackdrop) — null leaves a graphite field. */
   backdrop: ReactNode | null;
   entrance: { durationMs: number; staggerMs: number };
@@ -54,18 +56,19 @@ interface HomeHeroV2Props {
 /** Each part settles in after the one before it (the delay is the part's index × the stagger setting). */
 const rise = (i: number): CSSProperties => ({ "--i": i }) as CSSProperties;
 
-export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, phoneActions, footer, backdrop, entrance }: HomeHeroV2Props) {
+export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, phoneActions, orbit, backdrop, entrance }: HomeHeroV2Props) {
   return (
     <section
       aria-labelledby="hero-title"
       className="bg-night-deep text-paper relative isolate flex min-h-svh flex-col overflow-hidden md:min-h-[min(100svh,60rem)]"
       style={heroEntranceVars(entrance.durationMs, entrance.staggerMs) as CSSProperties}
     >
-      {backdrop}
+      {/* With the Orbit, the photo stays (owner, 2026-10-24), a little dimmer so the Orbit reads over it: the first screen on a phone (the Orbit's band follows the words), the whole hero from lg. */}
+      {orbit && backdrop ? <div className="absolute inset-x-0 top-0 -z-10 h-svh brightness-[0.8] lg:inset-y-0 lg:h-auto">{backdrop}</div> : backdrop}
 
-      <Container className="flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10">
-        {/* One column at the left, so the image's right side has the room. */}
-        <div className="flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]">
+      <Container className={cn("flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10", orbit && "relative z-10 lg:pb-14")}>
+        {/* One column at the left, so the image's (or the Orbit's) right side has the room; the Orbit keeps clear of it (data-orbit-copy). */}
+        <div data-orbit-copy="" className={cn("flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]", orbit && "lg:max-w-[min(34rem,40vw)]")}>
           {(liveLine || nowBuilding) && (
             // A phone sets the two facts one under the other; wider screens run them on one line.
             <p className="hero-rise text-mist flex max-w-full flex-col items-start gap-y-1.5 font-mono text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2.5" style={rise(0)}>
@@ -82,7 +85,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
               {nowBuilding && (
                 <span className="inline-flex max-w-full min-w-0 flex-wrap items-center gap-x-1.5 max-sm:pl-4">
                   {nowBuilding.label && <span className="text-line">{nowBuilding.label}</span>}
-                  <Link href={nowBuilding.url} className="tap-target text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
+                  <Link href={nowBuilding.url} data-orbit-system={/^\/systems\/([^/?#]+)/.exec(nowBuilding.url)?.[1]} className="tap-target text-paper hover:text-ember decoration-white/30 underline underline-offset-4 transition-colors">
                     {nowBuilding.name}
                   </Link>
                   {nowBuilding.when && <span className="text-line">· {nowBuilding.when}</span>}
@@ -154,7 +157,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
               {copy.stackLabel && <p className="text-mist font-mono text-[11px] tracking-wide">{copy.stackLabel}</p>}
               <ul className="flex flex-wrap gap-2" aria-label={copy.stackLabel ?? undefined}>
                 {stack.map((tech) => (
-                  <li key={tech}>
+                  <li key={tech} data-orbit-tech={tech}>
                     <TechChip name={tech} tone="dark" className="bg-night-deep/55 backdrop-blur" />
                   </li>
                 ))}
@@ -164,7 +167,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
         </div>
       </Container>
 
-      {footer}
+      {orbit}
     </section>
   );
 }
