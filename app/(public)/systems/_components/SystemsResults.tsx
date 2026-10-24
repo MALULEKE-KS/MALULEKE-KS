@@ -4,11 +4,12 @@
 // Data: lib/queries/catalog.ts — filters, counts and pages from one read.
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ArrowUpRight, SearchX, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, SearchX, X } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 import { CatalogCard } from "@/components/systems/CatalogCard";
 import { CatalogFilters, activeFilters } from "@/components/systems/CatalogFilters";
 import { getCatalog, type Catalog, type CatalogSystem } from "@/lib/queries/catalog";
+import { sectionCopy } from "@/lib/content/copy";
 import { PaginationQuerySchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
@@ -52,46 +53,54 @@ function Grid({ systems, showHome = true, fit = false }: { systems: CatalogSyste
   );
 }
 
+/** The three groups, in order (D-061): the owner's best work first, so the rest never dilutes it. */
+type GroupKey = "flagships" | "ventures" | "coursework";
+const GROUP_FALLBACK: Record<GroupKey, { title: string; description: string }> = {
+  flagships: { title: "Flagships", description: "My best work, live in production." },
+  ventures: { title: "Ventures & clients", description: "Built for my own ventures and for clients." },
+  coursework: { title: "Coursework & experiments", description: "University coursework and experiments." },
+};
+
+/** Flagships by the owner's flagship choice; then what lives under a venture or a client home; then the rest. */
+function groupOf(s: CatalogSystem, homes: Catalog["homes"]): GroupKey {
+  if (s.isFlagship) return "flagships";
+  const kind = homes.find((h) => h.slug === s.homeSlug)?.kind;
+  return kind === "venture" || kind === "client" ? "ventures" : "coursework";
+}
+
 /**
- * The unfiltered catalog, grouped by GitHub home (PUBLIC-REDESIGN-PLAN §2, D12):
- * each home a heading with the owner's role there and its count, then
- * its systems. Only when the whole catalog fits on one page — a group split
- * across pages would say less than the flat grid.
+ * The unfiltered catalog in three groups (D-061, the owner's choice 2026-10-24): Flagships,
+ * Ventures & clients, Coursework & experiments — each a heading, a line and its count, then its
+ * systems (each card still names its home). The groups follow data the owner manages — the
+ * flagship toggle and each organisation's kind — and their words are the "page-copy" block's
+ * systems.flagships / systems.ventures / systems.coursework. Only when the whole catalog fits on
+ * one page — a group split across pages would say less than the flat grid.
  */
-function ByHome({ systems, homes }: { systems: CatalogSystem[]; homes: Catalog["homes"] }) {
-  const groups = homes.map((h) => ({ ...h, systems: systems.filter((s) => s.homeSlug === h.slug) })).filter((g) => g.systems.length > 0);
-  const homeless = systems.filter((s) => !homes.some((h) => h.slug === s.homeSlug));
+async function ByGroup({ systems, homes }: { systems: CatalogSystem[]; homes: Catalog["homes"] }) {
+  const keys: GroupKey[] = ["flagships", "ventures", "coursework"];
+  const groups = await Promise.all(
+    keys.map(async (key) => ({ key, copy: await sectionCopy(`systems.${key}`, GROUP_FALLBACK[key]), systems: systems.filter((s) => groupOf(s, homes) === key) })),
+  );
   return (
-    <div className="space-y-14">
-      {groups.map((g) => (
-        <section key={g.slug} aria-labelledby={`home-${g.slug}`}>
-          {/* Each home reads as a chapter: its name, the owner's role there and its count, and its GitHub (D-049). */}
-          <div className="border-ink/10 mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b pb-3">
-            <div className="min-w-0">
-              <h2 id={`home-${g.slug}`} className="text-ink text-xl font-semibold tracking-tight md:text-2xl">
-                {g.name}
-              </h2>
-              <p className="text-slate mt-1 text-sm">
-                {g.role && <span>{g.role} · </span>}
+    <div className="space-y-16">
+      {groups
+        .filter((g) => g.systems.length > 0)
+        .map((g) => (
+          <section key={g.key} aria-labelledby={`group-${g.key}`}>
+            <div className="border-ink/10 mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b pb-3">
+              <div className="min-w-0">
+                <h2 id={`group-${g.key}`} className="text-ink text-xl font-semibold tracking-tight md:text-2xl">
+                  {g.copy.title}
+                </h2>
+                {g.copy.description && <p className="text-slate mt-1 max-w-2xl text-sm">{g.copy.description}</p>}
+              </div>
+              <p className="text-slate text-sm">
                 <span className="type-data">{g.systems.length}</span> {g.systems.length === 1 ? "system" : "systems"}
               </p>
             </div>
-            {g.github[0] && (
-              <a
-                href={g.github[0].url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tap-target press text-ink/80 hover:text-ink hover:border-ember border-ink/20 inline-flex items-center gap-1 border-b pb-0.5 text-sm transition-colors"
-              >
-                On GitHub <ArrowUpRight aria-hidden="true" className="size-3.5" />
-                <span className="sr-only">({g.name}, opens in a new tab)</span>
-              </a>
-            )}
-          </div>
-          <Grid systems={g.systems} showHome={false} fit />
-        </section>
-      ))}
-      {homeless.length > 0 && <Grid systems={homeless} />}
+            <Grid systems={g.systems} fit />
+          </section>
+        ))}
     </div>
   );
 }
@@ -100,7 +109,7 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
   const catalog = await loadCatalog(params);
   const { systems, total, page, totalPages, facets, homes } = catalog;
   const filtered = Boolean(params.home || params.status || params.tech || params.domain);
-  const grouped = !filtered && params.sort !== "active" && totalPages === 1 && homes.length > 1;
+  const grouped = !filtered && params.sort !== "active" && totalPages === 1;
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams(Object.entries(params).filter((e): e is [string, string] => Boolean(e[1])));
@@ -138,7 +147,7 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
         </div>
       ) : (
         <>
-          {grouped ? <ByHome systems={systems} homes={homes} /> : <Grid systems={systems} />}
+          {grouped ? <ByGroup systems={systems} homes={homes} /> : <Grid systems={systems} />}
 
           {totalPages > 1 && (
             <nav aria-label="Pages" className="mt-12 flex items-center justify-center gap-4">

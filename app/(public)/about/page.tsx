@@ -123,7 +123,7 @@ export default async function AboutPage() {
   const counters = [
     row?.buildingSinceYear && { value: Math.max(1, thisYear - row.buildingSinceYear), label: "years building" },
     { value: published, label: "published systems" },
-    { value: provenSkills.length, label: "skills proven in code" },
+    { value: provenSkills.length, label: "technologies used in published work" },
     { value: companies.length, label: companies.length === 1 ? "company" : "companies" },
   ].filter((c): c is HeroFigure => Boolean(c) && (c as HeroFigure).value > 0); // a zero is an absence, not a figure
 

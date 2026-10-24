@@ -454,3 +454,9 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Shipped:** #258 (header live chip D-058, case study hero images off D-059) as `89789bb`; #260 (the guide's own face, the orb, D-060) as `77c48d4`; production verified both (the chip's markup, the hero without a backdrop, `svg.guide-bot` on the live pages).
 - **This slice (from the CI screenshots):** Jobs — the schedule in words, the last failure's reason on its card, Run now on one line; Numbers — proposals waiting first; Today — healthy jobs as one count, only the ones needing a look by name. Inquiries, Journey, CV, Profile, Freshness, Guide health and Account read well (the delete-button regression was already fixed in #256).
 - **Open:** PR #6 (Docker, 2026-09-17) conflicts and predates the local Postgres setup — the owner decides whether to close it.
+
+### 2026-10-24 · Sprint 3 starts: credibility, then performance (D-061; branch `sprint-3/credibility`)
+- **Plan (owner's paste):** Phase 1 credibility → Phase 2 homepage positioning → Phase 3 performance (mobile LCP < 2.5 s, Lighthouse 85+) → Phase 4 accessibility (100 on every page) → Phase 5 Lighthouse CI and budgets failing the build. No new features, no rebuild.
+- **This slice:** the status vocabulary, three flagships, three groups on /systems, Software Engineer, Governova's domain, About's figure label, commit lines without codes.
+- **Owner to do:** write the three flagship case studies (Xkimi Xa Mali, Sunduza, MALULEKE-KS) in his own words — problem, my role, two or three decisions and their cost, one thing that broke and the fix, where it stands with evidence, what I'd do differently; review the other eight summaries.
+- **Next:** performance — the owner, 2026-10-24: "the site is slow to load more especially in mobile … even desktop performance its the same thing". Measure first (Lighthouse on CI for every public page), then fix in order of what the measurements say.

@@ -150,7 +150,7 @@ export async function getCatalog({ home, status, domain, tech, sort = "featured"
   // The homes, in the site's order (personal first), with what the page says about each.
   const homeList = homes
     .filter((h) => homeCounts.has(h.slug))
-    .map((h) => ({ slug: h.slug, name: h.name, role: h.role, github: h.github, count: homeCounts.get(h.slug)! }));
+    .map((h) => ({ slug: h.slug, name: h.name, role: h.role, kind: h.kind, github: h.github, count: homeCounts.get(h.slug)! }));
 
   return { systems: pageRows, total, page: current, totalPages, facets, stats, homes: homeList };
 }
