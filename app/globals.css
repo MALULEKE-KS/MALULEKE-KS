@@ -431,6 +431,12 @@ html {
 .orbit-x:hover { border-color: rgb(255 91 31 / 0.55); }
 .orbit-x:focus-visible, .orbit-go:focus-visible, .orbit-step button:focus-visible, .orbit-again:focus-visible, .orbit-explore-inline:focus-visible { outline: 2px solid var(--color-ember); outline-offset: 2px; }
 
+/* The core's name (D-073): quiet, like the system names, under the core; it opens the owner's GitHub. */
+.orbit-core-label { position: absolute; left: 0; top: 0; z-index: 3; display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px 3px 7px; border-radius: 999px; color: var(--color-paper); background: rgb(11 12 14 / 0.12); border: 1px solid rgb(255 255 255 / 0.07); text-shadow: 0 1px 10px rgb(0 0 0 / 0.95); white-space: nowrap; opacity: 0; transition: opacity 300ms, border-color 220ms, background-color 220ms; will-change: transform; }
+.orbit-core-label b { font-size: 11.5px; font-weight: 600; }
+.orbit-core-label small { margin-left: 6px; font-family: var(--font-ibm-plex-mono), ui-monospace, monospace; font-size: 10px; color: var(--color-mist); }
+.orbit-core-label:hover, .orbit-core-label:focus-visible { border-color: rgb(255 91 31 / 0.55); background: rgb(16 14 13 / 0.78); backdrop-filter: blur(10px); text-shadow: none; outline: none; }
+
 /* Inside a world (D-072): a small panel with the way back, and its technologies' moons named where they fly. */
 .orbit-enter { font-size: 12.5px; font-weight: 600; color: #170803; background: var(--color-ember); border-radius: 999px; padding: 5px 12px; }
 .orbit-enter:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 2px; }

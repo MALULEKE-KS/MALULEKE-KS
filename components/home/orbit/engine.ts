@@ -49,7 +49,8 @@ export interface OrbitFrame {
   sent: number;
   /** Each world's place on screen: CSS px, its drawn radius, and its depth. */
   worlds: { x: number; y: number; r: number; depth: number }[];
-  core: { x: number; y: number; scale: number; flash: number };
+  /** The core on screen: CSS px, its lens scale, its flash, and its drawn radius in CSS px. */
+  core: { x: number; y: number; scale: number; flash: number; r: number };
   grown: boolean;
   /** Inside a world (D-072): how far in (0–1), and where its technologies' moons are on screen. */
   inside: { t: number; moons: { x: number; y: number; depth: number }[] };
@@ -632,7 +633,7 @@ export async function createOrbit(
     week: -1,
     sent: 0,
     worlds: worlds.map(() => ({ x: 0, y: 0, r: 0, depth: 1 })),
-    core: { x: 0, y: 0, scale: 1, flash: 0 },
+    core: { x: 0, y: 0, scale: 1, flash: 0, r: 0 },
     grown: false,
     inside: { t: 0, moons: [] },
   };
@@ -1047,6 +1048,7 @@ export async function createOrbit(
     frameOut.core.y = cy;
     frameOut.core.scale = (cam.base / cw) * (0.45 + 0.55 * grow);
     frameOut.core.flash = st.flash;
+    frameOut.core.r = (R0 * scalePx) / Math.max(0.001, cw) / st.dpr;
     frameOut.grown = grow > 0.95;
     opts.onFrame(frameOut);
   }

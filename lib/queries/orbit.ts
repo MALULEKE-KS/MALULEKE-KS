@@ -25,6 +25,8 @@ export interface OrbitSystem {
 
 export interface OrbitData {
   homes: string[];
+  /** The core is the owner's GitHub (D-073): his own home's first account, or null. */
+  github: string | null;
   /** The Monday of each week, oldest first (YYYY-MM-DD). */
   weeks: string[];
   systems: OrbitSystem[];
@@ -87,5 +89,6 @@ export async function getOrbit(
   const weeks = Array.from({ length: WEEKS }, (_, i) =>
     new Date(start.getTime() - (WEEKS - 1 - i) * 7 * 86_400_000).toISOString().slice(0, 10)
   );
-  return { homes: used.map((h) => h.name), weeks, systems: out };
+  const personal = homes.find((h) => h.kind === "personal") ?? homes[0];
+  return { homes: used.map((h) => h.name), github: personal?.github[0]?.url ?? null, weeks, systems: out };
 }
