@@ -1,7 +1,7 @@
 // app/(public)/_components/HomeContent.tsx
 // Home (DESIGN-SYSTEM.md v3 §7). The async data-fetching for /, inside an
 // explicit <Suspense> boundary in page.tsx (same pattern as the Systems
-// catalog — see SystemsGridSkeleton.tsx for why not a loading.tsx).
+// catalog).
 
 import { ContactBand } from "@/components/home/ContactBand";
 import { HomeHeroV2Section } from "./HomeHeroV2Section";
