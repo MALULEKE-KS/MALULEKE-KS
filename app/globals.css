@@ -441,13 +441,14 @@ html:has(nav[data-dock="site"]) .orbit-bar { padding-bottom: calc(var(--dock-spa
 .orbit-bars > span[data-state="cur"] > span { background: var(--color-ember); box-shadow: 0 0 12px rgb(255 91 31 / 0.9); }
 
 @media (min-width: 1024px) {
-  .ks-orbit { position: static; background: none; }
-  .orbit-stage { position: absolute; inset: 0 0 var(--orbit-bar-h, 64px) 0; height: auto; }
+  /* The line under the stage is tall enough for its timeline (owner: it ran past the hero's foot). */
+  .ks-orbit { position: static; background: none; --orbit-bar-h: 84px; }
+  .orbit-stage { position: absolute; inset: 0 0 var(--orbit-bar-h) 0; height: auto; }
   .ks-orbit[data-over-photo] .orbit-shade { background: radial-gradient(120% 110% at 71% 50%, transparent 64%, rgb(11 12 14 / 0.4) 100%); }
   .ks-orbit:not([data-over-photo]) .orbit-shade { background: linear-gradient(90deg, var(--color-night-deep) 0%, rgb(11 12 14 / 0.9) 30%, rgb(11 12 14 / 0) 46%); }
   .orbit-poster-wrap { left: 72%; width: min(86%, 86vh); }
   .orbit-card { left: auto; right: max(2rem, env(safe-area-inset-right)); bottom: 18px; width: 300px; }
-  .orbit-bar { height: var(--orbit-bar-h, 64px); grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 28px; padding: 8px max(2rem, env(safe-area-inset-right)) 8px max(1.5rem, env(safe-area-inset-left)); background: linear-gradient(180deg, rgb(11 12 14 / 0.55), var(--color-night-deep)); }
+  .orbit-bar { height: var(--orbit-bar-h); grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 28px; padding: 10px max(2rem, env(safe-area-inset-right)) 16px max(1.5rem, env(safe-area-inset-left)); overflow: hidden; background: linear-gradient(180deg, rgb(11 12 14 / 0.55), var(--color-night-deep)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .orbit-canvas, .orbit-poster-wrap, .orbit-card, .orbit-plate { transition: none; }
