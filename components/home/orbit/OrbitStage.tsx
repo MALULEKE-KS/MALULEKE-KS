@@ -33,36 +33,6 @@ const fmtWeek = (iso: string, year = true) =>
   });
 const n0 = (n: number) => n.toLocaleString("en-ZA");
 
-function Sparkline({ weeks }: { weeks: number[] }) {
-  const max = Math.max(1, ...weeks),
-    W = 200,
-    H = 34;
-  const pts = weeks
-    .map(
-      (v, i) =>
-        `${((i / Math.max(1, weeks.length - 1)) * W).toFixed(1)},${(H - 2 - (v / max) * (H - 6)).toFixed(1)}`
-    )
-    .join(" ");
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      className="h-[34px] w-full"
-    >
-      <polygon points={`0,${H} ${pts} ${W},${H}`} fill="var(--color-ember)" opacity="0.18" />
-      <polyline
-        points={pts}
-        fill="none"
-        stroke="var(--color-ember)"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-}
-
 export function OrbitStage({
   data,
   copy,
@@ -85,11 +55,12 @@ export function OrbitStage({
   const bars = useRef<(HTMLSpanElement | null)[]>([]);
   const hudL = useRef<HTMLSpanElement>(null);
   const hudR = useRef<HTMLSpanElement>(null);
-  const blooms = useRef<(HTMLDivElement | null)[]>([]);
+  const blooms = useRef<(HTMLDivElement | null)[]>([]); // core bloom, inner bloom, streak, nebula
   const engine = useRef<OrbitEngine | null>(null);
   const [live, setLive] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const openRef = useRef<number | null>(null);
+  const relayout = useRef<(() => void) | null>(null);
 
   const sys = data.systems;
   const totals = useMemo(() => sys.map((s) => s.weeks.reduce((a, b) => a + b, 0)), [sys]);
@@ -113,12 +84,26 @@ export function OrbitStage({
     return byWeek;
   }, [sys]);
   const counts = { systems: sys.length, homes: data.homes.length, commits: n0(all) };
+  // What the panel says about a system — only what its own page doesn't (owner, 2026-10-24): its busiest
+  // week, its share of all the commits replayed, and the systems it shares its stack with.
+  const facts = sys.map((w, i) => {
+    const top = Math.max(0, ...w.weeks);
+    const linked = sys
+      .filter((o, j) => j !== i && o.stack.filter((t) => w.stack.includes(t)).length >= 2)
+      .map((o) => o.name);
+    return {
+      busiest: top > 0 ? { week: data.weeks[w.weeks.indexOf(top)]!, commits: top } : null,
+      share: all > 0 ? Math.round((totals[i]! / all) * 100) : 0,
+      linked,
+    };
+  });
 
   const openWorld = useCallback(
     (i: number | null) => {
       openRef.current = i;
       setOpen(i);
       engine.current?.focus(i);
+      relayout.current?.();
       try {
         const url = new URL(location.href);
         if (i === null) url.searchParams.delete("system");
@@ -277,6 +262,12 @@ export function OrbitStage({
       const glow = (0.6 + f.core.flash * 0.4) * (opened !== null ? 0.6 : 1);
       blooms.current.forEach((b, k) => {
         if (!b) return;
+        if (k === 3) {
+          // the Orbit's own ground: a dark, ember-lit field under it, so its colours own its space over the photo
+          b.style.transform = `translate(${f.core.x}px, ${f.core.y}px) scale(${f.core.scale})`;
+          b.style.opacity = "1";
+          return;
+        }
         b.style.transform = `translate(${f.core.x}px, ${f.core.y}px) ${k === 2 ? `scaleX(${f.core.scale})` : `scale(${f.core.scale})`}`;
         b.style.opacity = String(
           k === 2 ? (0.5 + f.core.flash * 0.5) * (opened !== null ? 0.4 : 1) : glow
@@ -315,10 +306,10 @@ export function OrbitStage({
       if (!matchMedia(DESKTOP).matches)
         return {
           cx: 0.5,
-          cy: 0.5,
-          ringPx: Math.min(r.width, r.height) * 0.4,
+          cy: openRef.current !== null ? 0.36 : 0.5,
+          ringPx: Math.min(r.width, r.height) * (openRef.current !== null ? 0.38 : 0.47),
           focusX: 0.5,
-          focusY: 0.24,
+          focusY: 0.36,
           minCoreX: 0,
         };
       const copyEl = root.current?.closest("section")?.querySelector("[data-orbit-copy]");
@@ -327,14 +318,15 @@ export function OrbitStage({
       const cx = (left + zone / 2) / r.width;
       return {
         cx,
-        cy: 0.52,
-        ringPx: Math.min(zone * 0.42, r.height * 0.38),
+        cy: 0.5,
+        ringPx: Math.min(zone * 0.5, r.height * 0.45),
         focusX: Math.max(0.3, (cx * r.width - 220) / r.width),
         focusY: 0.5,
         // the core is never carried into the words' column
         minCoreX: (left + 90) / r.width,
       };
     };
+    relayout.current = resize_;
     const quality = () =>
       (navigator.hardwareConcurrency || 8) <= 4 ||
       ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4 ||
@@ -342,6 +334,9 @@ export function OrbitStage({
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
         ? 0.5
         : 1;
+    function resize_() {
+      resize();
+    }
     const resize = () => {
       const e = engine.current;
       measure();
@@ -359,7 +354,13 @@ export function OrbitStage({
       booting = true;
       const { createOrbit } = await import("@/components/home/orbit/engine");
       if (cancelled) return;
-      const e = await createOrbit(cv, data, { reduced, quality: quality(), weekMs, sky: overPhoto ? 0.3 : 1, onFrame });
+      const e = await createOrbit(cv, data, {
+        reduced,
+        quality: quality(),
+        weekMs,
+        sky: overPhoto ? 0.3 : 1,
+        onFrame,
+      });
       if (cancelled) return e?.destroy();
       if (!e) return; // no WebGL2: the still stays
       engine.current = e;
@@ -526,6 +527,7 @@ export function OrbitStage({
     openWorld((open + by + sys.length) % sys.length);
   };
   const s = open !== null ? sys[open]! : null;
+  const f = open !== null ? facts[open]! : null;
 
   return (
     <div
@@ -535,23 +537,14 @@ export function OrbitStage({
       data-live={live ? "" : undefined}
       data-over-photo={overPhoto ? "" : undefined}
     >
-      {(copy.phoneEyebrow || copy.statsLine) && (
-        <div className="orbit-phonehead">
-          <div>
-            {copy.phoneEyebrow && (
-              <p className="text-ember type-micro font-mono">{copy.phoneEyebrow}</p>
-            )}
-            {copy.statsLine && (
-              <p className="text-mist mt-1 font-mono text-[11px]">
-                {fillIn(copy.statsLine, counts)}
-              </p>
-            )}
-          </div>
-          {copy.phoneHint && <p className="text-line font-mono text-[11px]">{copy.phoneHint}</p>}
-        </div>
-      )}
-
       <div ref={stage} className="orbit-stage">
+        <div
+          ref={(el) => {
+            blooms.current[3] = el;
+          }}
+          className="orbit-nebula"
+          aria-hidden="true"
+        />
         <div className="orbit-poster-wrap" aria-hidden="true">
           <OrbitPoster data={data} />
         </div>
@@ -586,7 +579,7 @@ export function OrbitStage({
         <svg ref={leaders} className="orbit-leaders" aria-hidden="true" data-conn="off">
           <path data-lead="" />
           <path data-conn="" className="orbit-conn" />
-          <circle data-dot="" r="3" />
+          <circle data-dot="" r="2.5" />
         </svg>
         <div className="orbit-plates">
           {sys.map((w, i) => (
@@ -603,7 +596,7 @@ export function OrbitStage({
                 open === i && "orbit-plate-on"
               )}
               aria-label={`${w.name}, ${homeLabels[w.home] ?? ""}, ${w.status}`}
-              onClick={() => openWorld(i)}
+              onClick={() => openWorld(open === i ? null : i)}
               onPointerEnter={() => {
                 hoverRef.current = i;
                 engine.current?.hover(i);
@@ -615,18 +608,16 @@ export function OrbitStage({
                 }
               }}
             >
-              <i className="orbit-orb" aria-hidden="true" />
-              <span>
-                <b>{w.name}</b>
-                <small>
-                  <i className={recent[i]! > 0 ? "orbit-live" : undefined} aria-hidden="true" />
-                  {homeLabels[w.home]} · {w.status}
-                </small>
-              </span>
+              <i
+                className={cn("orbit-orb", recent[i]! > 0 && "orbit-orb-live")}
+                aria-hidden="true"
+              />
+              <b>{w.name}</b>
             </button>
           ))}
         </div>
 
+        {/* The opened system: a small panel in the stage's corner, the whole orbit still in view. */}
         <div
           ref={card}
           className="orbit-card"
@@ -635,121 +626,104 @@ export function OrbitStage({
             ? { role: "dialog", "aria-modal": false, "aria-labelledby": "orbit-card-title" }
             : { "aria-hidden": true })}
         >
-          {s && open !== null && (
+          {s && f && open !== null && (
             <>
-              <div className="orbit-handle" aria-hidden="true" />
+              <p className="orbit-card-k">
+                {s.flagship && copy.flagshipLabel ? `${copy.flagshipLabel} · ` : ""}
+                {homeLabels[s.home]}
+              </p>
+              <h3 id="orbit-card-title" className="orbit-card-name">
+                {s.name}
+              </h3>
+              <dl className="orbit-facts">
+                {f.busiest
+                  ? copy.factBusiest && (
+                      <div>
+                        <dt>{copy.factBusiest}</dt>
+                        <dd>
+                          {fillIn(copy.busiestValue, {
+                            week: fmtWeek(f.busiest.week, false),
+                            commits: n0(f.busiest.commits),
+                          })}
+                        </dd>
+                      </div>
+                    )
+                  : copy.factQuiet && (
+                      <div>
+                        <dt>{copy.factBusiest}</dt>
+                        <dd>{copy.factQuiet}</dd>
+                      </div>
+                    )}
+                {copy.factShare && f.busiest && (
+                  <div>
+                    <dt>{copy.factShare}</dt>
+                    <dd>{fillIn(copy.shareValue, { percent: f.share, total: n0(all) })}</dd>
+                  </div>
+                )}
+                {copy.factLinked && f.linked.length > 0 && (
+                  <div>
+                    <dt>{copy.factLinked}</dt>
+                    <dd>
+                      {f.linked.slice(0, 3).join(", ")}
+                      {f.linked.length > 3 ? ` +${f.linked.length - 3}` : ""}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+              <div className="orbit-card-foot">
+                {copy.openLabel && (
+                  <a href={`/systems/${s.slug}`} className="orbit-go">
+                    {copy.openLabel}
+                    <ArrowRight className="size-3.5" aria-hidden="true" />
+                  </a>
+                )}
+                {sys.length > 1 && (
+                  <span className="orbit-step">
+                    <button
+                      type="button"
+                      onClick={() => step(-1)}
+                      aria-label={copy.prevLabel ?? undefined}
+                    >
+                      ‹
+                    </button>
+                    <span>
+                      {open + 1}/{sys.length}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => step(1)}
+                      aria-label={copy.nextLabel ?? undefined}
+                    >
+                      ›
+                    </button>
+                  </span>
+                )}
+              </div>
+              {/* Last in the panel and above its lines, so nothing paints over it. */}
               <button
                 type="button"
                 className="orbit-x"
                 onClick={() => openWorld(null)}
                 aria-label={copy.closeLabel ?? undefined}
               >
-                <X className="size-4" aria-hidden="true" />
+                <X className="size-3.5" aria-hidden="true" />
               </button>
-              <p className="text-ember type-micro font-mono">
-                {s.flagship && copy.flagshipLabel ? `${copy.flagshipLabel} · ` : ""}
-                {homeLabels[s.home]}
-              </p>
-              <h3
-                id="orbit-card-title"
-                className="mt-2 pr-8 text-2xl leading-tight font-bold tracking-tight"
-              >
-                {s.name}
-              </h3>
-              <p className="orbit-pill">
-                <i className={recent[open]! > 0 ? "orbit-live" : undefined} aria-hidden="true" />
-                {s.status}
-                {recent[open]! > 0 && copy.activeNote ? ` · ${copy.activeNote}` : ""}
-              </p>
-              <p className="text-mist mt-3 text-[13.5px] leading-relaxed">{s.line}</p>
-              <div className="orbit-stat">
-                <div>
-                  <b>{n0(totals[open]!)}</b>
-                  {copy.commitsLabel && <span>{copy.commitsLabel}</span>}
-                </div>
-                <Sparkline weeks={s.weeks} />
-              </div>
-              {s.stack.length > 0 && (
-                <ul className="orbit-chips">
-                  {s.stack.map((t) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              )}
-              {copy.openLabel && (
-                <a href={`/systems/${s.slug}`} className="orbit-go">
-                  {copy.openLabel}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </a>
-              )}
-              {sys.length > 1 && (
-                <div className="orbit-step">
-                  <button type="button" onClick={() => step(-1)}>
-                    ‹ {copy.prevLabel}
-                  </button>
-                  <span>
-                    {open + 1} / {sys.length}
-                  </span>
-                  <button type="button" onClick={() => step(1)}>
-                    {copy.nextLabel} ›
-                  </button>
-                </div>
-              )}
             </>
           )}
         </div>
         <div className="orbit-grain" aria-hidden="true" />
       </div>
 
-      {copy.exploreLabel && (
-        <div className="orbit-explore">
-          <button type="button" onClick={() => openWorld(0)}>
-            {copy.exploreLabel}
-          </button>
-          {copy.exploreHint && <p>{copy.exploreHint}</p>}
-        </div>
-      )}
-
+      {/* One quiet line under the stage: the count, a way in, the 26 weeks and the replay. */}
       <div className="orbit-bar">
-        <div className="min-w-0">
-          {copy.statsLine && (
-            <p className="orbit-stats">
-              {fillIn(copy.statsLine, counts)}
-              {copy.hint && <span className="text-line"> · {copy.hint}</span>}
-              {copy.exploreLabel && (
-                <button type="button" className="orbit-explore-inline" onClick={() => openWorld(0)}>
-                  {copy.exploreLabel}
-                </button>
-              )}
-            </p>
+        <p className="orbit-stats">
+          {copy.statsLine && <span>{fillIn(copy.statsLine, counts)}</span>}
+          {copy.exploreLabel && (
+            <button type="button" className="orbit-explore-inline" onClick={() => openWorld(0)}>
+              {copy.exploreLabel}
+            </button>
           )}
-          <ul className="orbit-legend">
-            {copy.legendFlagship && (
-              <li>
-                <i className="bg-ember shadow-[0_0_8px_var(--color-ember)]" />
-                {copy.legendFlagship}
-              </li>
-            )}
-            {copy.legendSystem && (
-              <li>
-                <i className="bg-paper" />
-                {copy.legendSystem}
-              </li>
-            )}
-            {copy.legendActive && (
-              <li>
-                <i className="bg-[var(--color-signal-finished-on-dark)]" />
-                {copy.legendActive}
-              </li>
-            )}
-            {copy.legendSpark && (
-              <li>
-                <i className="bg-[#ffb08a]" />
-                {copy.legendSpark}
-              </li>
-            )}
-          </ul>
-        </div>
+        </p>
         <div className="orbit-timeline">
           <div className="orbit-now">
             <span ref={hudL} aria-live="off">
@@ -778,7 +752,15 @@ export function OrbitStage({
             onClick={(e) => {
               if (!live) return;
               const r = e.currentTarget.getBoundingClientRect();
-              engine.current?.replay(Math.max(0, Math.min(weekTotals.length - 1, Math.floor(((e.clientX - r.left) / r.width) * weekTotals.length))));
+              engine.current?.replay(
+                Math.max(
+                  0,
+                  Math.min(
+                    weekTotals.length - 1,
+                    Math.floor(((e.clientX - r.left) / r.width) * weekTotals.length)
+                  )
+                )
+              );
             }}
           >
             {weekTotals.map((v, i) => (
@@ -787,18 +769,14 @@ export function OrbitStage({
                 ref={(el) => {
                   bars.current[i] = el;
                 }}
-                title={fillIn(copy.weekButton, { week: fmtWeek(data.weeks[i]!), commits: n0(v) }) ?? undefined}
+                title={
+                  fillIn(copy.weekButton, { week: fmtWeek(data.weeks[i]!), commits: n0(v) }) ??
+                  undefined
+                }
               >
-                <span style={{ height: `${Math.max(4, (v / maxWeek) * 100)}%` }} />
+                <span style={{ height: `${Math.max(6, (v / maxWeek) * 100)}%` }} />
               </span>
             ))}
-          </div>
-          <div className="orbit-axis">
-            <span>{fmtWeek(data.weeks[0]!, false)}</span>
-            <span>
-              {fmtWeek(data.weeks[data.weeks.length - 1]!, false)}
-              {copy.nowLabel ? ` · ${copy.nowLabel}` : ""}
-            </span>
           </div>
         </div>
       </div>

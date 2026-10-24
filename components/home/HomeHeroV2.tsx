@@ -60,15 +60,15 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
   return (
     <section
       aria-labelledby="hero-title"
-      className="bg-night-deep text-paper relative isolate flex min-h-svh flex-col overflow-hidden md:min-h-[min(100svh,60rem)]"
+      className={cn("bg-night-deep text-paper relative isolate flex min-h-svh flex-col overflow-hidden md:min-h-[min(100svh,60rem)]", orbit && "lg:h-svh lg:min-h-[600px]")}
       style={heroEntranceVars(entrance.durationMs, entrance.staggerMs) as CSSProperties}
     >
       {/* With the Orbit, the photo stays (owner, 2026-10-24), a little dimmer so the Orbit reads over it: the first screen on a phone (the Orbit's band follows the words), the whole hero from lg. */}
       {orbit && backdrop ? <div className="absolute inset-x-0 top-0 -z-10 h-svh brightness-[0.8] lg:inset-y-0 lg:h-auto">{backdrop}</div> : backdrop}
 
-      <Container className={cn("flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10", orbit && "relative z-10 lg:pb-14")}>
-        {/* One column at the left, so the image's (or the Orbit's) right side has the room; the Orbit keeps clear of it (data-orbit-copy). */}
-        <div data-orbit-copy="" className={cn("flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]", orbit && "lg:max-w-[min(34rem,40vw)]")}>
+      <Container className={cn("flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10", orbit && "relative z-10 min-h-0 lg:pointer-events-none lg:pb-6")}>
+        {/* One column at the left, so the image's (or the Orbit's) right side has the room; the Orbit keeps clear of it (data-orbit-copy). With the Orbit, the rest of the frame lets clicks through to it. */}
+        <div data-orbit-copy="" className={cn("flex max-w-[46rem] flex-col items-start text-left max-md:[text-shadow:0_1px_18px_rgb(11_12_14/0.7)]", orbit && "lg:pointer-events-auto lg:max-w-[min(34rem,40vw)]")}>
           {(liveLine || nowBuilding) && (
             // A phone sets the two facts one under the other; wider screens run them on one line.
             <p className="hero-rise text-mist flex max-w-full flex-col items-start gap-y-1.5 font-mono text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2.5" style={rise(0)}>
@@ -94,7 +94,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             </p>
           )}
 
-          <h1 id="hero-title" className="hero-rise type-hero-name mt-5 max-w-[18ch] md:mt-7" style={rise(1)}>
+          {/* With the Orbit, the name scales with the screen's height too, so the hero and its line fit one screen. */}
+          <h1 id="hero-title" className={cn("hero-rise type-hero-name mt-5 max-w-[18ch] md:mt-7", orbit && "lg:mt-5 lg:[font-size:clamp(2.75rem,min(5.2vw,8.6svh),5.5rem)]")} style={rise(1)}>
             {name}
           </h1>
 

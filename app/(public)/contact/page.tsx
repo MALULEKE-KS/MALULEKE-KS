@@ -86,7 +86,8 @@ export default async function ContactPage() {
               </h1>
               {hero.description && <p className="type-lede text-mist mt-5 max-w-xl">{hero.description}</p>}
             </div>
-            <div className="min-w-0 lg:col-span-5">
+            {/* On a phone the card sits a little lower, clear of the doorway in the photo (owner, 2026-10-24). */}
+            <div className="min-w-0 max-lg:mt-14 lg:col-span-5">
               <div className="flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.05] p-4 backdrop-blur-md">
                 <span className="relative shrink-0">
                   <Image src={face.url} alt={face.alt} width={56} height={56} unoptimized className="size-14 rounded-xl object-cover object-top" />

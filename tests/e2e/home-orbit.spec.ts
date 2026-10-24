@@ -51,7 +51,7 @@ for (const vp of [
       await page.screenshot({ path: `hero-screenshots/orbit-${vp.width}x${vp.height}-${vp.name}.png` });
 
       // open the first system with the explore button (there for keyboards, phones and browsers without WebGL)
-      const explore = vp.width >= 1024 ? orbit.locator(".orbit-explore-inline") : orbit.locator(".orbit-explore button");
+      const explore = orbit.locator(".orbit-explore-inline");
       await explore.scrollIntoViewIfNeeded();
       await explore.click();
       const panel = orbit.getByRole("dialog");
@@ -65,15 +65,23 @@ for (const vp of [
 
       // the panel walks to the next system
       const step = panel.locator(".orbit-step button").last();
+      // the close button works (it sits above the panel's lines)
+      const closeBox = await panel.locator(".orbit-x").boundingBox();
+      const onTop = await page.evaluate(([x, y]) => document.elementFromPoint(x!, y!)?.closest(".orbit-x") !== null, [closeBox!.x + closeBox!.width / 2, closeBox!.y + closeBox!.height / 2]);
+      expect(onTop, "the close button is the topmost thing at its centre").toBe(true);
       if (await step.count()) {
         await step.click();
         await expect(panel.getByRole("heading", { level: 3 })).not.toHaveText(first);
       }
 
-      // Escape closes it, and the address forgets it
-      await page.keyboard.press("Escape");
+      // its close button closes it, and the address forgets it; Escape closes one too
+      await panel.locator(".orbit-x").click();
       await expect(orbit.getByRole("dialog")).toHaveCount(0);
       expect(page.url()).not.toMatch(/system=/);
+      await explore.click();
+      await expect(orbit.getByRole("dialog")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(orbit.getByRole("dialog")).toHaveCount(0);
     });
   });
 }

@@ -97,6 +97,12 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "exploreHint", label: "Phone: under the explore button", max: 80, kind: "line" },
     { name: "phoneEyebrow", label: "Phone: above the orbit", max: 30, kind: "line" },
     { name: "phoneHint", label: "Phone: how to use it", max: 30, kind: "line" },
+    { name: "factBusiest", label: "Panel: busiest week (heading)", max: 30, kind: "line" },
+    { name: "busiestValue", label: "Panel: busiest week (value)", max: 60, kind: "line", hint: "Fill-ins: {week}, {commits}." },
+    { name: "factQuiet", label: "Panel: a system with no commits in the 26 weeks", max: 60, kind: "line" },
+    { name: "factShare", label: "Panel: share of the commits (heading)", max: 30, kind: "line" },
+    { name: "shareValue", label: "Panel: share of the commits (value)", max: 60, kind: "line", hint: "Fill-ins: {percent}, {total}." },
+    { name: "factLinked", label: "Panel: systems sharing its stack (heading)", max: 30, kind: "line" },
   ],
   "page-xray": [
     { name: "receiptLabel", label: "The receipt's name", max: 24, kind: "line", hint: "First word of the strip. Empty hides the receipt." },

@@ -31,6 +31,12 @@ const KEYS = [
   "exploreHint",
   "phoneEyebrow",
   "phoneHint",
+  "factBusiest",
+  "busiestValue",
+  "factQuiet",
+  "factShare",
+  "shareValue",
+  "factLinked",
 ] as const satisfies readonly (keyof Block)[];
 
 export type OrbitCopy = Record<(typeof KEYS)[number], string | null>;
