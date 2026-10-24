@@ -1,6 +1,7 @@
 // tests/unit/perf-budgets.test.ts
 // Performance budgets (spec WP-102): the file covers every core route, and the evaluator
-// fails a page that got heavier while only warning about noisy lab numbers.
+// fails a page that got heavier, fails a score under its floor (D-064), and only warns about the
+// noisy lab targets.
 
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
@@ -14,8 +15,8 @@ const budgets = JSON.parse(readFileSync("perf-budgets.json", "utf8"));
 const measurement = (over: Record<string, unknown> = {}) => ({
   route: "/contact",
   device: "mobile",
-  weight: { totalKb: 880, imageKb: 190, requests: 40, images: [{ kb: 116 }] },
-  lighthouse: { scores: { performance: 68 }, metrics: { lcpMs: 3000, cls: 0 } },
+  weight: { totalKb: 600, imageKb: 90, requests: 30, images: [{ kb: 80 }] },
+  lighthouse: { scores: { performance: 88, accessibility: 100 }, metrics: { lcpMs: 3000, cls: 0 } },
   ...over,
 });
 
@@ -51,25 +52,39 @@ describe("evaluate", () => {
   });
 
   it("fails a page that got heavier", () => {
-    const heavy = measurement({ weight: { totalKb: 5000, imageKb: 190, requests: 40, images: [{ kb: 116 }] } });
+    const heavy = measurement({ weight: { totalKb: 5000, imageKb: 90, requests: 30, images: [{ kb: 80 }] } });
     const { failures } = evaluate([heavy], budgets);
     expect(failures).toHaveLength(1);
     expect(failures[0]).toMatch(/\/contact \(mobile\): total weight 5000 KB is over its budget of/);
   });
 
   it("fails on one huge image, and on a route with no budget", () => {
-    const image = measurement({ weight: { totalKb: 880, imageKb: 190, requests: 40, images: [{ kb: 900 }] } });
+    const image = measurement({ weight: { totalKb: 600, imageKb: 90, requests: 30, images: [{ kb: 900 }] } });
     expect(evaluate([image], budgets).failures[0]).toMatch(/largest image/);
     expect(evaluate([measurement({ route: "/new-page" })], budgets).failures[0]).toMatch(/no weight budget/);
   });
 
-  it("only warns about lab numbers while the budgets say warn, and fails when they say fail", () => {
-    const slow = measurement({ lighthouse: { scores: { performance: 40 }, metrics: { lcpMs: 6000, cls: 0.4 } } });
+  it("only warns about the lab targets while the budgets say warn, and fails when they say fail", () => {
+    const slow = measurement({ lighthouse: { scores: { performance: 88, accessibility: 100 }, metrics: { lcpMs: 6000, cls: 0 } } });
     const warned = evaluate([slow], budgets);
     expect(warned.failures).toEqual([]);
-    expect(warned.warnings).toHaveLength(3);
+    expect(warned.warnings).toHaveLength(1);
     const strict = evaluate([slow], { ...budgets, lab: { ...budgets.lab, mode: "fail" } });
-    expect(strict.failures).toHaveLength(3);
+    expect(strict.failures).toHaveLength(1);
     expect(strict.warnings).toEqual([]);
+  });
+
+  it("fails a score under its floor, and CLS over it, whatever the lab mode (D-064)", () => {
+    const worse = measurement({ lighthouse: { scores: { performance: 60, accessibility: 80 }, metrics: { lcpMs: 2000, cls: 0.3 } } });
+    const { failures } = evaluate([worse], budgets);
+    expect(failures.some((f: string) => /performance 60 is under its floor of 78/.test(f))).toBe(true);
+    expect(failures.some((f: string) => /accessibility 80 is under its floor of 90/.test(f))).toBe(true);
+    expect(failures.some((f: string) => /CLS 0.3 is over its floor/.test(f))).toBe(true);
+  });
+
+  it("checks floors only when a budgets file has no weights (CI's own build)", () => {
+    const ci = JSON.parse(readFileSync("perf-budgets.ci.json", "utf8"));
+    expect(evaluate([measurement({ route: "/anything", weight: { totalKb: 99999, imageKb: 9999, requests: 999, images: [{ kb: 9999 }] } })], ci)).toEqual({ failures: [], warnings: [] });
+    expect(evaluate([measurement({ lighthouse: { scores: { performance: 50, accessibility: 100 }, metrics: { lcpMs: 2000, cls: 0 } } })], ci).failures).toHaveLength(1);
   });
 });
