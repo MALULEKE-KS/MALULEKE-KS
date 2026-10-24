@@ -22,6 +22,7 @@ import { JsonLd } from "@/components/shared/JsonLd";
 import { personLd } from "@/lib/seo/person";
 import { getContentBlock } from "@/lib/content/blocks";
 import { getEvidence } from "@/lib/evidence";
+import { xrayCopy } from "@/lib/xray/copy";
 import { siteUrl } from "@/lib/site-url";
 import { getPlatformPulse, getPublicTitles } from "@/lib/queries/profile";
 import { FLAGS, getFlags } from "@/lib/flags";
@@ -70,11 +71,13 @@ export async function HomeContent() {
     getPlatformPulse(),
   ]);
   const guideEnabled = flags[FLAGS.concierge] === true;
-  const [howIBuild, evidence, flagshipOutcomes] = await Promise.all([
+  const [howIBuild, evidence, flagshipOutcomes, xrayBlock] = await Promise.all([
     getContentBlock("how-i-build"),
     getEvidence(),
     getContentBlock("flagship-outcomes"),
+    getContentBlock("page-xray"),
   ]);
+  const xrayWords = xrayCopy(xrayBlock);
 
   // The line before the name: "Building now" when the owner named the system, "Latest commit" when it is only the latest real commit.
   const nowLabel = selectedWork.nowBuilding?.chosen ? heroWords.buildingLabel : heroWords.nowLabel;
@@ -157,7 +160,7 @@ export async function HomeContent() {
         />
       </div>
       <div className="below-fold" data-xray="map">
-        <SystemMap data={systemMap} pulse={pulse} numbers={numbers} />
+        <SystemMap data={systemMap} pulse={pulse} numbers={numbers} xray={xrayWords ? { copy: xrayWords, source: evidence.source } : null} />
       </div>
       <div className="below-fold" data-xray="contact">
         <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />

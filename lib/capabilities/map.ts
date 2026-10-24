@@ -69,6 +69,7 @@ export const CAPABILITIES: Capability[] = [
     frontend: [
       { page: "(every page)", section: "Footer: the three homes with their system counts" },
       { page: "/", section: "How it all connects: homes → systems → technologies", xray: "map" },
+      { page: "/", section: "Hero: the Orbit's rings, one per home (D-069)", xray: "hero" },
       { page: "/organizations/[slug] (proposed)", section: "One page per home" },
     ],
     notes: ["Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4)."],
@@ -111,6 +112,7 @@ export const CAPABILITIES: Capability[] = [
     rules: ["BR-1.1", "BR-1.13"],
     frontend: [
       { page: "/", section: "Selected work: a sparkline on each system", xray: "work" },
+      { page: "/", section: "Hero: the Orbit — each world's mass, its 26 weeks replayed as sparks, the timeline (D-069)", xray: "hero" },
       { page: "/systems", section: "Each card: a 26-week sparkline and a live marker when it moved this month" },
       { page: "/systems/[slug]", section: "Activity: 26 weeks of commits as bars" },
       { page: "/now (proposed)", section: "What's moving this week" },
@@ -149,7 +151,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /platform/pulse"],
     rules: ["BR-3.4"],
     frontend: [
-      { page: "/", section: "Hero: the live line (the build that is running) and the page's receipt", xray: "hero" },
+      { page: "/", section: "Hero: the live line (the build that is running)", xray: "hero" },
       { page: "/", section: "How I build: rules the database enforces, changes audited this week", xray: "principles" },
       { page: "/", section: "How it all connects: the live status line", xray: "map" },
       { page: "(every page)", section: "Header live chip and footer status line" },
@@ -184,7 +186,8 @@ export const CAPABILITIES: Capability[] = [
     rules: [],
     frontend: [
       { page: "/about", section: "Method: the mission and principles, each with its evidence (#method)" },
-      { page: "/", section: "Hero: the statement and every label (\"home-hero\"), the receipt and the X-ray's words (\"page-xray\")", xray: "hero" },
+      { page: "/", section: "Hero: the statement and every label (\"home-hero\"), the Orbit's words (\"home-orbit\") and the flagships' lines in its panel (\"flagship-outcomes\")", xray: "hero" },
+      { page: "/", section: "How it all connects: the X-ray's words (\"page-xray\")", xray: "map" },
       { page: "/", section: "Selected work: what each flagship achieved (\"flagship-outcomes\")", xray: "work" },
       { page: "/", section: "The AI guide's band (\"ai-guide\")", xray: "guide" },
       { page: "/", section: "How I build: the mission and principles (\"how-i-build\")", xray: "principles" },
@@ -199,7 +202,10 @@ export const CAPABILITIES: Capability[] = [
     db: ["PublicSystem", "PublicOrganization", "Status", "Domain"],
     endpoints: ["GET /systems", "GET /organizations"],
     rules: ["BR-1.1", "BR-1.3", "BR-1.4", "BR-1.7"],
-    frontend: [{ page: "/systems", section: "Grid, filters, pagination" }],
+    frontend: [
+      { page: "/systems", section: "Grid, filters, pagination" },
+      { page: "/", section: "Hero: the Orbit's worlds — every published system, its status and stack, its panel (D-069)", xray: "hero" },
+    ],
     notes: [
       "organization may be a masked label (\"a fintech client\") — show it as text, never link it.",
       "repoPrivate = true means repoUrl is null: show a private-repository lock and a Request access action (to /contact).",

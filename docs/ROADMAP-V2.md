@@ -30,6 +30,9 @@
 
 ## Part 2 — Update log (newest first)
 
+### The home hero's Orbit (2026-10-24, D-068, D-069)
+- **Owner's choice, reviewed and approved:** every published system around the platform's core, its last 26 weeks of commits replayed — over the hero's photo, with the hero's words kept and driving it. The commit counts it replays were fixed first (D-068). The receipt left the hero; the X-ray is in How it all connects.
+
 ### The page's receipt and "See how this page works" (2026-10-24, D-067)
 - **Owner request** for the foot of the home hero (where the record was, D-065): the receipt of the visitor's own request and an X-ray of the page — each section's data, endpoints, rules and source, generated from the capability map and the enforcement register and tested against them. Home page first; the other public pages follow one slice each.
 

@@ -10,7 +10,7 @@ import { commitTitle } from "@/lib/rules/commit-title";
 import { getHomeSelection } from "@/lib/queries/homepage";
 import { withScreenshots } from "@/lib/queries/systems";
 
-const WEEKS = 26;
+export const WEEKS = 26;
 const DAY = 86_400_000;
 
 /** "today", "yesterday", "3 days ago", "2 weeks ago", "4 months ago" — computed per request. */
@@ -27,14 +27,14 @@ export function ago(date: Date | null, now = new Date()): string | null {
 }
 
 /** The Monday (UTC) of the week containing `date`, as YYYY-MM-DD. */
-function monday(date: Date) {
+export function monday(date: Date) {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
   return d;
 }
 
 /** The last WEEKS weeks as a dense series (missing weeks are zero). */
-function series(rows: { weekStart: Date; commits: number }[], now: Date): number[] {
+export function series(rows: { weekStart: Date; commits: number }[], now: Date): number[] {
   const byWeek = new Map(rows.map((r) => [r.weekStart.toISOString().slice(0, 10), r.commits]));
   const start = monday(now);
   return Array.from({ length: WEEKS }, (_, i) => {

@@ -149,6 +149,12 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **Proof in the chrome:** a live chip reads the build Vercel is serving and opens the platform's vital signs from the same public view as the footer — the header states facts the visitor can check, not a tagline. A disclosure (button + card) rather than a hover card, so a tap works on a phone and Escape or a tap outside closes it.
 - **One bar, two states:** the open bar carries the commit, the CV and a readable search field; the scrolled capsule keeps only what moves you on (Live, the nav, search, Let's talk).
 
+### 2026-10-24 · The home hero's Orbit (D-069)
+- **The GPU does the moving:** one static buffer holds every particle that moves only with time (stars, ring dust, the core's nucleus, shell, wind and flares, each world's lit particles, atmosphere, trail and halo); the vertex shader places them from a clock and a few dozen uniforms (world positions, ring geometry, impacts). The CPU writes only the sparks. One draw call for points, one for threads; additive light on point sprites, depth of field by distance from the focus.
+- **Lit like an object:** each world's particles are shaded by their angle to the core, so a world shows a crescent; the core ripples where a spark lands; a CSS bloom and streak follow the core on screen.
+- **Space for every part:** name plates are placed each frame by a small collision pass against the words' column, the header's corner, the open panel, the edges and each other, with hysteresis so they don't jump; leader lines and the panel's thread are one SVG.
+- **Nothing blocks the page:** the still is server-drawn SVG; the engine loads after load and idle when on screen; shaders compile in parallel (KHR_parallel_shader_compile), buffers build between pauses; 30 fps at rest.
+
 ### 2026-10-24 · The page's receipt and the X-ray (D-067)
 - **Show the system, don't describe it:** the hero ends with a receipt of the visitor's own request (render time, build, rules held, first byte, the edge that answered) and a switch that X-rays the page — every section outlined, a label pinned under the header (sticky inside a zero-height anchor, so it follows its section without moving content), a sheet with the section's data, endpoints, rules and source.
 - **Weight only on request:** the overlay, its Radix dialog and its manifest are one chunk imported on the first switch (warmed on hover, focus or touch); the receipt measures after `load` in an idle callback, appending to a line that never wraps, so nothing shifts.

@@ -116,6 +116,12 @@ export const SETTINGS = {
     description: "Home hero: the pause between one part settling in and the next, in milliseconds.",
     rule: "D-030",
   }),
+  "home.orbit.weekMs": define({
+    schema: z.number().int().min(200).max(2000),
+    default: 520,
+    description: "Home Orbit: how long the replay spends on each of the 26 weeks, in milliseconds (520 = the 26 weeks in about 14 seconds).",
+    rule: "D-069",
+  }),
   "home.hero.glow": define({
     schema: z.number().int().min(0).max(100),
     default: 0,

@@ -1,7 +1,7 @@
 // tests/e2e/home-hero-v2.spec.ts
 // The home hero (docs/improvements/HOME-HERO-PLAN.md, Sprint 1; the only hero
 // since D-038): it fits a phone, reads in order, shows the right crop of the owner's photograph
-// for the screen, carries no character or canvas, doesn't repeat the control
+// for the screen (with the Orbit over it since D-069), doesn't repeat the control
 // room's figures, holds still for visitors who ask for reduced motion, and has no
 // serious accessibility violations. Runs in CI with the phone and axe checks.
 
@@ -27,7 +27,7 @@ for (const vp of VIEWPORTS) {
   test.describe(`the rebuilt hero on a ${vp.name}`, () => {
     test.use({ viewport: { width: vp.width, height: vp.height } });
 
-    test("fits the screen, reads in order and shows the right crop of the photograph", async ({ page }) => {
+    test("fits the screen, reads in order and shows the Orbit (or the right crop of the photograph)", async ({ page }) => {
       test.setTimeout(120_000);
       await settle(page);
       await page.goto(URL, { waitUntil: "networkidle" });
@@ -49,18 +49,21 @@ for (const vp of VIEWPORTS) {
       // on a phone the hero ends with Let's talk (and the CV when one is switched on); from a tablet up the header has them
       if (vp.width < 640) await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
 
-      // the cover image: the phone crop on phones, the wide crop on larger screens
+      // the cover image: the phone crop on phones, the wide crop on larger screens — kept under the Orbit (D-069)
       const img = hero.locator("picture img");
       await expect(img).toBeVisible();
       expect(await img.evaluate((e) => (e as HTMLImageElement).currentSrc)).toMatch(vp.crop);
+      const withOrbit = (await hero.locator(".orbit").count()) > 0;
+      if (withOrbit) await expect(hero.locator(".orbit-poster")).toBeAttached();
 
-      // it covers the whole hero, and the content sits on top of it (not beside or under it)
+      // it covers the hero (with the Orbit on a phone: the first screen, the Orbit's band following), the content on top of it
       const covers = await page.evaluate(() => {
         const section = document.querySelector('section[aria-labelledby="hero-title"]')!.getBoundingClientRect();
         const image = document.querySelector('section[aria-labelledby="hero-title"] picture img')!.getBoundingClientRect();
         return { top: image.top - section.top, left: image.left - section.left, bottom: section.bottom - image.bottom, right: section.right - image.right };
       });
-      for (const side of Object.values(covers)) expect(side).toBeLessThanOrEqual(1);
+      const sides = withOrbit && vp.width < 1024 ? { top: covers.top, left: covers.left, right: covers.right } : covers;
+      for (const side of Object.values(sides)) expect(side).toBeLessThanOrEqual(1);
 
       // keep the first view as a picture: CI uploads hero-screenshots/ with every run, so the owner can look at
       // the hero at each width on the pull request without running anything (docs/improvements/HOME-HERO-PLAN.md §19)
@@ -72,8 +75,8 @@ for (const vp of VIEWPORTS) {
       });
       expect(onTop, "the heading is the topmost thing at its own centre").toBe(true);
 
-      // no character, rig or canvas in the hero
-      await expect(hero.locator("canvas")).toHaveCount(0);
+      // no character or rig in the hero; the only canvas is the Orbit's
+      await expect(hero.locator("canvas:not(.orbit-canvas)")).toHaveCount(0);
 
       // the record is the proof of the method: each claim sits over its figure
       const claims = record.getByRole("listitem").filter({ hasText: /Runs in production|Enforces its own rules|Shows its proof/ });
