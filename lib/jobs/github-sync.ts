@@ -57,7 +57,19 @@ export interface GithubSyncConfig {
   /** Which new repos are shown by default (BR-1.6 — the github.sync.newRepoVisibility setting). */
   newRepoVisibility?: NewRepoVisibility;
   fetch?: FetchLike;
+  /** How the sync waits between asks for GitHub's commit statistics (tests pass one that doesn't wait). */
+  wait?: (ms: number) => Promise<void>;
 }
+
+/**
+ * GitHub computes a repo's weekly commit statistics on request and answers 202 until they're
+ * ready — and a repo that changed since it last counted (every repo being worked on) always
+ * starts at 202. So the sync asks again after these pauses before calling it pending; a single
+ * ask left the busiest repos' activity frozen for weeks (D-068: MALULEKE-KS showed none for three
+ * weeks of daily commits). GitHub's own guidance is to retry shortly; the pauses are a vendor
+ * detail, not a tunable.
+ */
+const STATS_RETRY_MS = [1500, 3000, 6000];
 
 interface GitHubRepo {
   id: number;
@@ -370,6 +382,7 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
   const clients = config.tokens.map((t) => new GithubClient(t, config.fetch ?? fetch));
   const visibility = config.newRepoVisibility ?? "public-only";
   const owned = new Set(config.ownedLogins.map((l) => l.toLowerCase()));
+  const wait = config.wait ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
 
   // Discover: everything each token can reach (owned, collaborator, org
   // member, private included), plus each configured account's own listing,
@@ -553,8 +566,13 @@ export async function syncGithub(config: GithubSyncConfig): Promise<GithubSyncSu
         }
       }
 
-      // Weekly activity: GitHub answers 202 while it computes the stats — try next run.
-      const stats = await gh.request(`/repos/${repo.full_name}/stats/commit_activity`);
+      // Weekly activity: GitHub answers 202 while it computes the stats — ask again shortly, then try next run.
+      let stats = await gh.request(`/repos/${repo.full_name}/stats/commit_activity`);
+      for (const ms of STATS_RETRY_MS) {
+        if (stats.status !== 202) break;
+        await wait(ms);
+        stats = await gh.request(`/repos/${repo.full_name}/stats/commit_activity`);
+      }
       if (stats.status === 202) summary.activityPending.push(repo.full_name);
       else if (stats.ok && stats.status !== 204) {
         const weeks = (await stats.json()) as CommitWeek[];

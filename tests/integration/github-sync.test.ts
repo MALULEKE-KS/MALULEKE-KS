@@ -40,8 +40,9 @@ const SUNDAY = Date.UTC(2026, 8, 20) / 1000;
 
 function fakeGithub(
   repos: Repo[],
-  options: { pendingStats?: string[]; rateLimited?: boolean; refusingOrg?: string; gone?: string[]; manifests?: Record<string, Record<string, string>> } = {},
+  options: { pendingStats?: string[]; slowStats?: string[]; rateLimited?: boolean; refusingOrg?: string; gone?: string[]; manifests?: Record<string, Record<string, string>> } = {},
 ): FetchLike {
+  const asked = new Map<string, number>();
   return async (url) => {
     const path = new URL(url).pathname + new URL(url).search;
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -66,6 +67,10 @@ function fakeGithub(
     const stats = /^\/repos\/(.+)\/stats\/commit_activity$/.exec(path);
     if (stats) {
       if (options.pendingStats?.includes(stats[1]!)) return new Response(null, { status: 202 });
+      // GitHub computing on the first ask, ready on the next (D-068).
+      const n = (asked.get(stats[1]!) ?? 0) + 1;
+      asked.set(stats[1]!, n);
+      if (options.slowStats?.includes(stats[1]!) && n === 1) return new Response(null, { status: 202 });
       return json([{ week: SUNDAY, total: 6, days: [1, 2, 0, 0, 0, 0, 3] }]);
     }
     return json({ message: `unexpected ${path}` }, 500);
@@ -73,7 +78,7 @@ function fakeGithub(
 }
 
 const sync = (repos: Repo[], options?: Parameters<typeof fakeGithub>[1]) =>
-  syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub(repos, options) });
+  syncGithub({ tokens: ["test-token"], ownedLogins: [OWNER], fetch: fakeGithub(repos, options), wait: async () => {} });
 const byRepo = (n: number) => db.system.findUnique({ where: { githubRepoId: baseId + n }, include: { repoRelationship: true } });
 
 let clientOrgId: string;
@@ -356,5 +361,16 @@ describe("the sync (#95)", () => {
     const pub = await byRepo(1);
     const entry = await db.activityLog.findFirstOrThrow({ where: { entityType: "System", entityId: pub!.id, action: "system.create" } });
     expect(entry.actorType).toBe("SYSTEM");
+  });
+});
+
+describe("weekly activity while GitHub is still counting (D-068)", () => {
+  it("asks again within the run, so a busy repo's weeks are saved, not left pending", async () => {
+    const busy = repo(40, OWNER, `${RUN}-busy-app`);
+    const summary = await sync([busy], { slowStats: [`${OWNER}/${RUN}-busy-app`] });
+    expect(summary.activityPending).toEqual([]);
+    const s = await byRepo(40);
+    const weeks = await db.systemActivityWeek.findMany({ where: { systemId: s!.id }, orderBy: { weekStart: "asc" } });
+    expect(weeks.map((w) => w.commits)).toEqual([1, 5]);
   });
 });
