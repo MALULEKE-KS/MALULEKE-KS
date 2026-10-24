@@ -6,6 +6,7 @@
 // through the public role (F1.8): published systems, public repos, counts.
 
 import { dbPublic } from "@/lib/db";
+import { commitTitle } from "@/lib/rules/commit-title";
 import { getHomeSelection } from "@/lib/queries/homepage";
 import { withScreenshots } from "@/lib/queries/systems";
 
@@ -118,7 +119,7 @@ export async function getSelectedWork(more = 3, chosenSlug: string | null = null
       chosen: active.chosen,
       lastPush: ago(active.latestCommitAt, now),
       commitsLast4Weeks: active.commitsLast4Weeks,
-      commits: commits.map((c) => ({ message: c.message, when: ago(c.committedAt, now), key: `${c.committedAt.toISOString()}:${c.message.slice(0, 24)}` })),
+      commits: commits.map((c) => ({ message: commitTitle(c.message), when: ago(c.committedAt, now), key: `${c.committedAt.toISOString()}:${c.message.slice(0, 24)}` })),
       screenshotUrl: shot?.screenshotUrl ?? null,
       liveUrl: shot?.liveUrl ?? null,
     };

@@ -16,8 +16,12 @@ async function main() {
   // stage is the homepage count each status joins (#52); same principle.
   await Promise.all(
     [
-      { key: "finished", label: "Finished", colorToken: "signal-finished", stage: "SHIPPED" as const },
-      { key: "in_progress", label: "In Progress", colorToken: "signal-progress", stage: "BUILDING" as const },
+      // One status vocabulary (D-061): Live, Live · paused, In progress, Coursework, Archived.
+      { key: "finished", label: "Live", colorToken: "signal-finished", stage: "SHIPPED" as const },
+      { key: "live_paused", label: "Live · paused", colorToken: "signal-planned", stage: "SHIPPED" as const },
+      { key: "in_progress", label: "In progress", colorToken: "signal-progress", stage: "BUILDING" as const },
+      { key: "coursework", label: "Coursework", colorToken: "signal-planned", stage: "QUEUED" as const },
+      { key: "archived", label: "Archived", colorToken: "signal-planned", stage: "QUEUED" as const },
       { key: "planned", label: "Planned", colorToken: "signal-planned", stage: "QUEUED" as const },
     ].map((s) =>
       prisma.status.upsert({ where: { key: s.key }, update: {}, create: s })
@@ -32,6 +36,7 @@ async function main() {
       { key: "architecture", label: "Architecture & Construction" },
       { key: "ai-ml", label: "AI / Machine Learning" },
       { key: "edtech", label: "EdTech" },
+      { key: "developer-tooling", label: "Developer tooling / Governance" },
     ].map((d) =>
       prisma.domain.upsert({ where: { key: d.key }, update: {}, create: d })
     )

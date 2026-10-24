@@ -82,7 +82,7 @@ async function ask(turns: string[], lens?: string, page?: string): Promise<Guide
 // site's own data — a guide stating these is not inventing. Anything beyond them still
 // has to be judged on the criteria.
 const SITE_FACTS = [
-  "Kurhula Success Maluleke, Software & AI Engineer, based in South Africa.",
+  "Kurhula Success Maluleke, Software Engineer, based in South Africa.",
   "Final-year BSc Computer Science & Mathematics at North-West University (Mafikeng Campus), from 2024; graduation expected 2027.",
   "Before that: Basopa Secondary School, Limpopo (2018–2022, Matric 2022); University of Limpopo in 2023 (BSc Mathematical Sciences).",
   "Founded KSDRILL-SA (January 2025, Founder & Principal Engineer); co-founded GrowthCore Solutions (2025).",

@@ -40,8 +40,8 @@ describe("titles and qualifications (D13)", () => {
   it("the profile carries the owner's current titles, in order", async () => {
     const body = await (await getProfile()).json();
     const labels = body.titles.map((t: { label: string }) => t.label);
-    expect(labels).toEqual(expect.arrayContaining(["Software & AI Engineer", "Final-year BSc Computer Science & Mathematics student"]));
-    expect(labels.indexOf("Software & AI Engineer")).toBeLessThan(labels.indexOf("Final-year BSc Computer Science & Mathematics student"));
+    expect(labels).toEqual(expect.arrayContaining(["Software Engineer", "Final-year BSc Computer Science & Mathematics student"]));
+    expect(labels.indexOf("Software Engineer")).toBeLessThan(labels.indexOf("Final-year BSc Computer Science & Mathematics student"));
   });
 
   it("a new title of any kind appears with no code change; an ended one leaves the site but stays on record", async () => {

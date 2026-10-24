@@ -15,14 +15,12 @@ import { getCatalog } from "@/lib/queries/catalog";
 import { getSkillEvidence, getSystemPace } from "@/lib/queries/evidence";
 import { getPublicSystemBySlug } from "@/lib/queries/systems";
 import { ago } from "@/lib/queries/work";
+import { commitTitle } from "@/lib/rules/commit-title";
+
+export { commitTitle };
 
 const COMMITS_SHOWN = 8;
 const RELATED = 3;
-
-/** A commit message's first line — the rest is detail the feed doesn't need. */
-export function commitTitle(message: string): string {
-  return message.split("\n")[0]!.trim().slice(0, 140);
-}
 
 /** Bytes per language → shares that add up to 100, largest first; slivers fold into "Other". */
 export function languageShares(languages: Record<string, number>, min = 2): { name: string; share: number }[] {
