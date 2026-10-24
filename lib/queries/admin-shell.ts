@@ -23,10 +23,12 @@ export interface AdminShellData {
   inquiries: { id: string; reference: string; name: string | null; status: string }[];
   settings: { key: string; description: string }[];
   blocks: { key: string; title: string }[];
+  /** The zone every admin date is written in (setting `site.timeZone`). */
+  timeZone: string;
 }
 
 export async function getAdminShell(): Promise<AdminShellData> {
-  const [inquiries, curation, journey, numbers, stale, systems, recent] = await Promise.all([
+  const [inquiries, curation, journey, numbers, stale, systems, recent, timeZone] = await Promise.all([
     db.inquiry.count({ where: { status: "NEW" } }),
     db.system.count({ where: { needsCuration: true } }),
     db.timeline.count({ where: { autoDrafted: true, contentStatus: "DRAFT" } }),
@@ -34,6 +36,7 @@ export async function getAdminShell(): Promise<AdminShellData> {
     getSetting("content.freshnessDays").then((days) => db.$queryRaw<{ n: bigint }[]>`SELECT count(*)::bigint AS n FROM stale_content(${days}::int)`),
     db.system.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true, contentStatus: true, organization: { select: { name: true } } } }),
     db.inquiry.findMany({ orderBy: { createdAt: "desc" }, take: SEARCH_INQUIRIES, select: { id: true, reference: true, name: true, status: true, anonymizedAt: true } }),
+    getSetting("site.timeZone"),
   ]);
   return {
     counts: { inquiries, curation, journey, numbers, freshness: Number(stale[0]?.n ?? 0) },
@@ -42,5 +45,6 @@ export async function getAdminShell(): Promise<AdminShellData> {
     inquiries: recent.map((i) => ({ id: i.id, reference: i.reference, name: i.anonymizedAt ? null : i.name, status: STATUS_LABEL[i.status] })),
     settings: SETTING_KEYS.map((key) => ({ key, description: SETTINGS[key].description })),
     blocks: (Object.keys(CONTENT_BLOCKS) as ContentKey[]).map((key) => ({ key, title: CONTENT_BLOCKS[key].title })),
+    timeZone,
   };
 }

@@ -15,6 +15,7 @@
 // Security floors can't be loosened from a screen protected by those floors.
 
 import { z } from "zod";
+import { DEFAULT_SITE_TIME_ZONE } from "@/lib/time-zone";
 
 interface SettingDefinition<T> {
   schema: z.ZodType<T>;
@@ -166,8 +167,8 @@ export const SETTINGS = {
         return false;
       }
     }, "Use an IANA time zone such as Africa/Johannesburg"),
-    default: "Africa/Johannesburg",
-    description: "The time zone the site's dates are shown in — today it is the live line's \"as of\" date on the home hero (an IANA name, e.g. Africa/Johannesburg).",
+    default: DEFAULT_SITE_TIME_ZONE,
+    description: "The time zone the site's dates are shown in — the live line's \"as of\" date on the home hero, and every date and time in the admin (an IANA name, e.g. Africa/Johannesburg).",
     rule: "D-039",
   }),
   "home.hero.scrim": define({

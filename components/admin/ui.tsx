@@ -7,6 +7,7 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DEFAULT_SITE_TIME_ZONE } from "@/lib/time-zone";
 
 export const adminInput =
   "w-full rounded-xl border border-ink/15 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink shadow-inset-hair outline-none transition-[border-color,box-shadow] placeholder:text-slate/60 focus:border-ember focus:ring-4 focus:ring-ember/15 disabled:opacity-60";
@@ -140,8 +141,24 @@ export function Pill({ children, tone = "neutral" }: { children: React.ReactNode
   );
 }
 
+/**
+ * The zone every admin date is written in — the site's (setting `site.timeZone`), set by AdminShell
+ * before the page's content renders, on the server and in the browser alike. Without a fixed zone the
+ * server (UTC) and the owner's browser wrote the same moment differently and React refused the page's
+ * HTML (error #418, a hydration mismatch, on every editor that shows a time).
+ */
+let adminZone = DEFAULT_SITE_TIME_ZONE;
+export function setAdminTimeZone(zone: string | null | undefined) {
+  if (zone) adminZone = zone;
+}
+
 export function formatWhen(iso: string | Date | null | undefined): string {
   if (!iso) return "—";
   const d = typeof iso === "string" ? new Date(iso) : iso;
-  return d.toLocaleString("en-ZA", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" };
+  try {
+    return d.toLocaleString("en-ZA", { ...options, timeZone: adminZone });
+  } catch {
+    return d.toLocaleString("en-ZA", { ...options, timeZone: DEFAULT_SITE_TIME_ZONE });
+  }
 }
