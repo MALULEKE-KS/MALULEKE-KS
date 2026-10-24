@@ -89,8 +89,7 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
         {cell("/systems")}
         {cell("/journey")}
         <li className="flex justify-center">
-          {/* Not on the home page: its AI guide section is right there (owner, 2026-10-24); Let's talk takes the place. */}
-          {enabled && askLabel && pathname !== "/" ? (
+          {enabled && askLabel ? (
             <button
               type="button"
               onClick={() => setOpen(true)}
