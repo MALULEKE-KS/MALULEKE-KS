@@ -55,7 +55,7 @@ export function startAngle(indexInHome: number, countInHome: number, home: numbe
 }
 
 /** A world's radius from its commits over the window: a floor for quiet work, growing with the square root. */
-export const worldRadius = (commits: number) => 0.046 + Math.sqrt(Math.max(0, commits)) * 0.0034;
+export const worldRadius = (commits: number) => 0.055 + Math.sqrt(Math.max(0, commits)) * 0.0036;
 
 /** Evenly spread unit vectors (a Fibonacci sphere). */
 export function fibonacci(n: number): Vec3[] {

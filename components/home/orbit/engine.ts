@@ -64,6 +64,10 @@ export interface OrbitEngine {
   pick(x: number, y: number, touch: boolean): number | null;
   turn(dyaw: number, dpitch: number): void;
   fling(vyaw: number): void;
+  /** Closer (f < 1) or further (f > 1), within limits. */
+  zoom(f: number): void;
+  /** Back to the starting view. */
+  reset(): void;
   start(): void;
   stop(): void;
   destroy(): void;
@@ -182,6 +186,143 @@ precision mediump float; in vec4 vCol; out vec4 o; void main() { o = vec4(vCol.r
 
 const pause = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+// ---------------------------------------------------------------- planets
+// Each world is a real sphere, drawn per pixel on a camera-facing quad (an impostor): lit from the core
+// with a soft terminator and a highlight, a surface of its own (flagships molten ember over basalt, the
+// rest stone and ice; the big ones gas giants with turning cloud bands), a cloud layer, an atmosphere at
+// the limb, city lights on the night side of a system worked on in the last six weeks, and — on a
+// flagship — a ring that passes in front of and behind it. The core hides what is behind it.
+const PVS = `#version 300 es
+precision highp float;
+uniform mat4 uPV; uniform vec2 uShift; uniform vec3 uRight; uniform vec3 uUp;
+uniform vec4 uW[${MAX_WORLDS}]; uniform vec4 uWB[${MAX_WORLDS}]; uniform int uOrder[${MAX_WORLDS}];
+out vec2 vUv; flat out int vI;
+void main() {
+  int i = uOrder[gl_InstanceID];
+  vec2 c = vec2[6](vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, 1.0))[gl_VertexID];
+  bool flagship = mod(uWB[i].w, 2.0) > 0.5;
+  float K = flagship ? 2.35 : 1.7; // room for the atmosphere, and a flagship's ring
+  vec4 W = uW[i];
+  vec3 p = W.xyz + (uRight * c.x + uUp * c.y) * W.w * K;
+  vec4 q = uPV * vec4(p, 1.0); q.xy += uShift * q.w; gl_Position = q;
+  vUv = c * K; vI = i;
+}`;
+const PFS = `#version 300 es
+precision highp float;
+in vec2 vUv; flat in int vI; out vec4 o;
+uniform vec4 uW[${MAX_WORLDS}]; uniform vec4 uWB[${MAX_WORLDS}]; uniform float uWSpin[${MAX_WORLDS}];
+uniform vec3 uRight; uniform vec3 uUp; uniform vec3 uBack; uniform float uTime; uniform float uCoreR; uniform int uOct;
+uniform float uWT[${MAX_WORLDS}]; // each world's kind of planet (PALETTES)
+
+float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float noise(vec3 x) {
+  vec3 i = floor(x); vec3 f = fract(x); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash(i), hash(i + vec3(1, 0, 0)), f.x), mix(hash(i + vec3(0, 1, 0)), hash(i + vec3(1, 1, 0)), f.x), f.y),
+             mix(mix(hash(i + vec3(0, 0, 1)), hash(i + vec3(1, 0, 1)), f.x), mix(hash(i + vec3(0, 1, 1)), hash(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+}
+float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int k = 0; k < 6; k++) { if (k >= uOct) break; s += a * noise(p); p = p * 2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5; } return s; }
+
+// Eight kinds of planet, so every world reads as itself: the flagships molten ember, amber desert and
+// coral; the rest ocean, ice, jade, a violet giant and sandstone. dark, mid, light — and the light is its air.
+void palette(int t, out vec3 a, out vec3 b, out vec3 c) {
+  if (t == 0) { a = vec3(0.12, 0.045, 0.03); b = vec3(0.86, 0.29, 0.08); c = vec3(1.0, 0.74, 0.46); }
+  else if (t == 1) { a = vec3(0.16, 0.09, 0.04); b = vec3(0.8, 0.5, 0.18); c = vec3(1.0, 0.86, 0.6); }
+  else if (t == 2) { a = vec3(0.14, 0.04, 0.05); b = vec3(0.88, 0.36, 0.32); c = vec3(1.0, 0.75, 0.66); }
+  else if (t == 3) { a = vec3(0.02, 0.06, 0.13); b = vec3(0.07, 0.4, 0.52); c = vec3(0.7, 0.92, 0.95); }
+  else if (t == 4) { a = vec3(0.08, 0.1, 0.14); b = vec3(0.55, 0.66, 0.78); c = vec3(0.93, 0.97, 1.0); }
+  else if (t == 5) { a = vec3(0.03, 0.09, 0.06); b = vec3(0.16, 0.55, 0.38); c = vec3(0.72, 0.95, 0.8); }
+  else if (t == 6) { a = vec3(0.07, 0.04, 0.15); b = vec3(0.44, 0.32, 0.8); c = vec3(0.86, 0.8, 1.0); }
+  else { a = vec3(0.13, 0.1, 0.07); b = vec3(0.6, 0.5, 0.38); c = vec3(0.95, 0.9, 0.8); }
+}
+
+void main() {
+  vec4 W = uW[vI]; vec4 B = uWB[vI];
+  int kind = int(uWT[vI] + 0.5);
+  vec3 c1, c2, c3; palette(kind, c1, c2, c3);
+  float calm = B.z; float fl = B.w;
+  bool flagship = mod(fl, 2.0) > 0.5; bool active = mod(floor(fl / 2.0), 2.0) > 0.5;
+  float seed = float(vI) * 1.618 + 3.0;
+  vec2 uv = vUv; float r2 = dot(uv, uv);
+  vec3 L = normalize(-W.xyz + vec3(1e-4));
+  vec3 sun = vec3(1.0, 0.86, 0.72);
+  vec3 atmCol = mix(c2, c3, 0.6);
+
+  // the planet
+  vec3 pc = vec3(0.0); float pa = 0.0; float z = 0.0;
+  if (r2 < 1.0) {
+    z = sqrt(1.0 - r2);
+    vec3 N = normalize(uRight * uv.x + uUp * uv.y + uBack * z);
+    float sp = uTime * uWSpin[vI] * 0.6; float cs = cos(sp), sn = sin(sp);
+    vec3 Q = vec3(N.x * cs - N.z * sn, N.y, N.x * sn + N.z * cs);
+    bool giant = W.w > 0.085;
+    float h = fbm(Q * 2.4 + seed);
+    vec3 surf;
+    if (giant || kind == 6) {
+      // a gas giant: bands bent by turbulence, a storm that turns with it
+      float b = sin((Q.y + (h - 0.5) * 0.5) * (10.0 + float(kind)) + seed) * 0.5 + 0.5;
+      surf = mix(c1, mix(c2, c3, b * b), 0.3 + 0.7 * b);
+      float storm = smoothstep(0.16, 0.0, length(vec2(Q.x - 0.45, (Q.y + 0.25) * 1.6)));
+      surf = mix(surf, c3 * 1.05, storm * 0.7);
+    } else if (kind == 3 || kind == 5) {
+      // oceans and continents, with ice at the poles
+      float land = smoothstep(0.5, 0.56, h);
+      surf = mix(mix(c1, c2, 0.55), mix(c2 * 0.8, c3 * 0.75, h), land);
+      surf = mix(surf, vec3(0.95), smoothstep(0.72, 0.82, abs(Q.y) + h * 0.2));
+    } else if (kind == 0 || kind == 2) {
+      // molten: dark crust, rivers of light in the cracks
+      float crack = 1.0 - smoothstep(0.0, 0.06, abs(h - 0.5));
+      surf = mix(c1, c2 * 0.55, smoothstep(0.3, 0.7, h)) + c3 * crack * 0.9;
+    } else {
+      // rock and ice: plains, ridges and craters
+      float crater = smoothstep(0.62, 0.7, noise(Q * 7.0 + seed)) * 0.35;
+      surf = mix(c1, c2, smoothstep(0.35, 0.62, h)) - crater * 0.2;
+      surf = mix(surf, c3, smoothstep(0.64, 0.74, abs(Q.y) + h * 0.3));
+    }
+    float clouds = smoothstep(0.56, 0.78, fbm(Q * 4.2 + vec3(uTime * 0.025, 0.0, 0.0) + seed * 2.0)) * (giant ? 0.22 : 0.5);
+    float d = dot(N, L); float day = smoothstep(-0.14, 0.32, d);
+    vec3 H = normalize(L + uBack); float spec = pow(max(dot(N, H), 0.0), 36.0) * 0.32 * day;
+    pc = surf * sun * (0.035 + 1.15 * day) + vec3(1.0) * clouds * day * 0.85 + spec * sun;
+    if (active) { float city = smoothstep(0.8, 0.9, noise(Q * 26.0 + seed)) * (1.0 - day) * smoothstep(0.3, 0.55, h); pc += vec3(1.0, 0.56, 0.26) * city * 1.6; }
+    float rim = pow(1.0 - z, 2.4); pc += atmCol * rim * (0.2 + 0.95 * max(d + 0.25, 0.0));
+    pc *= 0.72 + 0.28 * z;
+    pa = 1.0;
+  } else {
+    float r = sqrt(r2); float g = exp(-(r - 1.0) * 7.5) * 0.6;
+    float d = dot(normalize(uRight * uv.x + uUp * uv.y), L);
+    pc = atmCol * g * (0.2 + 0.8 * max(d * 0.5 + 0.5, 0.0)); pa = g * 0.55;
+  }
+
+  // a flagship's ring: the view ray through this pixel meets the ring's plane
+  vec3 rc = vec3(0.0); float ra = 0.0; bool ringFront = false;
+  if (flagship) {
+    vec3 Nr = normalize(vec3(sin(seed) * 0.45, 1.0, cos(seed) * 0.35));
+    vec3 P0 = (uRight * uv.x + uUp * uv.y);
+    float t = dot(P0, Nr) / dot(uBack, Nr);
+    vec3 Hp = P0 - uBack * t;
+    float rd = length(Hp);
+    if (rd > 1.38 && rd < 2.25) {
+      float band = 0.55 + 0.45 * sin(rd * 34.0 + seed) * sin(rd * 9.0);
+      ra = band * smoothstep(1.38, 1.5, rd) * (1.0 - smoothstep(2.05, 2.25, rd)) * 0.7;
+      float lit = 0.35 + 0.65 * abs(dot(Nr, L));
+      // the planet's shadow across the ring
+      vec3 toL = L; float along = dot(Hp, toL); float off = length(Hp - toL * along);
+      if (along < 0.0 && off < 1.0) lit *= 0.25;
+      rc = mix(c2 * 0.7, c3, band) * sun * lit;
+      ringFront = (-t) > z || r2 >= 1.0; // nearer the camera than the planet's surface here
+    }
+  }
+
+  vec3 col; float a;
+  if (ra > 0.0 && ringFront) { col = rc * ra + pc * pa * (1.0 - ra); a = ra + pa * (1.0 - ra); }
+  else if (ra > 0.0) { col = pc * pa + rc * ra * (1.0 - pa); a = pa + ra * (1.0 - pa); }
+  else { col = pc * pa; a = pa; }
+
+  // the core, when it's nearer the camera, hides what's behind it
+  vec3 P = W.xyz + (uRight * uv.x + uUp * uv.y) * W.w;
+  if (dot(P, uBack) < 0.0) { float dc = length(cross(P, uBack)); float hide = 1.0 - smoothstep(uCoreR * 0.75, uCoreR * 1.2, dc); col *= 1.0 - hide; a *= 1.0 - hide; }
+  float k = 0.35 + 0.65 * calm; o = vec4(col * k, a * k);
+}`;
+
 /** Compiles and links a program; where the driver compiles in parallel (KHR_parallel_shader_compile) it waits frame by frame instead of blocking. */
 async function compile(gl: WebGL2RenderingContext, vs: string, fs: string) {
   const p = gl.createProgram()!;
@@ -222,9 +363,9 @@ export async function createOrbit(
     powerPreference: "high-performance",
   });
   if (!gl) return null;
-  let PP: WebGLProgram, LP: WebGLProgram;
+  let PP: WebGLProgram, LP: WebGLProgram, PL: WebGLProgram;
   try {
-    [PP, LP] = await Promise.all([compile(gl, VS, FS), compile(gl, LVS, LFS)]);
+    [PP, LP, PL] = await Promise.all([compile(gl, VS, FS), compile(gl, LVS, LFS), compile(gl, PVS, PFS)]);
   } catch (err) {
     console.warn("[orbit] the live scene is off:", err);
     return null;
@@ -313,11 +454,6 @@ export async function createOrbit(
   }
   await pause();
   worlds.forEach((w, i) => {
-    fibonacci(n(40 + Math.round(Math.sqrt(w.total) * 5))).forEach((d, j) =>
-      v(7, i, j % 6 === 0 ? 1 : 0, 0, d, 0)
-    );
-    for (const d of fibonacci(n(46))) v(8, i, 0, 0, d, 0);
-    v(9, i, 0, 0, [0, 0, 0], 0);
     for (let k = 1; k <= 64; k++) v(10, i, k, 0, [0, 0, 0], 0);
     for (let k = 0; k < 22; k++) v(11, i, (k / 22) * Math.PI * 2, 0, [0, 0, 0], 0);
   });
@@ -326,7 +462,7 @@ export async function createOrbit(
   const staticData = new Float32Array(verts);
   const staticCount = staticData.length / F;
 
-  const MAX_DYN = 9000;
+  const MAX_DYN = 14000;
   const dyn = new Float32Array(MAX_DYN * F);
   const MAX_LINES = 400;
   const lines = new Float32Array(MAX_LINES * 2 * 7);
@@ -351,6 +487,7 @@ export async function createOrbit(
     gl.bindVertexArray(null);
     return vao;
   };
+  const planetVao = gl.createVertexArray()!; // no attributes: each corner comes from gl_VertexID
   const sVao = pointVao(sBuf),
     dVao = pointVao(dBuf);
   const lVao = gl.createVertexArray()!;
@@ -394,6 +531,16 @@ export async function createOrbit(
     const g = ring(h);
     ringU.set([g.r, g.tilt, g.roll, g.speed], h * 4);
   }
+  const pu = (name: string) => gl.getUniformLocation(PL, name);
+  const P_ = { pv: pu("uPV"), shift: pu("uShift"), right: pu("uRight"), up: pu("uUp"), back: pu("uBack"), w: pu("uW"), wb: pu("uWB"), spin: pu("uWSpin"), order: pu("uOrder"), kind: pu("uWT"), time: pu("uTime"), coreR: pu("uCoreR"), oct: pu("uOct") };
+  const orderU = new Int32Array(MAX_WORLDS);
+  // Each world's kind of planet: the flagships molten ember, amber, coral; the rest ocean, ice, jade, violet, sandstone, in turn.
+  const kindU = new Float32Array(MAX_WORLDS);
+  {
+    let f = 0, o = 0;
+    worlds.forEach((w, i) => { kindU[i] = w.s.flagship ? f++ % 3 : 3 + (o++ % 5); });
+  }
+  const KIND_LIGHT: Vec3[] = [[1, 0.6, 0.32], [1, 0.78, 0.45], [1, 0.62, 0.55], [0.45, 0.85, 0.92], [0.78, 0.88, 1], [0.5, 0.92, 0.68], [0.7, 0.6, 1], [0.92, 0.82, 0.66]];
   const wU = new Float32Array(MAX_WORLDS * 4),
     wbU = new Float32Array(MAX_WORLDS * 4),
     spinU = new Float32Array(MAX_WORLDS),
@@ -435,7 +582,8 @@ export async function createOrbit(
   let focused: number | null = null,
     hovered: number | null = null,
     techLit: string | null = null,
-    beacon = -1;
+    beacon = -1,
+    zoomK = 1;
   const pending: { w: number; at: number }[] = [];
   const sparks: { w: number; k: number; dur: number; lift: Vec3; from: Vec3 }[] = [];
   const impacts: { d: Vec3; age: number }[] = [];
@@ -514,20 +662,27 @@ export async function createOrbit(
     PEACH: Vec3 = [1, 0.69, 0.54];
   const ease4 = (x: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 4);
   const LINK: Vec3 = [0.78, 0.88, 1];
-  /** A luminous arc from a to b, bowed away from the core, with a pulse of light travelling along it. */
-  const arc = (a: Vec3, b: Vec3, base: number, hot: number, phase: number, speed: number, col: Vec3, T: number, bow: number) => {
+  /**
+   * A link from a to b: an arc bowed away from the core, drawn as a fine bright core inside a soft glow, its
+   * colour running from one end's to the other's, with two comet-tailed pulses of light travelling along it.
+   */
+  const arc = (a: Vec3, b: Vec3, base: number, hot: number, phase: number, speed: number, ca: Vec3, cb: Vec3, T: number, bow: number) => {
     const mid: Vec3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
     const len = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
     const out = Math.hypot(mid[0], mid[1], mid[2]) > 1e-3 ? norm(mid) : ([0, 1, 0] as Vec3);
     const c: Vec3 = [mid[0] + out[0] * len * bow, mid[1] + out[1] * len * bow + len * 0.1, mid[2] + out[2] * len * bow];
-    const N = Math.max(16, Math.round(len * 36));
-    const k = (T * speed + phase) % 1;
+    const N = Math.max(18, Math.round(len * 44));
+    const k1 = (T * speed + phase) % 1, k2 = (T * speed * 0.7 + phase + 0.5) % 1;
     for (let i = 1; i < N; i++) {
       const s = i / N, m = 1 - s;
       const p: Vec3 = [m * m * a[0] + 2 * m * s * c[0] + s * s * b[0], m * m * a[1] + 2 * m * s * c[1] + s * s * b[1], m * m * a[2] + 2 * m * s * c[2] + s * s * b[2]];
-      const fade = Math.pow(Math.sin(Math.PI * s), 0.6);
-      const pk = Math.exp(-((s - k) * (s - k)) / 0.0014);
-      D(p, 0.01 + pk * 0.018, pk > 0.35 ? HOT : col, (base + hot * pk) * fade);
+      const fade = Math.pow(Math.sin(Math.PI * s), 0.55);
+      const col: Vec3 = [ca[0] + (cb[0] - ca[0]) * s, ca[1] + (cb[1] - ca[1]) * s, ca[2] + (cb[2] - ca[2]) * s];
+      // a pulse is a bright head with a tail behind it (s below k), not a symmetric blob
+      const tail = (k: number) => { const d = k - s; return d < 0 ? Math.exp(-(d * d) / 0.0004) : Math.exp(-d / 0.05); };
+      const pk = Math.max(tail(k1), tail(k2) * 0.6);
+      D(p, 0.028, col, base * fade * 0.45); // the glow
+      D(p, 0.0075 + pk * 0.012, pk > 0.5 ? WHITE : col, (base * 1.6 + hot * pk) * fade); // the core and its light
     }
   };
 
@@ -702,14 +857,14 @@ export async function createOrbit(
       const mine = lit !== null && (l.a === lit || l.b === lit);
       const base = lit === null ? 0.055 : mine ? 0.17 : 0.018;
       const hot = lit === null ? 0.55 : mine ? 1 : 0.18;
-      arc(worlds[l.a]!.pos, worlds[l.b]!.pos, base * grow, hot * grow, l.phase, l.speed * (mine ? 2.2 : 1), LINK, T, 0.3);
+      arc(worlds[l.a]!.pos, worlds[l.b]!.pos, base * grow, hot * grow, l.phase, l.speed * (mine ? 2.2 : 1), KIND_LIGHT[kindU[l.a]!]!, KIND_LIGHT[kindU[l.b]!]!, T, 0.3);
     });
     // and a technology's threads, to the stack of the lit world, or to every world built with the technology named in the hero
     tech.forEach((t, i) => {
-      if (lit !== null && worlds[lit]!.s.stack.includes(t)) arc(worlds[lit]!.pos, techPos[i]!, 0.12, 0.8, i * 0.13, 0.35, PEACH, T, 0.12);
+      if (lit !== null && worlds[lit]!.s.stack.includes(t)) arc(worlds[lit]!.pos, techPos[i]!, 0.1, 0.8, i * 0.13, 0.35, KIND_LIGHT[kindU[lit]!]!, PEACH, T, 0.12);
       if (techLit === t)
         worlds.forEach((w, j) => {
-          if (w.s.stack.includes(t)) arc(w.pos, techPos[i]!, 0.16, 0.9, j * 0.17, 0.4, PEACH, T, 0.12);
+          if (w.s.stack.includes(t)) arc(w.pos, techPos[i]!, 0.14, 0.9, j * 0.17, 0.4, KIND_LIGHT[kindU[j]!]!, PEACH, T, 0.12);
         });
     });
     impU.fill(0);
@@ -758,6 +913,30 @@ export async function createOrbit(
     gl!.uniform1i(U.beacon, beacon);
     gl!.bindVertexArray(sVao);
     gl!.drawArrays(gl!.POINTS, 0, staticCount);
+
+    // the planets, farthest first, over the static light and under the sparks
+    const back: Vec3 = [V[2]!, V[6]!, V[10]!];
+    worlds.map((w, i) => [i, w.pos[0] * back[0] + w.pos[1] * back[1] + w.pos[2] * back[2]] as const).sort((p, q) => p[1] - q[1]).forEach(([i], k) => { orderU[k] = i; });
+    gl!.useProgram(PL);
+    gl!.blendFuncSeparate(gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA, gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA);
+    gl!.uniformMatrix4fv(P_.pv, false, PV);
+    gl!.uniform2f(P_.shift, st.sx, st.sy);
+    gl!.uniform3f(P_.right, right[0], right[1], right[2]);
+    gl!.uniform3f(P_.up, up[0], up[1], up[2]);
+    gl!.uniform3f(P_.back, back[0], back[1], back[2]);
+    gl!.uniform4fv(P_.w, wU);
+    gl!.uniform4fv(P_.wb, wbU);
+    gl!.uniform1fv(P_.spin, spinU);
+    gl!.uniform1iv(P_.order, orderU);
+    gl!.uniform1fv(P_.kind, kindU);
+    gl!.uniform1f(P_.time, T);
+    gl!.uniform1f(P_.coreR, R0);
+    gl!.uniform1i(P_.oct, q < 1 ? 3 : 5);
+    gl!.bindVertexArray(planetVao);
+    gl!.drawArraysInstanced(gl!.TRIANGLES, 0, 6, worlds.length);
+    gl!.blendFuncSeparate(gl!.ONE, gl!.ONE, gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA);
+    gl!.useProgram(PP);
+
     if (dc) {
       gl!.bindBuffer(gl!.ARRAY_BUFFER, dBuf);
       gl!.bufferSubData(gl!.ARRAY_BUFFER, 0, dyn, 0, dc * F);
@@ -811,7 +990,7 @@ export async function createOrbit(
       canvas.width = Math.round(st.w * dpr);
       canvas.height = Math.round(st.h * dpr);
       cam.base = distanceFor(next.ringPx, st.h);
-      cam.tdist = focused !== null ? cam.base * 0.94 : cam.base;
+      cam.tdist = focused !== null ? cam.base * 0.94 * zoomK : cam.base * zoomK;
       if (st.sx === 0 && st.sy === 0) {
         st.sx = 2 * next.cx - 1;
         st.sy = 1 - 2 * next.cy;
@@ -822,7 +1001,7 @@ export async function createOrbit(
     focus(i) {
       if (i === focused) return;
       focused = i;
-      cam.tdist = i !== null ? cam.base * 0.94 : cam.base;
+      cam.tdist = i !== null ? cam.base * 0.94 * zoomK : cam.base * zoomK;
       if (i !== null) shocks.push({ w: i, age: 0 });
       busy();
     },
@@ -855,7 +1034,20 @@ export async function createOrbit(
     turn(dyaw, dpitch) {
       cam.vyaw = dyaw;
       cam.tyaw += dyaw;
-      cam.tpitch = Math.max(-0.1, Math.min(1.0, cam.tpitch + dpitch));
+      cam.tpitch += dpitch; // any way round: over the top and upside down
+      busy();
+    },
+    zoom(f) {
+      zoomK = Math.max(0.55, Math.min(1.8, zoomK * f));
+      cam.tdist = cam.base * zoomK * (focused !== null ? 0.94 : 1);
+      busy();
+    },
+    reset() {
+      cam.tyaw = START.yaw + Math.round((cam.tyaw - START.yaw) / (Math.PI * 2)) * Math.PI * 2;
+      cam.tpitch = START.pitch;
+      cam.vyaw = 0;
+      zoomK = 1;
+      cam.tdist = cam.base;
       busy();
     },
     fling(vyaw) {
@@ -880,6 +1072,7 @@ export async function createOrbit(
       gl!.deleteBuffer(lBuf);
       gl!.deleteProgram(PP);
       gl!.deleteProgram(LP);
+      gl!.deleteProgram(PL);
     },
   };
 }
