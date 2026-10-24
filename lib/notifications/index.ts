@@ -29,7 +29,14 @@ export function emailConfigured(): boolean {
 
 /** Queue mail inside the caller's transaction, so it exists exactly when the change does. */
 export async function enqueue(tx: Prisma.TransactionClient, email: QueuedEmail) {
-  return tx.notification.create({ data: { ...email } });
+  // Addresses are stored as one spelling: Resend's test sender, for one, delivers only to the account's own
+  // address written exactly as it is — "Kurhula04s@…" was refused where "kurhula04s@…" was delivered (D-074).
+  return tx.notification.create({ data: { ...email, recipient: normalizeAddress(email.recipient) } });
+}
+
+/** An email address as one spelling: trimmed and lower-cased (no mailbox the site writes to tells case apart). */
+export function normalizeAddress(address: string): string {
+  return address.trim().toLowerCase();
 }
 
 /**
@@ -118,9 +125,9 @@ export async function retryNotification(id: string) {
 /** Where owner alerts go: the setting, else the profile's contact email. */
 export async function ownerAddress(): Promise<string | null> {
   const configured = await getSetting("notifications.ownerAddress");
-  if (configured) return configured;
+  if (configured) return normalizeAddress(configured);
   const profile = await db.profile.findFirst({ select: { email: true } });
-  return profile?.email ?? null;
+  return profile?.email ? normalizeAddress(profile.email) : null;
 }
 
 /**

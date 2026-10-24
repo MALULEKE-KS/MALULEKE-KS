@@ -200,8 +200,8 @@ export function OrbitStage({
       // Every read happens before any write, so the browser lays the page out once per frame.
       const cardBox = opened !== null && card.current ? rel(card.current) : null;
       if (coreEl.current && coreEl.current.style.opacity !== "0") {
-        const c = rel(coreEl.current);
-        blocks.push([c[0] - 8, c[1] - 8, c[2] + 8, c[3] + 8]);
+        const m = Math.max(18, Math.min(60, f.core.r * 1.15));
+        blocks.push([f.core.x - m - 70, f.core.y - m, f.core.x + m + 70, f.core.y + m + 44]);
       }
       if (cardBox)
         blocks.push([cardBox[0] - 10, cardBox[1] - 10, cardBox[2] + 10, cardBox[3] + 10]);
@@ -299,7 +299,9 @@ export function OrbitStage({
         const vis = f.grown && inT < 0.05 && openRef.current === null;
         c.style.opacity = vis ? "1" : "0";
         c.style.pointerEvents = vis ? "auto" : "none";
-        c.style.transform = `translate(${(f.core.x - c.offsetWidth / 2).toFixed(1)}px, ${(f.core.y + f.core.r * 1.25 + 10).toFixed(1)}px)`;
+        // the mark sits on the core itself and the name hangs just under it: both move with the core
+        c.style.transform = `translate(${f.core.x.toFixed(1)}px, ${f.core.y.toFixed(1)}px)`;
+        c.style.setProperty("--s", `${Math.max(18, Math.min(60, f.core.r * 1.15)).toFixed(1)}px`);
       }
       moonEls.current.forEach((el, m) => {
         if (!el) return;
@@ -542,8 +544,8 @@ export function OrbitStage({
   useEffect(() => {
     const cv = canvas.current;
     if (!cv) return;
-    // A mouse drags any way (round, over the top, upside down). On a phone one finger turns it sideways and
-    // leaves the page free to scroll; two fingers turn it any way and pinch to zoom. A double click or tap resets.
+    // A mouse or a finger drags it any way (round, over the top, upside down — owner, 2026-10-25: "the exact
+    // orbit … as in desktop in mobile"); two fingers pinch to zoom. A double click or tap resets.
     let down: { x: number; y: number; moved: boolean; lastX: number; lastY: number; touch: boolean } | null = null;
     const touches = new Map<number, { x: number; y: number }>();
     let pinch: { d: number; cx: number; cy: number } | null = null;
@@ -587,7 +589,7 @@ export function OrbitStage({
           setHint(false);
         }
         if (down.moved) {
-          en.turn((x - down.lastX) * 0.0068, down.touch ? 0 : (y - down.lastY) * 0.0068);
+          en.turn((x - down.lastX) * 0.0068, (y - down.lastY) * 0.0068);
           down.lastX = x;
           down.lastY = y;
         }
@@ -872,9 +874,11 @@ export function OrbitStage({
         )}
         {/* The core is the owner's GitHub (D-073): every spark is a commit pushed there. */}
         {copy.coreLabel && data.github && (
-          <a ref={coreEl} href={data.github} target="_blank" rel="noopener noreferrer" className="orbit-core-label">
-            <FaGithub aria-hidden="true" className="size-3.5" />
-            <span>
+          <a ref={coreEl} href={data.github} target="_blank" rel="noopener noreferrer" className="orbit-core" aria-label={`${copy.coreLabel}${copy.coreSub ? ` — ${copy.coreSub}` : ""}`}>
+            <span className="orbit-core-mark" aria-hidden="true">
+              <FaGithub />
+            </span>
+            <span className="orbit-core-cap" aria-hidden="true">
               <b>{copy.coreLabel}</b>
               {copy.coreSub && <small>{copy.coreSub}</small>}
             </span>
