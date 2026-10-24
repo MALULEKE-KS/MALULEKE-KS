@@ -1,12 +1,12 @@
 // components/shared/SocialLinks.tsx
 // Real brand icons (Font Awesome brands via react-icons) — the actual
-// LinkedIn, WhatsApp and GitHub marks, not look-alikes. Destinations are the
+// LinkedIn, WhatsApp, GitHub, Instagram and X marks, not look-alikes. Destinations are the
 // owner's profile links (ProfileLink, admin-editable, #99) plus the profile
 // email; a link kind without a brand mark gets a plain link icon. The phone
 // number is never printed; WhatsApp is reached through its link only.
 
 import { Link2, Mail } from "lucide-react";
-import { FaGithub, FaLinkedinIn, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { FaGithub, FaInstagram, FaLinkedinIn, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import type { IconType } from "react-icons";
 import type { SiteLink } from "@/lib/queries/site";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ const BRAND_ICONS: Record<string, IconType> = {
   linkedin: FaLinkedinIn,
   github: FaGithub,
   whatsapp: FaWhatsapp,
+  instagram: FaInstagram,
   x: FaXTwitter,
   twitter: FaXTwitter,
 };
