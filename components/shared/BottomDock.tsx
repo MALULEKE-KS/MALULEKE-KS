@@ -23,7 +23,8 @@
 
 import Link from "@/components/shared/IntentLink";
 import { usePathname } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { LayoutGrid, MessageSquareText, Route, UserRound } from "lucide-react";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { GuideBot } from "@/components/guide/GuideBot";
@@ -59,7 +60,7 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
           )}
         >
           {active && (
-            <motion.span
+            <m.span
               layoutId={reduced ? undefined : "dock-active"}
               transition={{ type: "spring", stiffness: 420, damping: 36 }}
               aria-hidden="true"

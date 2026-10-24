@@ -13,6 +13,7 @@ import { ViewTransition } from "react";
 import { SiteHeader } from "@/components/shared/SiteHeader";
 import { SiteFooter } from "@/components/shared/SiteFooter";
 import { ConsentProvider } from "@/components/shared/Consent";
+import { MotionProvider } from "@/components/shared/MotionProvider";
 import { getReviewSlaHours, getSiteProfile } from "@/lib/queries/site";
 import { getPlatformPulse, getPublicHomes } from "@/lib/queries/profile";
 import { getContentBlock } from "@/lib/content/blocks";
@@ -99,6 +100,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     // Analytics consent (BR-5.1/5.4) wraps the public site only — never the admin.
     <ConsentProvider>
+      <MotionProvider>
       <GuideProvider
         enabled={guideEnabled}
         ready={guideProviderConfigured()}
@@ -153,6 +155,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
         <GuidePanel />
         </GuideChatProvider>
       </GuideProvider>
+      </MotionProvider>
     </ConsentProvider>
   );
 }

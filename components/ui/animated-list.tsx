@@ -7,7 +7,8 @@
 // every item is simply there.
 
 import { Children, useEffect, useMemo, useRef, useState } from "react"
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react"
+import { AnimatePresence, useInView, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 
 import { cn } from "@/lib/utils"
 
@@ -38,7 +39,7 @@ export function AnimatedList({ children, className, delay = 650 }: { children: R
     <div ref={ref} className={cn("flex flex-col gap-2", className)}>
       <AnimatePresence initial={false}>
         {visible.map((item) => (
-          <motion.div
+          <m.div
             key={(item as React.ReactElement).key}
             layout
             initial={{ scale: 0.9, opacity: 0, y: -6 }}
@@ -47,7 +48,7 @@ export function AnimatedList({ children, className, delay = 650 }: { children: R
             transition={{ type: "spring", stiffness: 350, damping: 36 }}
           >
             {item}
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

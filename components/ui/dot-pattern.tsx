@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useId, useRef, useState } from "react"
-import { motion } from "motion/react"
+import * as m from "motion/react-m"
 
 import { cn } from "@/lib/utils"
 
@@ -125,7 +125,7 @@ export function DotPattern({
         </radialGradient>
       </defs>
       {dots.map((dot) => (
-        <motion.circle
+        <m.circle
           key={`${dot.x}-${dot.y}`}
           cx={dot.x}
           cy={dot.y}

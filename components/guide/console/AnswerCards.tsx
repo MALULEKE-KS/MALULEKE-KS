@@ -7,7 +7,8 @@
 "use client";
 
 import Link from "@/components/shared/IntentLink";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { Activity, ArrowLeftRight, ArrowUpRight, Check, CircleDashed, CircleDot, GitCommitHorizontal, ListChecks, Lock, Milestone, ShieldCheck } from "lucide-react";
 import { techMark } from "@/components/shared/TechChip";
 import type { CompareCardData, JourneyCardData, PulseCardData, SkillCardData, SystemCardData } from "@/lib/guide/show-tools";
@@ -31,14 +32,14 @@ function Shell({ children, className }: { children: React.ReactNode; className?:
 function Appear({ i, children }: { i: number; children: React.ReactNode }) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       className="max-sm:w-[82%] max-sm:shrink-0 max-sm:snap-start"
       initial={reduced ? false : { opacity: 0, y: 8, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.35, delay: i * 0.07, ease: [0.2, 0.8, 0.2, 1] }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 

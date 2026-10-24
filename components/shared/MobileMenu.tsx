@@ -22,7 +22,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "@/components/shared/IntentLink";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { ArrowRight, ArrowUpRight, Clock, Menu, X, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { SocialLinks } from "@/components/shared/SocialLinks";
@@ -128,7 +129,7 @@ export function MobileMenu({
         createPortal(
           <AnimatePresence>
             {open && (
-              <motion.div
+              <m.div
                 key="menu"
                 ref={sheet}
                 id="mobile-menu"
@@ -162,7 +163,7 @@ export function MobileMenu({
                     {PAGES.map((s, i) => {
                       const active = isActive(s.href);
                       return (
-                        <motion.li key={s.href} {...item(i)} className="border-b border-white/[0.07]">
+                        <m.li key={s.href} {...item(i)} className="border-b border-white/[0.07]">
                           <Link
                             href={s.href}
                             data-autofocus={i === 0 ? true : undefined}
@@ -181,13 +182,13 @@ export function MobileMenu({
                               <ArrowRight aria-hidden="true" className="text-line size-5 shrink-0 transition-transform group-active:translate-x-0.5" />
                             )}
                           </Link>
-                        </motion.li>
+                        </m.li>
                       );
                     })}
                   </ol>
                 </nav>
 
-                <motion.div {...item(PAGES.length)} className="relative shrink-0 border-t border-white/[0.07] px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+                <m.div {...item(PAGES.length)} className="relative shrink-0 border-t border-white/[0.07] px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                   {word(labels?.contactLabel) && (
                     <Link
                       href="/contact"
@@ -213,8 +214,8 @@ export function MobileMenu({
                   )}
                   {/* Public profiles only — the email and WhatsApp number live on /contact (spec WP-105). */}
                   <SocialLinks links={links.filter((l) => !l.url.includes("wa.me"))} className="mt-5 justify-center" />
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
           </AnimatePresence>,
           document.body,

@@ -9,7 +9,8 @@
 //   slideUp) — fewer variants, smaller bundle.
 
 import { memo } from "react"
-import { motion, useReducedMotion, type Variants } from "motion/react"
+import { useReducedMotion, type Variants } from "motion/react"
+import * as m from "motion/react-m"
 
 import { cn } from "@/lib/utils"
 
@@ -17,12 +18,12 @@ type By = "word" | "character" | "text"
 type Animation = "fadeIn" | "blurIn" | "blurInUp" | "slideUp"
 
 const motionElements = {
-  h1: motion.h1,
-  h2: motion.h2,
-  h3: motion.h3,
-  p: motion.p,
-  span: motion.span,
-  div: motion.div,
+  h1: m.h1,
+  h2: m.h2,
+  h3: m.h3,
+  p: m.p,
+  span: m.span,
+  div: m.div,
 } as const
 
 interface TextAnimateProps {
@@ -58,9 +59,9 @@ function TextAnimateBase({ children, className, segmentClassName, delay = 0, dur
   return (
     <Component variants={container} initial="hidden" whileInView="show" viewport={{ once }} className={cn("whitespace-pre-wrap", className)} aria-label={children}>
       {segments.map((segment, i) => (
-        <motion.span key={`${by}-${i}`} variants={ITEMS[animation]} transition={reduced ? { duration: 0 } : undefined} aria-hidden="true" className={cn("inline-block whitespace-pre", segmentClassName)}>
+        <m.span key={`${by}-${i}`} variants={ITEMS[animation]} transition={reduced ? { duration: 0 } : undefined} aria-hidden="true" className={cn("inline-block whitespace-pre", segmentClassName)}>
           {segment}
-        </motion.span>
+        </m.span>
       ))}
     </Component>
   )

@@ -3,7 +3,8 @@
 // prefers-reduced-motion — it loops forever, and motion won't pause an
 // offsetDistance animation on its own.
 
-import { motion, type MotionStyle, type Transition } from "motion/react"
+import { type MotionStyle, type Transition } from "motion/react"
+import * as m from "motion/react-m"
 
 import { cn } from "@/lib/utils"
 
@@ -76,7 +77,7 @@ export const BorderBeam = ({
         } as React.CSSProperties
       }
     >
-      <motion.div
+      <m.div
         className={cn(
           "absolute aspect-square",
           "bg-linear-to-l from-(--color-from) via-(--color-to) to-transparent",

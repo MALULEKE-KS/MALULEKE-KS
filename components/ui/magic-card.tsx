@@ -8,7 +8,8 @@
 //   never runs under prefers-reduced-motion (the border stays a quiet line).
 
 import { useCallback, useEffect } from "react"
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from "motion/react"
+import { useMotionTemplate, useMotionValue, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 
 import { cn } from "@/lib/utils"
 
@@ -61,7 +62,7 @@ export function MagicCard({
   const glow = useMotionTemplate`radial-gradient(${gradientSize * 1.6}px circle at ${mouseX}px ${mouseY}px, ${spotlight}, transparent 100%)`
 
   return (
-    <motion.div
+    <m.div
       className={cn("group relative isolate overflow-hidden border border-transparent", className)}
       onPointerMove={(e) => {
         if (reduced) return
@@ -72,9 +73,9 @@ export function MagicCard({
       onPointerLeave={reset}
       style={{ background: border }}
     >
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: glow }} />
+      <m.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: glow }} />
       {/* Fills the card, so what it holds can stretch to the card's height (a row of cards ends together, D-049). */}
       <div className="relative z-10 h-full">{children}</div>
-    </motion.div>
+    </m.div>
   )
 }

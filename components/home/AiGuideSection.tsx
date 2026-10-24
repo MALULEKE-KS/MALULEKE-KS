@@ -17,7 +17,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { HeroLabel } from "@/components/shared/HeroKit";
@@ -209,7 +210,7 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
       {/* Still answering, out of sight: the guide waits in the corner and brings you back. */}
       <AnimatePresence>
         {busy && !inView && (
-          <motion.button
+          <m.button
             type="button"
             initial={reduced ? false : { opacity: 0, y: 16, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -222,7 +223,7 @@ export function AiGuideSection({ content, facts }: { content: AiGuideContent; fa
               <span className="block text-[13px] font-medium">Still answering…</span>
               <span className="text-mist block truncate text-[11px]">{label}</span>
             </span>
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
     </section>

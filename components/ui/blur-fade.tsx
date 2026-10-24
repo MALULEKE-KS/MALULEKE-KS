@@ -6,12 +6,13 @@
 // same markup as the server renders (an instant transition, not a different
 // element), so hydration never mismatches.
 
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 
 export function BlurFade({ children, className, delay = 0, y = 8 }: { children: React.ReactNode; className?: string; delay?: number; y?: number }) {
   const reduced = useReducedMotion()
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={{ opacity: 0, y, filter: "blur(6px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -19,6 +20,6 @@ export function BlurFade({ children, className, delay = 0, y = 8 }: { children: 
       transition={reduced ? { duration: 0 } : { duration: 0.45, delay, ease: [0.2, 0.8, 0.2, 1] }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
