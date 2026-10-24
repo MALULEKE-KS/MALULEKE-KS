@@ -94,7 +94,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
           )}
 
           {/* With the Orbit, the name scales with the screen's height too, so the hero and its line fit one screen. */}
-          <h1 id="hero-title" className={cn("hero-rise type-hero-name mt-5 max-w-[18ch] md:mt-7", orbit && "lg:mt-5 lg:[font-size:clamp(2.75rem,min(5.2vw,8.6svh),5.5rem)]")} style={rise(1)}>
+          {/* The name is the page's largest paint on a phone, so it is there from the first frame — no entrance (the speed pass; as the statement, D-062). */}
+          <h1 id="hero-title" className={cn("type-hero-name mt-5 max-w-[18ch] md:mt-7", orbit && "lg:mt-5 lg:[font-size:clamp(2.75rem,min(5.2vw,8.6svh),5.5rem)]")}>
             {name}
           </h1>
 

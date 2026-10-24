@@ -108,7 +108,8 @@ test("reduced motion: the hero holds still", async ({ page }) => {
   await settle(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(URL, { waitUntil: "networkidle" });
-  const name = await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName);
+  // the name never moves (it is the first paint); the parts that settle in hold still too
+  const name = await page.locator("section[aria-labelledby='hero-title'] .hero-rise").first().evaluate((e) => getComputedStyle(e).animationName);
   expect(name).toBe("none");
 });
 
@@ -117,8 +118,10 @@ test("with motion allowed, each part settles in", async ({ page }) => {
   await settle(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto(URL, { waitUntil: "networkidle" });
-  const name = await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName);
-  expect(name).toBe("hero-rise");
+  // the parts around the name settle in; the name itself is there from the first frame (it is the largest paint)
+  const part = await page.locator("section[aria-labelledby='hero-title'] .hero-rise").first().evaluate((e) => getComputedStyle(e).animationName);
+  expect(part).toBe("hero-rise");
+  expect(await page.locator("#hero-title").evaluate((e) => getComputedStyle(e).animationName)).toBe("none");
 });
 
 for (const [name, viewport] of [
