@@ -142,6 +142,13 @@ export const CONTENT_BLOCKS = {
       exploreHint: z.string().trim().max(80).optional(),
       phoneEyebrow: z.string().trim().max(30).optional(),
       phoneHint: z.string().trim().max(30).optional(),
+      // The opened system's panel: only what its own page doesn't say (owner, 2026-10-24).
+      factBusiest: z.string().trim().max(30).optional(),
+      busiestValue: instantTemplate(60, ["week", "commits"]).optional(),
+      factQuiet: z.string().trim().max(60).optional(),
+      factShare: z.string().trim().max(30).optional(),
+      shareValue: instantTemplate(60, ["percent", "total"]).optional(),
+      factLinked: z.string().trim().max(30).optional(),
     }),
   },
   "page-xray": {

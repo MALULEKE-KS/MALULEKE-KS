@@ -257,6 +257,12 @@ export async function createOrbit(
     };
   });
 
+  // ---- the links: worlds sharing at least two technologies
+  const links: { a: number; b: number; phase: number; speed: number }[] = [];
+  for (let a = 0; a < worlds.length; a++)
+    for (let b = a + 1; b < worlds.length; b++)
+      if (worlds[a]!.s.stack.filter((t) => worlds[b]!.s.stack.includes(t)).length >= 2) links.push({ a, b, phase: rnd(), speed: 0.1 + rnd() * 0.1 });
+
   // ---- the static buffer: built once
   const verts: number[] = [];
   const v = (
@@ -507,6 +513,23 @@ export async function createOrbit(
     BONE: Vec3 = [0.95, 0.94, 0.91],
     PEACH: Vec3 = [1, 0.69, 0.54];
   const ease4 = (x: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 4);
+  const LINK: Vec3 = [0.78, 0.88, 1];
+  /** A luminous arc from a to b, bowed away from the core, with a pulse of light travelling along it. */
+  const arc = (a: Vec3, b: Vec3, base: number, hot: number, phase: number, speed: number, col: Vec3, T: number, bow: number) => {
+    const mid: Vec3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+    const out = Math.hypot(mid[0], mid[1], mid[2]) > 1e-3 ? norm(mid) : ([0, 1, 0] as Vec3);
+    const c: Vec3 = [mid[0] + out[0] * len * bow, mid[1] + out[1] * len * bow + len * 0.1, mid[2] + out[2] * len * bow];
+    const N = Math.max(16, Math.round(len * 36));
+    const k = (T * speed + phase) % 1;
+    for (let i = 1; i < N; i++) {
+      const s = i / N, m = 1 - s;
+      const p: Vec3 = [m * m * a[0] + 2 * m * s * c[0] + s * s * b[0], m * m * a[1] + 2 * m * s * c[1] + s * s * b[1], m * m * a[2] + 2 * m * s * c[2] + s * s * b[2]];
+      const fade = Math.pow(Math.sin(Math.PI * s), 0.6);
+      const pk = Math.exp(-((s - k) * (s - k)) / 0.0014);
+      D(p, 0.01 + pk * 0.018, pk > 0.35 ? HOT : col, (base + hot * pk) * fade);
+    }
+  };
 
   function frame(dt: number) {
     if (!opts.reduced) st.t += dt;
@@ -550,24 +573,16 @@ export async function createOrbit(
       w.pos = ringPoint(w.s.home, w.angle, ring(w.s.home).r * grow);
       w.dim += ((focused !== null && focused !== i ? 1 : 0) - w.dim) * e * 0.6;
     });
-    const fp = focused !== null ? worlds[focused]!.pos : null;
-    const tgt: Vec3 = fp ? [fp[0] * 0.5, fp[1] * 0.5, fp[2] * 0.5] : [0, 0, 0];
+    // An opened world doesn't move the camera (owner: "we shall still be able to see the whole orbiting"):
+    // it is lit — a shockwave, its links bright, the rest dimmed — and the whole orbit stays in view.
+    const tgt: Vec3 = [0, 0, 0];
     for (let k = 0; k < 3; k++)
       cam.target[k] = cam.target[k]! + (tgt[k]! - cam.target[k]!) * e * 0.7;
-    // An opened world is carried to its place on screen (clear of its panel) by shifting the scene; the
-    // core is never carried into the words' column. Measured from the last frame, so it converges.
-    let tsx = 2 * layout.cx - 1;
-    let tsy = 1 - 2 * layout.cy;
-    if (focused !== null && frameOut.worlds[focused]!.depth > 0) {
-      const o = frameOut.worlds[focused]!;
-      tsx = st.sx + (2 * (layout.focusX * st.w - o.x)) / st.w;
-      tsy = st.sy + (2 * (o.y - layout.focusY * st.h)) / st.h;
-      const coreX = frameOut.core.x + ((tsx - st.sx) * st.w) / 2;
-      if (coreX < layout.minCoreX * st.w) tsx += (2 * (layout.minCoreX * st.w - coreX)) / st.w;
-    }
+    const tsx = 2 * layout.cx - 1;
+    const tsy = 1 - 2 * layout.cy;
     st.sx += (tsx - st.sx) * e * 0.8;
     st.sy += (tsy - st.sy) * e * 0.8;
-    st.dof += ((focused !== null ? 1.1 : 0.42) - st.dof) * e * 0.6;
+    st.dof += ((focused !== null ? 0.62 : 0.4) - st.dof) * e * 0.6;
     const { PV, V } = matrices(
       { yaw: cam.yaw, pitch: cam.pitch, dist: cam.dist, target: cam.target },
       st.w / st.h
@@ -681,12 +696,20 @@ export async function createOrbit(
         );
       }
     }
+    // The links: worlds that share their stack are joined by luminous arcs bowed out round the core, a
+    // pulse of light running along each; a lit world's links run bright and fast, the rest quieten.
+    links.forEach((l) => {
+      const mine = lit !== null && (l.a === lit || l.b === lit);
+      const base = lit === null ? 0.055 : mine ? 0.17 : 0.018;
+      const hot = lit === null ? 0.55 : mine ? 1 : 0.18;
+      arc(worlds[l.a]!.pos, worlds[l.b]!.pos, base * grow, hot * grow, l.phase, l.speed * (mine ? 2.2 : 1), LINK, T, 0.3);
+    });
+    // and a technology's threads, to the stack of the lit world, or to every world built with the technology named in the hero
     tech.forEach((t, i) => {
-      if (lit !== null && worlds[lit]!.s.stack.includes(t))
-        Ln(worlds[lit]!.pos, techPos[i]!, PEACH, 0.32, 0.04);
+      if (lit !== null && worlds[lit]!.s.stack.includes(t)) arc(worlds[lit]!.pos, techPos[i]!, 0.12, 0.8, i * 0.13, 0.35, PEACH, T, 0.12);
       if (techLit === t)
-        worlds.forEach((w) => {
-          if (w.s.stack.includes(t)) Ln(w.pos, techPos[i]!, PEACH, 0.45, 0.06);
+        worlds.forEach((w, j) => {
+          if (w.s.stack.includes(t)) arc(w.pos, techPos[i]!, 0.16, 0.9, j * 0.17, 0.4, PEACH, T, 0.12);
         });
     });
     impU.fill(0);
@@ -788,7 +811,7 @@ export async function createOrbit(
       canvas.width = Math.round(st.w * dpr);
       canvas.height = Math.round(st.h * dpr);
       cam.base = distanceFor(next.ringPx, st.h);
-      cam.tdist = focused !== null ? cam.base * 0.66 : cam.base;
+      cam.tdist = focused !== null ? cam.base * 0.94 : cam.base;
       if (st.sx === 0 && st.sy === 0) {
         st.sx = 2 * next.cx - 1;
         st.sy = 1 - 2 * next.cy;
@@ -799,7 +822,7 @@ export async function createOrbit(
     focus(i) {
       if (i === focused) return;
       focused = i;
-      cam.tdist = i !== null ? cam.base * 0.66 : cam.base;
+      cam.tdist = i !== null ? cam.base * 0.94 : cam.base;
       if (i !== null) shocks.push({ w: i, age: 0 });
       busy();
     },
