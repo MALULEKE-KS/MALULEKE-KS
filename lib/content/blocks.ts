@@ -149,6 +149,9 @@ export const CONTENT_BLOCKS = {
       factShare: z.string().trim().max(30).optional(),
       shareValue: instantTemplate(60, ["percent", "total"]).optional(),
       factLinked: z.string().trim().max(30).optional(),
+      // How to play with it: a heading over the orbit on a phone; on a desktop a quiet hint over the orbit only, until it's used.
+      touchHint: z.string().trim().max(90).optional(),
+      pointerHint: z.string().trim().max(90).optional(),
     }),
   },
   "page-xray": {

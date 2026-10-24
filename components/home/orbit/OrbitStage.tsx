@@ -61,6 +61,9 @@ export function OrbitStage({
   const [open, setOpen] = useState<number | null>(null);
   const openRef = useRef<number | null>(null);
   const relayout = useRef<(() => void) | null>(null);
+  // the desktop hint: shown while the pointer is over the orbit's zone, gone for good once it has been used
+  const [hint, setHint] = useState(false);
+  const used = useRef(false);
 
   const sys = data.systems;
   const totals = useMemo(() => sys.map((s) => s.weeks.reduce((a, b) => a + b, 0)), [sys]);
@@ -493,8 +496,16 @@ export function OrbitStage({
         pinch = now;
         return;
       }
+      if (e.pointerType === "mouse" && !used.current) {
+        const zone = copyRef.current ? copyRef.current.getBoundingClientRect().right - cv.getBoundingClientRect().left : 0;
+        setHint(x > zone + 24);
+      }
       if (down) {
-        if (Math.abs(x - down.x) + Math.abs(y - down.y) > 6) down.moved = true;
+        if (Math.abs(x - down.x) + Math.abs(y - down.y) > 6) {
+          down.moved = true;
+          used.current = true;
+          setHint(false);
+        }
         if (down.moved) {
           en.turn((x - down.lastX) * 0.0068, down.touch ? 0 : (y - down.lastY) * 0.0068);
           down.lastX = x;
@@ -519,6 +530,8 @@ export function OrbitStage({
       const now = performance.now();
       if (h === null && now - lastTap < 320) { engine.current?.reset(); lastTap = 0; return; }
       lastTap = now;
+      used.current = true;
+      setHint(false);
       openWorld(h !== null ? h : null);
     };
     const onCancel = (e: PointerEvent) => {
@@ -527,6 +540,7 @@ export function OrbitStage({
       down = null;
     };
     const onLeave = () => {
+      setHint(false);
       if (!down) {
         hoverRef.current = null;
         engine.current?.hover(null);
@@ -566,7 +580,10 @@ export function OrbitStage({
       data-live={live ? "" : undefined}
       data-over-photo={overPhoto ? "" : undefined}
     >
-      <div ref={stage} className="orbit-stage">
+      <div ref={stage} className="orbit-stage" data-hint={hint ? "" : undefined}>
+        {/* How to play with it: a heading over the orbit on a phone; on a desktop only while the pointer is over the orbit, until it's used. */}
+        {copy.touchHint && <p className="orbit-hint orbit-hint-touch">{copy.touchHint}</p>}
+        {copy.pointerHint && <p className="orbit-hint orbit-hint-pointer" aria-hidden="true">{copy.pointerHint}</p>}
         <div
           ref={(el) => {
             blooms.current[3] = el;

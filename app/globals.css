@@ -390,6 +390,12 @@ html {
 .orbit-leaders circle { fill: var(--color-ember); }
 .orbit-leaders[data-conn="off"] .orbit-conn, .orbit-leaders[data-conn="off"] circle { opacity: 0; }
 
+/* How to play with it. */
+.orbit-hint { position: absolute; z-index: 3; pointer-events: none; font-family: var(--font-ibm-plex-mono), ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.02em; color: var(--color-mist); text-shadow: 0 1px 10px rgb(0 0 0 / 0.9); }
+.orbit-hint-touch { left: 50%; top: 14px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); text-align: center; padding: 5px 12px; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.08); background: rgb(11 12 14 / 0.45); backdrop-filter: blur(8px); }
+.orbit-hint-pointer { display: none; }
+.ks-orbit[data-open] .orbit-hint-touch { opacity: 0; }
+
 /* Names: small and quiet — the worlds are the picture (owner: "the system names … are too big than the orbits"). */
 .orbit-plates { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .orbit-plate { position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 5px; border-radius: 999px; background: rgb(11 12 14 / 0.1); border: 1px solid rgb(255 255 255 / 0.06); color: var(--color-paper); white-space: nowrap; cursor: pointer; opacity: 0; text-shadow: 0 1px 10px rgb(0 0 0 / 0.95), 0 0 2px rgb(0 0 0 / 0.85); transition: opacity 260ms, border-color 220ms, background-color 220ms; will-change: transform; }
@@ -447,6 +453,10 @@ html:has(nav[data-dock="site"]) .orbit-bar { padding-bottom: calc(var(--dock-spa
   .ks-orbit[data-over-photo] .orbit-shade { background: radial-gradient(120% 110% at 71% 50%, transparent 64%, rgb(11 12 14 / 0.4) 100%); }
   .ks-orbit:not([data-over-photo]) .orbit-shade { background: linear-gradient(90deg, var(--color-night-deep) 0%, rgb(11 12 14 / 0.9) 30%, rgb(11 12 14 / 0) 46%); }
   .orbit-poster-wrap { left: 72%; width: min(86%, 86vh); }
+  .orbit-hint-touch { display: none; }
+  .orbit-hint-pointer { display: block; right: max(2rem, env(safe-area-inset-right)); top: 92px; opacity: 0; transition: opacity 320ms ease; }
+  .orbit-stage[data-hint] .orbit-hint-pointer { opacity: 1; }
+  .ks-orbit[data-open] .orbit-hint-pointer { opacity: 0; }
   .orbit-card { left: auto; right: max(2rem, env(safe-area-inset-right)); bottom: 18px; width: 300px; }
   .orbit-bar { height: var(--orbit-bar-h); grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 28px; padding: 10px max(2rem, env(safe-area-inset-right)) 16px max(1.5rem, env(safe-area-inset-left)); overflow: hidden; background: linear-gradient(180deg, rgb(11 12 14 / 0.55), var(--color-night-deep)); }
 }

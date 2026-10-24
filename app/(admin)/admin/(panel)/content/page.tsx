@@ -103,6 +103,8 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "factShare", label: "Panel: share of the commits (heading)", max: 30, kind: "line" },
     { name: "shareValue", label: "Panel: share of the commits (value)", max: 60, kind: "line", hint: "Fill-ins: {percent}, {total}." },
     { name: "factLinked", label: "Panel: systems sharing its stack (heading)", max: 30, kind: "line" },
+    { name: "touchHint", label: "Phone: how to play with it (over the orbit)", max: 90, kind: "line" },
+    { name: "pointerHint", label: "Desktop: how to play with it (shown over the orbit until it's used)", max: 90, kind: "line" },
   ],
   "page-xray": [
     { name: "receiptLabel", label: "The receipt's name", max: 24, kind: "line", hint: "First word of the strip. Empty hides the receipt." },
