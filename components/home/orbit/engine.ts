@@ -194,12 +194,13 @@ const pause = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 // flagship — a ring that passes in front of and behind it. The core hides what is behind it.
 const PVS = `#version 300 es
 precision highp float;
+layout(location=0) in vec2 aCorner;
 uniform mat4 uPV; uniform vec2 uShift; uniform vec3 uRight; uniform vec3 uUp;
 uniform vec4 uW[${MAX_WORLDS}]; uniform vec4 uWB[${MAX_WORLDS}]; uniform int uOrder[${MAX_WORLDS}];
 out vec2 vUv; flat out int vI;
 void main() {
   int i = uOrder[gl_InstanceID];
-  vec2 c = vec2[6](vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, 1.0))[gl_VertexID];
+  vec2 c = aCorner;
   bool flagship = mod(uWB[i].w, 2.0) > 0.5;
   float K = flagship ? 2.35 : 1.7; // room for the atmosphere, and a flagship's ring
   vec4 W = uW[i];
@@ -240,7 +241,7 @@ void main() {
   int kind = int(uWT[vI] + 0.5);
   vec3 c1, c2, c3; palette(kind, c1, c2, c3);
   float calm = B.z; float fl = B.w;
-  bool flagship = mod(fl, 2.0) > 0.5; bool active = mod(floor(fl / 2.0), 2.0) > 0.5;
+  bool flagship = mod(fl, 2.0) > 0.5; bool worked = mod(floor(fl / 2.0), 2.0) > 0.5;
   float seed = float(vI) * 1.618 + 3.0;
   vec2 uv = vUv; float r2 = dot(uv, uv);
   vec3 L = normalize(-W.xyz + vec3(1e-4));
@@ -278,11 +279,11 @@ void main() {
       surf = mix(c1, c2, smoothstep(0.35, 0.62, h)) - crater * 0.2;
       surf = mix(surf, c3, smoothstep(0.64, 0.74, abs(Q.y) + h * 0.3));
     }
-    float clouds = smoothstep(0.56, 0.78, fbm(Q * 4.2 + vec3(uTime * 0.025, 0.0, 0.0) + seed * 2.0)) * (giant ? 0.22 : 0.5);
+    float clouds = smoothstep(0.58, 0.8, noise(Q * 4.2 + vec3(uTime * 0.025, 0.0, 0.0) + seed * 2.0) * 0.6 + h * 0.4) * (giant ? 0.22 : 0.5);
     float d = dot(N, L); float day = smoothstep(-0.14, 0.32, d);
     vec3 H = normalize(L + uBack); float spec = pow(max(dot(N, H), 0.0), 36.0) * 0.32 * day;
     pc = surf * sun * (0.035 + 1.15 * day) + vec3(1.0) * clouds * day * 0.85 + spec * sun;
-    if (active) { float city = smoothstep(0.8, 0.9, noise(Q * 26.0 + seed)) * (1.0 - day) * smoothstep(0.3, 0.55, h); pc += vec3(1.0, 0.56, 0.26) * city * 1.6; }
+    if (worked) { float city = smoothstep(0.8, 0.9, noise(Q * 26.0 + seed)) * (1.0 - day) * smoothstep(0.3, 0.55, h); pc += vec3(1.0, 0.56, 0.26) * city * 1.6; }
     float rim = pow(1.0 - z, 2.4); pc += atmCol * rim * (0.2 + 0.95 * max(d + 0.25, 0.0));
     pc *= 0.72 + 0.28 * z;
     pa = 1.0;
@@ -324,6 +325,9 @@ void main() {
 }`;
 
 /** Compiles and links a program; where the driver compiles in parallel (KHR_parallel_shader_compile) it waits frame by frame instead of blocking. */
+/** Every shader the Orbit compiles — checked by tests/unit/orbit-shaders.test.ts for words GLSL ES 3.00 reserves. */
+export const SHADERS = { VS, FS, LVS, LFS, PVS, PFS };
+
 async function compile(gl: WebGL2RenderingContext, vs: string, fs: string) {
   const p = gl.createProgram()!;
   const shaders = (
@@ -354,7 +358,7 @@ async function compile(gl: WebGL2RenderingContext, vs: string, fs: string) {
 export async function createOrbit(
   canvas: HTMLCanvasElement,
   data: OrbitData,
-  opts: { reduced: boolean; quality: number; weekMs: number; sky: number; onFrame: (f: OrbitFrame) => void }
+  opts: { reduced: boolean; quality: number; weekMs: number; sky: number; onFrame: (f: OrbitFrame) => void; /** A device that can't keep up: "lighter" (draw less), then "stop" (keep the still). */ onSlow?: (level: "lighter" | "stop") => void }
 ): Promise<OrbitEngine | null> {
   const gl = canvas.getContext("webgl2", {
     antialias: false,
@@ -363,12 +367,19 @@ export async function createOrbit(
     powerPreference: "high-performance",
   });
   if (!gl) return null;
-  let PP: WebGLProgram, LP: WebGLProgram, PL: WebGLProgram;
+  let PP: WebGLProgram, LP: WebGLProgram;
+  let PL: WebGLProgram | null = null;
   try {
-    [PP, LP, PL] = await Promise.all([compile(gl, VS, FS), compile(gl, LVS, LFS), compile(gl, PVS, PFS)]);
+    [PP, LP] = await Promise.all([compile(gl, VS, FS), compile(gl, LVS, LFS)]);
   } catch (err) {
     console.warn("[orbit] the live scene is off:", err);
     return null;
+  }
+  // The planets have a program of their own: if a driver refuses it, the worlds are drawn as particles instead.
+  try {
+    PL = await compile(gl, PVS, PFS);
+  } catch (err) {
+    console.warn("[orbit] planets off on this browser; drawing the worlds as particles:", err);
   }
   await pause();
   const q = opts.quality; // 1, or 0.5 on a small device — fewer particles, the same picture
@@ -458,6 +469,13 @@ export async function createOrbit(
     for (let k = 0; k < 22; k++) v(11, i, (k / 22) * Math.PI * 2, 0, [0, 0, 0], 0);
   });
   tech.forEach((_, i) => v(12, i, 0, 0, techPos[i]!, 0));
+  // A safety net: the worlds as lit particle bodies, drawn only on a browser that can't draw the planets.
+  const sceneCount = verts.length / F;
+  worlds.forEach((w, i) => {
+    fibonacci(n(40 + Math.round(Math.sqrt(w.total) * 5))).forEach((d, j) => v(7, i, j % 6 === 0 ? 1 : 0, 0, d, 0));
+    for (const d of fibonacci(n(46))) v(8, i, 0, 0, d, 0);
+    v(9, i, 0, 0, [0, 0, 0], 0);
+  });
   await pause();
   const staticData = new Float32Array(verts);
   const staticCount = staticData.length / F;
@@ -487,7 +505,15 @@ export async function createOrbit(
     gl.bindVertexArray(null);
     return vao;
   };
-  const planetVao = gl.createVertexArray()!; // no attributes: each corner comes from gl_VertexID
+  // The planets' quad: six corners in a buffer of their own (an attribute every driver draws with).
+  const planetVao = gl.createVertexArray()!;
+  const cornerBuf = gl.createBuffer()!;
+  gl.bindVertexArray(planetVao);
+  gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 8, 0);
+  gl.bindVertexArray(null);
   const sVao = pointVao(sBuf),
     dVao = pointVao(dBuf);
   const lVao = gl.createVertexArray()!;
@@ -531,7 +557,7 @@ export async function createOrbit(
     const g = ring(h);
     ringU.set([g.r, g.tilt, g.roll, g.speed], h * 4);
   }
-  const pu = (name: string) => gl.getUniformLocation(PL, name);
+  const pu = (name: string) => (PL ? gl.getUniformLocation(PL, name) : null);
   const P_ = { pv: pu("uPV"), shift: pu("uShift"), right: pu("uRight"), up: pu("uUp"), back: pu("uBack"), w: pu("uW"), wb: pu("uWB"), spin: pu("uWSpin"), order: pu("uOrder"), kind: pu("uWT"), time: pu("uTime"), coreR: pu("uCoreR"), oct: pu("uOct") };
   const orderU = new Int32Array(MAX_WORLDS);
   // Each world's kind of planet: the flagships molten ember, amber, coral; the rest ocean, ice, jade, violet, sandstone, in turn.
@@ -912,12 +938,12 @@ export async function createOrbit(
     gl!.uniform3f(U.up, up[0], up[1], up[2]);
     gl!.uniform1i(U.beacon, beacon);
     gl!.bindVertexArray(sVao);
-    gl!.drawArrays(gl!.POINTS, 0, staticCount);
+    gl!.drawArrays(gl!.POINTS, 0, planetsOk ? sceneCount : staticCount);
 
     // the planets, farthest first, over the static light and under the sparks
     const back: Vec3 = [V[2]!, V[6]!, V[10]!];
     worlds.map((w, i) => [i, w.pos[0] * back[0] + w.pos[1] * back[1] + w.pos[2] * back[2]] as const).sort((p, q) => p[1] - q[1]).forEach(([i], k) => { orderU[k] = i; });
-    gl!.useProgram(PL);
+    if (planetsOk && PL) gl!.useProgram(PL);
     gl!.blendFuncSeparate(gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA, gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA);
     gl!.uniformMatrix4fv(P_.pv, false, PV);
     gl!.uniform2f(P_.shift, st.sx, st.sy);
@@ -931,9 +957,20 @@ export async function createOrbit(
     gl!.uniform1fv(P_.kind, kindU);
     gl!.uniform1f(P_.time, T);
     gl!.uniform1f(P_.coreR, R0);
-    gl!.uniform1i(P_.oct, q < 1 ? 3 : 5);
-    gl!.bindVertexArray(planetVao);
-    gl!.drawArraysInstanced(gl!.TRIANGLES, 0, 6, worlds.length);
+    gl!.uniform1i(P_.oct, slowTier > 0 || q < 1 ? 2 : 4);
+    if (planetsOk) {
+      gl!.bindVertexArray(planetVao);
+      gl!.drawArraysInstanced(gl!.TRIANGLES, 0, 6, worlds.length);
+      // the first time, make sure the driver drew them; if it refused, fall back to the particle bodies for good
+      if (!planetsChecked) {
+        planetsChecked = true;
+        const err = gl!.getError();
+        if (err !== gl!.NO_ERROR) {
+          planetsOk = false;
+          console.warn("[orbit] planets off on this browser (GL error " + err + "); drawing the worlds as particles");
+        }
+      }
+    }
     gl!.blendFuncSeparate(gl!.ONE, gl!.ONE, gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA);
     gl!.useProgram(PP);
 
@@ -962,12 +999,26 @@ export async function createOrbit(
     last = 0,
     acc = 0,
     busyUntil = 0,
-    drawn = false;
+    drawn = false,
+    slowEma = 1 / 60,
+    slowFrames = 0,
+    slowTier = 0,
+    planetsOk = PL !== null,
+    planetsChecked = false;
   const tick = (now: number) => {
     if (!running) return;
     raf = requestAnimationFrame(tick);
-    const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+    const raw = (now - last) / 1000 || 0.016;
+    const dt = Math.min(0.05, raw);
     last = now;
+    // How long frames really take (not capped): if a device can't keep up, lighten the scene, then give up
+    // gracefully and leave the still — a frozen page is worse than a picture.
+    if (raw < 2) {
+      slowEma = slowEma * 0.92 + raw * 0.08;
+      slowFrames++;
+      if (slowFrames > 45 && slowEma > 0.07 && slowTier === 0) { slowTier = 1; slowFrames = 0; opts.onSlow?.("lighter"); }
+      else if (slowFrames > 90 && slowEma > 0.12 && slowTier === 1) { slowTier = 2; running = false; cancelAnimationFrame(raf); opts.onSlow?.("stop"); return; }
+    }
     acc += dt;
     const fast = st.phase !== "idle" || now < busyUntil || sparks.length > 40;
     // Reduced motion: nothing moves on its own, so a frame is drawn only when the visitor does something.
@@ -1070,9 +1121,10 @@ export async function createOrbit(
       gl!.deleteBuffer(sBuf);
       gl!.deleteBuffer(dBuf);
       gl!.deleteBuffer(lBuf);
+      gl!.deleteBuffer(cornerBuf);
       gl!.deleteProgram(PP);
       gl!.deleteProgram(LP);
-      gl!.deleteProgram(PL);
+      if (PL) gl!.deleteProgram(PL);
     },
   };
 }
