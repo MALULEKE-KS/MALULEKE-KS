@@ -422,10 +422,18 @@ export function OrbitStage({
       else if (onScreen && !document.hidden) engine.current?.start();
       else engine.current?.stop();
     });
+    // On a desktop the Orbit is in the first view: it starts once the page has loaded and gone idle. On a phone
+    // it sits under the words, so it starts on the visitor's first scroll or touch (the still shows until then) —
+    // the page's own first load stays light.
     const begin = () => {
       const go = () => !cancelled && io.observe(st);
-      if ("requestIdleCallback" in window) window.requestIdleCallback(go, { timeout: 2500 });
-      else setTimeout(go, 1200);
+      const idle = () => ("requestIdleCallback" in window ? window.requestIdleCallback(go, { timeout: 2500 }) : setTimeout(go, 1200));
+      if (matchMedia(DESKTOP).matches) return idle();
+      const first = () => {
+        for (const ev of ["scroll", "pointerdown", "touchstart", "keydown"]) removeEventListener(ev, first);
+        idle();
+      };
+      for (const ev of ["scroll", "pointerdown", "touchstart", "keydown"]) addEventListener(ev, first, { once: true, passive: true });
     };
     if (document.readyState === "complete") begin();
     else addEventListener("load", begin, { once: true });

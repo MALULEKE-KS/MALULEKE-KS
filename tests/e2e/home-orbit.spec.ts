@@ -17,6 +17,8 @@ async function arrive(page: Page, path = "/") {
   await page.goto(path, { waitUntil: "networkidle" });
   const orbit = page.locator("section[aria-labelledby='hero-title'] .ks-orbit");
   test.skip((await orbit.count()) === 0, "the Orbit is switched off (flag home.orbit)");
+  // on a phone the live scene starts on the first scroll or touch — scroll a little, as a visitor would
+  await page.evaluate(() => window.scrollBy(0, 2));
   // give the live scene its chance (WebGL2 in this browser); the still stays if it can't
   await page.waitForFunction(() => document.querySelector(".ks-orbit[data-live]") !== null, null, { timeout: 15_000 }).catch(() => undefined);
   return orbit;
