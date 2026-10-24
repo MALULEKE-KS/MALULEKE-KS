@@ -2,7 +2,8 @@
 // Home, section 1 — Direction C, chosen by the owner on 2026-10-20
 // (docs/improvements/HOME-HERO-PLAN.md §5–6): the name large, one plain
 // statement, two actions (on a phone, the CV and Let's talk), the technologies you build
-// with — the record moved to How I build (D-065) — all on one cover image behind the whole
+// with — the record moved to How I build (D-065); at its foot the page's receipt and the
+// "See how this page works" X-ray (D-067) — all on one cover image behind the whole
 // hero (HeroBackdrop; the owner's direction, same day), the two giving each
 // other room: on larger screens the type sits at the left, in the image's quiet
 // zone, and the right of the image shows at full strength; on phones the type sits
@@ -43,6 +44,8 @@ interface HomeHeroV2Props {
   copy: HeroCopy;
   /** The phone's two actions (owner, 2026-10-24): the uploaded CV — the phone's header has no room for it — and Let's talk. */
   phoneActions: { cvUrl: string | null; cvLabel: string | null; contactLabel: string | null };
+  /** The strip at the foot of the hero — the page's receipt and the X-ray switch (PageReceipt, D-067) — or null. */
+  footer: ReactNode | null;
   /** The cover image behind everything (HeroBackdrop) — null leaves a graphite field. */
   backdrop: ReactNode | null;
   entrance: { durationMs: number; staggerMs: number };
@@ -51,7 +54,7 @@ interface HomeHeroV2Props {
 /** Each part settles in after the one before it (the delay is the part's index × the stagger setting). */
 const rise = (i: number): CSSProperties => ({ "--i": i }) as CSSProperties;
 
-export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, phoneActions, backdrop, entrance }: HomeHeroV2Props) {
+export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, phoneActions, footer, backdrop, entrance }: HomeHeroV2Props) {
   return (
     <section
       aria-labelledby="hero-title"
@@ -161,6 +164,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
         </div>
       </Container>
 
+      {footer}
     </section>
   );
 }

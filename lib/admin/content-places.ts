@@ -8,7 +8,7 @@ import type { ContentKey } from "@/lib/content/blocks";
 
 export const CONTENT_PLACES: { id: string; label: string; path: string; keys: ContentKey[] }[] = [
   { id: "place-everywhere", label: "Every page", path: "/", keys: ["site-header", "page-copy", "release", "evidence"] },
-  { id: "place-home", label: "Home", path: "/", keys: ["home-hero", "flagship-outcomes", "home-intro", "ai-guide"] },
+  { id: "place-home", label: "Home", path: "/", keys: ["home-hero", "page-xray", "flagship-outcomes", "home-intro", "ai-guide"] },
   { id: "place-systems", label: "Systems", path: "/systems", keys: ["systems-page"] },
   { id: "place-journey", label: "Journey", path: "/journey", keys: ["journey"] },
   { id: "place-about", label: "About", path: "/about", keys: ["how-i-build"] },

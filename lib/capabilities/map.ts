@@ -7,7 +7,8 @@
 // are generated (npm run docs:capabilities), and tests/integration/
 // capability-coverage.test.ts fails if a table, view, function or route is
 // missing here, if the contract and the routes disagree, or if the guides are
-// stale. Not imported by the running app.
+// stale. The running app reads it only through the X-ray's generated manifest
+// (lib/xray/home.generated.json, D-067), written by the same command.
 
 export type Audience = "public" | "admin";
 
@@ -23,8 +24,12 @@ export interface Capability {
   endpoints: string[];
   /** Business rules it enforces or depends on. */
   rules: string[];
-  /** Where it belongs in the UI: page path → section. "(proposed)" = no page yet. */
-  frontend: { page: string; section: string }[];
+  /**
+   * Where it belongs in the UI: page path → section. "(proposed)" = no page yet. `xray` names the page's
+   * section (lib/xray/sections.ts) whose X-ray label lists this capability — required on a page the X-ray
+   * covers (D-067, tests/unit/xray.test.ts), so the "See how this page works" labels can't drift from the map.
+   */
+  frontend: { page: string; section: string; xray?: string }[];
   /** What a frontend must get right when using it. */
   notes: string[];
 }
@@ -41,7 +46,7 @@ export const CAPABILITIES: Capability[] = [
     rules: [],
     frontend: [
       { page: "(every page)", section: "Header name, footer contact and social links" },
-      { page: "/", section: "Hero: name, headline" },
+      { page: "/", section: "Hero: name, headline and the owner's titles", xray: "hero" },
       { page: "/about", section: "Bio, availability, location, building since" },
       { page: "/contact", section: "Email, phone (only when set), links" },
     ],
@@ -63,7 +68,7 @@ export const CAPABILITIES: Capability[] = [
     rules: ["BR-1.4", "BR-1.13"],
     frontend: [
       { page: "(every page)", section: "Footer: the three homes with their system counts" },
-      { page: "/", section: "System map: homes → systems → technologies" },
+      { page: "/", section: "How it all connects: homes → systems → technologies", xray: "map" },
       { page: "/organizations/[slug] (proposed)", section: "One page per home" },
     ],
     notes: ["Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4)."],
@@ -76,7 +81,7 @@ export const CAPABILITIES: Capability[] = [
     db: ["PublicVisitorLens"],
     endpoints: ["GET /lenses"],
     rules: [],
-    frontend: [{ page: "/", section: "Hero: lens chips" }, { page: "(every page)", section: "AI guide: opening chips" }],
+    frontend: [{ page: "(every page)", section: "AI guide: opening chips" }],
     notes: ["Key and label only — the framing prompt and priority content stay private (they are the guide's instructions)."],
   },
   {
@@ -89,6 +94,7 @@ export const CAPABILITIES: Capability[] = [
     rules: ["BR-1.3", "BR-1.4", "BR-1.7"],
     frontend: [
       { page: "(every page)", section: "AI guide: its GitHub knowledge" },
+      { page: "/", section: "Hero: the line naming the latest real commit, when the owner hasn't named what he's building", xray: "hero" },
       { page: "/systems", section: "Each card: languages and last push" },
       { page: "/systems/[slug]", section: "At a glance: languages and topics; proof strip: started, last push, commits this year; latest commits" },
       { page: "/now (proposed)", section: "What's changing: recent commits and active repos" },
@@ -104,7 +110,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /activity"],
     rules: ["BR-1.1", "BR-1.13"],
     frontend: [
-      { page: "/", section: "Selected work: a sparkline on each system" },
+      { page: "/", section: "Selected work: a sparkline on each system", xray: "work" },
       { page: "/systems", section: "Each card: a 26-week sparkline and a live marker when it moved this month" },
       { page: "/systems/[slug]", section: "Activity: 26 weeks of commits as bars" },
       { page: "/now (proposed)", section: "What's moving this week" },
@@ -120,8 +126,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["POST /guide", "POST /guide/warm", "POST /guide/feedback", "GET /guide/check"],
     rules: ["BR-2.4", "BR-4.1", "BR-4.2", "BR-4.3", "BR-4.4", "BR-4.6"],
     frontend: [
-      { page: "/", section: "Hero: the character, greeting and lens chips" },
-      { page: "/", section: "The AI guide's console: the character at work, the trail, live cards and sources" },
+      { page: "/", section: "The AI guide's console: the character at work, the trail, live cards and sources", xray: "guide" },
       { page: "(every page)", section: "Docked launcher and the chat panel (the same console and conversation)" },
       { page: "/contact", section: "A draft from the guide, for the visitor to review and send" },
     ],
@@ -143,7 +148,12 @@ export const CAPABILITIES: Capability[] = [
     db: ["PublicPlatformPulse", "ActivityLog", "JobRun"],
     endpoints: ["GET /platform/pulse"],
     rules: ["BR-3.4"],
-    frontend: [{ page: "/", section: "How it all connects: the live status line" }, { page: "(every page)", section: "Footer status line" }],
+    frontend: [
+      { page: "/", section: "Hero: the live line (the build that is running) and the page's receipt", xray: "hero" },
+      { page: "/", section: "How I build: rules the database enforces, changes audited this week", xray: "principles" },
+      { page: "/", section: "How it all connects: the live status line", xray: "map" },
+      { page: "(every page)", section: "Header live chip and footer status line" },
+    ],
     notes: ["Aggregates only — no rows, no actors. deployment is null outside Vercel."],
   },
   {
@@ -155,9 +165,9 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /home"],
     rules: ["BR-1.1", "BR-5.3"],
     frontend: [
-      { page: "/", section: "Hero ledger (years building, organizations founded, shipped / in progress / queued)" },
-      { page: "/", section: "Featured work (the admin's picks, in order)" },
-      { page: "/", section: "How it all connects: approved figures (approved metrics only)" },
+      { page: "/", section: "How I build: the record — systems shipped and published (D-065)", xray: "principles" },
+      { page: "/", section: "Selected work: the admin's picks, in order — or the flagships, up to three (D-065)", xray: "work" },
+      { page: "/", section: "How it all connects: approved figures (approved metrics only)", xray: "map" },
     ],
     notes: [
       "Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).",
@@ -174,7 +184,10 @@ export const CAPABILITIES: Capability[] = [
     rules: [],
     frontend: [
       { page: "/about", section: "Method: the mission and principles, each with its evidence (#method)" },
-      { page: "/", section: "Principles band" },
+      { page: "/", section: "Hero: the statement and every label (\"home-hero\"), the receipt and the X-ray's words (\"page-xray\")", xray: "hero" },
+      { page: "/", section: "Selected work: what each flagship achieved (\"flagship-outcomes\")", xray: "work" },
+      { page: "/", section: "The AI guide's band (\"ai-guide\")", xray: "guide" },
+      { page: "/", section: "How I build: the mission and principles (\"how-i-build\")", xray: "principles" },
     ],
     notes: ["404 for an unknown or empty block — hide the section rather than showing placeholder copy."],
   },
@@ -205,7 +218,7 @@ export const CAPABILITIES: Capability[] = [
       { page: "/systems/[slug]", section: "Header, case study body, impacts, testimonials" },
       { page: "/systems/[slug]", section: "Who wrote the case study: an \"AI\" label when it was written from the repo" },
       { page: "/systems/[slug]", section: "The screenshot of the live site, in a browser frame" },
-      { page: "/", section: "Selected work: each system's screenshot" },
+      { page: "/", section: "Selected work: each system's screenshot and case-study link", xray: "work" },
       { page: "/systems/[slug]", section: "Related systems" },
     ],
     notes: [
@@ -247,6 +260,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /skills"],
     rules: ["BR-1.1"],
     frontend: [
+      { page: "/", section: "Hero: the technologies the systems are built with, most used first", xray: "hero" },
       { page: "/about", section: "Skills, with the evidence for each (#skills)" },
       { page: "/systems/[slug]", section: "Skills this system proves (match systemSlugs)" },
     ],
@@ -274,7 +288,7 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /metrics"],
     rules: ["BR-5.3"],
     frontend: [
-      { page: "/", section: "Control room: approved figures" },
+      { page: "/", section: "How it all connects: approved figures", xray: "map" },
       { page: "/about", section: "By the numbers" },
     ],
     notes: ["Show approvedAt as \"as of\" — these are point-in-time figures."],
@@ -300,7 +314,8 @@ export const CAPABILITIES: Capability[] = [
     endpoints: ["GET /cv/options", "GET /cv", "POST /cv/generate", "GET /cv/documents/{id}", "GET /cv/uploads/{id}"],
     rules: ["BR-7.1", "BR-7.2", "BR-7.3", "BR-7.4", "BR-7.5", "BR-7.6"],
     frontend: [
-      { page: "/", section: "Header and phone menu: a CV button to the uploaded file while it's offered; the home hero's 'Get my CV'" },
+      { page: "(every page)", section: "Header and phone menu: a CV button to the uploaded file while it's offered" },
+      { page: "/", section: "Hero, on a phone: the CV button to the uploaded file (D-065)", xray: "hero" },
       { page: "/about", section: "Download my CV, while the uploaded option is offered" },
       { page: "/cv", section: "Redirects to the uploaded CV file (or About when it's off). The generated CV is dormant (owner, 2026-10-02): switched off in Admin → CV, its page kept unrouted" },
     ],
@@ -322,7 +337,7 @@ export const CAPABILITIES: Capability[] = [
     frontend: [
       { page: "/contact", section: "What brings you here? — the category tiles (GET /inquiries/types)" },
       { page: "/contact", section: "The form shaped to the category, and the confirmation with its reference" },
-      { page: "/", section: "Let's talk band: each category opens /contact?about=<key>" },
+      { page: "/", section: "Let's talk band: each category opens /contact?about=<key>", xray: "contact" },
     ],
     notes: [
       "Fetch GET /inquiries/form when the form is shown and send its token as formToken; include the hidden honeypot field \"website\" (the visitor's own site is organizationWebsite).",
