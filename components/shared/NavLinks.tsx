@@ -19,7 +19,8 @@
 import { useEffect, useState } from "react";
 import Link from "@/components/shared/IntentLink";
 import { usePathname } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SHEETS } from "@/lib/content/sheets";
 import type { HeaderSystems } from "@/lib/queries/header";
@@ -94,11 +95,11 @@ export function NavLinks({ preview, previewLabel, allLabel }: NavLinksProps) {
                 )}
               >
                 {hovered === s.href && (
-                  <motion.span layoutId="nav-hover" transition={transition} aria-hidden="true" className="absolute inset-0 rounded-full bg-white/[0.08]" />
+                  <m.span layoutId="nav-hover" transition={transition} aria-hidden="true" className="absolute inset-0 rounded-full bg-white/[0.08]" />
                 )}
                 <span className="relative">{s.label}</span>
                 {active && (
-                  <motion.span layoutId="nav-active" transition={transition} aria-hidden="true" className="absolute inset-x-3.5 -bottom-0.5 h-0.5 rounded-full bg-ember" />
+                  <m.span layoutId="nav-active" transition={transition} aria-hidden="true" className="absolute inset-x-3.5 -bottom-0.5 h-0.5 rounded-full bg-ember" />
                 )}
               </Link>
 

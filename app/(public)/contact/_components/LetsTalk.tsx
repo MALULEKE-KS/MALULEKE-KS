@@ -13,7 +13,8 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { ShineBorder } from "@/components/ui/shine-border";
@@ -92,7 +93,7 @@ export function LetsTalk({ categories, email, ownerFirstName, reviewSlaHours, re
           </span>
         </div>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.form
+          <m.form
             key={f.chosen.value}
             id="inquiry-form"
             onSubmit={onSubmit}
@@ -143,7 +144,7 @@ export function LetsTalk({ categories, email, ownerFirstName, reviewSlaHours, re
                 )}
               </ShimmerButton>
             </div>
-          </motion.form>
+          </m.form>
         </AnimatePresence>
       </>
     );

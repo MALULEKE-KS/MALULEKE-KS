@@ -7,7 +7,8 @@
 
 import { useState } from "react";
 import Link from "@/components/shared/IntentLink";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { Activity, ArrowLeftRight, Brain, Check, ChevronDown, Compass, Footprints, LayoutGrid, ListChecks, LoaderCircle, Milestone, PenLine, Search, Sparkles, X, type LucideIcon } from "lucide-react";
 import type { StepKind, TrailStep } from "@/lib/guide/trail";
 import { cn } from "@/lib/utils";
@@ -48,7 +49,7 @@ export function WorkingTrail({ steps, live, thoughtFor }: { steps: TrailStep[]; 
       </button>
       <AnimatePresence initial={false}>
         {expanded && (
-          <motion.ol
+          <m.ol
             initial={reduced ? false : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
@@ -58,7 +59,7 @@ export function WorkingTrail({ steps, live, thoughtFor }: { steps: TrailStep[]; 
             {steps.map((s) => {
               const Icon = ICON[s.kind];
               return (
-                <motion.li key={s.key} initial={reduced ? false : { opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} className="flex items-start gap-2">
+                <m.li key={s.key} initial={reduced ? false : { opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} className="flex items-start gap-2">
                   <span className={cn("mt-px grid size-5 shrink-0 place-items-center rounded-md border", s.state === "running" ? "border-ember/40 bg-ember/10" : s.state === "error" ? "border-white/10" : "border-white/10 bg-white/[0.04]")}>
                     {s.state === "error" ? <X aria-hidden="true" className="text-mist size-3" /> : <Icon aria-hidden="true" className={cn("size-3", s.state === "running" ? "text-ember" : "text-mist")} />}
                   </span>
@@ -77,10 +78,10 @@ export function WorkingTrail({ steps, live, thoughtFor }: { steps: TrailStep[]; 
                       </span>
                     )}
                   </span>
-                </motion.li>
+                </m.li>
               );
             })}
-          </motion.ol>
+          </m.ol>
         )}
       </AnimatePresence>
     </div>

@@ -6,7 +6,8 @@
 // (then it's just the content). The magnified copy is decorative.
 
 import { useCallback, useState } from "react"
-import { AnimatePresence, motion, useMotionTemplate, useReducedMotion } from "motion/react"
+import { AnimatePresence, useMotionTemplate, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 
 interface LensProps {
   children: React.ReactNode
@@ -39,7 +40,7 @@ export function Lens({ children, zoomFactor = 1.6, lensSize = 180, className }: 
       {children}
       <AnimatePresence>
         {hovering && (
-          <motion.div
+          <m.div
             aria-hidden="true"
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -51,7 +52,7 @@ export function Lens({ children, zoomFactor = 1.6, lensSize = 180, className }: 
             <div className="absolute inset-0" style={{ transform: `scale(${zoomFactor})`, transformOrigin: `${pos.x}px ${pos.y}px` }}>
               {children}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

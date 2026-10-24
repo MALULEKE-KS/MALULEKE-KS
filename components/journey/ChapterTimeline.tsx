@@ -18,7 +18,8 @@
 
 import { useRef } from "react";
 import Link from "@/components/shared/IntentLink";
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { useScroll, useSpring, useTransform } from "motion/react";
+import * as m from "motion/react-m";
 import { Reveal } from "@/components/shared/Reveal";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +49,7 @@ function Dot({ current }: { current: boolean }) {
   return (
     <span ref={ref} aria-hidden="true" className="relative grid size-4 place-items-center">
       <span className="bg-paper border-line/60 absolute inset-0 rounded-full border-2" />
-      <motion.span style={{ opacity: lit }} className="bg-ember absolute inset-0 rounded-full shadow-[0_0_0_5px_rgb(255_91_31/0.16)]" />
+      <m.span style={{ opacity: lit }} className="bg-ember absolute inset-0 rounded-full shadow-[0_0_0_5px_rgb(255_91_31/0.16)]" />
       {current && <span className="bg-ember/35 absolute -inset-1.5 -z-10 rounded-full motion-safe:animate-ping" />}
     </span>
   );
@@ -63,9 +64,9 @@ function Numeral({ n }: { n: number }) {
   return (
     <span ref={ref} aria-hidden="true" className="relative block font-mono text-5xl leading-none font-semibold tracking-tighter">
       <span className="text-transparent [-webkit-text-stroke:1px_rgb(18_20_23/0.18)]">{label}</span>
-      <motion.span style={{ opacity: lit }} className="text-ember-gradient absolute inset-0">
+      <m.span style={{ opacity: lit }} className="text-ember-gradient absolute inset-0">
         {label}
-      </motion.span>
+      </m.span>
     </span>
   );
 }
@@ -138,7 +139,7 @@ export function ChapterTimeline({ chapters }: { chapters: TimelineChapter[] }) {
     <ol ref={rail} className="relative">
       <span aria-hidden="true" className={cn("bg-ink/12 absolute top-2 bottom-0 w-px", railX)} />
       {/* The same markup on server and client: the moving beam, and a full one that only reduced-motion visitors see. */}
-      <motion.span aria-hidden="true" style={{ height, backgroundImage: BEAM }} className={cn("absolute top-2 -ml-px w-[3px] rounded-full shadow-[0_0_16px_rgb(255_91_31/0.45)] motion-reduce:hidden", railX)} />
+      <m.span aria-hidden="true" style={{ height, backgroundImage: BEAM }} className={cn("absolute top-2 -ml-px w-[3px] rounded-full shadow-[0_0_16px_rgb(255_91_31/0.45)] motion-reduce:hidden", railX)} />
       <span aria-hidden="true" style={{ backgroundImage: BEAM }} className={cn("absolute top-2 bottom-0 -ml-px hidden w-[3px] rounded-full motion-reduce:block", railX)} />
       {chapters.map((c, i) => (
         <li key={c.id} id={`chapter-${c.id}`} className="relative grid scroll-mt-36 grid-cols-[1rem_minmax(0,1fr)] gap-x-5 md:grid-cols-[11rem_1rem_minmax(0,1fr)] md:gap-x-10">
