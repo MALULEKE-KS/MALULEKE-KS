@@ -14,15 +14,8 @@ import { getContentBlock } from "@/lib/content/blocks";
 import { plainAccent } from "@/components/shared/Accent";
 import { HomeContent } from "./_components/HomeContent";
 
-// The ledger hero's whole point is a live, current count — Next.js's
-// automatic static-optimization heuristic doesn't know that and would
-// otherwise try to prerender this page once at build time (no request-
-// specific API used here forces it to dynamic on its own, unlike /systems'
-// searchParams). That would both fail wherever the build environment has
-// no DATABASE_URL (as CI's build job doesn't) and, worse, would bake in
-// stale counts from whenever the last deploy happened instead of showing
-// the real current numbers on every visit.
-export const dynamic = "force-dynamic";
+// Rendered ahead and refreshed by the (public) layout's cache (D-062): the ledger's counts
+// stay current through the refresh on every admin change and job, and the 5-minute timer.
 
 // The description search results and link previews show: the owner's own
 // introduction (the "home-intro" block), not a generic line — capped for search.

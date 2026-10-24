@@ -1472,7 +1472,7 @@ paths:
     get:
       tags: [Systems (Public)]
       summary: "A live system's current screenshot — captured from its live site or uploaded by the owner — the image itself (WebP), cached by content hash (BR-1.18). Never for an unpublished or NDA system."
-      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the image's hash — makes the link immutable" }]
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the image's hash — makes the link immutable (and kept by the CDN)" }, { name: w, in: query, schema: { type: integer, enum: [480, 800, 1200] }, description: "With v: the image resized to this width, as WebP — the size a card is drawn at (D-062). Any other width serves the original." }]
       responses: { "200": { description: image/webp }, "304": { description: Not modified }, "404": { $ref: "#/components/responses/NotFound" } }
   /admin/profile/photos:
     get: { tags: [Profile (Admin)], summary: "Every photo version, newest first per purpose (no bytes)", security: [{ adminSession: [] }], responses: { "200": { description: "{ versions: [...] }" }, "401": { $ref: "#/components/responses/Unauthorized" } } }

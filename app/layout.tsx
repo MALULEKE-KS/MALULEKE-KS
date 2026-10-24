@@ -116,9 +116,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Scroll reveals only hide content once we know JS is running
             (globals.css ".js [data-reveal]"), so a no-JS visitor never sees an
             invisible page. beforeInteractive is injected into the initial
-            HTML and runs before hydration (next/script docs). */}
+            HTML and runs before hydration (next/script docs). It also marks a
+            consent choice already made, so the banner — in the page's first
+            HTML, painted with it (D-062) — is hidden before it can show. */}
         <Script id="js-flag" strategy="beforeInteractive">
-          {"document.documentElement.classList.add('js')"}
+          {"document.documentElement.classList.add('js');try{var c=localStorage.getItem('mks.consent.v1');if(c==='granted'||c==='denied')document.documentElement.dataset.consent='decided'}catch(e){}"}
         </Script>
       </body>
     </html>

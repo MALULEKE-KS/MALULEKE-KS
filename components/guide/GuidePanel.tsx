@@ -7,37 +7,51 @@
 //
 // The accessible interface to the guide (the character is decorative): a
 // labelled dialog, focus moves in on open and back on close, Escape closes.
+// The console — cards, trail, composer — is downloaded and mounted the first time
+// the guide opens, not with every page (D-062; the owner's plan: "load the AI
+// guide only on idle or on click"), and kept after that so reopening is instant.
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useGuide } from "@/components/guide/GuideProvider";
-import { GuideConsole } from "@/components/guide/console/GuideConsole";
+const GuideConsole = dynamic(() => import("@/components/guide/console/GuideConsole").then((m) => m.GuideConsole), { ssr: false });
 
 export function GuidePanel() {
   const { enabled, open, setOpen } = useGuide();
   const pathname = usePathname();
   const openerRef = useRef<Element | null>(null);
   const home = pathname === "/";
+  const [wanted, setWanted] = useState(false);
+  useEffect(() => {
+    if (open) setWanted(true); // eslint-disable-line react-hooks/set-state-in-effect -- the console mounts on first open
+  }, [open]);
 
   // Focus in on open, back to where it came from on close; Escape closes.
   useEffect(() => {
     if (!open || home) return;
     openerRef.current = document.activeElement;
-    const t = setTimeout(() => document.getElementById("guide-input-panel")?.focus(), 50);
+    // The console may still be arriving on the first open: try for a moment until its input is there.
+    let tries = 0;
+    const t = setInterval(() => {
+      const input = document.getElementById("guide-input-panel");
+      if (input || ++tries > 40) clearInterval(t);
+      input?.focus();
+    }, 50);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     return () => {
-      clearTimeout(t);
+      clearInterval(t);
       document.removeEventListener("keydown", onKey);
       if (openerRef.current instanceof HTMLElement) openerRef.current.focus();
     };
   }, [open, home, setOpen]);
 
-  if (!enabled || home) return null;
+  if (!enabled || home || !(open || wanted)) return null;
 
   return (
     <div

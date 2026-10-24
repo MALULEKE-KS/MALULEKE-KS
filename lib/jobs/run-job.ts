@@ -15,6 +15,7 @@
 // (lib/adapters/scheduler/) calls it through here.
 
 import { Prisma } from "@prisma/client";
+import { refreshPublicSite } from "@/lib/cache/revalidate";
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
 
@@ -66,6 +67,8 @@ export async function runJob<T extends Prisma.InputJsonValue>(
       where: { id: runId },
       data: { status: "SUCCEEDED", finishedAt: new Date(), summary: result },
     });
+    // What the job changed — synced repos, new numbers, screenshots, write-ups — is on the public site at once (D-062).
+    refreshPublicSite();
     return { status: "succeeded", runId, result };
   } catch (err) {
     const error = (err instanceof Error ? err.message || err.name : String(err)) || "Unknown error";

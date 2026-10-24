@@ -14,6 +14,7 @@
 //   focus gets the same highlight as hover.
 
 import { useEffect, useRef, useState } from "react"
+import { screenshotSrc } from "@/lib/media/screenshot-src"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 
@@ -97,7 +98,7 @@ export function ProjectShowcase({ items, className }: { items: ShowcaseItem[]; c
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={item.key}
-                  src={item.image}
+                  {...screenshotSrc(item.image, "288px")}
                   alt=""
                   loading="lazy"
                   decoding="async"

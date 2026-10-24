@@ -53,7 +53,7 @@ import { siteUrl } from "@/lib/site-url";
 import { sectionCopy } from "@/lib/content/copy";
 import { pageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+// Rendered ahead and refreshed by the (public) layout's cache (D-062).
 // The description is the opening of his own introduction (data), never typed here.
 export async function generateMetadata() {
   const row = await dbPublic.publicProfile.findFirst({ select: { bio: true, summary: true } });
@@ -182,9 +182,10 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            {/* The portrait sits beside the words from a laptop up; on a phone it opens the story instead, so the hero stays one screen. */}
+            {/* The portrait sits beside the words from a laptop up; on a phone it opens the story instead, so the hero stays one screen.
+                Lazy, not preloaded (D-062): hidden on a phone, so a phone never fetches it; on a laptop it is on screen and loads at once. */}
             <figure className="rise-in hidden w-full max-w-md justify-self-end lg:col-span-5 lg:block" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
-              <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized priority className="h-auto w-full rounded-3xl border border-white/10 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.9)]" />
+              <Image src={photo.url} alt={photo.alt} width={photo.width} height={photo.height} unoptimized loading="lazy" className="h-auto w-full rounded-3xl border border-white/10 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.9)]" />
             </figure>
           </div>
 

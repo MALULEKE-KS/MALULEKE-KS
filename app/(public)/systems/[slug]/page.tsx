@@ -48,6 +48,7 @@ import { describe } from "@/lib/queries/catalog";
 import { publicSlugRedirect } from "@/lib/queries/systems";
 import { getSiteProfile } from "@/lib/queries/site";
 import { siteUrl } from "@/lib/site-url";
+import { dbPublic } from "@/lib/db";
 
 /** The write-up's sections, numbered — in the side panel on desktop, above the article on a phone. */
 function SectionIndex({ sections, className }: { sections: { id: string; title: string }[]; className?: string }) {
@@ -90,6 +91,12 @@ const HERO_MARKS = 8;
 
 // An unknown or unpublished slug gets no title of its own — the page then
 // calls notFound() and both fall through to the same generic 404 (BR-1.3/1.4).
+/** Every published system's page is rendered at build and served from the cache (D-062); a system published later renders on its first visit. */
+export async function generateStaticParams() {
+  const systems = await dbPublic.publicSystem.findMany({ select: { slug: true } });
+  return systems.map((s) => ({ slug: s.slug }));
+}
+
 export async function generateMetadata({ params }: SystemDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const cs = await load(slug);

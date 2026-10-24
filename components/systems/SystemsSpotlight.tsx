@@ -23,6 +23,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { techMark } from "@/components/shared/TechChip";
 import type { CatalogSystem } from "@/lib/queries/catalog";
 import { cn } from "@/lib/utils";
+import { screenshotSrc } from "@/lib/media/screenshot-src";
 import { SPOTLIGHT_CARD_ASPECT, SPOTLIGHT_CARD_WIDTH } from "./spotlight-size";
 
 type Slide = Pick<CatalogSystem, "slug" | "name" | "description" | "status" | "statusColorToken" | "home" | "domain" | "tech" | "screenshotUrl">;
@@ -32,7 +33,8 @@ function Face({ s, active }: { s: Slide; active: boolean }) {
     return (
       <span className="bg-night relative block size-full">
         {/* eslint-disable-next-line @next/next/no-img-element -- the screenshot route is ours, versioned by content hash */}
-        <img src={s.screenshotUrl} alt="" draggable={false} loading="lazy" className="size-full object-cover object-top" />
+        {/* The front card is the page's largest paint on a phone: it loads first; the cards behind it wait (D-062). */}
+        <img {...screenshotSrc(s.screenshotUrl, SPOTLIGHT_CARD_WIDTH)} alt="" draggable={false} loading={active ? "eager" : "lazy"} fetchPriority={active ? "high" : "auto"} className="size-full object-cover object-top" />
         <span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(to_top,rgb(11_12_14/0.92),transparent)] p-4 pt-12">
           <span className="text-paper block truncate font-sans text-lg font-semibold">{s.name}</span>
         </span>

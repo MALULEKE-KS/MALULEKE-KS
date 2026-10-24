@@ -24,7 +24,7 @@ import { pageMetadata } from "@/lib/seo/metadata";
 import { HeroLabel } from "@/components/shared/HeroKit";
 import { LetsTalk } from "./_components/LetsTalk";
 
-export const dynamic = "force-dynamic";
+// Rendered ahead and refreshed by the (public) layout's cache (D-062).
 // Words are data (the page-copy block); these are the fallbacks the seed matches.
 const HERO = {
   eyebrow: "Let's talk",
@@ -45,9 +45,8 @@ export async function generateMetadata() {
   return pageMetadata({ title: "Let's talk", description: hero.description, path: "/contact", imageAlt: "Let's talk — MALULEKE-KS" });
 }
 
-export default async function ContactPage({ searchParams }: { searchParams: Promise<{ about?: string }> }) {
-  const [{ about }, profile, photos, categories, reviewSlaHours, retentionMonths, maxFiles, maxMegabytes] = await Promise.all([
-    searchParams,
+export default async function ContactPage() {
+  const [profile, photos, categories, reviewSlaHours, retentionMonths, maxFiles, maxMegabytes] = await Promise.all([
     getSiteProfile(),
     getPublicPhotos(),
     getInquiryTypes(),
@@ -118,7 +117,6 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
         <Container>
           <LetsTalk
             categories={categories}
-            initialCategory={about ?? null}
             email={profile.email}
             ownerFirstName={first}
             reviewSlaHours={reviewSlaHours}

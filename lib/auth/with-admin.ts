@@ -12,6 +12,7 @@ import { getSessionAdminId } from "@/lib/auth/session";
 import { withActor, type Tx } from "@/lib/audit";
 import { ruleViolation } from "@/lib/db-errors";
 import { crossSiteRefusal } from "@/lib/security/csrf";
+import { refreshPublicSite } from "@/lib/cache/revalidate";
 
 // Rules the database enforces the same way for every content type: a refusal
 // is a bad request, answered in the rule's own words wherever it happens.
@@ -48,7 +49,10 @@ export function withAdmin<P extends Record<string, string> = Record<string, neve
       write: (work) => withActor({ kind: "admin", adminUserId, request }, work),
     };
     try {
-      return await handler(request, admin, context ?? (NO_PARAMS as unknown as RouteContext<P>));
+      const response = await handler(request, admin, context ?? (NO_PARAMS as unknown as RouteContext<P>));
+      // A change the owner made is on the public site at once, not after the cache's timer (D-062).
+      if (request.method !== "GET" && response.ok) refreshPublicSite();
+      return response;
     } catch (err) {
       for (const rule of RULES_ANSWERED_AS_400) {
         const message = ruleViolation(err, rule);

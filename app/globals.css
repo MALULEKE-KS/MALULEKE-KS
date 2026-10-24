@@ -814,3 +814,10 @@ html[data-header="hidden"] .under-header {
   .guide-bot .gb-float,
   .guide-bot .gb-shadow { animation: none !important; transition: none !important; }
 }
+
+/* The consent banner is in the first HTML (D-062); a choice already stored hides it before it
+   paints (the head script sets data-consent on <html>). Reopened from the footer, it shows again. */
+html[data-consent="decided"] [data-consent-banner=""] {
+  display: none;
+}
+
