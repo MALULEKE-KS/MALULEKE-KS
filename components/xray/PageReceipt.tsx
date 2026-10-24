@@ -97,8 +97,11 @@ export function PageReceipt({
     >
       <Container className="flex flex-col gap-2.5 py-3 sm:flex-row sm:items-center sm:gap-6">
         {showReceipt && (
-          <p
-            className="receipt-line text-mist min-w-0 flex-1 overflow-x-auto font-mono text-[11px] leading-6 whitespace-nowrap"
+          <div
+            // A line that scrolls sideways on a phone, so it takes the keyboard too (axe: scrollable-region-focusable).
+            role="group"
+            tabIndex={0}
+            className="receipt-line focus-visible:outline-ember text-mist min-w-0 flex-1 overflow-x-auto rounded-sm font-mono text-[11px] leading-6 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2"
             aria-label={copy.receiptLabel ?? undefined}
           >
             <span className="text-paper/90 mr-2.5 rounded-sm border border-white/15 px-1.5 py-0.5 tracking-[0.12em] uppercase">
@@ -132,7 +135,7 @@ export function PageReceipt({
                 )}
               </span>
             ))}
-          </p>
+          </div>
         )}
         {xray && <XraySwitch copy={xray} source={source} />}
       </Container>
