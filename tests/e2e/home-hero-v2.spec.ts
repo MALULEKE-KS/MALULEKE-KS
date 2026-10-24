@@ -53,7 +53,7 @@ for (const vp of VIEWPORTS) {
       const img = hero.locator("picture img");
       await expect(img).toBeVisible();
       expect(await img.evaluate((e) => (e as HTMLImageElement).currentSrc)).toMatch(vp.crop);
-      const withOrbit = (await hero.locator(".orbit").count()) > 0;
+      const withOrbit = (await hero.locator(".ks-orbit").count()) > 0;
       if (withOrbit) await expect(hero.locator(".orbit-poster")).toBeAttached();
 
       // it covers the hero (with the Orbit on a phone: the first screen, the Orbit's band following), the content on top of it

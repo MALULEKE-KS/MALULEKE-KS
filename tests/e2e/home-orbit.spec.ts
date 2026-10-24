@@ -15,10 +15,10 @@ async function arrive(page: Page, path = "/") {
     } catch {}
   });
   await page.goto(path, { waitUntil: "networkidle" });
-  const orbit = page.locator("section[aria-labelledby='hero-title'] .orbit");
+  const orbit = page.locator("section[aria-labelledby='hero-title'] .ks-orbit");
   test.skip((await orbit.count()) === 0, "the Orbit is switched off (flag home.orbit)");
   // give the live scene its chance (WebGL2 in this browser); the still stays if it can't
-  await page.waitForFunction(() => document.querySelector(".orbit[data-live]") !== null, null, { timeout: 15_000 }).catch(() => undefined);
+  await page.waitForFunction(() => document.querySelector(".ks-orbit[data-live]") !== null, null, { timeout: 15_000 }).catch(() => undefined);
   return orbit;
 }
 
@@ -88,6 +88,6 @@ test("a shared link opens its system", async ({ page }) => {
   });
   test.skip(!slug, "no published system");
   await page.goto(`/?system=${slug}`, { waitUntil: "networkidle" });
-  await expect(page.locator(".orbit").getByRole("dialog")).toBeVisible();
-  await expect(page.locator(".orbit").getByRole("dialog").getByRole("link")).toHaveAttribute("href", `/systems/${slug}`);
+  await expect(page.locator(".ks-orbit").getByRole("dialog")).toBeVisible();
+  await expect(page.locator(".ks-orbit").getByRole("dialog").getByRole("link")).toHaveAttribute("href", `/systems/${slug}`);
 });

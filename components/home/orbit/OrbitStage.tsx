@@ -82,7 +82,7 @@ export function OrbitStage({
   const leaders = useRef<SVGSVGElement>(null);
   const card = useRef<HTMLDivElement>(null);
   const plates = useRef<(HTMLButtonElement | null)[]>([]);
-  const bars = useRef<(HTMLButtonElement | null)[]>([]);
+  const bars = useRef<(HTMLSpanElement | null)[]>([]);
   const hudL = useRef<HTMLSpanElement>(null);
   const hudR = useRef<HTMLSpanElement>(null);
   const blooms = useRef<(HTMLDivElement | null)[]>([]);
@@ -527,7 +527,7 @@ export function OrbitStage({
   return (
     <div
       ref={root}
-      className="orbit"
+      className="ks-orbit"
       data-open={open !== null ? "" : undefined}
       data-live={live ? "" : undefined}
       data-over-photo={overPhoto ? "" : undefined}
@@ -768,23 +768,26 @@ export function OrbitStage({
               )}
             </span>
           </div>
-          <div className="orbit-bars">
+          {/* The weeks as bars; the strip replays from the week under a click or tap (the replay button is the keyboard's way). */}
+          <div
+            className="orbit-bars"
+            data-live={live ? "" : undefined}
+            onClick={(e) => {
+              if (!live) return;
+              const r = e.currentTarget.getBoundingClientRect();
+              engine.current?.replay(Math.max(0, Math.min(weekTotals.length - 1, Math.floor(((e.clientX - r.left) / r.width) * weekTotals.length))));
+            }}
+          >
             {weekTotals.map((v, i) => (
-              <button
+              <span
                 key={data.weeks[i]}
                 ref={(el) => {
                   bars.current[i] = el;
                 }}
-                type="button"
-                disabled={!live}
-                aria-label={
-                  fillIn(copy.weekButton, { week: fmtWeek(data.weeks[i]!), commits: n0(v) }) ??
-                  undefined
-                }
-                onClick={() => engine.current?.replay(i)}
+                title={fillIn(copy.weekButton, { week: fmtWeek(data.weeks[i]!), commits: n0(v) }) ?? undefined}
               >
                 <span style={{ height: `${Math.max(4, (v / maxWeek) * 100)}%` }} />
-              </button>
+              </span>
             ))}
           </div>
           <div className="orbit-axis">
