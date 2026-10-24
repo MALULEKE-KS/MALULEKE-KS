@@ -22,7 +22,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import Link from "@/components/shared/IntentLink";
 import { ArrowRight, FileDown } from "lucide-react";
-import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { Container } from "@/components/shared/Container";
 import { TechChip } from "@/components/shared/TechChip";
 import { Button } from "@/components/ui/button";
@@ -135,22 +134,18 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             </div>
           ) : null}
 
-          {/* From a tablet up: the work and the guide — the header carries the CV and Let's talk there. */}
-          <div className="hero-rise mt-6 hidden w-auto gap-3 sm:flex md:mt-7" style={rise(4)}>
-            {copy.primaryLabel && (
+          {/* From a tablet up: the work — the header carries the CV and Let's talk there. No "Ask the guide" here
+              (owner, 2026-10-24): the home page's AI guide section is a scroll away. */}
+          {copy.primaryLabel && (
+            <div className="hero-rise mt-6 hidden w-auto gap-3 sm:flex md:mt-7" style={rise(4)}>
               <Button asChild variant="accent" size="lg" className="w-full sm:w-auto">
                 <Link href="/systems">
                   {copy.primaryLabel}
                   <ArrowRight />
                 </Link>
               </Button>
-            )}
-            {copy.secondaryLabel && (
-              <AskGuideButton variant="glass" size="lg" showMark={false} className="bg-night-deep/40 w-full backdrop-blur sm:w-auto">
-                {copy.secondaryLabel}
-              </AskGuideButton>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* The technologies: shown when the screen is wide and tall enough to give them room (.hero-tall-only) — a phone's or a short laptop's first view keeps to the essentials. */}
           {stack.length > 0 && (

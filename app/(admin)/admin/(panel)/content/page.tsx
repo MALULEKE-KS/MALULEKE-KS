@@ -27,7 +27,6 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
   "home-hero": [
     { name: "statement", label: "Statement under your name and role", max: 200, kind: "text", hint: "One plain sentence. Your name and role come from your profile; the numbers under it are computed." },
     { name: "primaryLabel", label: "Main button", max: 40, kind: "line", hint: "Empty = the shipped wording." },
-    { name: "secondaryLabel", label: "Second button (opens the AI guide)", max: 40, kind: "line", hint: "Empty = the shipped wording." },
     { name: "liveLabel", label: "The live line", max: 60, kind: "line", hint: "Fill-ins: {date} — today's date; {commit} — the build that is running. Empty = the shipped wording." },
     { name: "previewLabel", label: "The line on a preview deployment (not the live site)", max: 60, kind: "line", hint: "Fill-in: {commit}. Shown instead of the live line when the page is a preview build." },
     { name: "localLabel", label: "The live line on a local build", max: 60, kind: "line" },
@@ -105,6 +104,9 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "factLinked", label: "Panel: systems sharing its stack (heading)", max: 30, kind: "line" },
     { name: "touchHint", label: "Phone: how to play with it (over the orbit)", max: 90, kind: "line" },
     { name: "pointerHint", label: "Desktop: how to play with it (shown over the orbit until it's used)", max: 90, kind: "line" },
+    { name: "enterLabel", label: "Panel: go inside the world", max: 30, kind: "line" },
+    { name: "backLabel", label: "Inside a world: back to the orbit", max: 30, kind: "line" },
+    { name: "insideLine", label: "Inside a world: what you're looking at", max: 200, kind: "text", hint: "Fill-in: {commits} — its commits over the 26 weeks." },
   ],
   "page-xray": [
     { name: "receiptLabel", label: "The receipt's name", max: 24, kind: "line", hint: "First word of the strip. Empty hides the receipt." },

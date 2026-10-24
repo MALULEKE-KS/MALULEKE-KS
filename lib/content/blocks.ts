@@ -152,6 +152,10 @@ export const CONTENT_BLOCKS = {
       // How to play with it: a heading over the orbit on a phone; on a desktop a quiet hint over the orbit only, until it's used.
       touchHint: z.string().trim().max(90).optional(),
       pointerHint: z.string().trim().max(90).optional(),
+      // Inside a world (D-072): the card's way in, the way back out, and one line about what you're looking at.
+      enterLabel: z.string().trim().max(30).optional(),
+      backLabel: z.string().trim().max(30).optional(),
+      insideLine: instantTemplate(200, ["commits"]).optional(),
     }),
   },
   "page-xray": {

@@ -20,6 +20,7 @@ import {
   project,
   ring,
   ringPoint,
+  rotX,
   rotY,
   seeded,
   startAngle,
@@ -50,6 +51,8 @@ export interface OrbitFrame {
   worlds: { x: number; y: number; r: number; depth: number }[];
   core: { x: number; y: number; scale: number; flash: number };
   grown: boolean;
+  /** Inside a world (D-072): how far in (0–1), and where its technologies' moons are on screen. */
+  inside: { t: number; moons: { x: number; y: number; depth: number }[] };
 }
 
 export interface OrbitEngine {
@@ -57,6 +60,8 @@ export interface OrbitEngine {
   focus(index: number | null): void;
   hover(index: number | null): void;
   tech(name: string | null): void;
+  /** Go inside a world (its weeks as shells of light, its stack as moons), or back out with null. */
+  enter(index: number | null): void;
   /** The world named in the hero's latest-commit line, or null. */
   beacon(index: number | null): void;
   replay(fromWeek?: number): void;
@@ -93,7 +98,7 @@ uniform vec4 uWB[${MAX_WORLDS}]; // angle, ring, calm, flags (1 flagship, 2 acti
 uniform float uWSpin[${MAX_WORLDS}];
 uniform vec4 uImp[${MAX_IMPACTS}]; uniform int uImpN;
 uniform vec4 uTech[${MAX_TECH / 4}];
-uniform vec3 uRight; uniform vec3 uUp; uniform int uBeacon;
+uniform vec3 uRight; uniform vec3 uUp; uniform int uBeacon; uniform float uDim;
 out vec4 vCol; out float vSoft;
 
 const vec3 EMBER = vec3(1.0, 0.36, 0.12); const vec3 DEEP = vec3(0.75, 0.16, 0.04); const vec3 HOT = vec3(1.0, 0.84, 0.68);
@@ -171,6 +176,7 @@ void main() {
   vec4 p = uPV * vec4(pos, 1.0); p.xy += uShift * p.w; gl_Position = p;
   float blur = clamp(abs(p.w - uFocus) * uDof, 0.0, 2.4);
   gl_PointSize = a <= 0.003 ? 0.0 : clamp(size * uScale / p.w * (1.0 + blur * 0.85), 1.0, 128.0);
+  if (kind != 99) a *= uDim; // inside a world, the rest of the sky draws back
   vCol = vec4(col, a); vSoft = blur;
 }`;
 const FS = `#version 300 es
@@ -549,6 +555,7 @@ export async function createOrbit(
     right: u("uRight"),
     up: u("uUp"),
     beacon: u("uBeacon"),
+    dim: u("uDim"),
     lpv: gl.getUniformLocation(LP, "uPV"),
     lshift: gl.getUniformLocation(LP, "uShift"),
   };
@@ -609,7 +616,11 @@ export async function createOrbit(
     hovered: number | null = null,
     techLit: string | null = null,
     beacon = -1,
-    zoomK = 1;
+    zoomK = 1,
+    inside: number | null = null,
+    diveDraw: number | null = null,
+    diveT = 0;
+  const heart = fibonacci(70);
   const pending: { w: number; at: number }[] = [];
   const sparks: { w: number; k: number; dur: number; lift: Vec3; from: Vec3 }[] = [];
   const impacts: { d: Vec3; age: number }[] = [];
@@ -623,6 +634,7 @@ export async function createOrbit(
     worlds: worlds.map(() => ({ x: 0, y: 0, r: 0, depth: 1 })),
     core: { x: 0, y: 0, scale: 1, flash: 0 },
     grown: false,
+    inside: { t: 0, moons: [] },
   };
 
   const schedule = (week: number, at: number) =>
@@ -746,9 +758,11 @@ export async function createOrbit(
     cam.pitch += (cam.tpitch - cam.pitch) * e;
     cam.dist += (cam.tdist - cam.dist) * e * 0.75;
     const grow = opts.reduced ? 1 : ease4(T / ARRIVE);
+    diveT += ((inside !== null ? 1 : 0) - diveT) * (opts.reduced ? 1 : 1 - Math.pow(0.04, dt));
+    if (inside === null && diveT < 0.005) diveT = 0;
 
     // worlds move along their rings
-    const slow = focused !== null ? 0.18 : 1;
+    const slow = inside !== null ? 0 : focused !== null ? 0.18 : 1;
     worlds.forEach((w, i) => {
       if (!opts.reduced) w.angle += dt * ring(w.s.home).speed * slow;
       w.pos = ringPoint(w.s.home, w.angle, ring(w.s.home).r * grow);
@@ -756,7 +770,7 @@ export async function createOrbit(
     });
     // An opened world doesn't move the camera (owner: "we shall still be able to see the whole orbiting"):
     // it is lit — a shockwave, its links bright, the rest dimmed — and the whole orbit stays in view.
-    const tgt: Vec3 = [0, 0, 0];
+    const tgt: Vec3 = inside !== null ? ([...worlds[inside]!.pos] as Vec3) : [0, 0, 0];
     for (let k = 0; k < 3; k++)
       cam.target[k] = cam.target[k]! + (tgt[k]! - cam.target[k]!) * e * 0.7;
     const tsx = 2 * layout.cx - 1;
@@ -771,14 +785,15 @@ export async function createOrbit(
     const scalePx = (st.h * st.dpr * 0.5) / Math.tan((34 * Math.PI) / 360);
     const right: Vec3 = [V[0]!, V[4]!, V[8]!],
       up: Vec3 = [V[1]!, V[5]!, V[9]!];
-    const lit = focused ?? hovered;
+    const lit = inside ?? focused ?? hovered;
 
     // per-world uniforms
     worlds.forEach((w, i) => {
       const big =
         (i === lit || (techLit !== null && w.s.stack.includes(techLit)) ? 1.18 : 1) * grow;
       wU.set([w.pos[0], w.pos[1], w.pos[2], w.rs * big], i * 4);
-      const calm = (w.coursework ? 0.62 : 1) * (1 - w.dim * 0.7);
+      const into = diveDraw === null ? 1 : i === diveDraw ? 1 - diveT : 1 - 0.85 * diveT;
+      const calm = (w.coursework ? 0.62 : 1) * (1 - w.dim * 0.7) * into;
       wbU.set(
         [w.angle, w.s.home % 4, calm, (w.s.flagship ? 1 : 0) + (w.recent > 0 ? 2 : 0)],
         i * 4
@@ -893,6 +908,47 @@ export async function createOrbit(
           if (w.s.stack.includes(t)) arc(w.pos, techPos[i]!, 0.14, 0.9, j * 0.17, 0.4, KIND_LIGHT[kindU[j]!]!, PEACH, T, 0.12);
         });
     });
+    // Inside a world (D-072): its 26 weeks as shells of light round its heart, the newest outermost, every
+    // commit one light on its week's shell and its busiest week burning brightest; its technologies as moons.
+    frameOut.inside.t = diveT;
+    frameOut.inside.moons.length = 0;
+    if (diveDraw !== null && diveT > 0.01) {
+      const w = worlds[diveDraw]!, C = w.pos, rs = w.rs, k = diveT;
+      const light = KIND_LIGHT[kindU[diveDraw]!]!;
+      const top = Math.max(0, ...w.s.weeks);
+      const hotWeek = top > 0 ? w.s.weeks.indexOf(top) : -1;
+      for (let j = 0; j < heart.length; j++) {
+        const d = heart[j]!, r = rs * 0.32 * (1 + 0.18 * Math.sin(T * 2.2 + j));
+        D([C[0] + d[0] * r, C[1] + d[1] * r, C[2] + d[2] * r], 0.024, j % 3 ? light : WHITE, 0.55 * k);
+      }
+      for (let wk = 0; wk < nWeeks; wk++) {
+        const r = rs * (0.72 + (2.5 * wk) / Math.max(1, nWeeks - 1)) * (0.6 + 0.4 * k);
+        const rot = T * (0.24 - wk * 0.006) + wk * 0.7, tilt = 0.35 + wk * 0.11;
+        for (let j = 0; j < 40; j++) {
+          const a = (j / 40) * Math.PI * 2;
+          const p = rotY(rotX([Math.cos(a), 0, Math.sin(a)], tilt), rot);
+          D([C[0] + p[0] * r, C[1] + p[1] * r, C[2] + p[2] * r], 0.007, light, 0.07 * k);
+        }
+        const c = w.s.weeks[wk] ?? 0, hot = wk === hotWeek;
+        for (let j = 0; j < c; j++) {
+          const phi = j * 2.39996 + wk * 1.7, y = 1 - (2 * (j + 0.5)) / c, rr = Math.sqrt(Math.max(0, 1 - y * y));
+          const p = rotY(rotX([Math.cos(phi) * rr, y, Math.sin(phi) * rr], tilt), rot);
+          const tw = 0.62 + 0.38 * Math.sin(T * 3 + j * 1.3 + wk);
+          D([C[0] + p[0] * r, C[1] + p[1] * r, C[2] + p[2] * r], hot ? 0.022 : 0.015, hot ? WHITE : light, (hot ? 1 : 0.72) * tw * k);
+        }
+      }
+      w.s.stack.forEach((_, m) => {
+        const n = w.s.stack.length, a = T * 0.22 + (m / n) * Math.PI * 2, r = rs * 3.7;
+        const p0 = rotX([Math.cos(a) * r, Math.sin(a * 2) * r * 0.18, Math.sin(a) * r], 0.45);
+        const p: Vec3 = [C[0] + p0[0], C[1] + p0[1], C[2] + p0[2]];
+        D(p, 0.055, PEACH, 0.95 * k);
+        D(p, 0.14, PEACH, 0.12 * k);
+        arc(C, p, 0.05 * k, 0.55 * k, m * 0.31, 0.45, light, PEACH, T, 0.08);
+        const [x, y, depth] = project(PV, p, st.w, st.h, [st.sx, st.sy]);
+        frameOut.inside.moons.push({ x, y, depth });
+      });
+    }
+
     impU.fill(0);
     impacts.forEach((im, i) => impU.set([im.d[0], im.d[1], im.d[2], im.age], i * 4));
 
@@ -937,6 +993,7 @@ export async function createOrbit(
     gl!.uniform3f(U.right, right[0], right[1], right[2]);
     gl!.uniform3f(U.up, up[0], up[1], up[2]);
     gl!.uniform1i(U.beacon, beacon);
+    gl!.uniform1f(U.dim, 1 - 0.82 * diveT);
     gl!.bindVertexArray(sVao);
     gl!.drawArrays(gl!.POINTS, 0, planetsOk ? sceneCount : staticCount);
 
@@ -973,6 +1030,7 @@ export async function createOrbit(
     }
     gl!.blendFuncSeparate(gl!.ONE, gl!.ONE, gl!.ONE, gl!.ONE_MINUS_SRC_ALPHA);
     gl!.useProgram(PP);
+    gl!.uniform1f(U.dim, 1);
 
     if (dc) {
       gl!.bindBuffer(gl!.ARRAY_BUFFER, dBuf);
@@ -1066,6 +1124,19 @@ export async function createOrbit(
     },
     tech(name) {
       techLit = name;
+      busy();
+    },
+    enter(i) {
+      if (i === inside) return;
+      inside = i;
+      if (i !== null) {
+        diveDraw = i;
+        focused = null;
+        hovered = null;
+        // close enough that its outermost shell fills about three quarters of the stage's shorter side
+        cam.tdist = distanceFor(Math.min(st.w, st.h) * 0.36, st.h, worlds[i]!.rs * 3.9);
+        shocks.push({ w: i, age: 0 });
+      } else cam.tdist = cam.base * zoomK;
       busy();
     },
     beacon(i) {
