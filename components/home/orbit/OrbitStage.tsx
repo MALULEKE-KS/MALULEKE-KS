@@ -147,6 +147,7 @@ export function OrbitStage({
     const st = stage.current,
       cv = canvas.current;
     if (!st || !cv) return;
+    let lighter = false;
     let cancelled = false,
       booting = false,
       onScreen = false;
@@ -348,7 +349,7 @@ export function OrbitStage({
       e.resize(
         r.width,
         r.height,
-        Math.min(devicePixelRatio || 1, quality() < 1 ? 1.25 : 1.75),
+        Math.min(devicePixelRatio || 1, lighter ? 1 : quality() < 1 ? 1.25 : 1.5),
         layout()
       );
     };
@@ -363,6 +364,13 @@ export function OrbitStage({
         weekMs,
         sky: overPhoto ? 0.3 : 1,
         onFrame,
+        // a device that can't keep up: a lighter scene first, then the still (the page never freezes)
+        onSlow: (level) => {
+          if (level === "lighter") {
+            lighter = true;
+            resize();
+          } else setLive(false);
+        },
       });
       if (cancelled) return e?.destroy();
       if (!e) return; // no WebGL2: the still stays
