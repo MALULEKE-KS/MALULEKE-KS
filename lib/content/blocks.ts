@@ -156,6 +156,9 @@ export const CONTENT_BLOCKS = {
       enterLabel: z.string().trim().max(30).optional(),
       backLabel: z.string().trim().max(30).optional(),
       insideLine: instantTemplate(200, ["commits"]).optional(),
+      // The core's name (D-073): it is the owner's GitHub, where every commit lands.
+      coreLabel: z.string().trim().max(30).optional(),
+      coreSub: z.string().trim().max(60).optional(),
     }),
   },
   "page-xray": {

@@ -17,6 +17,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, RotateCcw, X } from "lucide-react";
+import { FaGithub } from "react-icons/fa6";
 import type { OrbitData } from "@/lib/queries/orbit";
 import { fillIn, type OrbitCopy } from "@/lib/home/orbit-copy";
 import type { OrbitEngine, OrbitFrame, OrbitLayout } from "@/components/home/orbit/engine";
@@ -63,6 +64,7 @@ export function OrbitStage({
   const [inside, setInside] = useState<number | null>(null);
   const insideRef = useRef<number | null>(null);
   const moonEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const coreEl = useRef<HTMLAnchorElement>(null);
   const openRef = useRef<number | null>(null);
   const relayout = useRef<(() => void) | null>(null);
   // the desktop hint: shown while the pointer is over the orbit's zone, gone for good once it has been used
@@ -197,6 +199,10 @@ export function OrbitStage({
       const opened = openRef.current;
       // Every read happens before any write, so the browser lays the page out once per frame.
       const cardBox = opened !== null && card.current ? rel(card.current) : null;
+      if (coreEl.current && coreEl.current.style.opacity !== "0") {
+        const c = rel(coreEl.current);
+        blocks.push([c[0] - 8, c[1] - 8, c[2] + 8, c[3] + 8]);
+      }
       if (cardBox)
         blocks.push([cardBox[0] - 10, cardBox[1] - 10, cardBox[2] + 10, cardBox[3] + 10]);
       const lit = opened ?? hoverRef.current;
@@ -288,6 +294,13 @@ export function OrbitStage({
       // the lens follows the core
       const glow = (0.6 + f.core.flash * 0.4) * (opened !== null ? 0.6 : 1);
       const inT = f.inside.t;
+      if (coreEl.current) {
+        const c = coreEl.current;
+        const vis = f.grown && inT < 0.05 && openRef.current === null;
+        c.style.opacity = vis ? "1" : "0";
+        c.style.pointerEvents = vis ? "auto" : "none";
+        c.style.transform = `translate(${(f.core.x - c.offsetWidth / 2).toFixed(1)}px, ${(f.core.y + f.core.r * 1.25 + 10).toFixed(1)}px)`;
+      }
       moonEls.current.forEach((el, m) => {
         if (!el) return;
         const mo = f.inside.moons[m];
@@ -856,6 +869,16 @@ export function OrbitStage({
               )}
             </div>
           </div>
+        )}
+        {/* The core is the owner's GitHub (D-073): every spark is a commit pushed there. */}
+        {copy.coreLabel && data.github && (
+          <a ref={coreEl} href={data.github} target="_blank" rel="noopener noreferrer" className="orbit-core-label">
+            <FaGithub aria-hidden="true" className="size-3.5" />
+            <span>
+              <b>{copy.coreLabel}</b>
+              {copy.coreSub && <small>{copy.coreSub}</small>}
+            </span>
+          </a>
         )}
         <div className="orbit-moons" aria-hidden="true">
           {inside !== null &&
