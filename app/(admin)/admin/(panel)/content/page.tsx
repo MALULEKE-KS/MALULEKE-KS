@@ -71,6 +71,14 @@ const FIELDS: Partial<Record<ContentKey, BlockField[]>> = {
     { name: "vitalsAudited", label: "The card: the audited changes line", max: 40, kind: "line" },
     { name: "vitalsLink", label: "The card: its link", max: 40, kind: "line", hint: "Goes where Release → \"Where it links\" points. Empty hides it." },
   ],
+  "flagship-outcomes": [
+    {
+      name: "outcomes",
+      label: "One line per flagship",
+      kind: "json",
+      hint: 'The system\'s address and its line: { "xkimi-xa-mali": "Turned a family savings group\'s contributions into a ledger every member can trust…", … }. What it achieved, in one sentence; a flagship without a line shows its summary.',
+    },
+  ],
   "systems-page": [
     { name: "heading", label: "Heading", max: 140, kind: "line" },
     { name: "lede", label: "Introduction", max: 400, kind: "text" },

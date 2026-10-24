@@ -4,7 +4,7 @@
 // catalog).
 
 import { ContactBand } from "@/components/home/ContactBand";
-import { HomeHeroV2Section } from "./HomeHeroV2Section";
+import { HomeHeroV2Section, homeRecord } from "./HomeHeroV2Section";
 import { heroCopy } from "@/lib/home/hero";
 import { PrinciplesBand } from "@/components/home/PrinciplesBand";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
@@ -70,7 +70,7 @@ export async function HomeContent() {
     getPlatformPulse(),
   ]);
   const guideEnabled = flags[FLAGS.concierge] === true;
-  const [howIBuild, evidence] = await Promise.all([getContentBlock("how-i-build"), getEvidence()]);
+  const [howIBuild, evidence, flagshipOutcomes] = await Promise.all([getContentBlock("how-i-build"), getEvidence(), getContentBlock("flagship-outcomes")]);
 
 
   // The line before the name: "Building now" when the owner named the system, "Latest commit" when it is only the latest real commit.
@@ -107,7 +107,7 @@ export async function HomeContent() {
           except the AI guide's band: it holds fixed-position UI (the phone's full-screen conversation, the
           "still answering" button), which a content-visibility wrapper would trap inside the section. */}
       <div className="below-fold">
-        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} />
+        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} outcomes={flagshipOutcomes?.outcomes ?? {}} />
       </div>
       {guideEnabled && aiGuide && (
         <AiGuideSection
@@ -116,7 +116,7 @@ export async function HomeContent() {
         />
       )}
       <div className="below-fold">
-        <PrinciplesBand content={howIBuild} evidence={evidence} />
+        <PrinciplesBand content={howIBuild} evidence={evidence} record={homeRecord({ systemsShipped: inProduction, systemsPublished: totalPublished, pulse, block: heroBlock, evidence })} />
       </div>
       <div className="below-fold">
         <SystemMap data={systemMap} pulse={pulse} numbers={numbers} />

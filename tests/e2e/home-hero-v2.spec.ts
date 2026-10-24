@@ -38,10 +38,16 @@ for (const vp of VIEWPORTS) {
       await expect(h1).toBeVisible();
       expect((await h1.innerText()).trim().length).toBeGreaterThan(2);
 
-      // the record is computed: at least one entry, each a claim with its figure and label
-      const items = hero.getByRole("list").last().getByRole("listitem");
+      // the record is computed — at least one entry, each a claim with its figure and label — and it opens How I build,
+      // not the hero (D-065, the owner's plan: the first screen is who he is and what he builds)
+      const record = page.locator('section[aria-labelledby="principles-title"] [data-record]');
+      const items = record.getByRole("listitem");
       expect(await items.count()).toBeGreaterThan(0);
-      expect(await items.first().innerText()).toMatch(/\d+/);
+      expect(await items.first().textContent()).toMatch(/\d+/);
+      await expect(hero.locator("[data-record]")).toHaveCount(0);
+
+      // on a phone the hero ends with Let's talk (and the CV when one is switched on); from a tablet up the header has them
+      if (vp.width < 640) await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
 
       // the cover image: the phone crop on phones, the wide crop on larger screens
       const img = hero.locator("picture img");
@@ -69,8 +75,8 @@ for (const vp of VIEWPORTS) {
       // no character, rig or canvas in the hero
       await expect(hero.locator("canvas")).toHaveCount(0);
 
-      // the record is the proof of the statement: each claim sits over its figure
-      const claims = hero.getByRole("list").last().getByRole("listitem").filter({ hasText: /Runs in production|Enforces its own rules|Shows its proof/ });
+      // the record is the proof of the method: each claim sits over its figure
+      const claims = record.getByRole("listitem").filter({ hasText: /Runs in production|Enforces its own rules|Shows its proof/ });
       expect(await claims.count()).toBeGreaterThan(0);
 
       // nothing pushes the page sideways
@@ -80,14 +86,14 @@ for (const vp of VIEWPORTS) {
   });
 }
 
-test("the live status line doesn't repeat the hero's record", async ({ page }) => {
+test("the live status line doesn't repeat the record", async ({ page }) => {
   test.setTimeout(120_000);
   await settle(page);
   await page.goto(URL, { waitUntil: "networkidle" });
-  // The hero's ledger shows (and evidences) the pulse's figures; the status line above the map (the control
-  // room, merged in — D-047) keeps only what is new.
-  const hero = page.locator('section[aria-labelledby="hero-title"]');
-  await expect(hero.getByText(/rules the database enforces/i).first()).toBeVisible();
+  // The record (in How I build since D-065) shows and evidences the pulse's figures; the status line above the map
+  // (the control room, merged in — D-047) keeps only what is new.
+  const record = page.locator('section[aria-labelledby="principles-title"] [data-record]');
+  await expect(record.getByText(/rules the database enforces/i).first()).toBeAttached();
   const status = page.locator('section[aria-labelledby="map-title"] [aria-label="Live status"]');
   await expect(status).toBeAttached();
   await expect(status.getByText(/read-only database role/)).toHaveCount(1);

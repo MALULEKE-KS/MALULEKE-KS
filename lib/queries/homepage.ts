@@ -79,7 +79,10 @@ export async function getHomeSelection(more = 3) {
     db.publicSystem.findMany({ where: { featuredOnHome: false, homeOrder: { gt: 0 } }, orderBy: [{ homeOrder: "asc" }, { name: "asc" }], take: more }),
     db.publicSystem.findMany({ orderBy: [{ isFlagship: "desc" }, { sortOrder: "asc" }, { name: "asc" }, { id: "asc" }], take: more + 8 }),
   ]);
-  const featured = curated.length > 0 ? curated : pool.slice(0, 1);
+  // The owner's hand-picked cases first; otherwise his flagships — up to three (D-065, the owner's plan: "three flagship
+  // cards directly below the hero"); otherwise the first system.
+  const flagships = pool.filter((s) => s.isFlagship).slice(0, 3);
+  const featured = curated.length > 0 ? curated : flagships.length > 0 ? flagships : pool.slice(0, 1);
   const chosen = new Set(featured.map((s) => s.id));
   const rest: typeof pool = [];
   for (const s of [...picked, ...pool]) {
