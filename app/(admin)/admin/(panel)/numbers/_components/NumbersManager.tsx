@@ -73,7 +73,7 @@ export function NumbersManager({ metrics }: { metrics: Metric[] }) {
         <EmptyState icon={BarChart3}>No numbers defined yet.</EmptyState>
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {metrics.map((m) => <MetricCard key={`${m.key}:${m.pending?.id ?? ""}:${m.current?.id ?? ""}`} metric={m} />)}
+          {[...metrics].sort((a, b) => Number(Boolean(b.pending)) - Number(Boolean(a.pending))).map((m) => <MetricCard key={`${m.key}:${m.pending?.id ?? ""}:${m.current?.id ?? ""}`} metric={m} />)}
         </div>
       )}
     </div>
