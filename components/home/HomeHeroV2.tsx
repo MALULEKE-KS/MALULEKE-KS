@@ -1,8 +1,8 @@
 // components/home/HomeHeroV2.tsx
 // Home, section 1 — Direction C, chosen by the owner on 2026-10-20
 // (docs/improvements/HOME-HERO-PLAN.md §5–6): the name large, one plain
-// statement, two actions, the technologies you build with, and the record as a
-// frosted bar docked to the bottom — all on one cover image behind the whole
+// statement, two actions (on a phone, the CV and Let's talk), the technologies you build
+// with — the record moved to How I build (D-065) — all on one cover image behind the whole
 // hero (HeroBackdrop; the owner's direction, same day), the two giving each
 // other room: on larger screens the type sits at the left, in the image's quiet
 // zone, and the right of the image shows at full strength; on phones the type sits
@@ -19,10 +19,9 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import Link from "@/components/shared/IntentLink";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileDown } from "lucide-react";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { Container } from "@/components/shared/Container";
-import { ProofLedger, type ProofLedgerItem } from "@/components/shared/ProofLedger";
 import { TechChip } from "@/components/shared/TechChip";
 import { Button } from "@/components/ui/button";
 import { heroEntranceVars, type HeroCopy } from "@/lib/home/hero";
@@ -42,7 +41,8 @@ interface HomeHeroV2Props {
   /** What the owner is building (named by him) or, failing that, the repository with his latest real commit — null when there is neither. */
   nowBuilding: { name: string; url: string; when: string | null; label: string | null } | null;
   copy: HeroCopy;
-  ledger: ProofLedgerItem[];
+  /** The phone's two actions (owner, 2026-10-24): the uploaded CV — the phone's header has no room for it — and Let's talk. */
+  phoneActions: { cvUrl: string | null; cvLabel: string | null; contactLabel: string | null };
   /** The cover image behind everything (HeroBackdrop) — null leaves a graphite field. */
   backdrop: ReactNode | null;
   entrance: { durationMs: number; staggerMs: number };
@@ -51,7 +51,7 @@ interface HomeHeroV2Props {
 /** Each part settles in after the one before it (the delay is the part's index × the stagger setting). */
 const rise = (i: number): CSSProperties => ({ "--i": i }) as CSSProperties;
 
-export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, ledger, backdrop, entrance }: HomeHeroV2Props) {
+export function HomeHeroV2({ name, role, statement, credential, liveLine, stack, nowBuilding, copy, phoneActions, backdrop, entrance }: HomeHeroV2Props) {
   return (
     <section
       aria-labelledby="hero-title"
@@ -104,8 +104,32 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
             </p>
           )}
 
-          {/* The header already carries the CV and Let's talk, so the hero has no CV button (no duplicate). */}
-          <div className="hero-rise mt-6 grid w-full grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:flex sm:w-auto md:mt-7" style={rise(4)}>
+          {/* On a phone: the CV and Let's talk — what a recruiter on a phone came for (the owner's plan, Phase 2; owner,
+              2026-10-24: "only in mobile", where the header has no room for the CV). From a tablet up the header carries
+              both, and the hero keeps the work and the guide. */}
+          {(phoneActions.cvUrl && phoneActions.cvLabel) || phoneActions.contactLabel ? (
+            <div className="hero-rise mt-6 grid w-full grid-cols-2 gap-3 sm:hidden" style={rise(4)}>
+              {phoneActions.cvUrl && phoneActions.cvLabel && (
+                <Button asChild variant="glass" size="lg" className="bg-night-deep/40 w-full backdrop-blur">
+                  <a href={phoneActions.cvUrl}>
+                    <FileDown />
+                    {phoneActions.cvLabel}
+                  </a>
+                </Button>
+              )}
+              {phoneActions.contactLabel && (
+                <Button asChild variant="accent" size="lg" className={phoneActions.cvUrl && phoneActions.cvLabel ? "w-full" : "col-span-2 w-full"}>
+                  <Link href="/contact">
+                    {phoneActions.contactLabel}
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          ) : null}
+
+          {/* From a tablet up: the work and the guide — the header carries the CV and Let's talk there. */}
+          <div className="hero-rise mt-6 hidden w-auto gap-3 sm:flex md:mt-7" style={rise(4)}>
             {copy.primaryLabel && (
               <Button asChild variant="accent" size="lg" className="w-full sm:w-auto">
                 <Link href="/systems">
@@ -137,14 +161,6 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
         </div>
       </Container>
 
-      {/* The record, docked to the bottom of the hero as a frosted instrument bar. */}
-      {ledger.length > 0 && (
-        <div className="hero-rise border-t border-white/15 bg-night-deep/55 backdrop-blur-md" style={rise(6)}>
-          <Container className="py-5 md:py-6">
-            <ProofLedger items={ledger} ariaLabel={copy.ledgerAria} bare compact />
-          </Container>
-        </div>
-      )}
     </section>
   );
 }

@@ -44,7 +44,7 @@ function hasActivity(w: Work) {
   return w.weeks.some((n) => n > 0);
 }
 
-function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
+function FeaturedCase({ w, flip, outcome }: { w: Work; flip: boolean; /** What it achieved, in the owner's words ("flagship-outcomes" block) — shown instead of the summary and the stack (D-065). */ outcome: string | null }) {
   const meta = [w.organization, w.domain].filter(Boolean).join(" · ");
   const extra = w.techStack.length - STACK_SHOWN;
   return (
@@ -63,7 +63,11 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
               {w.name}
             </Link>
           </h3>
-          <p className="text-slate mt-3 max-w-[46ch] leading-relaxed">{w.description}</p>
+          {outcome ? (
+            <p className="text-ink/85 mt-3 max-w-[46ch] text-[17px] leading-relaxed">{outcome}</p>
+          ) : (
+            <p className="text-slate mt-3 max-w-[46ch] leading-relaxed">{w.description}</p>
+          )}
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {w.isFlagship && (
@@ -86,7 +90,7 @@ function FeaturedCase({ w, flip }: { w: Work; flip: boolean }) {
             </dl>
           )}
 
-          {w.techStack.length > 0 && (
+          {!outcome && w.techStack.length > 0 && (
             <ul className="text-ink/85 mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]" aria-label="Built with">
               {w.techStack.slice(0, STACK_SHOWN).map((t, i, shown) => (
                 <li key={t} className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -200,7 +204,7 @@ function CommitStrip({ now, label }: { now: NonNullable<SelectedWork["nowBuildin
  * "Featured on home") lead as cases, one under another; then what's moving;
  * then more work.
  */
-export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowLabel }: SelectedWork & { totalPublished: number; /** The owner's wording for the strip ("Building now" / "Latest commit") — empty hides its label. */ nowLabel: string | null }) {
+export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowLabel, outcomes = {} }: SelectedWork & { totalPublished: number; /** The owner's wording for the strip ("Building now" / "Latest commit") — empty hides its label. */ nowLabel: string | null; /** What each flagship achieved, keyed by its address ("flagship-outcomes" block, D-065). */ outcomes?: Record<string, string> }) {
   if (featured.length === 0) return null;
   return (
     <section aria-labelledby="work-title" className="bg-paper py-20 md:py-28">
@@ -211,7 +215,7 @@ export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowL
             eyebrow="Selected work"
             id="work-title"
             title={<Accent text="Shipped, running, and *still moving.*" className="type-accent text-ember-gradient pr-[0.06em]" />}
-            description="Each system here is read live from this site's data — its status, its stack, and its commits straight from GitHub."
+            description="What each system achieved, and its status and commits read live from this site's data and GitHub."
             action={{ href: "/systems", label: `All ${totalPublished} systems` }}
           />
         </Reveal>
@@ -219,7 +223,7 @@ export function WorkShowcase({ featured, more, nowBuilding, totalPublished, nowL
         <div className="grid grid-cols-1 gap-6 md:gap-8">
           {featured.map((w, i) => (
             <Reveal key={w.slug} className="min-w-0" delay={i * 80}>
-              <FeaturedCase w={w} flip={i % 2 === 1} />
+              <FeaturedCase w={w} flip={i % 2 === 1} outcome={outcomes[w.slug] ?? null} />
             </Reveal>
           ))}
           {nowBuilding && (

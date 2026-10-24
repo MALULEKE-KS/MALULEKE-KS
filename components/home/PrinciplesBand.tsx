@@ -11,6 +11,7 @@
 
 import { Plus } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { ProofLedger, type ProofLedgerItem } from "@/components/shared/ProofLedger";
 import { Reveal } from "@/components/shared/Reveal";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 import type { ContentBody } from "@/lib/content/blocks";
@@ -21,9 +22,12 @@ import { claimsFor, type ResolvedClaim } from "@/lib/evidence";
 export function PrinciplesBand({
   content,
   evidence,
+  record,
 }: {
   content: ContentBody<"how-i-build"> | null;
   evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
+  /** The record — systems shipped, rules enforced, changes audited — as the method's proof (D-065; it was in the hero). */
+  record?: { items: ProofLedgerItem[]; ariaLabel: string | null };
 }) {
   if (!content) return null;
   const { mission, principles } = content;
@@ -55,6 +59,15 @@ export function PrinciplesBand({
             </p>
           </blockquote>
         </Reveal>
+
+        {/* The method's proof, computed live: the figures engineers ask about, here rather than in the first screen (D-065). */}
+        {record && record.items.length > 0 && (
+          <Reveal delay={90}>
+            <div data-record className="bg-night-deep text-paper mt-10 rounded-3xl px-6 py-7 md:mt-12 md:px-10 md:py-9">
+              <ProofLedger items={record.items} ariaLabel={record.ariaLabel} bare />
+            </div>
+          </Reveal>
+        )}
 
         <ul className="border-ink/12 mt-12 border-t md:mt-16">
           {principles.map((p, i) => {

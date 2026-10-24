@@ -106,6 +106,13 @@ export const CONTENT_BLOCKS = {
       vitalsLink: z.string().trim().max(40).optional(),
     }),
   },
+  "flagship-outcomes": {
+    title: "Home — what each flagship achieved",
+    description: "One line per flagship, under its name on the home page: what it achieved, not what it's built with. Keyed by the system's address (the part after /systems/). A flagship without a line shows its summary.",
+    schema: z.object({
+      outcomes: z.record(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "a system's address, like xkimi-xa-mali"), Text(240)),
+    }),
+  },
   "systems-page": {
     title: "Systems — introduction",
     description: "The /systems page's heading and introduction.",

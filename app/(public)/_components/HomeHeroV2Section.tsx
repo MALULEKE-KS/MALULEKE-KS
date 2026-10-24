@@ -1,8 +1,8 @@
 // app/(public)/_components/HomeHeroV2Section.tsx
 // The rebuilt home hero with its data (docs/improvements/HOME-HERO-PLAN.md §7):
 // gathers what only this hero needs — the photo slots, the entrance's and the
-// glow's settings, the evidence behind the ledger — and hands HomeHeroV2 ready
-// values. It is the home hero (the flag and the previous hero are gone — D-038).
+// glow's settings, the phone's CV and contact buttons — and hands HomeHeroV2 ready
+// values. The record it used to carry is in How I build (homeRecord, D-065). It is the home hero (the flag and the previous hero are gone — D-038).
 
 import { Evidence } from "@/components/shared/Evidence";
 import { HeroBackdrop, type HeroImageSource } from "@/components/shared/HeroBackdrop";
@@ -15,6 +15,8 @@ import { heroAsOf, heroCopy, heroCredential, heroLedger, heroLiveLine, heroStack
 import { getPublicPhotos } from "@/lib/queries/profile";
 import type { SiteProfile } from "@/lib/queries/site";
 import { getSetting } from "@/lib/settings";
+import { getUploadedCvLink } from "@/lib/cv/options";
+import { getContentBlock } from "@/lib/content/blocks";
 
 interface HomeHeroV2SectionProps {
   profile: SiteProfile;
@@ -31,21 +33,16 @@ interface HomeHeroV2SectionProps {
   evidence: { claims: ResolvedClaim[]; source: { commit: string | null } };
 }
 
-export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
-  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories, timeZone] = await Promise.all([
-    getPublicPhotos(),
-    getSkillEvidence(),
-    getSetting("home.hero.entrance.durationMs"),
-    getSetting("home.hero.entrance.staggerMs"),
-    getSetting("home.hero.glow"),
-    getSetting("home.hero.scrim"),
-    getSetting("home.hero.stackCount"),
-    getSetting("home.hero.stackCategories"),
-    getSetting("site.timeZone"),
-  ]);
-
+/**
+ * The record — systems shipped, rules the database enforces, changes audited — with its
+ * evidence. Since D-065 (the owner's plan: "move the stats into a How I build section further
+ * down") it is shown in How I build, not in the hero; its words are still the "home-hero" block's.
+ */
+export function homeRecord(
+  { systemsShipped, systemsPublished, pulse, block, evidence }: Pick<HomeHeroV2SectionProps, "systemsShipped" | "systemsPublished" | "pulse" | "block" | "evidence">,
+): { items: ProofLedgerItem[]; ariaLabel: string | null } {
   const copy = heroCopy(block);
-  const ledger: ProofLedgerItem[] = heroLedger(
+  const items = heroLedger(
     { systemsShipped, systemsPublished, rulesEnforced: pulse.rulesEnforcedByDatabase, auditedThisWeek: pulse.auditEventsLast7Days },
     copy.ledgerLabels,
   ).map((item) => {
@@ -60,7 +57,25 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       href: item.key === "systems" ? "/systems" : undefined,
     };
   });
+  return { items, ariaLabel: copy.ledgerAria };
+}
 
+export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped, systemsPublished, titles, nowBuilding, evidence }: HomeHeroV2SectionProps) {
+  const [photos, skills, durationMs, staggerMs, glow, scrim, stackCount, stackCategories, timeZone, cv, header] = await Promise.all([
+    getPublicPhotos(),
+    getSkillEvidence(),
+    getSetting("home.hero.entrance.durationMs"),
+    getSetting("home.hero.entrance.staggerMs"),
+    getSetting("home.hero.glow"),
+    getSetting("home.hero.scrim"),
+    getSetting("home.hero.stackCount"),
+    getSetting("home.hero.stackCategories"),
+    getSetting("site.timeZone"),
+    getUploadedCvLink(),
+    getContentBlock("site-header"),
+  ]);
+
+  const copy = heroCopy(block);
   const source = (purpose: string): HeroImageSource | null => {
     const p = photos[purpose];
     return p ? { url: p.url, width: p.width, height: p.height } : null;
@@ -79,7 +94,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       nowBuilding={nowBuilding}
       stack={heroStack(skills, stackCategories, stackCount)}
       copy={copy}
-      ledger={ledger}
+      phoneActions={{ cvUrl: cv?.url ?? null, cvLabel: header?.cvMenuLabel?.trim() || null, contactLabel: header?.contactLabel?.trim() || null }}
       entrance={{ durationMs, staggerMs }}
       backdrop={
         desktop || mobile ? (
