@@ -9,7 +9,7 @@
 // where a thumb rests — the bottom dock (D-056), whose last cell opens the
 // full menu; the bar keeps the mark, search, the CV and Let's talk.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight, FileDown } from "lucide-react";
 import { CubeMark } from "@/components/shared/BrandMark";
 import { NavLinks } from "@/components/shared/NavLinks";

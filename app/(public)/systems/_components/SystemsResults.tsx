@@ -9,7 +9,7 @@
 
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowLeft, ArrowRight, SearchX, X } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 import { CatalogCard } from "@/components/systems/CatalogCard";

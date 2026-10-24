@@ -14,15 +14,14 @@
 // CV, the owner's links. Home is the mark in the header.
 //
 // The dock holds still while pages cross-fade (its own view-transition name),
-// steps aside while the guide's panel is open, and sets data-dock on <html> so
-// what floats at the foot of a page (the consent card, the guide's corner
-// button) and the page's own end sit above it. Every label is the owner's
+// steps aside while the guide's panel is open; CSS keyed on it (data-dock="site")
+// lifts what floats at the foot of a page (the consent card, the guide's corner
+// button) and the page's own end above it, from the first paint. Every label is the owner's
 // wording ("site-header" block); a label left empty hides its part.
 
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { LayoutGrid, MessageSquareText, Route, UserRound } from "lucide-react";
@@ -43,15 +42,6 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
   const askLabel = word(labels?.askLabel);
   const contactLabel = word(labels?.contactLabel);
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-
-  // Tell the page the dock is there (below lg, CSS lifts what floats at the foot and pads the page's end).
-  useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.dock = "";
-    return () => {
-      delete root.dataset.dock;
-    };
-  }, []);
 
   const cell = (href: string) => {
     const s = sheet(href);
@@ -85,7 +75,7 @@ export function BottomDock({ labels, menu }: { labels: HeaderLabels | null; /** 
 
   return (
     <nav
-      data-dock
+      data-dock="site"
       data-chrome
       aria-label={word(labels?.dockLabel) ?? "Pages"}
       data-capture-hide

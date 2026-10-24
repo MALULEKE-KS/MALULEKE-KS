@@ -251,7 +251,7 @@ export function AdminShell({ data, children }: { data: AdminShellData; children:
       </div>
 
       {/* Phone: the dock at the thumb. */}
-      <nav data-dock data-chrome aria-label="Admin quick navigation" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+      <nav data-dock="admin" data-chrome aria-label="Admin quick navigation" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
         <ul className="bg-night-deep/90 mx-auto grid h-16 max-w-md grid-cols-5 items-center rounded-full border border-white/10 p-1 shadow-[0_18px_50px_-14px_rgb(0_0_0/0.6)] backdrop-blur-xl">
           {ADMIN_DOCK.map((href) => {
             const p = ADMIN_PAGES.find((x) => x.href === href)!;

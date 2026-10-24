@@ -23,7 +23,7 @@
 // organisations live in the footer, not repeated here.
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { buttonVariants } from "@/components/ui/button";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { ArrowRight, ChevronDown, FileText } from "lucide-react";

@@ -11,7 +11,7 @@
 // and the owner's own profiles), opened in a new tab. Anything else stays
 // plain text; a [label](target) to a refused target shows just its label.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { Fragment } from "react";
 import { CopyButton } from "@/components/guide/CopyButton";
 

@@ -30,7 +30,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowUpRight, FolderGit2, Github, MousePointerClick, X } from "lucide-react";
 import { techMark } from "@/components/shared/TechChip";
 import type { MapNode, SystemMapData } from "@/lib/queries/map";

@@ -5,7 +5,7 @@
 
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { FileText, LayoutGrid, Milestone, type LucideIcon } from "lucide-react";
 import type { Receipt, ReceiptKind } from "@/lib/guide/receipts";
 

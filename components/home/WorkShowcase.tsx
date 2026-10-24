@@ -14,7 +14,7 @@
 //     "Project Showcase", adapted — components/ui/project-showcase.tsx)
 // Data: lib/queries/work.ts (public views only).
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { activityText } from "@/lib/rules/activity";
 import { ArrowRight, ArrowUpRight, Github, GitCommitHorizontal, Lock, Star } from "lucide-react";
 import { Container } from "@/components/shared/Container";

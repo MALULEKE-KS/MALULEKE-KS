@@ -9,7 +9,7 @@
 // typed here.
 
 import type { ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowUpRight } from "lucide-react";
 
 export interface ProofLedgerItem {

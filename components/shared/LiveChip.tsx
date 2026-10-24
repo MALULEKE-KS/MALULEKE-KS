@@ -12,7 +12,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight } from "lucide-react";
 import type { HeaderLabels } from "@/components/shared/SiteHeader";
 import { cn } from "@/lib/utils";

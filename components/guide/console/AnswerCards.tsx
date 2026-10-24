@@ -6,7 +6,7 @@
 
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { motion, useReducedMotion } from "motion/react";
 import { Activity, ArrowLeftRight, ArrowUpRight, Check, CircleDashed, CircleDot, GitCommitHorizontal, ListChecks, Lock, Milestone, ShieldCheck } from "lucide-react";
 import { techMark } from "@/components/shared/TechChip";

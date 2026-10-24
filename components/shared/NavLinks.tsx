@@ -17,7 +17,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { StatusBadge } from "@/components/shared/StatusBadge";

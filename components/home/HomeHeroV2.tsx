@@ -18,7 +18,7 @@
 // owner approved the release (D-038).
 
 import type { CSSProperties, ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight } from "lucide-react";
 import { AskGuideButton } from "@/components/guide/AskGuideButton";
 import { Container } from "@/components/shared/Container";

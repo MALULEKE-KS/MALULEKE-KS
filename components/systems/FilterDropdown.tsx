@@ -12,7 +12,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { brandMark } from "@/components/shared/TechChip";
 import { cn } from "@/lib/utils";

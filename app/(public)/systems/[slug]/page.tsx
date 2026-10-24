@@ -18,7 +18,7 @@
 // used before a rename redirects permanently (#87, BR-1.14).
 
 import { cache } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Activity, ArrowLeft, ArrowRight, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, ShieldCheck, Sparkles, Star, Tag } from "lucide-react";

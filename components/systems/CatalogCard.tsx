@@ -19,7 +19,7 @@
 // left, the story on the right. On a phone every card is a compact row — a small
 // square face beside the story — so the catalogue stays short (D-049).
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { activityText } from "@/lib/rules/activity";
 import { ArrowRight, Lock, Star } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
