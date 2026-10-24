@@ -14,7 +14,7 @@
 // in, and /contact keeps the alternatives; and the version the site is on,
 // with what's next, from the "release" content block.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { BrandMark, Wordmark } from "@/components/shared/BrandMark";

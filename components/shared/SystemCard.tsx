@@ -4,7 +4,7 @@
 // description → specs (stack) → one action. The whole card is one link; the
 // status colour is the Status row's own token (EXT-1), never a switch in code.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowUpRight, Star } from "lucide-react";
 import { Spotlight } from "@/components/shared/Spotlight";
 import { StatusBadge } from "@/components/shared/StatusBadge";

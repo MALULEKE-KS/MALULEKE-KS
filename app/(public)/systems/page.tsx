@@ -5,8 +5,9 @@
 // (2026-10-01) the catalog is every repo in his own homes that he hasn't
 // hidden, beside the written-up case studies.
 //
-// The data fetching lives in SystemsResults, inside an explicit <Suspense>
-// rather than a loading.tsx — see SystemsGridSkeleton.tsx for why.
+// Served from the cache (D-063): the page is rendered ahead with every published
+// system; the filters in the URL are applied in the browser (SystemsResults,
+// lib/catalog/apply.ts), so the page never waits on a database round trip.
 
 import { Suspense } from "react";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -17,62 +18,53 @@ import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { HeroFigures } from "@/components/shared/HeroKit";
 import { Accent, plainAccent } from "@/components/shared/Accent";
 import { getContentBlock } from "@/lib/content/blocks";
-import { getCatalog } from "@/lib/queries/catalog";
-import { SystemsResults } from "./_components/SystemsResults";
-import { SystemsGridSkeleton } from "./_components/SystemsGridSkeleton";
+import { loadCatalogData, type CatalogData } from "@/lib/queries/catalog";
+import { applyCatalog } from "@/lib/catalog/apply";
+import { sectionCopy } from "@/lib/content/copy";
+import { GROUP_FALLBACK, SystemsResults, SystemsResultsView, WhenUnfiltered, type GroupCopy } from "./_components/SystemsResults";
 import { SystemsSpotlight } from "@/components/systems/SystemsSpotlight";
-import { SPOTLIGHT_CARD_ASPECT, SPOTLIGHT_CARD_WIDTH } from "@/components/systems/spotlight-size";
 
 export async function generateMetadata(): Promise<Metadata> {
   const intro = await getContentBlock("systems-page").catch(() => null);
   return pageMetadata({ title: "Systems", description: intro ? plainAccent(intro.lede) : null, path: "/systems", imageAlt: "Systems — MALULEKE-KS" });
 }
 
-interface SystemsPageProps {
-  searchParams: Promise<Record<string, string | undefined>>;
-}
-
-/** The hero's live counts and, unfiltered, every published system on a ring in featured order — fetched together so they arrive together. */
-async function HeroExtras({ spotlight }: { spotlight: boolean }) {
-  const [{ stats }, catalog] = await Promise.all([getCatalog({ pageSize: 1 }), spotlight ? getCatalog({ pageSize: 100 }) : null]);
+/** The hero's live counts and, while no filter is on, every published system on a ring in featured order. */
+function HeroExtras({ data }: { data: CatalogData }) {
+  const { stats } = applyCatalog(data, { pageSize: 1 });
+  const ring = applyCatalog(data, { pageSize: 100 }).systems;
   const items = [
     { value: stats.systems, label: stats.systems === 1 ? "system" : "systems" },
     { value: stats.homes, label: stats.homes === 1 ? "GitHub home" : "GitHub homes" },
     { value: stats.caseStudies, label: stats.caseStudies === 1 ? "case study" : "case studies" },
     { value: stats.activeThisMonth, label: "active this month", live: true },
   ].filter((i) => i.value > 0); // a zero is an absence, not a figure — it isn't shown
+  const spotlight = (
+    <div className="mt-8 -mx-4 sm:mx-0 md:mt-10">
+      <SystemsSpotlight systems={ring} />
+    </div>
+  );
   return (
     <>
       <HeroFigures figures={items} />
-      {catalog && (
-        <div className="mt-8 -mx-4 sm:mx-0 md:mt-10">
-          <SystemsSpotlight systems={catalog.systems} />
-        </div>
-      )}
+      {/* The ring shows in the first HTML; a filter in the URL hides it once the browser reads it. */}
+      <Suspense fallback={spotlight}>
+        <WhenUnfiltered>{spotlight}</WhenUnfiltered>
+      </Suspense>
     </>
   );
 }
 
-/**
- * Holds the height the figures and the ring take once they arrive, so the catalog below doesn't jump
- * when they stream in (layout shift, WP-102). Measured on the page, 2026-10-22 (D-046): the figures
- * are 153 px on a phone (two rows) and 93 px from 768 px wide (one row); with the ring, the figures,
- * its frame, dots and caption are 367 px on a phone and 316 px from 768 px, plus the card's own
- * height — its width over its shape (spotlight-size.ts).
- */
-function HeroExtrasFallback({ spotlight }: { spotlight: boolean }) {
-  return spotlight ? (
-    <div aria-hidden="true" className="h-[var(--ring-phone)] md:h-[var(--ring-wide)]" style={{ "--ring-phone": `calc(367px + ${SPOTLIGHT_CARD_WIDTH} / ${SPOTLIGHT_CARD_ASPECT})`, "--ring-wide": `calc(316px + ${SPOTLIGHT_CARD_WIDTH} / ${SPOTLIGHT_CARD_ASPECT})` } as React.CSSProperties} />
-  ) : (
-    <div aria-hidden="true" className="h-[153px] md:h-[93px]" />
-  );
-}
-
-export default async function SystemsPage({ searchParams }: SystemsPageProps) {
-  const [params, intro] = await Promise.all([searchParams, getContentBlock("systems-page")]);
-
-  // The ring is the unfiltered first view only.
-  const showSpotlight = !(params.home || params.status || params.domain || params.tech || (params.page && params.page !== "1"));
+export default async function SystemsPage() {
+  // Served from the cache (D-063): every published system is in the page; the filters run in the browser.
+  const [intro, data, flagships, ventures, coursework] = await Promise.all([
+    getContentBlock("systems-page"),
+    loadCatalogData(),
+    sectionCopy("systems.flagships", GROUP_FALLBACK.flagships),
+    sectionCopy("systems.ventures", GROUP_FALLBACK.ventures),
+    sectionCopy("systems.coursework", GROUP_FALLBACK.coursework),
+  ]);
+  const groupCopy: GroupCopy = { flagships, ventures, coursework };
 
   return (
     <>
@@ -83,14 +75,12 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
         title={<Accent text={intro?.heading ?? "The systems."} className="type-accent text-ember-gradient pr-[0.06em]" />}
         description={intro?.lede}
       >
-        <Suspense fallback={<HeroExtrasFallback spotlight={showSpotlight} />}>
-          <HeroExtras spotlight={showSpotlight} />
-        </Suspense>
+        <HeroExtras data={data} />
       </PageHero>
       <section className="bg-paper py-14 md:py-20">
         <Container>
-          <Suspense fallback={<SystemsGridSkeleton />}>
-            <SystemsResults searchParams={params} />
+          <Suspense fallback={<SystemsResultsView data={data} groupCopy={groupCopy} params={{}} />}>
+            <SystemsResults data={data} groupCopy={groupCopy} />
           </Suspense>
         </Container>
       </section>

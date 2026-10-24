@@ -23,7 +23,7 @@
 // organisations live in the footer, not repeated here.
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { buttonVariants } from "@/components/ui/button";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { ArrowRight, ChevronDown, FileText } from "lucide-react";
@@ -327,7 +327,6 @@ export default async function AboutPage() {
                                 <li key={s.skillId}>
                                   <Link
                                     href={`/systems?tech=${encodeURIComponent(s.name)}`}
-                                    aria-label={`${s.name} — used in ${s.systemCount} published system${s.systemCount === 1 ? "" : "s"}`}
                                     className="group/k press text-ink focus-visible:outline-ember flex min-h-11 items-center gap-3 py-2 text-[15px] focus-visible:outline-2 focus-visible:-outline-offset-2"
                                   >
                                     <SkillIcon name={s.name} className="size-4 shrink-0" />

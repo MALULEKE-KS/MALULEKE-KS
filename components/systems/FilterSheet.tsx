@@ -11,7 +11,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { Check, SlidersHorizontal } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { brandMark } from "@/components/shared/TechChip";

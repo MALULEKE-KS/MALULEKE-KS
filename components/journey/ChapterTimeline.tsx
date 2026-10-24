@@ -17,7 +17,7 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { Reveal } from "@/components/shared/Reveal";
 import { cn } from "@/lib/utils";

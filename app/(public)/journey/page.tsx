@@ -18,7 +18,7 @@
 // page-copy block; dates are his milestones (Admin → Journey); every number is
 // computed. No GitHub entries — the systems live on /systems.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { buttonVariants } from "@/components/ui/button";
 import { PageHeroBackdrop } from "@/components/shared/PageHeroBackdrop";
 import { ArrowRight, FileText } from "lucide-react";

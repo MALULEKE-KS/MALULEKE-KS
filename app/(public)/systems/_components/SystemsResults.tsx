@@ -1,16 +1,22 @@
 // app/(public)/systems/_components/SystemsResults.tsx
-// The catalog's filters and results (PAGE-BUILD-PLAYBOOK §9), inside the
-// page's <Suspense> (see SystemsGridSkeleton.tsx for why not a loading.tsx).
-// Data: lib/queries/catalog.ts — filters, counts and pages from one read.
+// The catalog's filters and results (PAGE-BUILD-PLAYBOOK §9). /systems is served
+// from the cache (D-063): the page carries every published system once, and the
+// filters, counts and pages are applied here, in the browser, from the URL — by
+// the same pure step the server uses (lib/catalog/apply.ts), so a link such as
+// ?status=coursework reads exactly as before. The page's first HTML is the
+// unfiltered view (SystemsResultsView with no filters, as the Suspense fallback);
+// the browser takes over with the URL's filters.
 
-import Link from "next/link";
+"use client";
+
+import Link from "@/components/shared/IntentLink";
 import { ArrowLeft, ArrowRight, SearchX, X } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 import { CatalogCard } from "@/components/systems/CatalogCard";
 import { CatalogFilters, activeFilters } from "@/components/systems/CatalogFilters";
-import { getCatalog, type Catalog, type CatalogSystem } from "@/lib/queries/catalog";
-import { sectionCopy } from "@/lib/content/copy";
-import { PaginationQuerySchema } from "@/lib/schemas";
+import { useSearchParams } from "next/navigation";
+import type { Catalog, CatalogData, CatalogSystem } from "@/lib/queries/catalog";
+import { applyCatalog } from "@/lib/catalog/apply";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 12;
@@ -19,15 +25,20 @@ const PAGER =
 
 type Params = Record<string, string | undefined>;
 
-export async function loadCatalog(params: Params): Promise<Catalog> {
-  const { page } = PaginationQuerySchema.parse({ page: params.page });
-  return getCatalog({
+/** The page the URL asks for: a whole number from 1, anything else is the first page. */
+function pageOf(value: string | undefined) {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 ? n : 1;
+}
+
+export function catalogFor(data: CatalogData, params: Params): Catalog {
+  return applyCatalog(data, {
     home: params.home ?? null,
     status: params.status ?? null,
     domain: params.domain ?? null,
     tech: params.tech ?? null,
     sort: params.sort === "active" ? "active" : "featured",
-    page,
+    page: pageOf(params.page),
     pageSize: PAGE_SIZE,
   });
 }
@@ -54,8 +65,9 @@ function Grid({ systems, showHome = true, fit = false }: { systems: CatalogSyste
 }
 
 /** The three groups, in order (D-061): the owner's best work first, so the rest never dilutes it. */
-type GroupKey = "flagships" | "ventures" | "coursework";
-const GROUP_FALLBACK: Record<GroupKey, { title: string; description: string }> = {
+export type GroupKey = "flagships" | "ventures" | "coursework";
+export type GroupCopy = Record<GroupKey, { title?: string; description?: string }>;
+export const GROUP_FALLBACK: Record<GroupKey, { title: string; description: string }> = {
   flagships: { title: "Flagships", description: "My best work, live in production." },
   ventures: { title: "Ventures & clients", description: "Built for my own ventures and for clients." },
   coursework: { title: "Coursework & experiments", description: "University coursework and experiments." },
@@ -76,11 +88,9 @@ function groupOf(s: CatalogSystem, homes: Catalog["homes"]): GroupKey {
  * systems.flagships / systems.ventures / systems.coursework. Only when the whole catalog fits on
  * one page — a group split across pages would say less than the flat grid.
  */
-async function ByGroup({ systems, homes }: { systems: CatalogSystem[]; homes: Catalog["homes"] }) {
+function ByGroup({ systems, homes, copy }: { systems: CatalogSystem[]; homes: Catalog["homes"]; copy: GroupCopy }) {
   const keys: GroupKey[] = ["flagships", "ventures", "coursework"];
-  const groups = await Promise.all(
-    keys.map(async (key) => ({ key, copy: await sectionCopy(`systems.${key}`, GROUP_FALLBACK[key]), systems: systems.filter((s) => groupOf(s, homes) === key) })),
-  );
+  const groups = keys.map((key) => ({ key, copy: copy[key], systems: systems.filter((s) => groupOf(s, homes) === key) }));
   return (
     <div className="space-y-16">
       {groups
@@ -105,8 +115,9 @@ async function ByGroup({ systems, homes }: { systems: CatalogSystem[]; homes: Ca
   );
 }
 
-export async function SystemsResults({ searchParams: params }: { searchParams: Params }) {
-  const catalog = await loadCatalog(params);
+/** The results for one set of filters — the unfiltered view on the server, the URL's in the browser. */
+export function SystemsResultsView({ data, groupCopy, params }: { data: CatalogData; groupCopy: GroupCopy; params: Params }) {
+  const catalog = catalogFor(data, params);
   const { systems, total, page, totalPages, facets, homes } = catalog;
   const filtered = Boolean(params.home || params.status || params.tech || params.domain);
   const grouped = !filtered && params.sort !== "active" && totalPages === 1;
@@ -147,7 +158,7 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
         </div>
       ) : (
         <>
-          {grouped ? <ByGroup systems={systems} homes={homes} /> : <Grid systems={systems} />}
+          {grouped ? <ByGroup systems={systems} homes={homes} copy={groupCopy} /> : <Grid systems={systems} />}
 
           {totalPages > 1 && (
             <nav aria-label="Pages" className="mt-12 flex items-center justify-center gap-4">
@@ -179,3 +190,17 @@ export async function SystemsResults({ searchParams: params }: { searchParams: P
     </>
   );
 }
+
+/** The results the URL asks for — read in the browser, so the page itself stays in the cache. */
+export function SystemsResults({ data, groupCopy }: { data: CatalogData; groupCopy: GroupCopy }) {
+  const search = useSearchParams();
+  return <SystemsResultsView data={data} groupCopy={groupCopy} params={Object.fromEntries(search.entries())} />;
+}
+
+/** Shown only while no filter is on (the spotlight ring) — the URL is read in the browser. */
+export function WhenUnfiltered({ children }: { children: React.ReactNode }) {
+  const search = useSearchParams();
+  const filtered = ["home", "status", "domain", "tech"].some((k) => search.get(k)) || (search.get("page") ?? "1") !== "1";
+  return filtered ? null : <>{children}</>;
+}
+

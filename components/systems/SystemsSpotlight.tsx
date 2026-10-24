@@ -15,7 +15,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { CoverflowCarousel } from "@/components/ui/coverflow-carousel";

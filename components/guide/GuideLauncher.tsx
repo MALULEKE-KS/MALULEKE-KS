@@ -14,7 +14,7 @@ import { GuideBot } from "@/components/guide/GuideBot";
 import { cn } from "@/lib/utils";
 
 export function GuideLauncher() {
-  const { enabled, open, setOpen, ownerFirstName } = useGuide();
+  const { enabled, open, setOpen } = useGuide();
   const pathname = usePathname();
   if (!enabled || pathname === "/") return null;
   const hidden = open;
@@ -24,7 +24,6 @@ export function GuideLauncher() {
       type="button"
       data-capture-hide
       onClick={() => setOpen(true)}
-      aria-label={`Ask ${ownerFirstName}'s AI guide`}
       aria-hidden={hidden}
       tabIndex={hidden ? -1 : 0}
       className={cn(

@@ -18,7 +18,7 @@
 // used before a rename redirects permanently (#87, BR-1.14).
 
 import { cache } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Activity, ArrowLeft, ArrowRight, ArrowUpRight, Award, Boxes, Building2, GitCommitHorizontal, Globe, Lock, Quote, ShieldCheck, Sparkles, Star, Tag } from "lucide-react";
@@ -273,7 +273,7 @@ export default async function SystemDetailPage({ params }: SystemDetailPageProps
                       Written by AI from {repo ? <a href={repo.url} target="_blank" rel="noopener noreferrer" className="text-ink decoration-ink/30 hover:decoration-ink underline underline-offset-2">the repository</a> : "the repository"}
                       {cs.writeUp.writtenAgo && ` · updated ${cs.writeUp.writtenAgo}`}
                     </span>
-                    <AiBadge className="shrink-0" />
+                    <AiBadge tone="light" className="shrink-0" />
                   </p>
                 )}
                 <Prose markdown={cs.writeUp.markdown} />

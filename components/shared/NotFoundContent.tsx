@@ -11,7 +11,7 @@
 // the rendered cube appears (with the share image and the home-screen icon).
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { HeroLabel } from "@/components/shared/HeroKit";

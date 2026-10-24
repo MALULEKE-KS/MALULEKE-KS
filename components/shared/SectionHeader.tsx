@@ -6,7 +6,7 @@
 // With a copyKey, the eyebrow, title and description come from the
 // "page-copy" content block (lib/content/copy.ts); the props are the fallback.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accent } from "@/components/shared/Accent";

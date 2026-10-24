@@ -6,7 +6,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Activity, ArrowLeftRight, Brain, Check, ChevronDown, Compass, Footprints, LayoutGrid, ListChecks, LoaderCircle, Milestone, PenLine, Search, Sparkles, X, type LucideIcon } from "lucide-react";
 import type { StepKind, TrailStep } from "@/lib/guide/trail";

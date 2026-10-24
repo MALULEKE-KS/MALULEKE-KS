@@ -12,7 +12,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { brandMark } from "@/components/shared/TechChip";
 import { cn } from "@/lib/utils";
@@ -108,7 +108,6 @@ export function FilterDropdown({ name, hint, options, allHref, current, marks = 
           selected ? "border-ink bg-ink text-paper" : "border-ink/12 bg-sheet text-ink hover:border-ink/30",
           "group-open/dd:ring-ember/40 group-open/dd:ring-2",
         )}
-        aria-label={`${name}: ${selected ? selected.label : "all"}`}
       >
         <span className={cn("type-micro", selected ? "text-mist" : "text-slate")}>{name}</span>
         <span className="flex min-w-0 items-center gap-1.5 font-medium">

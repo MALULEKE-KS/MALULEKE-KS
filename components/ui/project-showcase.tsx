@@ -15,7 +15,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { screenshotSrc } from "@/lib/media/screenshot-src"
-import Link from "next/link"
+import Link from "@/components/shared/IntentLink"
 import { ArrowUpRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"

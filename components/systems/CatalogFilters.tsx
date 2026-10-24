@@ -14,7 +14,7 @@
 // isn't shown. Options come from the data (lib/queries/catalog.ts), never a
 // list in code.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { X } from "lucide-react";
 import { FilterDropdown } from "@/components/systems/FilterDropdown";
 import { FilterSheet, type SheetGroup } from "@/components/systems/FilterSheet";

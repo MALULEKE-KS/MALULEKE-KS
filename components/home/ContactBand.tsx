@@ -7,7 +7,7 @@
 // InquiryType lookup, #99) as a ruled list of links, each opening Let's talk
 // with that topic already chosen (?about=). Nothing invented.
 
-import Link from "next/link";
+import Link from "@/components/shared/IntentLink";
 import { Accent } from "@/components/shared/Accent";
 import { HeroLabel } from "@/components/shared/HeroKit";
 import { sectionCopy } from "@/lib/content/copy";
