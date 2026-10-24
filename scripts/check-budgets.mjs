@@ -1,6 +1,6 @@
 // scripts/check-budgets.mjs — fail when a core page has got heavier than its budget (spec WP-102).
 //
-// usage: node scripts/check-budgets.mjs <base-url> [--budgets <file>] [--lighthouse none|mobile|both] [--only <route>] [--repeats <n>]
+// usage: node scripts/check-budgets.mjs <base-url> [--budgets <file>] [--lighthouse none|mobile|both] [--only <route>] [--routes a,b,c] [--repeats <n>]
 //
 // Measures what each core route downloads on a phone and a desktop (always), and optionally runs
 // Lighthouse, then judges the numbers against perf-budgets.json. Weight breaches fail (exit 1);
@@ -21,6 +21,7 @@ function args(argv) {
     if (a === "--budgets") out.budgets = argv[++i];
     else if (a === "--lighthouse") out.lighthouse = argv[++i];
     else if (a === "--only") out.only = argv[++i];
+    else if (a === "--routes") out.routes = argv[++i].split(",").map((r) => r.trim()).filter(Boolean);
     else if (a === "--repeats") out.repeats = Number(argv[++i]);
     else if (!out.base) out.base = a;
   }
@@ -36,7 +37,7 @@ async function main() {
   }
   const base = opts.base.replace(/\/$/, "");
   const budgets = JSON.parse(await readFile(opts.budgets, "utf8"));
-  const routes = opts.only ? ROUTES.filter((r) => r === opts.only) : ROUTES;
+  const routes = opts.routes ?? (opts.only ? ROUTES.filter((r) => r === opts.only) : ROUTES);
 
   let lighthouse = null;
   let desktopConfig = null;

@@ -1,0 +1,10 @@
+{
+  "about": "CI's own budget (D-064): every pull request's production build is measured with Lighthouse on CI's database — not production's data, so no weights, only the floors. A score under its floor fails the build before it can deploy. Production's own weights and floors are perf-budgets.json, checked after every deploy.",
+  "floors": {
+    "mobile": {
+      "performance": 70,
+      "accessibility": 90,
+      "cls": 0.1
+    }
+  }
+}

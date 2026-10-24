@@ -171,3 +171,23 @@ jobs:
         run: PGPASSWORD=postgres psql -h localhost -U postgres -d malulekeks_build -c "CREATE ROLE ci_public LOGIN PASSWORD 'ci_public' IN ROLE platform_public;"
       - run: npx tsx prisma/seed.ts
       - run: npm run build
+      # The owner's plan, Phase 5 (D-064): every pull request's production build is measured with
+      # Lighthouse, as a phone, and a performance or accessibility score under its floor — or CLS
+      # over it — fails the build before it can deploy (perf-budgets.ci.json; CI's data isn't
+      # production's, so weights are checked after each deploy instead, post-deploy.yml).
+      - run: npx playwright install --with-deps chromium
+      - name: The production build meets its Lighthouse floors
+        env:
+          LH_REPORT_DIR: lighthouse-ci
+        run: |
+          npx next start -p 3100 > next-start.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3100/ && break; sleep 2; done
+          node scripts/check-budgets.mjs http://localhost:3100 --budgets perf-budgets.ci.json --lighthouse mobile --routes /,/systems,/about,/journey,/contact --repeats 1
+      - name: Keep the Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-ci
+          path: lighthouse-ci/
+          if-no-files-found: ignore
+          retention-days: 14
