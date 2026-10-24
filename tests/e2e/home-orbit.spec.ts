@@ -48,6 +48,13 @@ for (const vp of [
         });
         expect(overlaps, "no name plate over the hero's words").toBe(false);
       }
+      // the line under the stage, its timeline included, ends inside the hero (owner: it ran past the hero's foot)
+      const inside = await page.evaluate(() => {
+        const hero = document.querySelector("section[aria-labelledby='hero-title']")!.getBoundingClientRect();
+        const bars = document.querySelector(".orbit-bars")!.getBoundingClientRect();
+        return bars.bottom <= hero.bottom + 0.5;
+      });
+      expect(inside, "the timeline ends inside the hero").toBe(true);
       await page.screenshot({ path: `hero-screenshots/orbit-${vp.width}x${vp.height}-${vp.name}.png` });
 
       // open the first system with the explore button (there for keyboards, phones and browsers without WebGL)
