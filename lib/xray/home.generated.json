@@ -826,9 +826,9 @@
     ],
     "LT-13": [
       {
-        "claim": "Safe display: control, bidi and zero-width characters can't disguise a name; applicant links shown as text",
+        "claim": "Safe display: control, bidi and zero-width characters can't disguise a name; applicant links shown as text, opened only by an explicit act",
         "layer": "App",
-        "status": "partial"
+        "status": "enforced"
       }
     ]
   }
