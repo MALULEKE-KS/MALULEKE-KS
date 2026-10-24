@@ -46,8 +46,13 @@ for (const vp of VIEWPORTS) {
       expect(await items.first().textContent()).toMatch(/\d+/);
       await expect(hero.locator("[data-record]")).toHaveCount(0);
 
-      // on a phone the hero ends with Let's talk (and the CV when one is switched on); from a tablet up the header has them
-      if (vp.width < 640) await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
+      // on a phone the hero ends with the CV (when one is switched on) and — with the Orbit — its play button, or else
+      // Let's talk (the header carries Let's talk; owner, 2026-10-25); from a tablet up the header has them
+      if (vp.width < 640) {
+        const orbitOn = (await hero.locator(".ks-orbit").count()) > 0;
+        if (orbitOn) await expect(hero.getByRole("button", { name: /Watch 26 weeks/ })).toBeVisible();
+        else await expect(hero.getByRole("link", { name: /Let.s talk/ })).toBeVisible();
+      }
 
       // the cover image: the phone crop on phones, the wide crop on larger screens — kept under the Orbit (D-069)
       const img = hero.locator("picture img");

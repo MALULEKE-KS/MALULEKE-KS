@@ -8,6 +8,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useGuide } from "@/components/guide/GuideProvider";
 import { GuideBot } from "@/components/guide/GuideBot";
@@ -16,7 +17,17 @@ import { cn } from "@/lib/utils";
 export function GuideLauncher() {
   const { enabled, open, setOpen } = useGuide();
   const pathname = usePathname();
-  if (!enabled || pathname === "/") return null;
+  // Not where the guide already has its own section (the home page): checked by the section itself, not only
+  // by the address, so it can't slip back (owner, 2026-10-25: "on desktop homepage there is still that ask my ai
+  // guide floating button").
+  const [hasSection, setHasSection] = useState(false);
+  useEffect(() => {
+    const look = () => setHasSection(document.getElementById("ai-guide") !== null);
+    look();
+    const t = setTimeout(look, 600); // after a client navigation's new page has mounted
+    return () => clearTimeout(t);
+  }, [pathname]);
+  if (!enabled || pathname === "/" || hasSection) return null;
   const hidden = open;
 
   return (

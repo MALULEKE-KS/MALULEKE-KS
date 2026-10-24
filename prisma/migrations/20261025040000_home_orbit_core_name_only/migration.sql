@@ -5,3 +5,8 @@
 UPDATE "SiteContent"
 SET "body" = "body" - 'coreSub'
 WHERE "key" = 'home-orbit' AND "body"->>'coreSub' = 'every commit lands here';
+
+-- The phone hero's second action (owner, 2026-10-25: its Let's talk duplicated the header's): play the Orbit.
+UPDATE "SiteContent"
+SET "body" = jsonb_build_object('playLabel', 'Watch 26 weeks of work') || "body"
+WHERE "key" = 'home-orbit';

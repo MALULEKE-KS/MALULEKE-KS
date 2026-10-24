@@ -159,6 +159,8 @@ export const CONTENT_BLOCKS = {
       // The core's name (D-073): it is the owner's GitHub, where every commit lands.
       coreLabel: z.string().trim().max(30).optional(),
       coreSub: z.string().trim().max(60).optional(),
+      // The phone hero's second action, with the Orbit: down to it, playing the 26 weeks (the header has Let's talk).
+      playLabel: z.string().trim().max(40).optional(),
     }),
   },
   "page-xray": {

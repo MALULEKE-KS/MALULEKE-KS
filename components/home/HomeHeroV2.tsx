@@ -27,6 +27,7 @@ import { TechChip } from "@/components/shared/TechChip";
 import { Button } from "@/components/ui/button";
 import { heroEntranceVars, type HeroCopy } from "@/lib/home/hero";
 import { cn } from "@/lib/utils";
+import { OrbitPlayButton } from "@/components/home/orbit/OrbitPlayButton";
 
 interface HomeHeroV2Props {
   name: string;
@@ -44,7 +45,7 @@ interface HomeHeroV2Props {
   nowBuilding: { name: string; url: string; when: string | null; label: string | null } | null;
   copy: HeroCopy;
   /** The phone's two actions (owner, 2026-10-24): the uploaded CV — the phone's header has no room for it — and Let's talk. */
-  phoneActions: { cvUrl: string | null; cvLabel: string | null; contactLabel: string | null };
+  phoneActions: { cvUrl: string | null; cvLabel: string | null; contactLabel: string | null; /** With the Orbit: play its 26 weeks instead of Let's talk (the header has Let's talk). */ playLabel: string | null };
   /** The Orbit (OrbitStage, D-069): the stage beside the words, over the cover photo, and its instrument bar at the hero's foot — or null. */
   orbit: ReactNode | null;
   /** The cover image behind everything (HeroBackdrop) — null leaves a graphite field. */
@@ -114,7 +115,7 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
           {/* On a phone: the CV and Let's talk — what a recruiter on a phone came for (the owner's plan, Phase 2; owner,
               2026-10-24: "only in mobile", where the header has no room for the CV). From a tablet up the header carries
               both, and the hero keeps the work and the guide. */}
-          {(phoneActions.cvUrl && phoneActions.cvLabel) || phoneActions.contactLabel ? (
+          {(phoneActions.cvUrl && phoneActions.cvLabel) || phoneActions.contactLabel || phoneActions.playLabel ? (
             <div className="hero-rise mt-6 grid w-full grid-cols-2 gap-3 sm:hidden" style={rise(4)}>
               {phoneActions.cvUrl && phoneActions.cvLabel && (
                 <Button asChild variant="glass" size="lg" className="bg-night-deep/40 w-full backdrop-blur">
@@ -124,7 +125,10 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
                   </a>
                 </Button>
               )}
-              {phoneActions.contactLabel && (
+              {/* With the Orbit, the second action plays it (the header already carries Let's talk — owner, 2026-10-25). */}
+              {phoneActions.playLabel ? (
+                <OrbitPlayButton label={phoneActions.playLabel} className={phoneActions.cvUrl && phoneActions.cvLabel ? "w-full" : "col-span-2 w-full"} />
+              ) : phoneActions.contactLabel && (
                 <Button asChild variant="accent" size="lg" className={phoneActions.cvUrl && phoneActions.cvLabel ? "w-full" : "col-span-2 w-full"}>
                   <Link href="/contact">
                     {phoneActions.contactLabel}
