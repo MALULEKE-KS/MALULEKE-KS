@@ -307,7 +307,7 @@ export function OrbitStage({
         return {
           cx: 0.5,
           cy: openRef.current !== null ? 0.36 : 0.5,
-          ringPx: Math.min(r.width, r.height) * (openRef.current !== null ? 0.38 : 0.47),
+          ringPx: Math.min(r.width, r.height) * (openRef.current !== null ? 0.4 : 0.5),
           focusX: 0.5,
           focusY: 0.36,
           minCoreX: 0,
@@ -319,7 +319,7 @@ export function OrbitStage({
       return {
         cx,
         cy: 0.5,
-        ringPx: Math.min(zone * 0.5, r.height * 0.45),
+        ringPx: Math.min(zone * 0.56, r.height * 0.5),
         focusX: Math.max(0.3, (cx * r.width - 220) / r.width),
         focusY: 0.5,
         // the core is never carried into the words' column
@@ -459,24 +459,46 @@ export function OrbitStage({
   useEffect(() => {
     const cv = canvas.current;
     if (!cv) return;
-    let down: { x: number; y: number; moved: boolean; last: number; touch: boolean } | null = null;
+    // A mouse drags any way (round, over the top, upside down). On a phone one finger turns it sideways and
+    // leaves the page free to scroll; two fingers turn it any way and pinch to zoom. A double click or tap resets.
+    let down: { x: number; y: number; moved: boolean; lastX: number; lastY: number; touch: boolean } | null = null;
+    const touches = new Map<number, { x: number; y: number }>();
+    let pinch: { d: number; cx: number; cy: number } | null = null;
+    let lastTap = 0;
     const local = (e: PointerEvent) => {
       const r = cv.getBoundingClientRect();
       return [e.clientX - r.left, e.clientY - r.top] as const;
     };
+    const two = () => {
+      const [p, q] = [...touches.values()];
+      return { d: Math.hypot(p!.x - q!.x, p!.y - q!.y), cx: (p!.x + q!.x) / 2, cy: (p!.y + q!.y) / 2 };
+    };
     const onDown = (e: PointerEvent) => {
       const [x, y] = local(e);
-      down = { x, y, moved: false, last: x, touch: e.pointerType !== "mouse" };
+      if (e.pointerType !== "mouse") {
+        touches.set(e.pointerId, { x, y });
+        if (touches.size === 2) { pinch = two(); down = null; return; }
+      }
+      down = { x, y, moved: false, lastX: x, lastY: y, touch: e.pointerType !== "mouse" };
     };
     const onMove = (e: PointerEvent) => {
       const [x, y] = local(e),
         en = engine.current;
       if (!en) return;
+      if (touches.has(e.pointerId)) touches.set(e.pointerId, { x, y });
+      if (pinch && touches.size === 2) {
+        const now = two();
+        en.turn((now.cx - pinch.cx) * 0.007, (now.cy - pinch.cy) * 0.007);
+        if (now.d > 10 && pinch.d > 10) en.zoom(pinch.d / now.d);
+        pinch = now;
+        return;
+      }
       if (down) {
         if (Math.abs(x - down.x) + Math.abs(y - down.y) > 6) down.moved = true;
         if (down.moved) {
-          en.turn((x - down.last) * 0.0072, e.pointerType === "mouse" ? e.movementY * 0.004 : 0);
-          down.last = x;
+          en.turn((x - down.lastX) * 0.0068, down.touch ? 0 : (y - down.lastY) * 0.0068);
+          down.lastX = x;
+          down.lastY = y;
         }
       } else if (e.pointerType === "mouse") {
         const h = en.pick(x, y, false);
@@ -486,15 +508,22 @@ export function OrbitStage({
       }
     };
     const onUp = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      if (touches.size < 2) pinch = null;
       if (!down) return;
       const was = down;
       down = null;
       if (was.moved) return;
       const [x, y] = local(e);
       const h = engine.current?.pick(x, y, was.touch) ?? null;
+      const now = performance.now();
+      if (h === null && now - lastTap < 320) { engine.current?.reset(); lastTap = 0; return; }
+      lastTap = now;
       openWorld(h !== null ? h : null);
     };
-    const onCancel = () => {
+    const onCancel = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      if (touches.size < 2) pinch = null;
       down = null;
     };
     const onLeave = () => {
