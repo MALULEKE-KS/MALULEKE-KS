@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdminId } from "@/lib/auth/current-admin";
 import { getAdminShell } from "@/lib/queries/admin-shell";
+import { setAdminTimeZone } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -19,5 +20,6 @@ export const metadata: Metadata = { title: { default: "Admin", template: "%s · 
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   await requireAdminId();
   const shell = await getAdminShell();
+  setAdminTimeZone(shell.timeZone); // server-rendered pages write their dates in the same zone
   return <AdminShell data={shell}>{children}</AdminShell>;
 }

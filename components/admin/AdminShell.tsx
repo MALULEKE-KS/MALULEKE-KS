@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ChevronRight, LogOut, Menu, Search, X } from "lucide-react";
 import { BrandMark } from "@/components/shared/BrandMark";
+import { setAdminTimeZone } from "@/components/admin/ui";
 import { AdminSearch } from "@/components/admin/AdminSearch";
 import { ADMIN_DOCK, ADMIN_GROUPS, ADMIN_PAGES, adminPageFor, isAdminPageActive, type AdminPage } from "@/lib/admin/nav";
 import type { AdminShellData } from "@/lib/queries/admin-shell";
@@ -47,6 +48,8 @@ function recordFor(pathname: string, data: AdminShellData) {
 }
 
 export function AdminShell({ data, children }: { data: AdminShellData; children: React.ReactNode }) {
+  // Every date below is written in the site's zone, on the server and in the browser alike (no hydration mismatch).
+  setAdminTimeZone(data.timeZone);
   const pathname = usePathname();
   const router = useRouter();
   const [menuFor, setMenuFor] = useState<string | null>(null);
