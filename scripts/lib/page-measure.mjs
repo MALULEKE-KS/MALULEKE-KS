@@ -105,8 +105,13 @@ export function diagnose(lhr) {
   const a = lhr.audits;
   const kb = (b) => Math.round((b ?? 0) / 1024);
   const items = (id) => a[id]?.details?.items ?? [];
-  const phases = (items("largest-contentful-paint-element")[1]?.items ?? []).map((p) => `${p.phase ?? p.label}: ${Math.round(p.timing ?? 0)} ms`);
+  // Lighthouse 12+: the LCP's element and the parts of its time live in the "lcp-breakdown-insight" audit, as a list of a table and a node.
+  const breakdown = items("lcp-breakdown-insight").length ? items("lcp-breakdown-insight") : items("largest-contentful-paint-element");
+  const parts = breakdown.flatMap((b) => (b.type === "table" ? b.items ?? [] : b.type === "list" ? (b.items ?? []).flatMap((x) => (x.type === "table" ? x.items ?? [] : [])) : []));
+  const nodes = breakdown.flatMap((b) => (b.type === "node" ? [b] : b.type === "list" ? (b.items ?? []).filter((x) => x.type === "node") : []));
+  const phases = parts.map((p) => `${p.label ?? p.subpart ?? p.phase}: ${Math.round(p.duration ?? p.timing ?? 0)} ms`);
   return {
+    lcpNode: nodes[0]?.snippet ?? null,
     lcpPhases: phases,
     serverResponseMs: Math.round(a["server-response-time"]?.numericValue ?? 0),
     renderBlocking: items("render-blocking-resources").map((i) => `${i.url} (${Math.round(i.wastedMs ?? 0)} ms)`),
