@@ -358,7 +358,7 @@ async function compile(gl: WebGL2RenderingContext, vs: string, fs: string) {
 export async function createOrbit(
   canvas: HTMLCanvasElement,
   data: OrbitData,
-  opts: { reduced: boolean; quality: number; weekMs: number; sky: number; onFrame: (f: OrbitFrame) => void; /** A device that can't keep up: "lighter" (draw less), then "stop" (keep the still). */ onSlow?: (level: "lighter" | "stop") => void }
+  opts: { reduced: boolean; quality: number; weekMs: number; sky: number; onFrame: (f: OrbitFrame) => void; /** A device that can't keep up: "lighter" (draw less), then "stop" (pause on the still until touched). */ onSlow?: (level: "lighter" | "stop") => void; /** The scene is running again (so the still gives way to it). */ onResume?: () => void }
 ): Promise<OrbitEngine | null> {
   const gl = canvas.getContext("webgl2", {
     antialias: false,
@@ -1003,6 +1003,7 @@ export async function createOrbit(
     slowEma = 1 / 60,
     slowFrames = 0,
     slowTier = 0,
+    lastTouch = performance.now(),
     planetsOk = PL !== null,
     planetsChecked = false;
   const tick = (now: number) => {
@@ -1011,25 +1012,29 @@ export async function createOrbit(
     const raw = (now - last) / 1000 || 0.016;
     const dt = Math.min(0.05, raw);
     last = now;
-    // How long frames really take (not capped): if a device can't keep up, lighten the scene, then give up
-    // gracefully and leave the still — a frozen page is worse than a picture.
-    if (raw < 2) {
-      slowEma = slowEma * 0.92 + raw * 0.08;
+    // How long frames really take (not capped). A device that keeps struggling — not a one-off stall (a busy
+    // machine swapping, a tab coming back) — gets a lighter scene; only one that truly can't run it (about four
+    // frames a second, for several seconds) pauses on the still, and any touch, click or return brings it back.
+    if (raw < 1) {
+      slowEma = slowEma * 0.95 + raw * 0.05;
       slowFrames++;
-      if (slowFrames > 45 && slowEma > 0.07 && slowTier === 0) { slowTier = 1; slowFrames = 0; opts.onSlow?.("lighter"); }
-      else if (slowFrames > 90 && slowEma > 0.12 && slowTier === 1) { slowTier = 2; running = false; cancelAnimationFrame(raf); opts.onSlow?.("stop"); return; }
+      if (slowFrames > 120 && slowEma > 0.08 && slowTier === 0) { slowTier = 1; slowFrames = 0; opts.onSlow?.("lighter"); }
+      else if (slowFrames > 240 && slowEma > 0.25 && slowTier === 1) { slowFrames = 0; running = false; cancelAnimationFrame(raf); opts.onSlow?.("stop"); return; }
     }
+    // Quiet when no one has touched it for a minute: a gentle pace, the planets still there; full speed again on any touch.
+    const quiet = now - lastTouch > 60_000 && st.phase === "idle" && now >= busyUntil;
     acc += dt;
     const fast = st.phase !== "idle" || now < busyUntil || sparks.length > 40;
     // Reduced motion: nothing moves on its own, so a frame is drawn only when the visitor does something.
     if (opts.reduced && now >= busyUntil && drawn) return;
-    if (!fast && acc < 1 / 30) return;
+    if (!fast && acc < (quiet ? 1 / 12 : 1 / 30)) return;
     drawn = true;
     frame(acc);
     acc = 0;
   };
   const busy = () => {
     busyUntil = performance.now() + 2500;
+    lastTouch = performance.now();
   };
 
   return {
@@ -1109,6 +1114,10 @@ export async function createOrbit(
       if (running) return;
       running = true;
       last = performance.now();
+      slowEma = 1 / 60; // a fresh start: the stall that paused it doesn't count against it
+      slowFrames = 0;
+      lastTouch = performance.now();
+      opts.onResume?.();
       raf = requestAnimationFrame(tick);
     },
     stop() {

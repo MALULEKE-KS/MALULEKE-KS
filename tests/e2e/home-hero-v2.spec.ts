@@ -56,14 +56,13 @@ for (const vp of VIEWPORTS) {
       const withOrbit = (await hero.locator(".ks-orbit").count()) > 0;
       if (withOrbit) await expect(hero.locator(".orbit-poster")).toBeAttached();
 
-      // it covers the hero (with the Orbit on a phone: the first screen, the Orbit's band following), the content on top of it
+      // it covers the whole hero — with the Orbit too, on a phone as on a desktop — and the content sits on top of it
       const covers = await page.evaluate(() => {
         const section = document.querySelector('section[aria-labelledby="hero-title"]')!.getBoundingClientRect();
         const image = document.querySelector('section[aria-labelledby="hero-title"] picture img')!.getBoundingClientRect();
         return { top: image.top - section.top, left: image.left - section.left, bottom: section.bottom - image.bottom, right: section.right - image.right };
       });
-      const sides = withOrbit && vp.width < 1024 ? { top: covers.top, left: covers.left, right: covers.right } : covers;
-      for (const side of Object.values(sides)) expect(side).toBeLessThanOrEqual(1);
+      for (const side of Object.values(covers)) expect(side).toBeLessThanOrEqual(1);
 
       // keep the first view as a picture: CI uploads hero-screenshots/ with every run, so the owner can look at
       // the hero at each width on the pull request without running anything (docs/improvements/HOME-HERO-PLAN.md §19)

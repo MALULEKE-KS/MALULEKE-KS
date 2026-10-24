@@ -63,8 +63,8 @@ export function HomeHeroV2({ name, role, statement, credential, liveLine, stack,
       className={cn("bg-night-deep text-paper relative isolate flex min-h-svh flex-col overflow-hidden md:min-h-[min(100svh,60rem)]", orbit && "lg:h-svh lg:min-h-[600px]")}
       style={heroEntranceVars(entrance.durationMs, entrance.staggerMs) as CSSProperties}
     >
-      {/* With the Orbit, the photo stays (owner, 2026-10-24), a little dimmer so the Orbit reads over it: the first screen on a phone (the Orbit's band follows the words), the whole hero from lg. */}
-      {orbit && backdrop ? <div className="absolute inset-x-0 top-0 -z-10 h-svh brightness-[0.8] lg:inset-y-0 lg:h-auto">{backdrop}</div> : backdrop}
+      {/* With the Orbit, the photo stays (owner, 2026-10-24), a little dimmer so the Orbit reads over it — under the whole hero on a phone too, the Orbit over it as on a desktop. */}
+      {orbit && backdrop ? <div className="absolute inset-0 -z-10 brightness-[0.8]">{backdrop}</div> : backdrop}
 
       <Container className={cn("flex flex-1 flex-col justify-start pt-24 pb-6 md:justify-center md:pt-[5.5rem] md:pb-10", orbit && "relative z-10 min-h-0 lg:pointer-events-none lg:pb-6")}>
         {/* One column at the left, so the image's (or the Orbit's) right side has the room; the Orbit keeps clear of it (data-orbit-copy). With the Orbit, the rest of the frame lets clicks through to it. */}
