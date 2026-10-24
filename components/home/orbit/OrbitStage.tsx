@@ -428,6 +428,10 @@ export function OrbitStage({
       e.beacon(bi >= 0 ? bi : null);
       resize();
       e.focus(openRef.current);
+      if (playAsked.current) {
+        playAsked.current = false;
+        e.replay(0);
+      }
       if (onScreen && !document.hidden) e.start();
       setLive(true);
     };
@@ -488,6 +492,18 @@ export function OrbitStage({
       engine.current = null;
     };
   }, [all, busiest, copy, data, measure, openWorld, overPhoto, sys, weekMs, weekTotals]);
+
+  // ---- the phone hero's play button: down to the Orbit, and the 26 weeks from the first
+  const playAsked = useRef(false);
+  useEffect(() => {
+    const play = () => {
+      stage.current?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+      if (engine.current) engine.current.replay(0);
+      else playAsked.current = true; // the scroll starts the scene; it plays as soon as it's up
+    };
+    addEventListener("orbit:play", play);
+    return () => removeEventListener("orbit:play", play);
+  }, []);
 
   // ---- a shared link (?system=…) opens its system — with or without the live scene
   useEffect(() => {

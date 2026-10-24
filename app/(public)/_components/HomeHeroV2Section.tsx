@@ -107,7 +107,7 @@ export async function HomeHeroV2Section({ profile, block, pulse, systemsShipped,
       stack={heroStack(skills, stackCategories, stackCount)}
       copy={copy}
       orbit={orbit}
-      phoneActions={{ cvUrl: cv?.url ?? null, cvLabel: header?.cvMenuLabel?.trim() || null, contactLabel: header?.contactLabel?.trim() || null }}
+      phoneActions={{ cvUrl: cv?.url ?? null, cvLabel: header?.cvMenuLabel?.trim() || null, contactLabel: header?.contactLabel?.trim() || null, playLabel: orbitData ? orbitCopy(orbitBlock).playLabel : null }}
       entrance={{ durationMs, staggerMs }}
       backdrop={
         desktop || mobile ? (

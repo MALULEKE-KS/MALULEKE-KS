@@ -22,6 +22,7 @@
 // focal points from the "home-hero" block, the overlay and the glow from settings.
 
 import type { CSSProperties } from "react";
+import { photoSrcSet } from "@/lib/media/photo-src";
 
 export interface HeroImageSource {
   url: string;
@@ -60,9 +61,12 @@ export function HeroBackdrop({ desktop, mobile, credit, positionDesktop, positio
     <>
       <div className="absolute inset-0 -z-10 overflow-hidden" style={style}>
         <picture>
-          <source media="(max-width: 767px)" srcSet={tall.url} width={tall.width} height={tall.height} />
+          {/* Each crop at the size it's drawn: the route serves narrower versions (lib/media/photo-src.ts), so a phone loads a phone-sized photo. */}
+          <source media="(max-width: 767px)" srcSet={photoSrcSet(tall.url, tall.width) ?? tall.url} sizes="100vw" width={tall.width} height={tall.height} />
           <img
             src={wide.url}
+            srcSet={photoSrcSet(wide.url, wide.width)}
+            sizes="100vw"
             width={wide.width}
             height={wide.height}
             alt=""

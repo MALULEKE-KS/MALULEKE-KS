@@ -1466,7 +1466,7 @@ paths:
     get:
       tags: [Profile (Public)]
       summary: "The owner's current photo for a place on the site, e.g. about — the image itself (WebP), cached by content hash (BR-1.17)"
-      parameters: [{ name: purpose, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the photo's hash — makes the link immutable" }]
+      parameters: [{ name: purpose, in: path, required: true, schema: { type: string } }, { name: v, in: query, schema: { type: string }, description: "The first 12 hex of the photo's hash — makes the link immutable" }, { name: w, in: query, schema: { type: integer, enum: [480, 768, 1080, 1440, 1920] }, description: "With v: the photo resized to this width (never larger than the original), as WebP — a phone gets a phone-sized hero. Any other width serves the original." }]
       responses: { "200": { description: image/webp }, "304": { description: Not modified }, "404": { $ref: "#/components/responses/NotFound" } }
   /systems/{slug}/screenshot:
     get:
