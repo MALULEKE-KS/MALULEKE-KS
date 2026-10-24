@@ -371,7 +371,7 @@ html {
 .orbit-phonehead { display: flex; align-items: end; justify-content: space-between; gap: 12px; padding: 18px max(1.5rem, env(safe-area-inset-right)) 0 max(1.5rem, env(safe-area-inset-left)); border-top: 1px solid rgb(255 255 255 / 0.08); }
 .orbit-stage { position: relative; height: 400px; overflow: hidden; isolation: isolate; transition: height 520ms cubic-bezier(0.22, 1, 0.36, 1);
   background: radial-gradient(70% 55% at 50% 48%, rgb(255 91 31 / 0.08), transparent 70%); }
-.ks-orbit[data-open] .orbit-stage { height: 640px; }
+.ks-orbit[data-open] .orbit-stage { height: 720px; }
 .orbit-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; opacity: 0; transition: opacity 700ms ease; }
 .ks-orbit[data-live] .orbit-canvas { opacity: 1; }
 .orbit-poster-wrap { position: absolute; left: 50%; top: 50%; width: min(96%, 400px); aspect-ratio: 1; transform: translate(-50%, -50%); transition: opacity 600ms ease; pointer-events: none; }
@@ -402,7 +402,7 @@ html {
 i.orbit-live { background: var(--color-signal-finished-on-dark) !important; box-shadow: 0 0 6px rgb(61 220 151 / 0.8); }
 
 /* The opened system's panel: under its world on a phone, beside it from lg — never over it. */
-.orbit-card { position: absolute; z-index: 6; left: 12px; right: 12px; bottom: 12px; max-height: 62%; overflow-y: auto; padding: 14px 18px 18px; border-radius: 22px; background: rgb(14 15 18 / 0.82); border: 1px solid rgb(255 255 255 / 0.1); backdrop-filter: blur(18px) saturate(150%); box-shadow: 0 30px 80px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.07); color: var(--color-paper); transition: opacity 300ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+.orbit-card { position: absolute; z-index: 6; left: 12px; right: 12px; bottom: 12px; max-height: 66%; overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 18px; border-radius: 22px; background: rgb(14 15 18 / 0.82); border: 1px solid rgb(255 255 255 / 0.1); backdrop-filter: blur(18px) saturate(150%); box-shadow: 0 30px 80px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.07); color: var(--color-paper); transition: opacity 300ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
 .orbit-card[data-open="false"] { opacity: 0; transform: translateY(30px); pointer-events: none; }
 .orbit-card[data-open="true"] > * { animation: orbit-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .orbit-card > :nth-child(3) { animation-delay: 40ms; } .orbit-card > :nth-child(4) { animation-delay: 80ms; } .orbit-card > :nth-child(5) { animation-delay: 120ms; }

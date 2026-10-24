@@ -36,6 +36,8 @@ export interface OrbitLayout {
   /** Where an opened world sits on screen (shares of width and height), clear of its panel. */
   focusX: number;
   focusY: number;
+  /** The core never comes left of this (a share of the width): the words' column is the core's limit too. */
+  minCoreX: number;
 }
 
 export interface OrbitFrame {
@@ -423,7 +425,7 @@ export async function createOrbit(
     base: 4,
     target: [0, 0, 0] as Vec3,
   };
-  let layout: OrbitLayout = { cx: 0.5, cy: 0.5, ringPx: 200, focusX: 0.5, focusY: 0.5 };
+  let layout: OrbitLayout = { cx: 0.5, cy: 0.5, ringPx: 200, focusX: 0.5, focusY: 0.5, minCoreX: 0 };
   let focused: number | null = null,
     hovered: number | null = null,
     techLit: string | null = null,
@@ -548,11 +550,21 @@ export async function createOrbit(
       w.pos = ringPoint(w.s.home, w.angle, ring(w.s.home).r * grow);
       w.dim += ((focused !== null && focused !== i ? 1 : 0) - w.dim) * e * 0.6;
     });
-    const tgt = focused !== null ? worlds[focused]!.pos : ([0, 0, 0] as Vec3);
+    const fp = focused !== null ? worlds[focused]!.pos : null;
+    const tgt: Vec3 = fp ? [fp[0] * 0.5, fp[1] * 0.5, fp[2] * 0.5] : [0, 0, 0];
     for (let k = 0; k < 3; k++)
       cam.target[k] = cam.target[k]! + (tgt[k]! - cam.target[k]!) * e * 0.7;
-    const tsx = focused !== null ? 2 * layout.focusX - 1 : 2 * layout.cx - 1;
-    const tsy = focused !== null ? 1 - 2 * layout.focusY : 1 - 2 * layout.cy;
+    // An opened world is carried to its place on screen (clear of its panel) by shifting the scene; the
+    // core is never carried into the words' column. Measured from the last frame, so it converges.
+    let tsx = 2 * layout.cx - 1;
+    let tsy = 1 - 2 * layout.cy;
+    if (focused !== null && frameOut.worlds[focused]!.depth > 0) {
+      const o = frameOut.worlds[focused]!;
+      tsx = st.sx + (2 * (layout.focusX * st.w - o.x)) / st.w;
+      tsy = st.sy + (2 * (o.y - layout.focusY * st.h)) / st.h;
+      const coreX = frameOut.core.x + ((tsx - st.sx) * st.w) / 2;
+      if (coreX < layout.minCoreX * st.w) tsx += (2 * (layout.minCoreX * st.w - coreX)) / st.w;
+    }
     st.sx += (tsx - st.sx) * e * 0.8;
     st.sy += (tsy - st.sy) * e * 0.8;
     st.dof += ((focused !== null ? 1.1 : 0.42) - st.dof) * e * 0.6;
@@ -776,7 +788,7 @@ export async function createOrbit(
       canvas.width = Math.round(st.w * dpr);
       canvas.height = Math.round(st.h * dpr);
       cam.base = distanceFor(next.ringPx, st.h);
-      cam.tdist = focused !== null ? cam.base * 0.5 : cam.base;
+      cam.tdist = focused !== null ? cam.base * 0.66 : cam.base;
       if (st.sx === 0 && st.sy === 0) {
         st.sx = 2 * next.cx - 1;
         st.sy = 1 - 2 * next.cy;
@@ -787,7 +799,7 @@ export async function createOrbit(
     focus(i) {
       if (i === focused) return;
       focused = i;
-      cam.tdist = i !== null ? cam.base * 0.5 : cam.base;
+      cam.tdist = i !== null ? cam.base * 0.66 : cam.base;
       if (i !== null) shocks.push({ w: i, age: 0 });
       busy();
     },

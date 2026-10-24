@@ -318,7 +318,8 @@ export function OrbitStage({
           cy: 0.5,
           ringPx: Math.min(r.width, r.height) * 0.4,
           focusX: 0.5,
-          focusY: 0.26,
+          focusY: 0.24,
+          minCoreX: 0,
         };
       const copyEl = root.current?.closest("section")?.querySelector("[data-orbit-copy]");
       const left = copyEl ? copyEl.getBoundingClientRect().right - r.left : r.width * 0.45;
@@ -330,6 +331,8 @@ export function OrbitStage({
         ringPx: Math.min(zone * 0.42, r.height * 0.38),
         focusX: Math.max(0.3, (cx * r.width - 220) / r.width),
         focusY: 0.5,
+        // the core is never carried into the words' column
+        minCoreX: (left + 90) / r.width,
       };
     };
     const quality = () =>
