@@ -61,8 +61,10 @@ export function HeroBackdrop({ desktop, mobile, credit, positionDesktop, positio
     <>
       <div className="absolute inset-0 -z-10 overflow-hidden" style={style}>
         <picture>
-          {/* Each crop at the size it's drawn: the route serves narrower versions (lib/media/photo-src.ts), so a phone loads a phone-sized photo. */}
-          <source media="(max-width: 767px)" srcSet={photoSrcSet(tall.url, tall.width) ?? tall.url} sizes="100vw" width={tall.width} height={tall.height} />
+          {/* Each crop at the size it's drawn: the route serves narrower versions (lib/media/photo-src.ts), so a phone loads a phone-sized photo.
+              On a phone the photo sits dimmed under a veil behind the words, so it's asked for at about half the screen's
+              pixels (sizes 55vw): a 3× screen takes the 768 px version — half the bytes, no visible loss behind the veil. */}
+          <source media="(max-width: 767px)" srcSet={photoSrcSet(tall.url, tall.width) ?? tall.url} sizes="55vw" width={tall.width} height={tall.height} />
           <img
             src={wide.url}
             srcSet={photoSrcSet(wide.url, wide.width)}
