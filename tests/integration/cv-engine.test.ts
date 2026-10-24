@@ -199,7 +199,7 @@ describe("everything on the CV is editable in the admin", () => {
   it("edits the profile — headline, phone, summary — audited, and the CV follows", async () => {
     const res = await patchProfile(
       adminRequest(`${SITE}/api/v1/admin/profile`, "PATCH", {
-        headline: "Software & AI Engineer",
+        headline: "Software Engineer",
         phone: "+27 60 000 0000",
         summary: `${RUN} summary.`,
       }),
