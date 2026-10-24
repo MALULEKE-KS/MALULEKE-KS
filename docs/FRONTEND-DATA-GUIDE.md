@@ -48,7 +48,7 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
-**Platform pulse** — Footer status line
+**Platform pulse** — Header live chip and footer status line
 
 - Call `GET /platform/pulse`
 - Aggregates only — no rows, no actors. deployment is null outside Vercel.
@@ -60,9 +60,21 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Debounce typing; 429 means slow down (limits are admin settings search.rateLimit.*).
 - Queries under 2 characters are refused — don't send them.
 
+**CV — the options, view and download** — Header and phone menu: a CV button to the uploaded file while it's offered
+
+- Call `GET /cv/options`
+- Call `GET /cv`
+- Call `POST /cv/generate`
+- Call `GET /cv/documents/{id}`
+- Call `GET /cv/uploads/{id}`
+- Start from GET /cv/options: show exactly those options, in that order, with their labels — never assume either exists.
+- Never present one option as the other: the uploaded CV is the owner's file as uploaded; the generated one is live data (BR-7.1).
+- Render GET /cv exactly — it's the same model the generated files come from. It, generate and document downloads are 404 while the generated option is hidden.
+- POST /cv/generate returns a fileUrl; navigate to it to download. Uploaded files are plain links (files[].url). 429 = rate-limited.
+
 ### /
 
-**Owner profile and links** — Hero: name, headline
+**Owner profile and links** — Hero: name, headline and the owner's titles
 
 - Call `GET /profile`
 - Call `GET /profile/photo/{purpose}`
@@ -72,22 +84,23 @@ Page by page, every piece of data and every action the backend offers — so a r
 - titles[] are the owner's current titles and qualifications, in order — show them together wherever the name appears; never type a title into a page (F5c, D13).
 - photos.{purpose} gives a cache-safe url, alt text and size — use it with next/image; a missing purpose means no photo yet: render nothing (BR-1.17).
 
-**GitHub homes** — System map: homes → systems → technologies
+**GitHub homes** — How it all connects: homes → systems → technologies
 
 - Call `GET /homes`
 - Counts come from the database and never include a draft, a scheduled system or an unnamed client (BR-1.4).
 
-**Visitor lenses** — Hero: lens chips
+**Public GitHub work** — Hero: the line naming the latest real commit, when the owner hasn't named what he's building
 
-- Call `GET /lenses`
-- Key and label only — the framing prompt and priority content stay private (they are the guide's instructions).
+- Call `GET /github/repos`
+- Call `GET /github/commits`
+- The sync stores a README and commits for public repos only, and wipes them if a repo turns private.
 
 **Weekly build activity** — Selected work: a sparkline on each system
 
 - Call `GET /activity`
 - Only systems that are live on the site; no commit content, no authors.
 
-**The AI guide** — Hero: the character, greeting and lens chips; The AI guide's console: the character at work, the trail, live cards and sources
+**The AI guide** — The AI guide's console: the character at work, the trail, live cards and sources
 
 - Call `POST /guide`
 - Call `POST /guide/warm`
@@ -101,23 +114,23 @@ Page by page, every piece of data and every action the backend offers — so a r
 - Each answer is checked after it finishes (lib/guide/verify.ts): facts it states about him are looked up in the site's data and any it can't find are listed under the answer; the humor governor (lib/guide/tone.ts) decides per reply how much wit is right, from the owner's concierge.humor* settings; a question-specific playbook (lib/guide/playbooks.ts) adds short guidance for the kind of question.
 - The instant lane (flag concierge.instant_lane): pure-data questions — contact, the CV, how many systems, the platform's numbers — are answered from the data with no model, in the wording of the guide-instant content block, before any limit is spent. POST /guide/warm primes the server when a visitor focuses the chat.
 
-**Platform pulse** — How it all connects: the live status line
+**Platform pulse** — Hero: the live line (the build that is running) and the page's receipt; How I build: rules the database enforces, changes audited this week; How it all connects: the live status line
 
 - Call `GET /platform/pulse`
 - Aggregates only — no rows, no actors. deployment is null outside Vercel.
 
-**Homepage** — Hero ledger (years building, organizations founded, shipped / in progress / queued); Featured work (the admin's picks, in order); How it all connects: approved figures (approved metrics only)
+**Homepage** — How I build: the record — systems shipped and published (D-065); Selected work: the admin's picks, in order — or the flagships, up to three (D-065); How it all connects: approved figures (approved metrics only)
 
 - Call `GET /home`
 - Ledger counts are live content facts; metrics are curated snapshots — label them differently (BR-5.3).
 - featured falls back to flagship-first until the admin picks some; never empty while anything is published.
 
-**Page content blocks** — Principles band
+**Page content blocks** — Hero: the statement and every label ("home-hero"), the receipt and the X-ray's words ("page-xray"); Selected work: what each flagship achieved ("flagship-outcomes"); The AI guide's band ("ai-guide"); How I build: the mission and principles ("how-i-build")
 
 - Call `GET /content/{key}`
 - 404 for an unknown or empty block — hide the section rather than showing placeholder copy.
 
-**Case study** — Selected work: each system's screenshot
+**Case study** — Selected work: each system's screenshot and case-study link
 
 - Call `GET /systems/{slug}`
 - Call `GET /systems/{slug}/related`
@@ -128,12 +141,17 @@ Page by page, every piece of data and every action the backend offers — so a r
 - caseStudyAuthor = ai means the case study was written by AI from the public repo (BR-4.5): label it, with caseStudyWrittenAt.
 - screenshotUrl points at /systems/{slug}/screenshot?v=… when a screenshot is stored (captured or uploaded, BR-1.18) — the link is immutable; never present for NDA work.
 
-**Curated numbers** — Control room: approved figures
+**Skills with evidence** — Hero: the technologies the systems are built with, most used first
+
+- Call `GET /skills`
+- Show evidence, not self-rating: "used in 3 systems, 2 roles" beats a bar chart.
+
+**Curated numbers** — How it all connects: approved figures
 
 - Call `GET /metrics`
 - Show approvedAt as "as of" — these are point-in-time figures.
 
-**CV — the options, view and download** — Header and phone menu: a CV button to the uploaded file while it's offered; the home hero's 'Get my CV'
+**CV — the options, view and download** — Hero, on a phone: the CV button to the uploaded file (D-065)
 
 - Call `GET /cv/options`
 - Call `GET /cv`

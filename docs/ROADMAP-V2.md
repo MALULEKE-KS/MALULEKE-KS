@@ -30,6 +30,9 @@
 
 ## Part 2 — Update log (newest first)
 
+### The page's receipt and "See how this page works" (2026-10-24, D-067)
+- **Owner request** for the foot of the home hero (where the record was, D-065): the receipt of the visitor's own request and an X-ray of the page — each section's data, endpoints, rules and source, generated from the capability map and the enforcement register and tested against them. Home page first; the other public pages follow one slice each.
+
 ### V2 goes agile — the way of working written (2026-10-20, docs only)
 - **Owner:** V2 is launched and worked "bit by bit and part by part delivering a working software"; agile is the core working technique (D-028).
 - **Written:** `docs/improvements/WAY-OF-WORKING.md` — vertical slices, sprints with one goal, the relay as the daily stand-up, review and retro, Definitions of Ready/Done/Released, the owner lane, and the proposed Sprints 1–8 (the spec's order, grouped; Sprint 1 sliced). Spec revision 4 (process only); the tracker has a **Current sprint**; D-029 (decided): one release per sprint, to stay inside the Vercel deploy caps; every push is announced to the owner first.

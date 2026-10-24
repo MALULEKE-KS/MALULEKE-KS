@@ -149,6 +149,11 @@ Earlier frontend work — the F5c redesign, the home, Systems, Journey, About, L
 - **Proof in the chrome:** a live chip reads the build Vercel is serving and opens the platform's vital signs from the same public view as the footer — the header states facts the visitor can check, not a tagline. A disclosure (button + card) rather than a hover card, so a tap works on a phone and Escape or a tap outside closes it.
 - **One bar, two states:** the open bar carries the commit, the CV and a readable search field; the scrolled capsule keeps only what moves you on (Live, the nav, search, Let's talk).
 
+### 2026-10-24 · The page's receipt and the X-ray (D-067)
+- **Show the system, don't describe it:** the hero ends with a receipt of the visitor's own request (render time, build, rules held, first byte, the edge that answered) and a switch that X-rays the page — every section outlined, a label pinned under the header (sticky inside a zero-height anchor, so it follows its section without moving content), a sheet with the section's data, endpoints, rules and source.
+- **Weight only on request:** the overlay, its Radix dialog and its manifest are one chunk imported on the first switch (warmed on hover, focus or touch); the receipt measures after `load` in an idle callback, appending to a line that never wraps, so nothing shifts.
+- **One source of truth:** the labels are generated from the capability map and the enforcement register and tested against them — a label can't claim a rule the register doesn't hold.
+
 ### 2026-10-24 · The guide's own face — the orb (D-060)
 - **Drawn as a product, not an illustration:** one hand-built SVG (`GuideBot`) lit like an object — a single key light, a warm rim, a grain filter, a seam, smoked glass over LED eyes with a soft bloom, a metal ring split into a back and a front half so it really passes behind and in front. The earlier glow-halo sketch read as generated and was dropped.
 - **Motion that reports state:** every animation maps to the guide's real state (`botStateOf`); CSS keyframes in globals.css, no animation library; pointer-following through one rAF-throttled listener while on screen; reduced motion stills it.

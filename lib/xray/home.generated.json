@@ -1,0 +1,758 @@
+{
+  "page": "/",
+  "sections": [
+    {
+      "key": "hero",
+      "source": "components/home/HomeHeroV2.tsx",
+      "capabilities": [
+        {
+          "id": "profile",
+          "title": "Owner profile and links",
+          "summary": "Who the owner is — name, headline, role, location, contact, summary, bio, availability, building-since year, social links, and the organizations founded or co-founded. All admin-edited data.",
+          "db": [
+            "PublicProfile",
+            "PublicProfileLink",
+            "PublicAffiliation",
+            "PublicProfileTitle",
+            "PublicProfilePhoto"
+          ],
+          "endpoints": [
+            "GET /profile",
+            "GET /profile/photo/{purpose}"
+          ],
+          "rules": [],
+          "shows": [
+            "Hero: name, headline and the owner's titles"
+          ]
+        },
+        {
+          "id": "github",
+          "title": "Public GitHub work",
+          "summary": "Every public repo in the owner's homes — from the day it began — with languages, topics, stars, activity and README excerpt, and the last 90 days of commits. Refreshed by the daily GitHub sync; private, archived and client-restricted repos never appear (F5c).",
+          "db": [
+            "PublicGithubRepo",
+            "PublicRepoCommit",
+            "RepoCommit"
+          ],
+          "endpoints": [
+            "GET /github/repos",
+            "GET /github/commits"
+          ],
+          "rules": [
+            "BR-1.3",
+            "BR-1.4",
+            "BR-1.7"
+          ],
+          "shows": [
+            "Hero: the line naming the latest real commit, when the owner hasn't named what he's building"
+          ]
+        },
+        {
+          "id": "platform.pulse",
+          "title": "Platform pulse",
+          "summary": "The platform reporting on itself — business rules the database enforces (counted from its own constraints, triggers and functions), audit events, the last successful job and GitHub sync, the running build (F5c §3.2).",
+          "db": [
+            "PublicPlatformPulse",
+            "ActivityLog",
+            "JobRun"
+          ],
+          "endpoints": [
+            "GET /platform/pulse"
+          ],
+          "rules": [
+            "BR-3.4"
+          ],
+          "shows": [
+            "Hero: the live line (the build that is running) and the page's receipt"
+          ]
+        },
+        {
+          "id": "content",
+          "title": "Page content blocks",
+          "summary": "Admin-edited site copy by key — e.g. how-i-build: the mission statement and governing principles (#106).",
+          "db": [
+            "PublicSiteContent"
+          ],
+          "endpoints": [
+            "GET /content/{key}"
+          ],
+          "rules": [],
+          "shows": [
+            "Hero: the statement and every label (\"home-hero\"), the receipt and the X-ray's words (\"page-xray\")"
+          ]
+        },
+        {
+          "id": "skills",
+          "title": "Skills with evidence",
+          "summary": "Every skill with what proves it: published systems that use it, roles and published study — strongest first.",
+          "db": [
+            "SkillEvidence",
+            "Skill",
+            "SkillCategory"
+          ],
+          "endpoints": [
+            "GET /skills"
+          ],
+          "rules": [
+            "BR-1.1"
+          ],
+          "shows": [
+            "Hero: the technologies the systems are built with, most used first"
+          ]
+        },
+        {
+          "id": "cv",
+          "title": "CV — the options, view and download",
+          "summary": "Two clearly labelled CV options (#92): the CV generated from live data — as data for on-screen rendering and as identical ATS-safe PDF or Word files, optionally tailored to a target role — and the owner's uploaded CV file. Each is offered only while the admin…",
+          "db": [
+            "PublicCvOption",
+            "PublicCvUpload",
+            "PublicExperience",
+            "PublicEducation",
+            "PublicAchievement",
+            "PublicProfile",
+            "PublicProfileLink",
+            "SkillEvidence",
+            "DocumentGen",
+            "rate_limit_hit"
+          ],
+          "endpoints": [
+            "GET /cv/options",
+            "GET /cv",
+            "POST /cv/generate",
+            "GET /cv/documents/{id}",
+            "GET /cv/uploads/{id}"
+          ],
+          "rules": [
+            "BR-7.1",
+            "BR-7.2",
+            "BR-7.3",
+            "BR-7.4",
+            "BR-7.5",
+            "BR-7.6"
+          ],
+          "shows": [
+            "Hero, on a phone: the CV button to the uploaded file (D-065)"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "work",
+      "source": "components/home/WorkShowcase.tsx",
+      "capabilities": [
+        {
+          "id": "activity",
+          "title": "Weekly build activity",
+          "summary": "Commits per week for each published system over the last 26 weeks — counts only, from the daily GitHub sync (F5c).",
+          "db": [
+            "PublicSystemActivity"
+          ],
+          "endpoints": [
+            "GET /activity"
+          ],
+          "rules": [
+            "BR-1.1",
+            "BR-1.13"
+          ],
+          "shows": [
+            "Selected work: a sparkline on each system"
+          ]
+        },
+        {
+          "id": "home",
+          "title": "Homepage",
+          "summary": "Everything the homepage shows in one call: the live ledger, the admin's homepage picks, the published-systems count and the admin-approved numbers.",
+          "db": [
+            "PublicLedger",
+            "PublicSystem",
+            "PublicMetric"
+          ],
+          "endpoints": [
+            "GET /home"
+          ],
+          "rules": [
+            "BR-1.1",
+            "BR-5.3"
+          ],
+          "shows": [
+            "Selected work: the admin's picks, in order — or the flagships, up to three (D-065)"
+          ]
+        },
+        {
+          "id": "content",
+          "title": "Page content blocks",
+          "summary": "Admin-edited site copy by key — e.g. how-i-build: the mission statement and governing principles (#106).",
+          "db": [
+            "PublicSiteContent"
+          ],
+          "endpoints": [
+            "GET /content/{key}"
+          ],
+          "rules": [],
+          "shows": [
+            "Selected work: what each flagship achieved (\"flagship-outcomes\")"
+          ]
+        },
+        {
+          "id": "systems.caseStudy",
+          "title": "Case study",
+          "summary": "One published system in full — case study body, measured impacts, permitted testimonials — and related systems in the same domain.",
+          "db": [
+            "PublicSystem",
+            "PublicImpact",
+            "PublicTestimonial",
+            "PublicSlugRedirect",
+            "PublicSystemScreenshot"
+          ],
+          "endpoints": [
+            "GET /systems/{slug}",
+            "GET /systems/{slug}/related",
+            "GET /systems/{slug}/screenshot"
+          ],
+          "rules": [
+            "BR-1.1",
+            "BR-1.3",
+            "BR-1.4",
+            "BR-1.7",
+            "BR-6.1",
+            "BR-6.2",
+            "BR-1.14",
+            "BR-4.5"
+          ],
+          "shows": [
+            "Selected work: each system's screenshot and case-study link"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "guide",
+      "source": "components/home/AiGuideSection.tsx",
+      "capabilities": [
+        {
+          "id": "guide",
+          "title": "The AI guide",
+          "summary": "The owner's AI guide: answers visitors from the site's public data, cites the page each fact came from, shows live cards of systems, journey, skills and the site's pulse read from the public views, and can open a page, search the site or draft the contact…",
+          "db": [
+            "PublicFlag",
+            "VisitorLens",
+            "PublicSystem",
+            "PublicTimeline",
+            "SkillEvidence",
+            "PublicPlatformPulse",
+            "PublicSiteContent",
+            "PublicExperience",
+            "PublicEducation",
+            "PublicProfile",
+            "PublicGuideCheck"
+          ],
+          "endpoints": [
+            "POST /guide",
+            "POST /guide/warm",
+            "POST /guide/feedback",
+            "GET /guide/check"
+          ],
+          "rules": [
+            "BR-2.4",
+            "BR-4.1",
+            "BR-4.2",
+            "BR-4.3",
+            "BR-4.4",
+            "BR-4.6"
+          ],
+          "shows": [
+            "The AI guide's console: the character at work, the trail, live cards and sources"
+          ]
+        },
+        {
+          "id": "content",
+          "title": "Page content blocks",
+          "summary": "Admin-edited site copy by key — e.g. how-i-build: the mission statement and governing principles (#106).",
+          "db": [
+            "PublicSiteContent"
+          ],
+          "endpoints": [
+            "GET /content/{key}"
+          ],
+          "rules": [],
+          "shows": [
+            "The AI guide's band (\"ai-guide\")"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "principles",
+      "source": "components/home/PrinciplesBand.tsx",
+      "capabilities": [
+        {
+          "id": "platform.pulse",
+          "title": "Platform pulse",
+          "summary": "The platform reporting on itself — business rules the database enforces (counted from its own constraints, triggers and functions), audit events, the last successful job and GitHub sync, the running build (F5c §3.2).",
+          "db": [
+            "PublicPlatformPulse",
+            "ActivityLog",
+            "JobRun"
+          ],
+          "endpoints": [
+            "GET /platform/pulse"
+          ],
+          "rules": [
+            "BR-3.4"
+          ],
+          "shows": [
+            "How I build: rules the database enforces, changes audited this week"
+          ]
+        },
+        {
+          "id": "home",
+          "title": "Homepage",
+          "summary": "Everything the homepage shows in one call: the live ledger, the admin's homepage picks, the published-systems count and the admin-approved numbers.",
+          "db": [
+            "PublicLedger",
+            "PublicSystem",
+            "PublicMetric"
+          ],
+          "endpoints": [
+            "GET /home"
+          ],
+          "rules": [
+            "BR-1.1",
+            "BR-5.3"
+          ],
+          "shows": [
+            "How I build: the record — systems shipped and published (D-065)"
+          ]
+        },
+        {
+          "id": "content",
+          "title": "Page content blocks",
+          "summary": "Admin-edited site copy by key — e.g. how-i-build: the mission statement and governing principles (#106).",
+          "db": [
+            "PublicSiteContent"
+          ],
+          "endpoints": [
+            "GET /content/{key}"
+          ],
+          "rules": [],
+          "shows": [
+            "How I build: the mission and principles (\"how-i-build\")"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "map",
+      "source": "components/home/SystemMap.tsx",
+      "capabilities": [
+        {
+          "id": "homes",
+          "title": "GitHub homes",
+          "summary": "The organisations the owner's repositories live under — their own account and their ventures — each with role, GitHub accounts and how many published systems it holds (F5c, D12).",
+          "db": [
+            "PublicHome",
+            "OrganizationKind",
+            "PublicSystemHome"
+          ],
+          "endpoints": [
+            "GET /homes"
+          ],
+          "rules": [
+            "BR-1.4",
+            "BR-1.13"
+          ],
+          "shows": [
+            "How it all connects: homes → systems → technologies"
+          ]
+        },
+        {
+          "id": "platform.pulse",
+          "title": "Platform pulse",
+          "summary": "The platform reporting on itself — business rules the database enforces (counted from its own constraints, triggers and functions), audit events, the last successful job and GitHub sync, the running build (F5c §3.2).",
+          "db": [
+            "PublicPlatformPulse",
+            "ActivityLog",
+            "JobRun"
+          ],
+          "endpoints": [
+            "GET /platform/pulse"
+          ],
+          "rules": [
+            "BR-3.4"
+          ],
+          "shows": [
+            "How it all connects: the live status line"
+          ]
+        },
+        {
+          "id": "home",
+          "title": "Homepage",
+          "summary": "Everything the homepage shows in one call: the live ledger, the admin's homepage picks, the published-systems count and the admin-approved numbers.",
+          "db": [
+            "PublicLedger",
+            "PublicSystem",
+            "PublicMetric"
+          ],
+          "endpoints": [
+            "GET /home"
+          ],
+          "rules": [
+            "BR-1.1",
+            "BR-5.3"
+          ],
+          "shows": [
+            "How it all connects: approved figures (approved metrics only)"
+          ]
+        },
+        {
+          "id": "metrics",
+          "title": "Curated numbers",
+          "summary": "The admin-approved statistics (\"By the numbers\"). A computed or entered value is never public until approved.",
+          "db": [
+            "PublicMetric"
+          ],
+          "endpoints": [
+            "GET /metrics"
+          ],
+          "rules": [
+            "BR-5.3"
+          ],
+          "shows": [
+            "How it all connects: approved figures"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "contact",
+      "source": "components/home/ContactBand.tsx",
+      "capabilities": [
+        {
+          "id": "inquiries.submit",
+          "title": "Let's Talk — send a message",
+          "summary": "The single visitor write path (docs/LETS-TALK-SPEC.md): a category and kind, a form shaped to it, PDFs checked by their bytes; honeypot, signed form token, per-connection and per-address limits, payload-bound idempotency; a reference back; email queued in the…",
+          "db": [
+            "Inquiry",
+            "InquiryType",
+            "InquirySubtype",
+            "InquiryMeeting",
+            "InquiryDocument",
+            "Notification",
+            "rate_limit_hit",
+            "new_inquiry_reference"
+          ],
+          "endpoints": [
+            "POST /inquiries",
+            "GET /inquiries/form",
+            "GET /inquiries/types"
+          ],
+          "rules": [
+            "BR-2.2",
+            "BR-2.3",
+            "BR-2.4",
+            "BR-2.5",
+            "BR-2.6",
+            "BR-2.7",
+            "LT-1",
+            "LT-2",
+            "LT-3",
+            "LT-4",
+            "LT-5",
+            "LT-8",
+            "LT-9",
+            "LT-10",
+            "LT-12",
+            "LT-13"
+          ],
+          "shows": [
+            "Let's talk band: each category opens /contact?about=<key>"
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "BR-1.1": [
+      {
+        "claim": "No publish while clientVisibility ≠ PUBLIC and clientApproved = false, server-side",
+        "layer": "App + DB CHECK",
+        "status": "enforced"
+      }
+    ],
+    "BR-1.3": [
+      {
+        "claim": "NDA_RESTRICTED never exposes repo/live URL publicly",
+        "layer": "DB public view + platform_public role (#76)",
+        "status": "enforced"
+      }
+    ],
+    "BR-1.4": [
+      {
+        "claim": "ANONYMIZED_ONLY never exposes the org name unless nameDisclosureApproved — including through the organization list and filter",
+        "layer": "DB public views + platform_public role (#76)",
+        "status": "enforced"
+      }
+    ],
+    "BR-1.7": [
+      {
+        "claim": "Revised by owner (2026-09-19): private repos are synced too, shown as private with access on request; repo URL never exposed",
+        "layer": "DB public view + sync",
+        "status": "enforced"
+      }
+    ],
+    "BR-1.13": [
+      {
+        "claim": "Scheduled content is public exactly at its time, everywhere, and every publish gate is checked when it's scheduled",
+        "layer": "DB function + trigger + CHECK",
+        "status": "enforced"
+      }
+    ],
+    "BR-1.14": [
+      {
+        "claim": "Renamed systems keep their old links; old slugs stay reserved",
+        "layer": "DB triggers + view + App",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.2": [
+      {
+        "claim": "Every new inquiry reviewed within the configured deadline (48 hours by default)",
+        "layer": "Admin query + setting",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.3": [
+      {
+        "claim": "Name, valid email, message 20–5000 chars, type",
+        "layer": "App + DB CHECK",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.4": [
+      {
+        "claim": "Max 5 per IP per 24h, no privileged bypass",
+        "layer": "DB function + settings table",
+        "status": "enforced"
+      },
+      {
+        "claim": "IP kept only as long as the window needs",
+        "layer": "Hashed keys + daily prune",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.5": [
+      {
+        "claim": "source captured server-side, \"direct\" fallback",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.6": [
+      {
+        "claim": "Idempotency key bound to its payload: same → original, different → 409",
+        "layer": "App + DB unique",
+        "status": "enforced"
+      }
+    ],
+    "BR-2.7": [
+      {
+        "claim": "Honeypot returns an identical 201, creates nothing",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "BR-3.4": [
+      {
+        "claim": "Every mutation and every login attempt logged",
+        "layer": "DB triggers + App",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.1": [
+      {
+        "claim": "Read-only tools; the guide drafts an inquiry the visitor sends through the normal form (stricter than submit_inquiry); every tool ships disabled",
+        "layer": "app/api/v1/guide/route.ts registers open_page (site paths only, as an enum), search_systems (search_public(), public views), draft_inquiry…",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.2": [
+      {
+        "claim": "Read-only tools; the guide drafts an inquiry the visitor sends through the normal form (stricter than submit_inquiry); every tool ships disabled",
+        "layer": "app/api/v1/guide/route.ts registers open_page (site paths only, as an enum), search_systems (search_public(), public views), draft_inquiry…",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.3": [
+      {
+        "claim": "Answers grounded in the site's public data; \"I don't know\" over a guess; no commitments on his behalf",
+        "layer": "grounding: lib/guide/corpus.ts reads only the public views (public role) — tested that unpublished systems, the phone and lens prompts…",
+        "status": "enforced"
+      },
+      {
+        "claim": "The guide's speed, reliability and model use are measured per question — never with visitor text or identifiers — and pruned on a schedule",
+        "layer": "GuideTurn (migration 20261009090000_guide_turns): one metrics row per question written by app/api/v1/guide/route.ts through…",
+        "status": "enforced"
+      },
+      {
+        "claim": "What the guide says about him is checked against his data after it says it; wit is decided by code, not mood; the log of what it couldn't answer keeps no identity",
+        "layer": "verifier: lib/guide/verify.ts looks up paths, links, technologies, years, counts and figures in the answer against the knowledge and shows…",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.4": [
+      {
+        "claim": "Read-only tools; the guide drafts an inquiry the visitor sends through the normal form (stricter than submit_inquiry); every tool ships disabled",
+        "layer": "app/api/v1/guide/route.ts registers open_page (site paths only, as an enum), search_systems (search_public(), public views), draft_inquiry…",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.5": [
+      {
+        "claim": "Write-ups are generated from the public repo, labelled as AI, and never replace the owner's words",
+        "layer": "database: the system_writeup_source trigger marks an admin edit as the owner's and refuses a generated write (app.writeup = 'generated')…",
+        "status": "enforced"
+      }
+    ],
+    "BR-4.6": [
+      {
+        "claim": "Nothing a visitor sends changes what the guide is or may do",
+        "layer": "lib/guide/request.ts whitelist (user text + the guide's own parts; no system/file/unknown-tool parts; size and concierge.* bounds); tool…",
+        "status": "enforced"
+      }
+    ],
+    "BR-5.3": [
+      {
+        "claim": "Public statistics are admin-approved; live counts are content facts",
+        "layer": "DB",
+        "status": "enforced"
+      }
+    ],
+    "BR-6.1": [
+      {
+        "claim": "hasPermission = false never public",
+        "layer": "DB public view",
+        "status": "enforced"
+      }
+    ],
+    "BR-6.2": [
+      {
+        "claim": "Only for published systems",
+        "layer": "DB public view",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.1": [
+      {
+        "claim": "Two labelled CVs: generated from live data at request time, or the owner's uploaded file with its date",
+        "layer": "App + DB view",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.2": [
+      {
+        "claim": "Prior documents and uploads superseded, not deleted; an upload can't be altered",
+        "layer": "App + DB triggers + grants",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.3": [
+      {
+        "claim": "The CV shows only what the site shows, and never invents",
+        "layer": "DB views + App",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.4": [
+      {
+        "claim": "ATS-safe, identical PDF and Word",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.5": [
+      {
+        "claim": "Admin chooses which CV options show; never none; a hidden option is refused everywhere",
+        "layer": "DB CHECK + trigger + views + App",
+        "status": "enforced"
+      }
+    ],
+    "BR-7.6": [
+      {
+        "claim": "Uploads are real PDF/Word files within the size limit, served only as attachments",
+        "layer": "App + DB CHECK",
+        "status": "enforced"
+      }
+    ],
+    "LT-1": [
+      {
+        "claim": "Each category asks only its own questions; another form's field is refused",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "LT-2": [
+      {
+        "claim": "Each category asks only its own questions; another form's field is refused",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "LT-3": [
+      {
+        "claim": "A non-sequential reference, unique, never a credential",
+        "layer": "DB",
+        "status": "enforced"
+      }
+    ],
+    "LT-4": [
+      {
+        "claim": "Compensation is a choice; a range never runs backwards or below zero",
+        "layer": "App + DB",
+        "status": "enforced"
+      }
+    ],
+    "LT-5": [
+      {
+        "claim": "Meetings are events with their own IANA time zone",
+        "layer": "App + DB",
+        "status": "enforced"
+      }
+    ],
+    "LT-8": [
+      {
+        "claim": "Documents are PDFs by their bytes, bounded, admin-only downloads",
+        "layer": "App + DB",
+        "status": "enforced"
+      }
+    ],
+    "LT-9": [
+      {
+        "claim": "Email can't be weaponised; a failed send never undoes state",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "LT-10": [
+      {
+        "claim": "Email can't be weaponised; a failed send never undoes state",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "LT-12": [
+      {
+        "claim": "Possible duplicates flagged, never removed",
+        "layer": "App",
+        "status": "enforced"
+      }
+    ],
+    "LT-13": [
+      {
+        "claim": "Safe display: control, bidi and zero-width characters can't disguise a name; applicant links shown as text",
+        "layer": "App",
+        "status": "partial"
+      }
+    ]
+  }
+}

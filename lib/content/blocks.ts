@@ -113,6 +113,32 @@ export const CONTENT_BLOCKS = {
       outcomes: z.record(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "a system's address, like xkimi-xa-mali"), Text(240)),
     }),
   },
+  "page-xray": {
+    title: "Home — the receipt and the X-ray",
+    description: "The strip at the foot of the home hero: the page's receipt (when this copy was rendered, how fast its first byte came, where it was served from, the build, the rules the database holds) and the \"See how this page works\" switch that labels every section with the data it reads, the endpoint that serves it, the rules it keeps and its source (D-067). The labels' facts come from the capability map and the enforcement register; these are only their words. A label left empty hides its part; an empty switch label hides the X-ray.",
+    schema: z.object({
+      receiptLabel: z.string().trim().max(24).optional(),
+      renderedLabel: instantTemplate(60, ["time"]).optional(),
+      firstByteLabel: instantTemplate(60, ["seconds"]).optional(),
+      edgeLabel: instantTemplate(60, ["region"]).optional(),
+      cacheLabel: instantTemplate(40, ["cache"]).optional(),
+      buildLabel: instantTemplate(40, ["commit"]).optional(),
+      rulesLabel: instantTemplate(60, ["count"]).optional(),
+      switchLabel: z.string().trim().max(40).optional(),
+      onLabel: z.string().trim().max(40).optional(),
+      offLabel: z.string().trim().max(24).optional(),
+      intro: z.string().trim().max(240).optional(),
+      showsLabel: z.string().trim().max(40).optional(),
+      readsLabel: z.string().trim().max(40).optional(),
+      servedLabel: z.string().trim().max(40).optional(),
+      rulesHeading: z.string().trim().max(40).optional(),
+      sourceLabel: z.string().trim().max(40).optional(),
+      /** Each register status in words: enforced, partial, missing, building, deferred. */
+      statusLabels: z.record(z.enum(["enforced", "partial", "missing", "building", "deferred"]), Text(40)).optional(),
+      /** Each section's name on its label, keyed as lib/xray/sections.ts keys them (hero, work, …). */
+      sectionLabels: z.record(z.string().regex(/^[a-z]+$/), Text(40)).optional(),
+    }),
+  },
   "systems-page": {
     title: "Systems — introduction",
     description: "The /systems page's heading and introduction.",

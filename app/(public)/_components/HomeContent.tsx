@@ -70,15 +70,21 @@ export async function HomeContent() {
     getPlatformPulse(),
   ]);
   const guideEnabled = flags[FLAGS.concierge] === true;
-  const [howIBuild, evidence, flagshipOutcomes] = await Promise.all([getContentBlock("how-i-build"), getEvidence(), getContentBlock("flagship-outcomes")]);
-
+  const [howIBuild, evidence, flagshipOutcomes] = await Promise.all([
+    getContentBlock("how-i-build"),
+    getEvidence(),
+    getContentBlock("flagship-outcomes"),
+  ]);
 
   // The line before the name: "Building now" when the owner named the system, "Latest commit" when it is only the latest real commit.
   const nowLabel = selectedWork.nowBuilding?.chosen ? heroWords.buildingLabel : heroWords.nowLabel;
 
   const base = siteUrl();
   // Structured data (#101): who this is and what the site is — the same data the page shows.
-  const personLdData = { "@context": "https://schema.org", ...personLd(profile, base, { organisations: affiliations }) };
+  const personLdData = {
+    "@context": "https://schema.org",
+    ...personLd(profile, base, { organisations: affiliations }),
+  };
   const siteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -91,37 +97,69 @@ export async function HomeContent() {
     <>
       <JsonLd data={personLdData} />
       <JsonLd data={siteLd} />
-      <HomeHeroV2Section
-        profile={profile}
-        block={heroBlock}
-        pulse={pulse}
-        systemsShipped={inProduction}
-        systemsPublished={totalPublished}
-        titles={titles}
-        nowBuilding={selectedWork.nowBuilding ? { name: selectedWork.nowBuilding.name, url: selectedWork.nowBuilding.url, when: selectedWork.nowBuilding.lastPush, label: nowLabel } : null}
-        evidence={evidence}
-      />
+      {/* Each section carries data-xray="<key>" (lib/xray/sections.ts): what the X-ray labels when it's on (D-067). */}
+      <div data-xray="hero">
+        <HomeHeroV2Section
+          profile={profile}
+          block={heroBlock}
+          pulse={pulse}
+          systemsShipped={inProduction}
+          systemsPublished={totalPublished}
+          titles={titles}
+          nowBuilding={
+            selectedWork.nowBuilding
+              ? {
+                  name: selectedWork.nowBuilding.name,
+                  url: selectedWork.nowBuilding.url,
+                  when: selectedWork.nowBuilding.lastPush,
+                  label: nowLabel,
+                }
+              : null
+          }
+          evidence={evidence}
+        />
+      </div>
       {/* The order since the premium pass (D-047): who he is, the proof, a way to question it, how he
           thinks, how the platform holds together, a way to talk — graphite and bone alternating.
           Each section skips its own layout and paint until it nears the screen (.below-fold, globals.css) —
           except the AI guide's band: it holds fixed-position UI (the phone's full-screen conversation, the
           "still answering" button), which a content-visibility wrapper would trap inside the section. */}
-      <div className="below-fold">
-        <WorkShowcase {...selectedWork} totalPublished={totalPublished} nowLabel={nowLabel} outcomes={flagshipOutcomes?.outcomes ?? {}} />
+      <div className="below-fold" data-xray="work">
+        <WorkShowcase
+          {...selectedWork}
+          totalPublished={totalPublished}
+          nowLabel={nowLabel}
+          outcomes={flagshipOutcomes?.outcomes ?? {}}
+        />
       </div>
       {guideEnabled && aiGuide && (
-        <AiGuideSection
-          content={aiGuide}
-          facts={{ systems: totalPublished, synced: ago(pulse.lastGithubSyncAt ? new Date(pulse.lastGithubSyncAt) : null) }}
-        />
+        <div data-xray="guide">
+          <AiGuideSection
+            content={aiGuide}
+            facts={{
+              systems: totalPublished,
+              synced: ago(pulse.lastGithubSyncAt ? new Date(pulse.lastGithubSyncAt) : null),
+            }}
+          />
+        </div>
       )}
-      <div className="below-fold">
-        <PrinciplesBand content={howIBuild} evidence={evidence} record={homeRecord({ systemsShipped: inProduction, systemsPublished: totalPublished, pulse, block: heroBlock, evidence })} />
+      <div className="below-fold" data-xray="principles">
+        <PrinciplesBand
+          content={howIBuild}
+          evidence={evidence}
+          record={homeRecord({
+            systemsShipped: inProduction,
+            systemsPublished: totalPublished,
+            pulse,
+            block: heroBlock,
+            evidence,
+          })}
+        />
       </div>
-      <div className="below-fold">
+      <div className="below-fold" data-xray="map">
         <SystemMap data={systemMap} pulse={pulse} numbers={numbers} />
       </div>
-      <div className="below-fold">
+      <div className="below-fold" data-xray="contact">
         <ContactBand inquiryTypes={inquiryTypes} reviewSlaHours={reviewSlaHours} />
       </div>
     </>
