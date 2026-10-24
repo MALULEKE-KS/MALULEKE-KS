@@ -10,7 +10,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   CircleDashed,
@@ -52,6 +52,8 @@ const STATUS: Record<XrayStatus, { icon: LucideIcon; className: string }> = {
   deferred: { icon: Clock3, className: "text-mist border-white/15 bg-white/5" },
 };
 
+const SECTIONS = new Map(MANIFEST.sections.map((s) => [s.key, s]));
+
 const unique = (lists: string[][]) => [...new Set(lists.flat())];
 
 /** A GET with no path parameters is something a browser can open: link it to the live endpoint. */
@@ -59,7 +61,18 @@ const openable = (endpoint: string) =>
   /^GET \/[^{}]*$/.test(endpoint) ? `/api/v1${endpoint.slice(4)}` : null;
 
 export default function XrayOverlay({ copy, source, onClose }: XrayOverlayProps) {
-  const [anchors, setAnchors] = useState<{ key: string; node: HTMLElement }[]>([]);
+  // One anchor for the top of each marked section — the label sticks inside it while the section is on screen.
+  // Made once, when the overlay first renders (it only ever renders in the browser, after the switch), and
+  // put in place by the effect below.
+  const [anchors] = useState(() =>
+    [...document.querySelectorAll<HTMLElement>("[data-xray]")].flatMap((el) => {
+      const key = el.dataset.xray!;
+      if (!SECTIONS.has(key)) return [];
+      const node = document.createElement("div");
+      node.className = "xray-anchor";
+      return [{ key, el, node }];
+    }),
+  );
   const [open, setOpen] = useState<string | null>(null);
   const openRef = useRef(open);
   const closeRef = useRef(onClose);
@@ -67,32 +80,22 @@ export default function XrayOverlay({ copy, source, onClose }: XrayOverlayProps)
     openRef.current = open;
     closeRef.current = onClose;
   });
-
-  const sections = useMemo(() => new Map(MANIFEST.sections.map((s) => [s.key, s])), []);
+  const sections = SECTIONS;
 
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute("data-xray-mode", "on");
-    // One anchor at the top of each marked section — the label sticks inside it while the section is on screen.
-    const made = [...document.querySelectorAll<HTMLElement>("[data-xray]")].flatMap((el) => {
-      const key = el.dataset.xray!;
-      if (!sections.has(key)) return [];
-      const node = document.createElement("div");
-      node.className = "xray-anchor";
-      el.prepend(node);
-      return [{ key, node }];
-    });
-    setAnchors(made);
+    for (const a of anchors) a.el.prepend(a.node);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !openRef.current) closeRef.current();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
-      for (const a of made) a.node.remove();
+      for (const a of anchors) a.node.remove();
       root.removeAttribute("data-xray-mode");
     };
-  }, [sections]);
+  }, [anchors]);
 
   const label = (key: string) => copy.sectionLabels[key] ?? key;
   const current = open ? sections.get(open) : null;
