@@ -91,6 +91,29 @@ export async function runLighthouse(url, device, lighthouse, desktopConfig) {
     },
     lcpElement: lhr.audits["largest-contentful-paint-element"]?.details?.items?.[0]?.items?.[0]?.node?.snippet ?? null,
     warnings: lhr.runWarnings ?? [],
+    diagnosis: diagnose(lhr),
+    lhr,
+  };
+}
+
+/**
+ * What slows a page, from one Lighthouse report, in a few lines: where the LCP's time goes
+ * (its phases), what blocks the first render, the JavaScript nobody runs, and the main thread's
+ * busiest work. Written next to the full report so a fix can follow a number (WP-102).
+ */
+export function diagnose(lhr) {
+  const a = lhr.audits;
+  const kb = (b) => Math.round((b ?? 0) / 1024);
+  const items = (id) => a[id]?.details?.items ?? [];
+  const phases = (items("largest-contentful-paint-element")[1]?.items ?? []).map((p) => `${p.phase ?? p.label}: ${Math.round(p.timing ?? 0)} ms`);
+  return {
+    lcpPhases: phases,
+    serverResponseMs: Math.round(a["server-response-time"]?.numericValue ?? 0),
+    renderBlocking: items("render-blocking-resources").map((i) => `${i.url} (${Math.round(i.wastedMs ?? 0)} ms)`),
+    unusedJs: items("unused-javascript").slice(0, 8).map((i) => `${i.url} — ${kb(i.wastedBytes)} of ${kb(i.totalBytes)} KB unused`),
+    bootup: items("bootup-time").slice(0, 8).map((i) => `${i.url} — ${Math.round(i.total ?? 0)} ms (script ${Math.round(i.scripting ?? 0)} ms)`),
+    mainThread: items("mainthread-work-breakdown").slice(0, 6).map((i) => `${i.groupLabel ?? i.group}: ${Math.round(i.duration ?? 0)} ms`),
+    largestRequests: items("total-byte-weight").slice(0, 10).map((i) => `${i.url} — ${kb(i.totalBytes)} KB`),
   };
 }
 

@@ -9,6 +9,8 @@
 
 import { readFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { DEBUG_PORT, DEVICES, ROUTES, measureWeight, runLighthouse } from "./lib/page-measure.mjs";
 import { evaluate } from "./lib/budgets.mjs";
 
@@ -61,6 +63,14 @@ async function main() {
         }
         const wantsLighthouse = lighthouse && (opts.lighthouse === "both" || device === "mobile");
         const lh = wantsLighthouse ? await runLighthouse(`${base}${route}`, device, lighthouse, desktopConfig) : null;
+        // Keep the full report and its diagnosis where CI uploads them (LH_REPORT_DIR), so a slow page says why.
+        if (lh && process.env.LH_REPORT_DIR) {
+          const name = `${route === "/" ? "home" : route.slice(1).replaceAll("/", "-")}-${device}`;
+          await mkdir(process.env.LH_REPORT_DIR, { recursive: true });
+          await writeFile(join(process.env.LH_REPORT_DIR, `${name}.json`), JSON.stringify(lh.lhr));
+          await writeFile(join(process.env.LH_REPORT_DIR, `${name}.diagnosis.json`), JSON.stringify({ route, device, metrics: lh.metrics, scores: lh.scores, lcpElement: lh.lcpElement, ...lh.diagnosis }, null, 2));
+        }
+        if (lh) delete lh.lhr;
         measurements.push({ route, device, weight, lighthouse: lh });
         console.log(`${route.padEnd(24)} ${device.padEnd(8)} ${weight.totalKb} KB · ${weight.imageKb} KB images · ${weight.requests} requests${lh ? ` · LCP ${lh.metrics.lcpMs} ms · CLS ${lh.metrics.cls} · perf ${lh.scores.performance}` : ""}`);
       }
