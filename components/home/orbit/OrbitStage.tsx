@@ -369,8 +369,9 @@ export function OrbitStage({
           if (level === "lighter") {
             lighter = true;
             resize();
-          } else setLive(false);
+          } else setLive(false); // paused on the still; a touch, a click or coming back to it resumes (onResume)
         },
+        onResume: () => setLive(true),
       });
       if (cancelled) return e?.destroy();
       if (!e) return; // no WebGL2: the still stays
@@ -398,6 +399,23 @@ export function OrbitStage({
     };
     if (document.readyState === "complete") begin();
     else addEventListener("load", begin, { once: true });
+    const lost = (e: Event) => {
+      e.preventDefault(); // ask the browser to restore it
+      engine.current?.destroy();
+      engine.current = null;
+      booting = false;
+      setLive(false);
+    };
+    const restored = () => {
+      if (onScreen) void boot();
+    };
+    cv.addEventListener("webglcontextlost", lost);
+    cv.addEventListener("webglcontextrestored", restored);
+    // a touch or click on a paused still brings the scene back
+    const wake = () => {
+      if (engine.current) engine.current.start();
+    };
+    st.addEventListener("pointerdown", wake);
     const vis = () =>
       document.hidden ? engine.current?.stop() : onScreen && engine.current?.start();
     document.addEventListener("visibilitychange", vis);
@@ -410,6 +428,9 @@ export function OrbitStage({
       ro.disconnect();
       removeEventListener("load", begin);
       document.removeEventListener("visibilitychange", vis);
+      cv.removeEventListener("webglcontextlost", lost);
+      cv.removeEventListener("webglcontextrestored", restored);
+      st.removeEventListener("pointerdown", wake);
       engine.current?.destroy();
       engine.current = null;
     };
