@@ -3,15 +3,23 @@
 //
 // The applicant's confirmation is fixed copy plus the reference and category —
 // never anything they typed, so the form can't be used to put a stranger's
-// words (or links) in someone else's inbox. The owner's alert says who and
-// what, and links to the admin — the message itself stays in the database.
+// words (or links) in someone else's inbox. The owner's alert carries the
+// whole message and how to reach the sender, so he can read it in his inbox,
+// then open it in the admin to answer and decide (owner, 2026-10-24: "trigger
+// an alert to my email also where i can read it then go and do the rest in
+// the admin"). It goes only to the owner's own address.
 
 import type { Inquiry } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
 import { siteUrl } from "@/lib/site-url";
 
-export function ownerAlertEmail(i: Pick<Inquiry, "id" | "reference" | "name" | "organization" | "role" | "preferredChannel">, category: string, subtype: string | null, documents: number) {
+export function ownerAlertEmail(
+  i: Pick<Inquiry, "id" | "reference" | "name" | "organization" | "role" | "preferredChannel" | "email" | "phone" | "message">,
+  category: string,
+  subtype: string | null,
+  documents: number,
+) {
   const who = [i.name, i.role, i.organization].filter(Boolean).join(" · ");
   return {
     kind: "owner-alert" as const,
@@ -22,10 +30,16 @@ export function ownerAlertEmail(i: Pick<Inquiry, "id" | "reference" | "name" | "
       `Reference: ${i.reference}`,
       `Category:  ${category}${subtype ? ` — ${subtype}` : ""}`,
       `From:      ${who}`,
+      `Email:     ${i.email}`,
+      ...(i.phone ? [`Phone:     ${i.phone}`] : []),
       `Prefers:   ${i.preferredChannel}`,
-      ...(documents > 0 ? [`Attached:  ${documents} PDF${documents === 1 ? "" : "s"}`] : []),
+      ...(documents > 0 ? [`Attached:  ${documents} PDF${documents === 1 ? "" : "s"} (in the admin)`] : []),
       ``,
-      `Open it: ${siteUrl()}/admin/inquiries/${i.id}`,
+      `Their message:`,
+      ``,
+      ...i.message.split("\n").map((line) => `  ${line}`),
+      ``,
+      `Answer it and decide in the admin: ${siteUrl()}/admin/inquiries/${i.id}`,
     ].join("\n"),
   };
 }

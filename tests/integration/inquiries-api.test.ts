@@ -261,7 +261,12 @@ describe("after it's stored", () => {
     await postInquiry(makeRequest(body));
     const row = await stored(body.email);
     const queued = await db.notification.findMany({ where: { inquiryId: row!.id } });
-    expect(queued.some((q) => q.kind === "owner-alert")).toBe(true);
+    const alert = queued.find((q) => q.kind === "owner-alert");
+    expect(alert).toBeDefined();
+    // The owner reads it in his inbox (owner, 2026-10-24): the whole message, how to reach the sender, and the way into the admin.
+    expect(alert!.body).toContain(body.message.split("\n")[0]!);
+    expect(alert!.body).toContain(body.email);
+    expect(alert!.body).toContain(`/admin/inquiries/${row!.id}`);
     // LT-9: no applicant email while the flag is off.
     expect(queued.some((q) => q.kind === "inquiry-received")).toBe(false);
   });
