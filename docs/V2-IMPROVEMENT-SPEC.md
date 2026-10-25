@@ -2,6 +2,7 @@
 
 Audience: Claude Code (implementer). Owner: Kurhula Success Maluleke.
 **V2 PLAN — LOCKED (owner, 2026-10-02).** V1 is finished and released; this is everything V2 builds. Every Claude Code session reads this file first (CLAUDE.md points here), works the relay in Section 0.1, and updates `docs/improvements/TRACKER.md` before it stops. Formerly titled "v1.1"; REVISION 3 (Section 1.2) records the re-scope and the statuses checked against the repo.
+**CLOSED 2026-10-25 (owner), released as `v2.0.0`** — what each work package reached is in the closing ledger at the top of `docs/improvements/TRACKER.md`; what follows is V2 polish until V3 is announced.
 Status history: LOCKED 2026-10-02. REVISION 2 (2026-10-02): re-verified against the live site (builds 6b32ac6 and afed2f6) and re-scoped. Section 1.1 lists what changed. REVISION 4 (2026-10-20): process only — V2 is delivered agile (Section 1.3, `docs/improvements/WAY-OF-WORKING.md`); no scope change. Changes follow Section 2.4.
 Target: raise the platform from a reviewed 8/10 to a defensible 10/10 on one axis: **verifiability** — a skeptical reviewer can confirm any claim on the site in under two minutes.
 

@@ -30,6 +30,10 @@
 
 ## Part 2 — Update log (newest first)
 
+### V2 closed — `v2.0.0` (2026-10-25, D-078)
+- **Owner:** "v2 is done close and update everything." V2 is closed and released as `v2.0.0`. The tracker opens with the closing ledger: every work package at the status it reached (8 done, 14 partial, 7 not started, 5 waiting on the owner). Open work carries forward as V2 polish on request, or into V3.
+- The deferred features in Part 1 stay deferred until their triggers.
+
 ### V2 is done — V2 polish until V3 (2026-10-25, D-076)
 - **Owner:** V2 is complete; what follows is V2 polish — refining what V2 built — until V3 is announced. The deferred features in Part 1 stay deferred until their triggers (or V3).
 - **The README** is the owner's GitHub profile README again, exactly as he wrote it.

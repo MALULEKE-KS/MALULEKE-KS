@@ -2,9 +2,9 @@
 
 This file is loaded automatically by Claude Code at the start of every session in this repository. Do not treat anything below as optional context — it is binding for all implementation work here.
 
-## Start here — V2 is done; this is V2 polish until V3 (owner, 2026-10-25)
+## Start here — V2 is closed; this is V2 polish until V3 (owner, 2026-10-25)
 
-**V2 is complete (owner, 2026-10-25).** Everything from here is **V2 polish** — refining what V2 built, in small verified slices, never new scope — until the owner announces V3. The relay below still governs how work is done.
+**V2 is complete and closed (owner, 2026-10-25), released as `v2.0.0`; the tracker opens with its closing ledger.** Everything from here is **V2 polish** — refining what V2 built, in small verified slices, never new scope — until the owner announces V3. The relay below still governs how work is done.
 
 ### The relay, delivered agile (owner, 2026-10-02; agile 2026-10-20)
 
@@ -82,7 +82,7 @@ See `/docs/DEPLOYMENT.md`, the update log in `/docs/ROADMAP-V2.md`, and the last
 
 **Owner-requested work shipped 2026-10-08 (outside the WP list, D-020–D-023):** the still hero character that turns to clicks and taps; More work order; private systems shown as private; the map traced by click with a phone layout; AI guide phase 1; Functions Storage trimmed. See the tracker's last handoff entry for what's open.
 
-**V2 is done (owner, 2026-10-25); V2 polish until V3:** `/docs/V2-IMPROVEMENT-SPEC.md` stays the reference, `/docs/improvements/TRACKER.md` the state (see "Start here" above). The home hero's Orbit (D-067–D-074) and the speed pass (D-075) were V2's last releases.
+**V2 is closed (owner, 2026-10-25, release `v2.0.0`); V2 polish until V3:** `/docs/V2-IMPROVEMENT-SPEC.md` stays the reference, `/docs/improvements/TRACKER.md` the state (see "Start here" above). The home hero's Orbit (D-067–D-074) and the speed pass (D-075) were V2's last releases.
 
 **Still out of scope:** testimonials, public API exposure beyond `/systems` read, full analytics dashboard, and everything else in `/docs/ROADMAP-V2.md` — real and specified, but not scaffolded until its trigger.
 
