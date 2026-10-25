@@ -10,13 +10,33 @@
   </p>
 </div>
 
-## About me
+### Hi, I'm Kurhula
 
-Final-year **BSc Computer Science & Mathematics** student at North-West University, South Africa, building production-grade systems — full-stack web, AI integration and enterprise automation. The design is complete before any code is written, and one system gets built at a time.
+I design and build software that people and businesses rely on: websites, web apps, business systems and AI assistants, from the first plan to the live product. I'm a final-year **BSc Computer Science & Mathematics** student at North-West University in South Africa, and I founded **[KSDRILL-SA](https://github.com/KSDRILL-SA)**, where I build these systems.
 
-- **Founder & Principal Engineer** — [KSDRILL-SA](https://github.com/KSDRILL-SA): AI systems, fintech, SaaS, EdTech, GovTech
-- **Co-Founder** — [GrowthCore-Solutions](https://github.com/GrowthCore-Solutions): web development, digital marketing, analytics
-- **Live** — [my platform](https://maluleke-ks.vercel.app): a full-stack, database-backed system with an AI guide, itself the proof of the work
+## What I do
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <b>Websites &amp; web apps</b><br/>
+      Fast and built for phones first, so they work for everyone who visits.<br/><br/>
+      <sub>Next.js · React · Angular · Tailwind</sub>
+    </td>
+    <td width="33%" valign="top">
+      <b>Business systems</b><br/>
+      The databases, logins and dashboards behind a product, built to stay secure and correct.<br/><br/>
+      <sub>PostgreSQL · FastAPI · Node.js · Prisma</sub>
+    </td>
+    <td width="33%" valign="top">
+      <b>AI that helps</b><br/>
+      Assistants and automation that answer from real data, not guesses.<br/><br/>
+      <sub>LangChain · RAG pipelines · ChromaDB</sub>
+    </td>
+  </tr>
+</table>
+
+**See it working:** [my platform](https://maluleke-ks.vercel.app) is one of these systems: a full-stack site with its own database and an AI guide you can question.
 
 ## Core skills
 
@@ -24,23 +44,26 @@ Final-year **BSc Computer Science & Mathematics** student at North-West Universi
   <img src="https://skillicons.dev/icons?i=ts,py,nextjs,react,angular,fastapi,nodejs,postgres,prisma,mongodb,redis,docker,githubactions,vercel&theme=dark" alt="TypeScript, Python, Next.js, React, Angular, FastAPI, Node.js, PostgreSQL, Prisma, MongoDB, Redis, Docker, GitHub Actions, Vercel" />
 </p>
 
-**AI:** LangChain · RAG pipelines · ChromaDB &nbsp;·&nbsp; **Stack by problem:** Next.js for content, Angular + FastAPI for precision
+→ The full stack, and the systems that prove each skill: **[maluleke-ks.vercel.app/systems](https://maluleke-ks.vercel.app/systems)**
 
-→ The full stack, with the systems that prove each skill: **[maluleke-ks.vercel.app/systems](https://maluleke-ks.vercel.app/systems)**
+## How I work
 
-## How I build
+1. **Plan first.** The design is finished before any code is written, so nothing is guessed halfway.
+2. **One thing at a time, done properly.** Each part is finished and tested before the next begins.
+3. **No surprises.** When something goes wrong, it's easy to see and quick to fix.
 
-1. **Design before code** — architecture, flows, schema and interfaces are finished first.
-2. **One system at a time** — no forward dependencies, phase by phase, in order.
-3. **Controlled failure** — failures that are predictable, traceable and debuggable.
+## Where I lead
+
+- **[KSDRILL-SA](https://github.com/KSDRILL-SA)**, Founder & Principal Engineer: AI systems, fintech, SaaS, EdTech and GovTech
+- **[GrowthCore-Solutions](https://github.com/GrowthCore-Solutions)**, Co-Founder: web development, digital marketing and analytics
 
 ## Open to
 
-Full-time · Part-time · Contract · Remote — **full-stack, backend, AI/ML and systems architecture** roles, partnerships and social-impact projects.
+Full-time, part-time, contract and remote work in **full-stack, backend, AI/ML and systems architecture**, plus partnerships and social-impact projects.
 
 <div align="center">
   <br/>
-  <a href="https://maluleke-ks.vercel.app/contact"><img src="https://img.shields.io/badge/Let's%20talk-FF5B1F?style=for-the-badge&logoColor=FFFFFF" alt="Let's talk" /></a>
+  <a href="https://maluleke-ks.vercel.app/contact"><img src="https://img.shields.io/badge/Let's%20talk-FF5B1F?style=for-the-badge" alt="Let's talk" /></a>
   <a href="https://wa.me/27640708649"><img src="https://img.shields.io/badge/WhatsApp-16181C?style=for-the-badge&logo=whatsapp&logoColor=FF5B1F" alt="WhatsApp" /></a>
   <br/><br/>
   <em>The sky is the limit — KSDRILL SA</em>
