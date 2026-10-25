@@ -93,6 +93,16 @@ for (const vp of VIEWPORTS) {
   });
 }
 
+test("no floating guide button on the home page, which has the guide's own section (owner, 2026-10-25)", async ({ page }) => {
+  test.setTimeout(120_000);
+  await settle(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(URL);
+  await page.waitForLoadState("load");
+  await page.waitForTimeout(1200); // past the launcher's own second look
+  await expect(page.getByRole("button", { name: "Ask my AI guide" })).toHaveCount(0);
+});
+
 test("the live status line doesn't repeat the record", async ({ page }) => {
   test.setTimeout(120_000);
   await settle(page);
