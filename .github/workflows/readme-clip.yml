@@ -27,8 +27,8 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: A small looping GIF, from the scene once it has settled
         run: |
-          ffmpeg -loglevel error -ss 5 -t 8 -i readme-clip/home.webm \
-            -vf "fps=12,scale=880:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=160:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle" \
+          ffmpeg -loglevel error -ss "$(cat readme-clip/start.txt)" -t 8 -i readme-clip/home.webm \
+            -vf "fps=12,scale=880:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle" \
             -loop 0 readme-clip/orbit.gif
           ls -la readme-clip
       - uses: actions/upload-artifact@v4
