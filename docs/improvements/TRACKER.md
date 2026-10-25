@@ -2,6 +2,17 @@
 
 The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every Claude Code session reads this before any code and updates it before it stops** (spec Section 0.1). `tests/unit/v2-tracker.test.ts` fails if a WP from the spec is missing here, listed twice, has an unknown status, or if **Next up** names a WP that doesn't exist.
 
+## V2 — CLOSED (owner, 2026-10-25)
+
+**V2 is closed** (owner, 2026-10-25: "v2 is done close and update everything"); released as **`v2.0.0`**. What V2 delivered beyond the work-package list is in the handoff log below and in DECISIONS D-030–D-078: the home hero and its Orbit, the premium pass on every public page, the admin pass, the credibility and speed work, the AI guide's phase 2, owner alerts, the profile README.
+
+**The closing ledger.** Every work package keeps the status it actually reached — nothing is marked done that wasn't. What is open carries forward: picked up as **V2 polish** only when the owner asks, or taken into **V3** when he announces it (V3 gets a spec of its own).
+
+- **Done (8):** WP-001 Baseline measurement; WP-002 Tracker and decision log; WP-101 Homepage metadata and link previews; WP-105 Contact exposure; WP-106 CV on the homepage; WP-107 AI guide prompts; WP-108 Honest activity labels; WP-110 Deploy consistency
+- **Partial (14):** WP-102 Image performance and CI budgets; WP-103 Skill evidence tiers (+ manifests); WP-104 Work-map curation; WP-109 Domain-ready configuration; WP-201 Extend the evidence layer; WP-203 Public trust surface; WP-204 Accessibility and motion; WP-205 Error, empty and print states; WP-301 Cited answers; WP-302 Public eval scorecard; WP-303 Abuse controls visible and tested; WP-401 Audience entry paths; WP-402 Case study template upgrade; WP-405 Complete the roster
+- **Not started (7):** WP-111 AI guide capacity in production; WP-202 Verified numbers; WP-304 Unanswered-question loop; WP-406 Postmortem content type; WP-407 Long-form writing; WP-409 Testimonials; WP-501 Search algorithm visualizer
+- **Blocked — owner (5):** WP-206 Error and uptime monitoring; WP-403 Xkimi aggregate impact metrics; WP-404 Sunduza case study depth; WP-408 Mathematics evidence for admissions; WP-502 Spotball Intelligence Engine demo
+
 ## Next up
 
 **Next up: V2 polish**
@@ -10,7 +21,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 > **Sprint 1 (the home hero, D-030) is the current sprint and comes first** (owner, 2026-10-20); the note below is Sprint 2's start. (The part still open: LCP and CLS.) The budgets are done and enforced after every production deploy (D-027). What the spec's acceptance still asks for and the baseline says is unmet: phone LCP ≤ 2.5 s (3.0–6.2 s now on five of six routes), CLS ≤ 0.1 (home desktop 0.319, `/systems` desktop 0.156). First find each route's LCP element and the layout shifts (re-measure on a quiet machine — the baseline's lab numbers are noisy), then fix and ratchet `perf-budgets.json`. Then WP-111, then WP-103/104/109 remainders.
 
-## Current sprint
+## Sprint 1 — closed
 
 **Sprint 1 — the home hero (owner request, D-030), a week, one release at the end, reviewed live.** Goal: *a first impression a professional would trust: the home hero rebuilt on real evidence, and the kit other pages inherit.* Plan: `HOME-HERO-PLAN.md`; record: `../FRONTEND-CRAFT-RECORD.md`; Figma: https://www.figma.com/design/KkGly8QVHOrfyRSFjcqLxb. **Direction C chosen 2026-10-20** (a professional hero image slot for desktop and mobile; the guide's character leaves the hero; Sunduza approved; the avatar later). Branch when building starts: `release/sprint-1`; the new hero ships behind the flag `home.hero_v2`. Every push is announced to the owner first (approve, or add per slice). Slice states: `Proposed` · `In progress` · `Done (merged, not yet released)` · `Accepted` (owner, at the live review) · `Rejected` · `Dropped`.
 
@@ -22,7 +33,7 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 | S1.4 | The one entrance (CSS, timing from two settings, none under reduced motion) and the live line | **Done** (pushed and green in CI) | #218 | 2026-10-20 |
 | S1.5 | Cut the old hero: the character, rig, flickering grid, beam and stat cards are removed from the code (`HomeHero`, `HeroGuide`), and the new hero is the only hero — no flag (D-038, the owner's instruction after the first release) | **Done**; first-view weight to be measured on the runner | #218 | 2026-10-20 |
 | S1.6 | No duplicates: the hero's rules and audited figures carry their evidence; the control room drops its tiles and two terminal lines when the new hero shows | **Done** (pushed and green in CI) | #218 | 2026-10-20 |
-| S1.7 | Verify and measure: phone LCP ≤ 2.5 s, CLS 0, axe 0, mobile e2e, budgets, baseline; flag on at the review | **In progress** — CI on `07b9d26` is green (lint, migration-check, test incl. Playwright: unit and integration, 43 e2e tests incl. `home-hero-v2` and `header`); LCP/CLS and first-view weight are measured on the runner once the flag is on in production | #218 | 2026-10-20 |
+| S1.7 | Verify and measure: phone LCP ≤ 2.5 s, CLS 0, axe 0, mobile e2e, budgets, baseline; flag on at the review | **Done** — closed with V2: the hero shipped, and LCP, CLS, axe and weight were measured in production since (Lighthouse in CI and post-deploy, D-063–D-066, D-075) | #218 | 2026-10-20 |
 | S1.8 | The kit: `HeroBackdrop`, `ProofLedger` (code) and Figma components (Button/Primary, Button/Glass, Chip/Live, Ledger/Cell, HeroImage Desktop and Phone); Design System §7, Playbook, redesign plan §7a, enforcement register, craft record updated | **Done** — `PageHero` keeps its field until each inner page is rebuilt on the pattern | #218 | 2026-10-20 |
 | S1.9 | The header and navigation (owner request): the Systems preview of the owner's real featured systems with live status, a glass nav pill over the cover image, and every word in the header and phone menu as owner-edited data (`site-header` block) | **Done** (pushed and green in CI) | #218 | 2026-10-20 |
 
@@ -489,3 +500,8 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 
 - **V2 polish — the floating guide button on the desktop home page, gone for real.** The owner saw it again: the server's prerender of the home page didn't read its path as "/", drew the button, and hydration left that server-drawn node in place (it had no React fiber) though the browser rendered nothing. The launcher now starts hidden and decides in the browser after mount; an e2e check holds it (`home-hero-v2.spec.ts`).
 - **V2 polish — Agile, SDLC and DBLC lead the principles; the profile README rebuilt for every reader (D-077).** The three principles are data (how-i-build), added at the top by a replay-safe migration; the limit is 12. The README is short and plain-worded, with live numbers from the site's API, the three flagships, a CV button and a GIF of the live Orbit filmed by `.github/workflows/readme-clip.yml` (run it by hand to refresh the clip, then commit `.github/readme/orbit.gif`).
+
+### 2026-10-25 · V2 CLOSED — `v2.0.0`
+- **Owner:** "v2 is done close and update everything." The tracker opens with the closing ledger (every WP at the status it reached); Sprint 1's last slice is closed; `v2.0.0` is tagged and released on GitHub; the finished milestones are closed; branches left by merged work are removed (D-078).
+- **Still open for the owner:** issue #5 (Docker for local development, Phase 0) — keep it, or close it as not planned; the WPs blocked on him (see the ledger); the flagship case studies; the CV's four gaps; a Resend sending domain.
+
