@@ -1,0 +1,38 @@
+# The clip of the live home page's Orbit on the owner's GitHub profile README (owner, 2026-10-25). By hand
+# (Actions → readme-clip → Run workflow) or on a push to a readme-clip branch: films production's home page and
+# keeps the GIF as an artifact, to be committed beside the README. Read-only: it only loads the public home page.
+name: readme-clip
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["readme-clip**"]
+
+permissions:
+  contents: read
+
+jobs:
+  film:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/readme-clip.mjs "${{ vars.PRODUCTION_URL || 'https://maluleke-ks.vercel.app' }}" readme-clip
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: A small looping GIF, from the scene once it has settled
+        run: |
+          ffmpeg -loglevel error -sseof -8 -i readme-clip/home.webm \
+            -vf "fps=12,scale=880:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle" \
+            -loop 0 readme-clip/orbit.gif
+          ls -la readme-clip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: readme-clip
+          path: readme-clip/
+          retention-days: 7
