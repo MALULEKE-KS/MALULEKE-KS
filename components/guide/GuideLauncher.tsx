@@ -19,8 +19,9 @@ export function GuideLauncher() {
   const pathname = usePathname();
   // Not where the guide already has its own section (the home page): checked by the section itself, not only
   // by the address, so it can't slip back (owner, 2026-10-25: "on desktop homepage there is still that ask my ai
-  // guide floating button").
-  const [hasSection, setHasSection] = useState(false);
+  // guide floating button"). It starts hidden and the browser decides after mount: the server's prerender of the
+  // home page didn't see "/", and the button it drew stayed in the page — React hydrated past it without removing it.
+  const [hasSection, setHasSection] = useState(true);
   useEffect(() => {
     const look = () => setHasSection(document.getElementById("ai-guide") !== null);
     look();
