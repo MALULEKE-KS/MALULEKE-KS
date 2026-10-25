@@ -5,7 +5,7 @@
 // Read-only: it only loads the public home page.
 
 import { chromium } from "@playwright/test";
-import { mkdirSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, renameSync } from "node:fs";
 import { join } from "node:path";
 
 const [base = "https://maluleke-ks.vercel.app", out = "readme-clip"] = process.argv.slice(2);
@@ -19,13 +19,11 @@ await context.addInitScript(() => {
     localStorage.setItem("mks.consent.v1", "denied");
   } catch {}
 });
-const t0 = Date.now(); // the video starts with the page
 const page = await context.newPage();
 await page.goto(base, { waitUntil: "load" });
 // The scene is up once the stage says it's live; then let it play.
 await page.waitForSelector(".ks-orbit[data-live]", { timeout: 60_000 }).catch(() => console.warn("the Orbit never reported live — filming anyway"));
-// The clip starts a moment after that (the workflow trims to it), so it never shows the page loading.
-writeFileSync(join(out, "start.txt"), ((Date.now() - t0) / 1000 + 1.5).toFixed(1));
+// The workflow keeps the last 8 seconds, so the clip never shows the page loading.
 await page.waitForTimeout(12_000);
 await context.close();
 await browser.close();
