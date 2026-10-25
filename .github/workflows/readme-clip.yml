@@ -24,6 +24,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
       - run: node scripts/readme-clip.mjs "${{ vars.PRODUCTION_URL || 'https://maluleke-ks.vercel.app' }}" readme-clip
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: A small looping GIF, from the scene once it has settled
         run: |
           ffmpeg -loglevel error -ss 5 -t 8 -i readme-clip/home.webm \
