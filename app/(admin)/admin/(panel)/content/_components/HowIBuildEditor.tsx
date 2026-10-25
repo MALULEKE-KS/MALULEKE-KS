@@ -23,7 +23,7 @@ interface Body {
   principles: Principle[];
 }
 
-const MAX_PRINCIPLES = 8;
+const MAX_PRINCIPLES = 12;
 
 export function HowIBuildEditor({ initial }: { initial: Body | null }) {
   const router = useRouter();

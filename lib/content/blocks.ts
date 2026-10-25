@@ -30,7 +30,7 @@ export const CONTENT_BLOCKS = {
       principles: z
         .array(z.object({ name: Text(80), summary: Text(160), body: Text(800) }))
         .min(1)
-        .max(8),
+        .max(12),
     }),
   },
   "home-intro": {
