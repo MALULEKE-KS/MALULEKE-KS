@@ -30,6 +30,10 @@
 
 ## Part 2 — Update log (newest first)
 
+### V2 is done — V2 polish until V3 (2026-10-25, D-076)
+- **Owner:** V2 is complete; what follows is V2 polish — refining what V2 built — until V3 is announced. The deferred features in Part 1 stay deferred until their triggers (or V3).
+- **The README** is the owner's GitHub profile README again, exactly as he wrote it.
+
 ### The home hero's Orbit (2026-10-24, D-068, D-069)
 - **Owner's choice, reviewed and approved:** every published system around the platform's core, its last 26 weeks of commits replayed — over the hero's photo, with the hero's words kept and driving it. The commit counts it replays were fixed first (D-068). The receipt left the hero; the X-ray is in How it all connects.
 

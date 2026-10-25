@@ -28,7 +28,8 @@ describe("V2 tracker", () => {
     for (const r of rows) expect(STATUSES, `${r.wp}: "${r.status}"`).toContain(r.status);
   });
 
-  it("names a real work package as Next up", () => {
+  it("names a real work package as Next up — or V2 polish, once V2 is done (owner, 2026-10-25)", () => {
+    if (/\*\*Next up: V2 polish\*\*/.test(tracker)) return;
     const next = /\*\*Next up: (WP-\d{3})\*\*/.exec(tracker)?.[1];
     expect(next).toBeDefined();
     expect(specWps).toContain(next);

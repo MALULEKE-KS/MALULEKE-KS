@@ -4,7 +4,9 @@ The live status of every work package in `docs/V2-IMPROVEMENT-SPEC.md`. **Every 
 
 ## Next up
 
-**Next up: WP-102**
+**Next up: V2 polish**
+
+> **V2 is done (owner, 2026-10-25): "update everything that v2 done — the things that will come after will be V2 polish until V3 is announced."** What V2 built is live — the premium pass on every public page, the admin pass, the credibility and speed work (D-061–D-066, D-075), the home hero's Orbit (D-067–D-074) — and the work packages below keep the state they reached. From here every change is **V2 polish**: refining what V2 built, page by page and slice by slice (`WAY-OF-WORKING.md` still governs how), never new scope (spec §2.4) — until the owner announces V3, which gets a spec of its own. Open work packages are picked up as polish only if the owner asks.
 
 > **Sprint 1 (the home hero, D-030) is the current sprint and comes first** (owner, 2026-10-20); the note below is Sprint 2's start. (The part still open: LCP and CLS.) The budgets are done and enforced after every production deploy (D-027). What the spec's acceptance still asks for and the baseline says is unmet: phone LCP ≤ 2.5 s (3.0–6.2 s now on five of six routes), CLS ≤ 0.1 (home desktop 0.319, `/systems` desktop 0.156). First find each route's LCP element and the layout shifts (re-measure on a quiet machine — the baseline's lab numbers are noisy), then fix and ratchet `perf-budgets.json`. Then WP-111, then WP-103/104/109 remainders.
 
@@ -478,3 +480,10 @@ Each entry: date · WP · what was done · what was verified (with numbers) · w
 - **Built (owner: "i approve all"):** the Orbit over the hero's photo (a little dimmer), the hero's words kept and wired to it; the receipt off the hero, the X-ray switch in How it all connects. Engine `components/home/orbit/engine.ts` (WebGL2, GPU-side), stage `OrbitStage.tsx`, still `OrbitPoster.tsx`, data `lib/queries/orbit.ts`, words block "home-orbit", setting `home.orbit.weekMs`, flag `home.orbit` (migration `20261024220000_home_orbit`). Tests: `tests/e2e/home-orbit.spec.ts` (phone and desktop: open, step, close, shared link, no overlap with the words, no sideways scroll), the hero spec updated.
 - **Next:** look at CI's `hero-screenshots` (orbit-*.png) and production on a phone and a desktop; then the X-ray on the other public pages; the final end-to-end sweep.
 - **Second pass (D-070, branch `sprint-3/orbit-2`):** the owner's review of the live Orbit — bigger, cleaner, small names, a small facts panel with the orbit in view, a working close button, luminous linking arcs, a field of its own over the photo, the desktop hero fitting one screen; Let's talk's card lower on a phone.
+
+### 2026-10-25 · V2 is done — V2 polish begins (owner); the README is the owner's again
+- **Owner:** "update everything that v2 done — the things that will come after will be V2 polish until V3 announced." V2 is closed; **Next up** reads *V2 polish* (the tracker test accepts it).
+- **The README** is the owner's GitHub profile README — it represents him to anyone on his profile, not this system. The version he wrote (commit `ff453c4`, May 2026) is restored exactly; the two rewrites that made it about the platform (#158, #226) are undone (D-076).
+- **Last of V2, live:** the speed pass (D-075; production phone 81 → 87 on home, desktop 99–100), owner alerts delivered again (D-074), the Orbit's GitHub core, one-finger turning on a phone, the phone hero's *Watch 26 weeks of work*.
+- **Owner to do:** confirm the alert for KS-26-3KQ0-K3 reached Gmail (or press Retry on it); write the three flagship case studies; review the other AI summaries; curate the two portfolio drafts; fill the CV's four gaps; verify a sending domain at Resend when applicant confirmations are wanted.
+
